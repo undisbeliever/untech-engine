@@ -1,0 +1,11 @@
+*.swp
+*~
+
+bin
+obj
+*.2bpp
+*.4bpp
+*.map
+*.clr
+*.ut??
+
