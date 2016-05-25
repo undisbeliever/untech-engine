@@ -1,5 +1,6 @@
 
 include "common/assert.inc"
+include "common/cpu.inc"
 include "common/memory.inc"
 include "common/registers.inc"
 include "common/snes_header.inc"
