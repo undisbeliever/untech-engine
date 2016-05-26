@@ -1,4 +1,10 @@
 
+TEST_SRC	= $(wildcard tests/*.asm)
+TEST_BINARIES	= $(patsubst tests/%.asm,bin/%.sfc, $(TEST_SRC))
+
+INC_DIR         = ../src/
+INCLUDES	= $(wildcard $(INC_DIR)/*.* $(INC_DIR)/*/*.* $(INC_DIR)/*/*/*.*)
+
 STATIC_TESTS    = $(wildcard static-tests/*.success.asm static-tests/*/*.success.asm)
 STATIC_TESTS   += $(wildcard static-tests/*.error*.asm static-tests/*/*.error*.asm)
 
@@ -9,7 +15,9 @@ else
 endif
 
 .PHONY: all
-all: static-tests
+all: static-tests tests
+
+
 
 .PHONY: static-tests
 static-tests: $(STATIC_TESTS)
@@ -24,4 +32,17 @@ static-tests/%.error.asm: FORCE
 	! bass -strict -create -o $(NULL_FILE) $@ > $(NULL_FILE)
 
 FORCE:
+
+
+
+.PHONY: tests
+tests: $(TEST_BINARIES)
+
+bin/%.sfc: tests/%.asm bin/ $(INCLUDES)
+	bass -strict -create -o $@ -sym $(@:.sfc=.sym) $<
+
+
+
+bin/:
+	mkdir -p $@
 
