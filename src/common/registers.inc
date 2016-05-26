@@ -4,6 +4,11 @@
 // Names and flags taken from Anomie's SNES Documents
 //
 
+
+// a Data Bank that can access the registers.
+constant REGISTER_DB(0x80)
+
+
 // Tile Map Format
 //
 // cccccccc
