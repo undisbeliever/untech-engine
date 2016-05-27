@@ -94,15 +94,15 @@ macro createDataBlock(name, evaluate start, evaluate end) {
 
 // seeks to the next position in the selected block id
 macro rodata(id) {
-    if {defined ::romBlocks.current} {
-        if (pc() - 1) > {::romBlocks.{::romBlocks.current}.end} {
-            error "Overflow in rom block {::romBlocks.current}"
+    if {defined ::romBlock.current} {
+        if (pc() - 1) > {::romBlocks.{::romBlock.current}.end} {
+            error "Overflow in rom block {::romBlock.current}"
         }
 
-        global evaluate ::romBlocks.{::romBlocks.current}.pos(pc())
+        global evaluate ::romBlocks.{::romBlock.current}.pos(pc())
     }
 
-    global define ::romBlocks.current({id})
+    global define ::romBlock.current({id})
     private.seek({::romBlocks.{id}.pos})
 
     if pc() >= {::romBlocks.{id}.end} {
@@ -122,6 +122,27 @@ macro code(id) {
 
 macro code() {
     code(code)
+}
+
+
+evaluate ::romBlock.stackSize(0)
+
+// pushes the current code/data block onto the stack
+macro pushBlock() {
+    global define ::romBlock.stack.{::romBlock.stackSize}({::romBlock.current})
+
+    global evaluate ::romBlock.stackSize({::romBlock.stackSize} + 1)
+}
+
+// pulls the current code/data block from the stack
+macro popBlock() {
+    if {::romBlock.stackSize} <= 0 {
+        error "No block stack"
+    }
+
+    global evaluate ::romBlock.stackSize({::romBlock.stackSize} - 1)
+
+    rodata({::romBlock.stack.{::romBlock.stackSize}})
 }
 
 
