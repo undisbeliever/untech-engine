@@ -9,9 +9,11 @@ define VERSION(0)
 
 include "../../src/common.inc"
 
-createCodeBlock(code,  0xc08000, 0xc0ffaf)
+createCodeBlock(code,            0xc08000, 0xc0ffaf)
+createDataBlock(testTableBlock,  0xc00000, 0xc07fff)
 
-createDataBlock(rom1,  0xc10000, 0xc1ffff)
+createDataBlock(rom0,            0xc10000, 0xc1a000)
+createDataBlock(testNameBlock,   0xc1a000, 0xc1ffff)
 
 createRamBlock(dp,     0x000000, 0x000100)
 createRamBlock(shadow, 0x7e0100, 0x7e1f80)
@@ -19,7 +21,21 @@ createRamBlock(stack,  0x7e1f80, 0x7e1fff)
 
 
 include "../../src/interrupts.inc"
+include "../../src/math.inc"
 
+include "includes/test-framework.inc"
+
+
+// A simple test that always succeeds
+code()
+Test.add("Success Test")
+scope SuccessTest: {
+    sec
+    rts
+}
+
+
+Test.finalizeTable()
 
 code(code)
 CopHandler:
@@ -27,14 +43,6 @@ IrqHandler:
 EmptyHandler:
 NmiHandler:
     rti
-
-
-a8()
-i16()
-scope Main: {
-    // just test that brk works as expected
-    brk     #0
-}
 
 // vim: ft=asm ts=4 sw=4 et:
 
