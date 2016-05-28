@@ -16,6 +16,11 @@ constant TESTING_COLOR((22 << Palette.green.shift) | (20 << Palette.red.shift))
 constant SUCCESS_COLOR(22 << Palette.green.shift)
 constant FAILURE_COLOR(20 << Palette.red.shift)
 
+allocate(dpTmp, dp, 32)
+
+allocate(tmp, shadow, 32)
+
+
 // TABLE LOCATIONS
 // ===============
 rodata(testTableBlock)

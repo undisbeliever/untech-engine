@@ -18,13 +18,13 @@ createDataBlock(testNameBlock,   0xc1a000, 0xc1ffff)
 createRamBlock(dp,     0x000000, 0x000100)
 createRamBlock(shadow, 0x7e0100, 0x7e1f80)
 createRamBlock(stack,  0x7e1f80, 0x7e1fff)
-
+createRamBlock(wram7e, 0x7e2000, 0x7effff)
 
 include "../../src/interrupts.inc"
 include "../../src/math.inc"
 
-include "includes/test-framework.inc"
 
+include "includes/test-framework.inc"
 
 // A simple test that always succeeds
 code()
@@ -34,6 +34,7 @@ scope SuccessTest: {
     rts
 }
 
+include "tests/math.inc"
 
 Test.finalizeTable()
 
