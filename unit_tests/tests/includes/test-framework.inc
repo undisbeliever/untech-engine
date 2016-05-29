@@ -127,6 +127,8 @@ i16()
         // ::TODO display test Id::
         // ::TODO add test name Id::
 
+        jsr     EnableVBlank
+
         lda.w   testId
         asl
         tax
@@ -138,9 +140,17 @@ i16()
         jsr     (AddrTable,x)
         bcc     Fail
 
+        // restore screen brightness
+        sep     #$20
+    a8()
+        lda.b   #15
+        sta.l   INIDISP
+
         plb
         pld
         plp
+
+    a16()
 
         lda.w   testId
         inc
