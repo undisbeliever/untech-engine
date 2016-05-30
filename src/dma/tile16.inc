@@ -14,7 +14,6 @@ rodata(DMA_Tile16Data)
     constant TileListOffset(pc() & 0xff0000)
 code()
 
-
 constant BUFFER_SIZE(30)
 constant TABLE_ENTRIES(15)
 
@@ -23,6 +22,7 @@ allocate(processVBlankOnZero, shadow, 2)
 
 
 allocateTmpWord(tmp0)
+allocateTmpWord(tmp1)
 
 
 // SOA table for handling transfer information.
@@ -147,8 +147,6 @@ macro _VBlank() {
 
             lda.w   Dma.Tile16.table.wordVramAddress,y
             sta.w   VMADD
-            clc
-            adc.w   #16 * 16
 
             ldy.w   Dma.Tile16._ProcessDMA.bufferIndex
 
@@ -236,7 +234,9 @@ scope FunctionTable: {
         i8()
 
         scope Transfer{nTiles}: {
-            pha
+            if {nTiles} < 8 {
+                pha
+            }
 
             _AddrSize({nTiles})
 
@@ -254,8 +254,11 @@ scope FunctionTable: {
             ldy.b   #(1 << {nTiles}) - 1
             sty.w   MDMAEN
 
-            pla
-            sta.w   VMADD
+            if {nTiles} < 8 {
+                pla
+                ora.w   #16 * 16
+                sta.w   VMADD
+            }
 
             ldx.b   #dmaBuffer.TILE_HALF_SIZE
             _StxDAS0({nTiles})
@@ -337,6 +340,137 @@ Fail16:
 Fail8:
     clc
 a8()
+    rts
+}
+
+
+// Buffers many 16x16px tiles for a transfer during VBlank
+//
+// Tile list format:
+//  * byte: n tiles
+//    * word: (tileAddress >> 7) * n tiles
+//
+// REQUIRES: 8 bit A, 16 bit Index, DB = $7E
+//
+// INPUT:
+//      X - the address of the tile list data (Within `TileListBank`)
+//      Y - the VRAM word address (MUST on an even VRAM tile row)
+//
+// OUTPUT: C set if successful
+code()
+a8()
+i16()
+scope BufferTileList: {
+    lda.l   TileListOffset,x
+    inx
+End:
+}
+
+
+
+
+// Buffers many 16x16px tiles from a list of a given size
+//
+// REQUIRES: 8 bit A, 16 bit Index, DB = $7E
+//
+// INPUT:
+//      X - the address of the tile list (within `TileListBank`)
+//      Y - the VRAM word address (MUST on an even VRAM tile row)
+//      A - the number of tiles to render
+//
+// Tile list is a word list, containing (tileAddresses >> 7)
+//
+// OUTPUT: C set if successful
+a8()
+i16()
+scope BufferTileListGivenSize: {
+constant tmpVram(tmp0)
+constant tmpNtiles(tmp1)
+
+    assert(pc() == BufferTileList.End)
+
+    sty.w   tmpVram
+
+    // assert 1 <= a <= 8
+    dec
+    and.b   #7
+    inc
+    sta.w   tmpNtiles
+
+    asl
+    // C clear
+    adc.w   dmaBufferIndex
+    cmp.b   #DMA_BUFFER_INDEX_END
+    bcs     Fail8
+
+
+    ldy.w   tableIndex
+    cpy.w   #TABLE_INDEX_END
+    bcs     Fail8
+
+
+    lda.w   Dma.transfersLeft
+    sec
+    sbc.w   tmpNtiles
+    bcc     Fail8
+    sta.w   Dma.transfersLeft
+
+
+    lda.w   tmpNtiles
+    asl
+    sta.w   table.vblankFunctionAddr,y
+
+    rep     #$30
+a16()
+    lda.w   tmpVram
+    sta.w   table.wordVramAddress,y
+
+    sep     #$20
+a8()
+
+    iny
+    iny
+    sty     tableIndex
+
+    ldy     dmaBufferIndex
+
+    Loop:
+        // tileBank = tileList << 7 >> 16
+        // tileAddress = word(tileList << 7)
+
+        lda.l   TileListOffset + 1,x
+        lsr
+        sta.w   dmaBuffer.tileBank,y
+
+        lda.l   TileListOffset,x
+
+        rep     #$30
+a16()
+        xba
+        ror
+        and.w   #0xff80
+        sta.w   dmaBuffer.tileAddress,y
+
+        sep     #$20
+a8()
+
+        inx
+        inx
+
+        iny
+        iny
+
+        dec.w   tmpNtiles
+        bne     Loop
+
+
+    sty.w   dmaBufferIndex
+
+    sec
+    rts
+
+Fail8:
+    clc
     rts
 }
 
