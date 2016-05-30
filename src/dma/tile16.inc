@@ -294,9 +294,6 @@ i16()
 scope BufferOneTile: {
     sty.w   tmp0
 
-    ldy.w   Dma.transfersLeft
-    beq     Fail8
-
     ldy.w   dmaBufferIndex
     cpy.w   #DMA_BUFFER_INDEX_END
     bcs     Fail8
@@ -313,6 +310,14 @@ a16()
     cpx.w   #TABLE_INDEX_END
     bcs     Fail16
 
+
+    lda.w   Dma.transfersLeft
+    dec
+    dec                     // VBlank code overhead
+    bmi     Fail16
+    sta.w   Dma.transfersLeft
+
+
     lda.w   tmp0
     sta.w   table.wordVramAddress,x
 
@@ -327,8 +332,6 @@ a16()
     iny
     iny
     sty.w   dmaBufferIndex
-
-    dec.w   Dma.transfersLeft
 
     sep     #$21
     // C set
@@ -408,9 +411,8 @@ constant tmpNtiles(tmp1)
     cpy.w   #TABLE_INDEX_END
     bcs     Fail8
 
-
     lda.w   Dma.transfersLeft
-    sec
+    clc                 // -1 code overhead
     sbc.w   tmpNtiles
     bcc     Fail8
     sta.w   Dma.transfersLeft
