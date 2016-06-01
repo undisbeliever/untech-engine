@@ -15,7 +15,7 @@
 
 evaluate ::struct(0)
 
-macro struct() {
+macro struct(evaluate start) {
     if {defined __struct} {
         error "scope is already a struct"
     }
@@ -24,16 +24,21 @@ macro struct() {
     }
 
     global evaluate ::struct(0x1337)
+    global evaluate ::struct.pos({start})
     global evaluate ::struct.size(0)
+}
+macro struct() {
+    struct(0)
 }
 
 // Creates a field in a struct of a given size.
-macro field(name, size) {
+macro field(name, evaluate size) {
     if {::struct} != 0x1337 {
         error "Not in a struct"
     }
 
-    constant {name}({::struct.size})
+    constant {name}({::struct.pos})
+    global evaluate ::struct.pos({::struct.pos} + {size})
     global evaluate ::struct.size({::struct.size} + {size})
 }
 

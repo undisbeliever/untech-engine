@@ -33,3 +33,22 @@ assert(test.nest.B == 1)
 assert(test.C == 11)
 assert(test.size == 13)
 
+
+// test struct with a given starting value
+scope startTest {
+    struct(0x1337)
+
+    field(A, 1)
+    scope nest {
+        field(B, 10)
+    }
+    field(C, 2)
+
+    endstruct()
+}
+
+assert(startTest.A == 0x1337)
+assert(startTest.nest.B == 0x1337 + 1)
+assert(startTest.C == 0x1337 + 11)
+assert(startTest.size == 13)
+
