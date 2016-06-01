@@ -124,6 +124,11 @@ macro code() {
     code(code)
 }
 
+// Creates a constant containing the starting address of a block
+macro storeBlockStart(name, blockId) {
+    constant {name}({::romBlocks.{blockId}.start})
+}
+
 
 evaluate ::romBlock.stackSize(0)
 

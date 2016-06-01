@@ -50,5 +50,12 @@ rodata(fixedsize)
 fill 0x1000, 0xff
 code()
 
+
+storeBlockStart(rom1Start, rom1)
+assert(rom1Start == 0xc18000)
+
+storeBlockStart(rom2Start, rom2)
+assert(rom2Start == 0xc28000)
+
 // vim: ft=asm ts=4 sw=4 et:
 
