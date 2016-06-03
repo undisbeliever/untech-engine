@@ -1,4 +1,5 @@
 
+include "dma/palette.inc"
 include "dma/tile16.inc"
 
 include "dma/_common.inc"

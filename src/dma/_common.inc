@@ -44,6 +44,7 @@ macro VBlank() {
         ldx.b   #VMAIN.incrementMode.high | VMAIN.increment.by1
         stx.w   VMAIN
 
+        Dma.Palette._VBlank()
         Dma.Tile16._VBlank()
 
 
@@ -60,6 +61,7 @@ code()
 a16()
 i16()
 scope Init: {
+    Palette._Init()
     Tile16._Init()
 
     rts
@@ -75,6 +77,7 @@ code()
 a16()
 i16()
 scope TransferOnNextVBlank: {
+    Palette._TransferOnNextVBlank()
     Tile16._TransferOnNextVBlank()
 
     rts
