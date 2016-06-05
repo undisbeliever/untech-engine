@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF_8"?>
+<!DOCTYPE untech>
+<metasprite id="FST_10Palettes" tilesettype="ONE_TILE_FIXED">
+  <exportorder src="../formats/OneFrame.utft"/>
+  <smalltileset>
+    GAA8AGYAwwDDAGYAPAAYAAAAAAAAAAAAAAAAAAAAAAA=
+  </smalltileset>
+  <palette>
+    AADgAwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=
+  </palette>
+  <palette>
+    AAAfAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=
+  </palette>
+  <palette>
+    AAAAfAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=
+  </palette>
+  <palette>
+    AADgfwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=
+  </palette>
+  <palette>
+    AAAffAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=
+  </palette>
+  <palette>
+    AAD/AwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=
+  </palette>
+  <palette>
+    AAD/fwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=
+  </palette>
+  <palette>
+    AAAyPgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=
+  </palette>
+  <palette>
+    AADGEQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=
+  </palette>
+  <palette>
+    AAAgOQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=
+  </palette>
+  <frame id="frame">
+    <object size="small" x="-4" y="-4" tile="0" order="2"/>
+  </frame>
+</metasprite>
