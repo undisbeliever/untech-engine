@@ -17,18 +17,20 @@ createDataBlock(MS_PaletteList,         0xc10100, 0xc101ff)
 createDataBlock(MS_FrameList,           0xc10200, 0xc102ff)
 createDataBlock(MS_AnimationList,       0xc10300, 0xc103ff)
 
-createDataBlock(MS_FrameSetData,        0xc10400, 0xc104ff)
-createDataBlock(MS_FrameData,           0xc10500, 0xc105ff)
-createDataBlock(MS_FrameObjectsData,    0xc10600, 0xc106ff)
-createDataBlock(MS_TileHitboxData,      0xc10700, 0xc107ff)
-createDataBlock(MS_EntityHitboxData,    0xc10800, 0xc108ff)
-createDataBlock(MS_ActionPointsData,    0xc10900, 0xc109ff)
+createDataBlock(MS_FrameSetData,        0xc10400, 0xc105ff)
+createDataBlock(MS_FrameData,           0xc10600, 0xc107ff)
+createDataBlock(MS_FrameObjectsData,    0xc10800, 0xc109ff)
+createDataBlock(MS_TileHitboxData,      0xc10a00, 0xc10bff)
+createDataBlock(MS_EntityHitboxData,    0xc10c00, 0xc10dff)
+createDataBlock(MS_ActionPointsData,    0xc10e00, 0xc10fff)
 
-createDataBlock(MS_PaletteData,         0xc10a00, 0xc10eff)
+createDataBlock(MS_PaletteData,         0xc11000, 0xc117ff)
 
-createDataBlock(DMA_Tile16Data,         0xc10f00, 0xc10fff)
+createDataBlock(DMA_Tile16Data,         0xc11800, 0xc11fff)
 
-createDataBlock(rom0,                   0xc11000, 0xc14000)
+createDataBlock(MS_TileBlock_0,         0xc11000, 0xc11fff)
+
+createDataBlock(rom0,                   0xc12000, 0xc19fff)
 createDataBlock(testNameBlock,          0xc1a000, 0xc1ffff)
 
 
@@ -45,6 +47,53 @@ include "../../src/math.inc"
 include "../../src/metasprite.inc"
 
 
+include "resources/metasprite/metasprites.gen.inc"
+
+// ::DEBUG::
+scope tmp {
+    allocate(tmp, shadow, 26)
+    markTmpWord(tmp + 0)
+    markTmpWord(tmp + 2)
+    markTmpWord(tmp + 4)
+    markTmpWord(tmp + 8)
+    markTmpWord(tmp + 10)
+    markTmpWord(tmp + 12)
+    markTmpWord(tmp + 14)
+    markTmpWord(tmp + 16)
+    markTmpWord(tmp + 18)
+    markTmpWord(tmp + 20)
+    markTmpWord(tmp + 22)
+    markTmpWord(tmp + 24)
+}
+
+// ::DEBUG::
+// ::TODO move into src/includes somehow::
+scope Entities {
+    constant ENTITY_SIZE(64)
+
+    allocate(entity0, shadow, ENTITY_SIZE)
+    allocate(entity1, shadow, ENTITY_SIZE)
+    allocate(entity2, shadow, ENTITY_SIZE)
+    allocate(entity3, shadow, ENTITY_SIZE)
+    allocate(entity4, shadow, ENTITY_SIZE)
+    allocate(entity5, shadow, ENTITY_SIZE)
+    allocate(entity6, shadow, ENTITY_SIZE)
+    allocate(entity7, shadow, ENTITY_SIZE)
+    allocate(entity8, shadow, ENTITY_SIZE)
+    allocate(entity9, shadow, ENTITY_SIZE)
+    allocate(entity10, shadow, ENTITY_SIZE)
+    allocate(entity11, shadow, ENTITY_SIZE)
+    allocate(entity12, shadow, ENTITY_SIZE)
+}
+scope BaseEntity {
+    struct()
+        MetaSprite.EntityData()
+    endstruct()
+
+    assert(size <= Entities.ENTITY_SIZE)
+}
+
+
 include "includes/test-framework.inc"
 
 // A simple test that always succeeds
@@ -57,6 +106,7 @@ scope SuccessTest: {
 
 include "tests/dma.inc"
 include "tests/math.inc"
+include "tests/metasprite.inc"
 
 Test.finalizeTable()
 

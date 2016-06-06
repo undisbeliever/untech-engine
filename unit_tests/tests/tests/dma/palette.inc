@@ -3,14 +3,6 @@ scope DmaTest {
 
 scope Palette {
 
-
-// ::DEBUG::
-allocate(_tmp, shadow, 8)
-markTmpWord(_tmp)
-markTmpWord(_tmp + 2)
-markTmpWord(_tmp + 4)
-markTmpWord(_tmp + 6)
-
 code()
 a16()
 i16()

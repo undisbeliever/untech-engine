@@ -1,4 +1,6 @@
 
+code()
+
 // Ensure test table block is in the same bank as the code block
 assert(({::romBlocks.testTableBlock.start} >> 16) == ({::romBlocks.code.start} >> 16))
 
