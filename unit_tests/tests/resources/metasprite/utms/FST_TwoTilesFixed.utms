@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF_8"?>
+<!DOCTYPE untech>
+<metasprite id="FST_TwoTilesFixed" tilesettype="TWO_TILES_FIXED">
+  <exportorder src="../formats/OneSmallAndLarge.utft"/>
+  <smalltileset>
+    GAA8AGYAwwDDAGYAPAAYAAAAAAAAAAAAAAAAAAAAAAA=
+  </smalltileset>
+  <largetileset>
+    gABAACAAEAAIAAQAAgABAAAAAAAAAAAAAAAAAAAAAAABAAIABAAIABAAIABAAIAA
+    AAAAAAAAAAAAAAAAAAAAAAEAAgAEAAgAEAAgAEAAgAAAAAAAAAAAAAAAAAAAAAAA
+    gABAACAAEAAIAAQAAgABAAAAAAAAAAAAAAAAAAAAAAA=
+  </largetileset>
+  <palette>
+    4AMjEAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=
+  </palette>
+  <frame id="OneLargeObj">
+    <object size="large" x="-8" y="-8" tile="0" order="2"/>
+  </frame>
+  <frame id="OneSmallObj">
+    <object size="small" x="-4" y="-4" tile="0" order="2"/>
+  </frame>
+</metasprite>

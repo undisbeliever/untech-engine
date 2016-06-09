@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF_8"?>
+<!DOCTYPE untech>
+<spriteimporter id="FST_TwoRows" tilesettype="TWO_ROWS" image="FST_TwoRows.png" transparent="00b800">
+  <grid width="128" height="32" xoffset="0" yoffset="0" xpadding="0" ypadding="0" xorigin="64" yorigin="0"/>
+  <exportorder src="../formats/TwoFrames.utft"/>
+  <frame id="frame1" order="2">
+    <gridlocation x="0" y="0"/>
+    <object size="large" x="0" y="0"/>
+    <object size="large" x="16" y="0"/>
+    <object size="large" x="32" y="0"/>
+    <object size="large" x="48" y="0"/>
+    <object size="large" x="64" y="0"/>
+    <object size="large" x="80" y="0"/>
+    <object size="large" x="96" y="0"/>
+    <object size="large" x="112" y="0"/>
+    <object size="large" x="0" y="16"/>
+    <object size="large" x="16" y="16"/>
+    <object size="large" x="32" y="16"/>
+    <object size="large" x="48" y="16"/>
+    <object size="large" x="64" y="16"/>
+    <object size="large" x="80" y="16"/>
+    <object size="large" x="96" y="16"/>
+    <object size="large" x="112" y="16"/>
+  </frame>
+  <frame id="frame2" order="2">
+    <location x="0" y="40" width="128" height="40"/>
+    <origin x="64" y="8"/>
+    <object size="large" x="1" y="10"/>
+    <object size="large" x="17" y="10"/>
+    <object size="large" x="33" y="8"/>
+    <object size="large" x="49" y="8"/>
+    <object size="large" x="65" y="8"/>
+    <object size="large" x="81" y="8"/>
+    <object size="large" x="97" y="11"/>
+    <object size="large" x="33" y="24"/>
+    <object size="large" x="49" y="24"/>
+    <object size="large" x="65" y="24"/>
+    <object size="large" x="81" y="24"/>
+    <object size="small" x="111" y="19"/>
+    <object size="small" x="119" y="19"/>
+    <object size="small" x="105" y="3"/>
+    <object size="small" x="11" y="2"/>
+  </frame>
+</spriteimporter>

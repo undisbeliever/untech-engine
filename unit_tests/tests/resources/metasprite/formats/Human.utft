@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF_8"?>
+<!DOCTYPE untech>
+<framesettype name="Human">
+<!-- Deliberately ignoring Blink:: -->
+  <frame id="Stand_Right">
+    <alt name="Stand_Left" vflip="true"/>
+  </frame>
+  <frame id="Stand_Left">
+    <alt name="Stand_Right" vflip="true"/>
+  </frame>
+  <frame id="Jump_Left">
+    <alt name="Jump_Right" vflip="true"/>
+  </frame>
+  <frame id="Jump_Right">
+    <alt name="Jump_Left" vflip="true"/>
+  </frame>
+  <frame id="Fall_Right">
+    <alt name="Fall_Left" vflip="true"/>
+  </frame>
+  <frame id="Fall_Left">
+    <alt name="Fall_Right" vflip="true"/>
+  </frame>
+  <frame id="TouchEnemy_Right">
+    <alt name="TouchEnemy_Left" vflip="true"/>
+  </frame>
+  <frame id="TouchEnemy_Left">
+    <alt name="TouchEnemy_Right" vflip="true"/>
+  </frame>
+
+<!-- ::TODO replace with animations:: -->
+  <frame id="Walk_Right_0">
+    <alt name="Walk_Left_0" vflip="true"/>
+  </frame>
+  <frame id="Walk_Left_0">
+    <alt name="Walk_Right_0" vflip="true"/>
+  </frame>
+  <frame id="Walk_Right_1">
+    <alt name="Walk_Left_1" vflip="true"/>
+  </frame>
+  <frame id="Walk_Left_1">
+    <alt name="Walk_Right_1" vflip="true"/>
+  </frame>
+  <frame id="Walk_Right_2">
+    <alt name="Walk_Left_2" vflip="true"/>
+  </frame>
+  <frame id="Walk_Left_2">
+    <alt name="Walk_Right_2" vflip="true"/>
+  </frame>
+  <frame id="Walk_Right_3">
+    <alt name="Walk_Left_3" vflip="true"/>
+  </frame>
+  <frame id="Walk_Left_3">
+    <alt name="Walk_Right_3" vflip="true"/>
+  </frame>
+  <frame id="Walk_Right_4">
+    <alt name="Walk_Left_4" vflip="true"/>
+  </frame>
+  <frame id="Walk_Left_4">
+    <alt name="Walk_Right_4" vflip="true"/>
+  </frame>
+  <frame id="Walk_Right_5">
+    <alt name="Walk_Left_5" vflip="true"/>
+  </frame>
+  <frame id="Walk_Left_5">
+    <alt name="Walk_Right_5" vflip="true"/>
+  </frame>
+</framesettype>

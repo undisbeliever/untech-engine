@@ -3,4 +3,22 @@
 <metaspriteexport>
   <frameset src="utms/FST_10Palettes.utms"/>
   <frameset/>
+  <frameset/>
+  <frameset src="utms/FST_OneTileFixed.utms"/>
+  <frameset src="utms/FST_TwoTilesFixed.utms"/>
+  <frameset/>
+  <frameset src="utms/FST_OneTile.utms"/>
+  <frameset src="utms/FST_TwoTiles.utms"/>
+  <frameset/>
+
+  <!-- ONE ROW FIXED -->
+  <frameset src="utms-gen/SpikedWalker.utms"/>
+
+  <!-- TWO ROWS FIXED -->
+  <frameset src="utms-gen/Man.utms"/>
+
+  <!-- ONE ROW DYNAMIC -->
+  <frameset src="utms-gen/Woman.utms"/>
+  <frameset src="utms-gen/FST_TwoRows.utms"/>
+
 </metaspriteexport>

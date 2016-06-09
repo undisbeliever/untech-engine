@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF_8"?>
+<!DOCTYPE untech>
+<metasprite id="FST_TwoTiles" tilesettype="TWO_TILES">
+  <exportorder src="../formats/TwoFrames.utft"/>
+  <smalltileset>
+    AAADAAMAAwADAAcADwAPAAAAAAAAAAAAAAAAAAAAAAAAAOAA8AC8QPwA8ACwQMAw
+    AAAAAAAAAAAAAAAAAAAAAA==
+  </smalltileset>
+  <largetileset>
+    DwAPAA8ADwAPAA8ADwAPAAAAAAAAAAAAAAAAAAAAAAD4APgA+AD4APgA+ADwAPAA
+    AAAAAAAAAAAAAAAAAAAAAA8ABgAGAAYABgAGAAcAAAAAAAAAAAAAAAAAAAAAAAAA
+    8ABgAGAAYABgAGAAcAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAwAHAA8PAA8A
+    AAAAAAAAAAAAAAAAAAAAAAAAAAAAAADAAOAA8PAAsEAAAAAAAAAAAAAAAAAAAAAA
+    DwAHAAcABwAHAA8ADwAPAAAAAAAAAAAAAAAAAAAAAADgAADgwCDgAPAA8AD4APgA
+    AAAAAAAAAAAAAAAAAAAAAA==
+  </largetileset>
+  <palette>
+    3395QQQIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=
+  </palette>
+  <frame id="frame1">
+    <object size="large" x="-8" y="0" tile="0" order="2"/>
+    <object size="large" x="-8" y="-16" tile="1" order="2"/>
+  </frame>
+  <frame id="frame2">
+    <object size="large" x="-8" y="0" tile="0" order="2"/>
+    <object size="small" x="-8" y="-8" tile="0" order="2"/>
+    <object size="small" x="0" y="-8" tile="1" order="2"/>
+  </frame>
+</metasprite>

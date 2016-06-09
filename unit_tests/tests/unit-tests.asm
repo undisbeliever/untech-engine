@@ -17,21 +17,22 @@ createDataBlock(MS_PaletteList,         0xc10100, 0xc101ff)
 createDataBlock(MS_FrameList,           0xc10200, 0xc102ff)
 createDataBlock(MS_AnimationList,       0xc10300, 0xc103ff)
 
-createDataBlock(MS_FrameSetData,        0xc10400, 0xc105ff)
-createDataBlock(MS_FrameData,           0xc10600, 0xc107ff)
-createDataBlock(MS_FrameObjectsData,    0xc10800, 0xc109ff)
-createDataBlock(MS_TileHitboxData,      0xc10a00, 0xc10bff)
-createDataBlock(MS_EntityHitboxData,    0xc10c00, 0xc10dff)
-createDataBlock(MS_ActionPointsData,    0xc10e00, 0xc10fff)
+createDataBlock(MS_FrameSetData,        0xc10400, 0xc10fff)
+createDataBlock(MS_FrameData,           0xc11000, 0xc117ff)
+createDataBlock(MS_FrameObjectsData,    0xc12000, 0xc127ff)
+createDataBlock(MS_TileHitboxData,      0xc12800, 0xc12fff)
+createDataBlock(MS_EntityHitboxData,    0xc13000, 0xc137ff)
+createDataBlock(MS_ActionPointsData,    0xc13800, 0xc13fff)
 
-createDataBlock(MS_PaletteData,         0xc11000, 0xc117ff)
+createDataBlock(MS_PaletteData,         0xc14000, 0xc147ff)
 
-createDataBlock(DMA_Tile16Data,         0xc11800, 0xc11fff)
+createDataBlock(DMA_Tile16Data,         0xc14800, 0xc14fff)
 
-createDataBlock(MS_TileBlock_0,         0xc11000, 0xc11fff)
+createDataBlock(MS_TileBlock_0,         0xc15000, 0xc16fff)
+createDataBlock(MS_TileBlock_1,         0xc17000, 0xc18fff)
 
-createDataBlock(rom0,                   0xc12000, 0xc19fff)
-createDataBlock(testNameBlock,          0xc1a000, 0xc1ffff)
+createDataBlock(rom0,                   0xc19000, 0xc1cfff)
+createDataBlock(testNameBlock,          0xc1d000, 0xc1ffff)
 
 
 createRamBlock(dp,     0x000000, 0x000100)

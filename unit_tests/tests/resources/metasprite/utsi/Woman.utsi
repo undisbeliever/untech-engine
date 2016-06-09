@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF_8"?>
+<!DOCTYPE untech>
+<spriteimporter id="Woman" tilesettype="ONE_ROW" image="Woman.png" transparent="feb3b2">
+  <grid width="24" height="32" xoffset="0" yoffset="0" xpadding="0" ypadding="0" xorigin="12" yorigin="14"/>
+  <exportorder src="../formats/Human.utft"/>
+  <frame id="Fall_Right" order="2">
+    <gridlocation x="4" y="0"/>
+    <tilehitbox x="5" y="2" width="14" height="29"/>
+    <object size="small" x="0" y="8"/>
+    <object size="large" x="5" y="0"/>
+    <object size="large" x="3" y="16"/>
+    <entityhitbox parameter="0" x="5" y="2" width="14" height="29"/>
+  </frame>
+  <frame id="Jump_Right" order="2">
+    <gridlocation x="3" y="0"/>
+    <tilehitbox x="5" y="2" width="14" height="29"/>
+    <object size="small" x="0" y="8"/>
+    <object size="large" x="6" y="0"/>
+    <object size="large" x="3" y="16"/>
+    <entityhitbox parameter="0" x="4" y="13" width="15" height="17"/>
+    <entityhitbox parameter="0" x="8" y="3" width="12" height="14"/>
+  </frame>
+  <frame id="Stand_Right" order="2">
+    <gridlocation x="0" y="0"/>
+    <tilehitbox x="7" y="2" width="8" height="29"/>
+    <object size="large" x="4" y="0"/>
+    <object size="large" x="4" y="16"/>
+    <entityhitbox parameter="0" x="7" y="2" width="8" height="29"/>
+  </frame>
+  <frame id="TouchEnemy_Right" order="2">
+    <gridlocation x="5" y="0"/>
+    <tilehitbox x="7" y="5" width="16" height="26"/>
+    <object size="large" x="8" y="16"/>
+    <object size="large" x="5" y="3"/>
+  </frame>
+  <frame id="Walk_Right_0" order="2">
+    <gridlocation x="0" y="1"/>
+    <tilehitbox x="7" y="2" width="8" height="29"/>
+    <object size="large" x="4" y="0"/>
+    <object size="large" x="4" y="16"/>
+    <entityhitbox parameter="0" x="7" y="2" width="8" height="29"/>
+  </frame>
+  <frame id="Walk_Right_1" order="2">
+    <gridlocation x="1" y="1"/>
+    <tilehitbox x="7" y="2" width="8" height="29"/>
+    <object size="large" x="4" y="0"/>
+    <object size="large" x="4" y="16"/>
+    <entityhitbox parameter="0" x="7" y="2" width="8" height="29"/>
+  </frame>
+  <frame id="Walk_Right_2" order="2">
+    <gridlocation x="2" y="1"/>
+    <tilehitbox x="7" y="2" width="9" height="29"/>
+    <object size="large" x="4" y="16"/>
+    <object size="large" x="4" y="1"/>
+    <entityhitbox parameter="0" x="7" y="2" width="9" height="29"/>
+  </frame>
+  <frame id="Walk_Right_3" order="2">
+    <gridlocation x="3" y="1"/>
+    <tilehitbox x="5" y="2" width="14" height="29"/>
+    <object size="small" x="0" y="21"/>
+    <object size="small" x="0" y="8"/>
+    <object size="large" x="6" y="0"/>
+    <object size="large" x="3" y="16"/>
+    <entityhitbox parameter="0" x="4" y="11" width="15" height="19"/>
+    <entityhitbox parameter="0" x="8" y="2" width="14" height="14"/>
+  </frame>
+  <frame id="Walk_Right_4" order="2">
+    <gridlocation x="4" y="1"/>
+    <tilehitbox x="7" y="2" width="10" height="29"/>
+    <object size="large" x="4" y="0"/>
+    <object size="large" x="4" y="16"/>
+    <entityhitbox parameter="0" x="7" y="3" width="10" height="28"/>
+  </frame>
+  <frame id="Walk_Right_5" order="2">
+    <gridlocation x="5" y="1"/>
+    <tilehitbox x="5" y="2" width="16" height="29"/>
+    <object size="small" x="16" y="21"/>
+    <object size="large" x="6" y="0"/>
+    <object size="large" x="1" y="16"/>
+    <entityhitbox parameter="0" x="4" y="16" width="17" height="13"/>
+    <entityhitbox parameter="0" x="8" y="3" width="13" height="15"/>
+  </frame>
+</spriteimporter>
