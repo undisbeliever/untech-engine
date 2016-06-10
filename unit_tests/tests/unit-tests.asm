@@ -41,6 +41,10 @@ createRamBlock(stack,  0x7e1f80, 0x7e1fff)
 createRamBlock(wram7e, 0x7e2000, 0x7effff)
 
 
+// ::DEBUG::
+// ::TODO move somewhere else::
+constant VRAM_OBJ_WADDR(0x6000)
+
 
 include "../../src/dma.inc"
 include "../../src/interrupts.inc"
@@ -52,25 +56,22 @@ include "resources/metasprite/metasprites.gen.inc"
 
 // ::DEBUG::
 scope tmp {
-    allocate(tmp, shadow, 26)
-    markTmpWord(tmp + 0)
-    markTmpWord(tmp + 2)
-    markTmpWord(tmp + 4)
-    markTmpWord(tmp + 8)
-    markTmpWord(tmp + 10)
-    markTmpWord(tmp + 12)
-    markTmpWord(tmp + 14)
-    markTmpWord(tmp + 16)
-    markTmpWord(tmp + 18)
-    markTmpWord(tmp + 20)
-    markTmpWord(tmp + 22)
-    markTmpWord(tmp + 24)
+    allocate(tmp, shadow, 20 * 2)
+    macro repeat(variable n) {
+        if n > 0 {
+            n = n - 1
+            markTmpWord(tmp + n * 2)
+            repeat(n)
+        }
+    }
+    repeat(20)
 }
 
 // ::DEBUG::
 // ::TODO move into src/includes somehow::
 scope Entities {
     constant ENTITY_SIZE(64)
+    constant N_ENTITIES(15)
 
     allocate(entity0, shadow, ENTITY_SIZE)
     allocate(entity1, shadow, ENTITY_SIZE)
@@ -85,6 +86,8 @@ scope Entities {
     allocate(entity10, shadow, ENTITY_SIZE)
     allocate(entity11, shadow, ENTITY_SIZE)
     allocate(entity12, shadow, ENTITY_SIZE)
+    allocate(entity13, shadow, ENTITY_SIZE)
+    allocate(entity14, shadow, ENTITY_SIZE)
 }
 scope BaseEntity {
     struct()

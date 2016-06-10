@@ -3,6 +3,7 @@ include "metasprite/_dataformat.inc"
 include "metasprite/_variables.inc"
 
 include "metasprite/palette.inc"
+include "metasprite/vram.inc"
 
 include "metasprite/_common.inc"
 

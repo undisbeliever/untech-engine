@@ -14,7 +14,7 @@ scope MetaSprite {
             //
             //      p: palette set
             //      d: dynamic tileset active (MUST NOT be set if vram is clear)
-            //      iiiii: vram slot table number (index / 2)
+            //      iiiii: vram slot table number (equal to vram slot index)
             //      v: vram set
             field(status, 1)
 
@@ -39,6 +39,89 @@ scope MetaSprite {
         constant vramSet(0x01)
     }
 
+
+    scope Vram {
+        constant VRAM_TILE_SLOTS(16)
+        constant VRAM_ROW_SLOTS(14)
+
+        assert(VRAM_TILE_SLOTS + VRAM_ROW_SLOTS * 8 <= 8 * 16)
+
+        // State data for the VRAM table
+        //
+        // Slots 0 - (VRAM_TILE_SLOTS - 1) are VRAM tile slots
+        // Slots `VRAM_TILE_SLOTS` and onwards are VRAM row slots
+        //
+        // This data exists in one of 4 states:
+        //	1) A single linked list holding the free slots
+        //	2) Not part of a linked list (used in dynamic tilesets)
+        //	3) A double linked list for fixed tilesets (it makes removing easier)
+        //	4) Second half of a dual tileset. (not part of a linked list, see `pair`)
+        //
+        // Data is a SOA linked list.
+        //
+        //	    slot index = status & METASPRITE_VRAM_TILE_SLOTS
+        //
+        scope slots {
+            constant N_ELEMENTS(VRAM_TILE_SLOTS + VRAM_ROW_SLOTS)
+            constant ARRAY_INCREMENT(2)
+            constant _sectionSize(N_ELEMENTS * ARRAY_INCREMENT)
+
+            // All indexes at or above this value are Row slots
+            constant ROW_SLOTS_MIN_INDEX(ARRAY_INCREMENT * VRAM_TILE_SLOTS)
+
+
+            // This assumption allows the MSB of the index to mean NULL
+            assert(N_ELEMENTS * ARRAY_INCREMENT <= 128)
+
+            // Index of the next slot.
+            // This is NOT set if the slot is dynamic or the second half of a dual slot
+            // (byte index, if >= 0x80 then NULL)
+            allocate(next, wram7e, N_ELEMENTS * 2)
+
+            // Index of the previous slot.
+            // This is ONLY set if in a fixed tileset
+            // (byte index, if >= 0x80 then NULL)
+            constant prev(next + 1)
+
+            // Address of the tileset in the `DMA_Tile16Data` block
+            // (word address)
+            allocate(tileset, wram7e, N_ELEMENTS * 2)
+
+            // Number of times the slot is used
+            // (uint8)
+            allocate(count, wram7e, N_ELEMENTS * 2)
+
+            // Index of the second slot (if in a two slot type)
+            // (byte index, if >= 0x80 then NULL
+            constant pair(count + 1)
+        }
+
+        scope slotPool {
+            // List of slots using one fixed tile
+            // (byte index, if >= 0x80 the NULL)
+            allocateTmpWord(oneTile)
+
+            // List of slots using two fixed tiles
+            // (byte index, if >= 0x80 the NULL)
+            constant twoTiles(oneTile + 1)
+
+            // List of slots using one fixed row
+            // (byte index, if >= 0x80 the NULL)
+            allocateTmpWord(oneRow)
+
+            // List of slots using two fixed rows
+            // (byte index, if >= 0x80 the NULL)
+            constant twoRows(oneRow + 1)
+
+            // List of unallocated vram tile slots
+            // (byte index, if >= 0x80 the NULL)
+            allocateTmpWord(freeTiles)
+
+            // List of unallocated vram row slots
+            // (byte index, if >= 0x80 the NULL)
+            allocateTmpWord(freeRows)
+        }
+    }
 
     scope Palette {
         constant N_PALETTES(8)

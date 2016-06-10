@@ -12,6 +12,7 @@ macro Init() {
     assert8i()
 
     MetaSprite.Palette._Init()
+    MetaSprite.Vram._Init()
 }
 
 
@@ -51,6 +52,7 @@ macro _InitEntity() {
 
         rep     #$30
     a16()
+    i16()
     }
 }
 
@@ -87,12 +89,21 @@ scope Activate: {
 
     sep     #$20
 a8()
-    // X = frameSet
+    Vram._Activate()
+
+    sep     #$20
+    rep     #$10
+a8()
+i16()
+
+    ldx.b   BaseEntity.MetaSprite.frameSet
     jsr     MetaSprite.Palette._ProcessSlots
     // c = return
 
-    rep     #$20
+ReturnRep:
+    rep     #$30
 a16()
+i16()
 Return:
     rts
 }
@@ -111,6 +122,7 @@ scope Deactivate: {
 a8()
 i8()
     Palette._Deallocate()
+    Vram._Deallocate()
 
     rep     #$30
 a16()
@@ -118,6 +130,78 @@ a16()
     rts
 }
 
+
+// Sets the entity's metasprite frame.
+//
+// If the frame is active and has a dynamic tileset then a new tileset
+// is loaded into vram.
+//
+// This routine will fail IF:
+//      * entity has not FrameSet
+//      * frameId is invalid
+//      * FrameSet uses a dynamic tileset and there is not enough dma
+//        time to upload the tileset in the next VBlank.
+//
+// REQUIRES: 16 bit A, 16 bit Index, DB = $7e
+//
+// INPUT: DP = Entity
+// INPUT: A = frame Id
+// OUTPUT: C set if successful
+code()
+a16()
+i16()
+scope SetFrame: {
+    ldx.b   BaseEntity.MetaSprite.frameSet
+    beq     ReturnFalse
+
+    sep     #$20
+a8()
+    cmp.l   MetaSprite.Format.FrameSet.nFrames,x
+    bcs     ReturnFalse
+
+    assert(StatusFlags.dynamicTileset == 0x40)
+    bit.b   BaseEntity.MetaSprite.status
+    rep     #$30
+a16()
+    bvs     DynamicTileset
+
+        // Fixed or Unallocated Tileset
+        and.w   #0x00ff
+        asl
+        adc.l   MetaSprite.Format.FrameSet.frameTable,x
+        tax
+        lda.l   MetaSprite.Data.FrameList,x
+
+        sta.b   BaseEntity.MetaSprite.currentFrame
+
+        sec
+        rts
+
+ReturnFalse:
+    rep     #$31
+    rts
+
+
+a16()
+DynamicTileset:
+        // Activated with a Dynamic Tileset
+        and.w   #0x00ff
+        asl
+        adc.l   MetaSprite.Format.FrameSet.frameTable,x
+        tax
+        lda.l   MetaSprite.Data.FrameList,x
+
+        pha
+        tax
+            jsr     Vram._UploadDynamicTileset.GivenFrame
+        pla
+        bcc     Return
+
+        sta.b   BaseEntity.MetaSprite.currentFrame
+
+Return:
+    rts
+}
 
 }
 
