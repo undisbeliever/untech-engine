@@ -54,18 +54,6 @@ include "../../src/metasprite.inc"
 
 include "resources/metasprite/metasprites.gen.inc"
 
-// ::DEBUG::
-scope tmp {
-    allocate(tmp, shadow, 20 * 2)
-    macro repeat(variable n) {
-        if n > 0 {
-            n = n - 1
-            markTmpWord(tmp + n * 2)
-            repeat(n)
-        }
-    }
-    repeat(20)
-}
 
 // ::DEBUG::
 // ::TODO move into src/includes somehow::

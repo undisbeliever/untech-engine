@@ -44,9 +44,9 @@ macro VBlank() {
         ldx.b   #VMAIN.incrementMode.high | VMAIN.increment.by1
         stx.w   VMAIN
 
+        Dma.MetaSprite._VBlank()
         Dma.Palette._VBlank()
         Dma.Tile16._VBlank()
-
 
         Dma.ResetTransfersLeft()
     }

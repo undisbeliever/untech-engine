@@ -143,7 +143,7 @@ scope Format {
 
                 // Object attributes
                 //
-                // vhoo000s 00bccccc
+                // vhoo00s0 00bccccc
                 //      v     - vflip
                 //      h     - hflip
                 //      oo    - order (0 - 3)
@@ -153,7 +153,7 @@ scope Format {
                 field(charAttr, 2)
                 scope charAttr {
                     constant mask(0xF01F)
-                    constant sizeBit(0x0100)
+                    constant sizeBit(0x0200)
                     constant blockBit(0x0020)
                 }
             }

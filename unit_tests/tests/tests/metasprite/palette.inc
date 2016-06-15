@@ -325,16 +325,9 @@ i16()
 scope _Init: {
     jsr     Dma.Init
 
-    sep     #$30
-a8()
-i8()
     MetaSprite.Init()
 
     stz.w   Dma.Palette.dirty
-
-    rep     #$30
-a16()
-i16()
 
     rts
 }

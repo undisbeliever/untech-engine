@@ -5,14 +5,23 @@ scope MetaSprite {
 //
 // This MUST be called before using this module.
 //
-// REQUIRES: 8 bit A, 8 bit Index, DB = $7E
+// REQUIRES: 16 bit A, 16 bit Index, DB = $7E
 code()
 macro Init() {
-    assert8a()
-    assert8i()
+    assert16a()
+    assert16i()
 
+    MetaSprite.Render._Init()
+
+    sep     #$30
+a8()
+i8()
     MetaSprite.Palette._Init()
     MetaSprite.Vram._Init()
+
+    rep     #$30
+a16()
+i16()
 }
 
 
@@ -69,6 +78,7 @@ macro EntityDestructor() {
     scope EntityDestructor: {
         jsr     MetaSprite.Deactivate
         stz.b   BaseEntity.MetaSprite.frameSet
+        stz.b   BaseEntity.MetaSprite.currentFrame
     }
 }
 
@@ -200,6 +210,31 @@ DynamicTileset:
         sta.b   BaseEntity.MetaSprite.currentFrame
 
 Return:
+    rts
+}
+
+
+// Retrieves the frame address of a metasprite.
+//
+// REQUITES: 16 bit A, 16 bit Index, DB = $7e
+//
+// NOTE: no overflow checking is preformed here
+//
+// ASSUMES: Entity has a frameSet
+//
+// INPUT: DP = entity
+//        A = frameId
+// OUTPUT: X = frameAddress
+code()
+a16()
+i16()
+scope GetFrameAddress: {
+    and.w   #0x00ff
+    asl
+    adc.l   MetaSprite.Format.FrameSet.frameTable,x
+    tax
+    lda.l   MetaSprite.Data.FrameList,x
+    tax
     rts
 }
 

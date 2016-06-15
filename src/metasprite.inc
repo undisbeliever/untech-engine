@@ -4,6 +4,7 @@ include "metasprite/_variables.inc"
 
 include "metasprite/palette.inc"
 include "metasprite/vram.inc"
+include "metasprite/render.inc"
 
 include "metasprite/_common.inc"
 

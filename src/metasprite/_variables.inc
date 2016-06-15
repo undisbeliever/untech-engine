@@ -39,6 +39,52 @@ scope MetaSprite {
         constant vramSet(0x01)
     }
 
+    scope Render {
+        allocate(oamBuffer, wram7e, 128 * 4)
+        scope oamBuffer {
+            constant xPos(oamBuffer + OamFormat.xPos)
+            constant yPos(oamBuffer + OamFormat.yPos)
+            constant charAttr(oamBuffer + OamFormat.charAttr)
+        }
+
+        allocate(oamHiBuffer, wram7e, 128 / 4)
+
+        // Buffer the oam's x8/size bits
+        // bits 10-15 of each 4 byte block MUST BE CLEAR
+        //
+        // bits 16-31 are unused by the renderer and can be used elsewhere
+        allocate(oamXposBuffer, wram7e, 128 * 4)
+
+        scope {
+            // Mark the unused word of `oamXposBuffer` as unused.
+            macro addUnused(variable n) {
+                if (n > 0) {
+                    n = n - 1
+                    markTmpWord(oamXposBuffer + n * 4 + 2)
+                    addUnused(n)
+                }
+            }
+            addUnused(128)
+        }
+
+        // The index of the buffer
+        // (word index)
+        allocateTmpWord(bufferPos)
+
+        // The index of the buffer in the previous frame
+        // (word index)
+        allocateTmpWord(previousBufferPos)
+
+
+        // argument for `MetaSprite.Render functions`
+        // (word value - INT_MS8_OFFSET)
+        allocateTmpWord(xPos)
+
+        // argument for `MetaSprite.Render functions`
+        // (word value - INT_MS8_OFFSET)
+        allocateTmpWord(yPos)
+    }
+
 
     scope Vram {
         constant VRAM_TILE_SLOTS(16)
