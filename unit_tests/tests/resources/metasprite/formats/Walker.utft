@@ -2,53 +2,53 @@
 <!DOCTYPE untech>
 <framesettype name="Walker">
   <frame id="Stand_Right">
-    <alt name="Stand_Left" vflip="true"/>
+    <alt name="Stand_Left" hflip="true"/>
   </frame>
   <frame id="Stand_Left">
-    <alt name="Stand_Right" vflip="true"/>
+    <alt name="Stand_Right" hflip="true"/>
   </frame>
   <frame id="Fall_Right">
-    <alt name="Fall_Left" vflip="true"/>
+    <alt name="Fall_Left" hflip="true"/>
   </frame>
   <frame id="Fall_Left">
-    <alt name="Fall_Right" vflip="true"/>
+    <alt name="Fall_Right" hflip="true"/>
   </frame>
   <frame id="TouchPlayer_Right">
-    <alt name="TouchPlayer_Left" vflip="true"/>
+    <alt name="TouchPlayer_Left" hflip="true"/>
   </frame>
   <frame id="TouchPlayer_Left">
-    <alt name="TouchPlayer_Right" vflip="true"/>
+    <alt name="TouchPlayer_Right" hflip="true"/>
   </frame>
 
 <!-- ::TODO replace these with two animations -->
   <frame id="Walk_Right_0">
-    <alt name="Walk_Left_0" vflip="true"/>
+    <alt name="Walk_Left_0" hflip="true"/>
   </frame>
   <frame id="Walk_Left_0">
-    <alt name="Walk_Right_0" vflip="true"/>
+    <alt name="Walk_Right_0" hflip="true"/>
   </frame>
   <frame id="Walk_Right_1">
-    <alt name="Walk_Left_1" vflip="true"/>
+    <alt name="Walk_Left_1" hflip="true"/>
   </frame>
   <frame id="Walk_Left_1">
-    <alt name="Walk_Right_1" vflip="true"/>
+    <alt name="Walk_Right_1" hflip="true"/>
   </frame>
   <frame id="Walk_Left_2">
-    <alt name="Walk_Right_2" vflip="true"/>
+    <alt name="Walk_Right_2" hflip="true"/>
   </frame>
   <frame id="Walk_Right_2">
-    <alt name="Walk_Left_2" vflip="true"/>
+    <alt name="Walk_Left_2" hflip="true"/>
   </frame>
   <frame id="Walk_Right_3">
-    <alt name="Walk_Left_3" vflip="true"/>
+    <alt name="Walk_Left_3" hflip="true"/>
   </frame>
   <frame id="Walk_Left_3">
-    <alt name="Walk_Right_3" vflip="true"/>
+    <alt name="Walk_Right_3" hflip="true"/>
   </frame>
   <frame id="Walk_Right_4">
-    <alt name="Walk_Left_4" vflip="true"/>
+    <alt name="Walk_Left_4" hflip="true"/>
   </frame>
   <frame id="Walk_Left_4">
-    <alt name="Walk_Right_4" vflip="true"/>
+    <alt name="Walk_Right_4" hflip="true"/>
   </frame>
 </framesettype>
