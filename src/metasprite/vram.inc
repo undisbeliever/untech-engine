@@ -327,8 +327,7 @@ Return:
 
 
 scope _Upload {
-    allocateTmpWord(tmp_tilesetSlot2Address)
-    allocateTmpWord(tmp_vramSlot2Address)
+    allocateTmpWord(tmp_vramSlot1Address)
     allocateTmpWord(tmp_nTiles)
 
     // Uploads a single tileset slot to VRAM
@@ -365,8 +364,8 @@ scope _Upload {
     // REQUIRES: Dma module initialized
     //
     // INPUT: tmp_tileset = tileset to upload
-    // INPUT: y = slot 1 index
-    // INPUT: x = slot 2 index
+    // INPUT: x = slot 1 index
+    // INPUT: y = slot 2 index
     //
     // OUTPUT: C set on success
     // MODIFIES: Register size
@@ -374,33 +373,37 @@ scope _Upload {
     a16()
     i8()
     scope TwoTiles: {
+
         lda.l   slots.VramAddress,x
-        sta.w   tmp_vramSlot2Address
+        sta.w   tmp_vramSlot1Address
 
         tyx
         lda.l   slots.VramAddress,x
 
-        // A = slot 1 address
-        // tmp_vramSlot2Address = slot 2 address
-        rep     #$30
+        rep     #$10
     i16()
         tay
+
         sep     #$20
     a8()
-    i16()
-        // Y = vram Address
+
+        ldx.w   tmp_tileset
+
+        // ::TODO Check Dma.transfersLeft::
+
+        // transfer second tile first
+        inx
+        inx
+        inx
+        lda.b   #1
+        jsr     Dma.Tile16.BufferTileListGivenSize
+        bcc     NoDmaTime
 
         ldx.w   tmp_tileset
         inx
-        phx
-            jsr     Dma.Tile16.BufferOneTile
-        plx
-        bcc     NoDmaTime
-
-        inx
-        inx
-        ldy     tmp_vramSlot2Address
-        jmp     Dma.Tile16.BufferOneTile
+        ldy     tmp_vramSlot1Address
+        lda.b   #1
+        jmp     Dma.Tile16.BufferTileListGivenSize
 
     NoDmaTime:
         // c clear
@@ -414,8 +417,8 @@ scope _Upload {
     // REQUIRES: Dma module initialized
     //
     // INPUT: tmp_tileset = tileset to upload
-    // INPUT: y = slot 1 index
-    // INPUT: x = slot 2 index
+    // INPUT: x = slot 1 index
+    // INPUT: y = slot 2 index
     //
     // OUTPUT: C set on success
     // MODIFIES: Register size
@@ -423,14 +426,13 @@ scope _Upload {
     a16()
     i8()
     scope TwoRows: {
-        // first row is fixed {slotSize} / 2
+        // first row is fixed (8 tiles)
         // second row is unknown size
 
-        // A = slot 1 address
-        // tmp_vramSlot2Address = slot 2 address
+        // ::TODO Check Dma.transfersLeft::
 
         lda.l   slots.VramAddress,x
-        sta.w   tmp_vramSlot2Address
+        sta.w   tmp_vramSlot1Address
 
         tyx
         lda.l   slots.VramAddress,x
@@ -438,33 +440,40 @@ scope _Upload {
         rep     #$31
     i16()
         tay
-
         ldx.w   tmp_tileset
-        txa
-        // carry clear
-        adc.w   #16
-        sta.w   tmp_tilesetSlot2Address
+        lda.l   Dma.Tile16.TileListOffset,x // nTiles
+        and.w   #0x00ff
+        cmp.w   #9
+        bcc     OnlyOneTransfer
 
-        sep     #$20
+            txa
+            // c set
+            adc.w   #8 * 2
+            tax
+
+            // X = address of second slot
+            // Y = vram word address of second slot
+            // A will properly clipped in `Dma.BufferTileListGivenSize`
+
+            sep     #$21
+        a8()
+            lda.l   Dma.Tile16.TileListOffset - (8 * 2 + 1),x // nTiles
+            jsr     Dma.Tile16.BufferTileListGivenSize
+            bcc     NoDmaTime
+
+            ldx.w   tmp_tileset
+            inx
+            ldy.w   tmp_vramSlot1Address
+            lda.b   #8
+            jmp     Dma.Tile16.BufferTileListGivenSize
+
+
+        OnlyOneTransfer:
+            sep     #$21
     a8()
-
-        // Y = vram Address
-        // X = tileset address
-        lda.l   Dma.Tile16.TileListOffset,x
-
-        sec
-        sbc.b   #8
-        sta.w   tmp_nTiles
-        inx
-
-        lda.b   #8
-        jsr     Dma.Tile16.BufferTileListGivenSize
-        bcc     NoDmaTime
-
-        lda.w   tmp_nTiles
-        ldy.w   tmp_vramSlot2Address
-        ldx.w   tmp_tilesetSlot2Address
-        jmp     Dma.Tile16.BufferTileListGivenSize
+            inx
+            ldy.w   tmp_vramSlot1Address
+            jmp     Dma.Tile16.BufferTileListGivenSize
 
     NoDmaTime:
         // c clear
@@ -524,7 +533,7 @@ scope _ActivateFixed {
                 bpl     -
 
         Found_Y:
-            txy
+            tyx
         Found_X:
             sep     #$30
         a8()
@@ -534,7 +543,6 @@ scope _ActivateFixed {
             if {nSlots} == 1 {
                 jmp     SetState_OneSlot
             } else {
-                ldy.b   slots.pair,x
                 jmp     SetState_TwoSlots
             }
 
@@ -620,19 +628,18 @@ scope _ActivateFixed {
     // Creates two new slot and uploads them to vram (if possible)
     // INPUT: 16 bit A, 8 bit Index
     // OUTPUT: 8 bit A, 8 bit Index
-    // OUTPUT: X = slot
+    // OUTPUT: X = slot index
     // BRANCH: to NoSlotsFound if no slots available
     // BRANCH: to NoDmaTime if no slots available
     macro scope NotFound_Dual(freeSlotPool, usedSlotPool, uploadRoutine) {
         assert16a()
         assert8i()
 
-        ldy.w   slotPool.{freeSlotPool}
-        bmi     NoSlotsFound
-        ldx.w   slots.next,y
+        ldx.w   slotPool.{freeSlotPool}
         bmi     NoSlotsFound
 
-        // NOTE: upload routine has y = slot 1 and x = slot 2
+        ldy.w   slots.next,x
+        bmi     NoSlotsFound
 
         // Upload to VRAM
         jsr     {uploadRoutine}
@@ -685,18 +692,13 @@ scope _ActivateFixed {
         txa
         sta.w   slots.prev,y
         sta.w   slotPool.{usedSlotPool}
-
-
-        ldy.w   slots.pair,x
-        // X = first
-        // Y = second
     }
 
 
     // Update the MetaSprite status and charAttr Offsets then jumps to Return
     //
     // REQUIRES: 8 bit A, 8 bit Index
-    // INPUT: X = slot 1 address, Y = slot 2 address
+    // INPUT: X = slot index
     // OUTPUT: C set
     // RETURN: Jump to Return
     // MODIFIES: register size
@@ -733,7 +735,7 @@ scope _ActivateFixed {
     // Update the MetaSprite status and charAttr Offsets then jumps to Return
     //
     // REQUIRES: 8 bit A, 8 bit Index
-    // INPUT: X = slot 1 address, Y = slot 2 address
+    // INPUT: X = slot 1 index
     // OUTPUT: C set
     // RETURN: Jump to Return
     // MODIFIES: register size
@@ -763,6 +765,8 @@ scope _ActivateFixed {
         sta.b   BaseEntity.MetaSprite.blockOneCharAttrOffset
 
         txy
+        ldx.w   slots.pair,y
+
         lda.b   BaseEntity.MetaSprite.blockTwoCharAttrOffset
         and.w   #~OamFormat.charAttr.char.mask
         ora.l   slots.CharAttrOffset,x
@@ -827,7 +831,7 @@ scope _AllocateDynamic {
     // current->pair = NULL
     //
     // MetaSprite.status &= ~StatusFlags.vramSlotMask
-    // MetaSprite.status |= current >> 1
+    // MetaSprite.status |= current
     // MetaSprite.status |= StatusFlags.vramSet | StatusFlags.dynamicTileset
     //
     // MetaSprite.blockOneCharAttrOffset &= ~OamFormat.change.char.mask
@@ -862,8 +866,7 @@ scope _AllocateDynamic {
     a16()
     i8()
     scope Finalize_Single: {
-        lda.w   #0
-        sta.w   slots.tileset,x
+        stz.w   slots.tileset,x
 
         sep     #$20
     a8()
@@ -923,7 +926,7 @@ scope _AllocateDynamic {
     // first->pair = second
     //
     // MetaSprite.status &= ~StatusFlags.vramSlotMask
-    // MetaSprite.status |= current >> 1
+    // MetaSprite.status |= current
     // MetaSprite.status |= StatusFlags.vramSet | StatusFlags.dynamicTileset
     //
     // MetaSprite.blockOneCharAttrOffset &= ~OamFormat.change.char.mask
@@ -946,8 +949,7 @@ scope _AllocateDynamic {
             bmi     NoSlotsFound
 
 
-            lda.w   #0
-            sta.w   slots.tileset,x
+            stz.w   slots.tileset,x
 
             sep     #$20
         a8()
@@ -1025,7 +1027,6 @@ scope _AllocateDynamic {
 rodata(rom0)
 scope slots {
     constant ROW_START(((VRAM_TILE_SLOTS + 7) / 8))
-    constant ROW_CHARATTR_START((VRAM_TILE_SLOTS + 7) / 8)
 
     // The CharAttr offset for each slot
     scope CharAttrOffset: {
@@ -1037,7 +1038,7 @@ scope slots {
         }
         macro rows(variable i) {
             if i < VRAM_ROW_SLOTS {
-                dw  (ROW_CHARATTR_START + i) * 32
+                dw  (ROW_START + i) * 32
                 rows(i + 1)
             }
         }
@@ -1056,7 +1057,7 @@ scope slots {
         }
         macro rows(variable i) {
             if i < VRAM_ROW_SLOTS {
-                dw  VRAM_OBJ_WADDR + (ROW_START + i) * 32 * 16
+                dw  VRAM_OBJ_WADDR + ((ROW_START + i) * 32) * 16
                 rows(i + 1)
             }
         }

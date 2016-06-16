@@ -347,6 +347,7 @@ a8()
 }
 
 
+
 // Buffers many 16x16px tiles for a transfer during VBlank
 //
 // Tile list format:
@@ -373,6 +374,8 @@ End:
 
 
 // Buffers many 16x16px tiles from a list of a given size
+//
+// NOTE: Will transfer a MAXIMUM of 8 tiles.
 //
 // REQUIRES: 8 bit A, 16 bit Index, DB = $7E
 //
