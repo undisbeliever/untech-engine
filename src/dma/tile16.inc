@@ -22,7 +22,12 @@ allocate(processVBlankOnZero, shadow, 2)
 
 
 allocateTmpWord(tmp0)
-allocateTmpWord(tmp1)
+
+// Parameter to the upload routines
+// (word)
+allocateTmpWord(tileListAddr)
+allocateTmpWord(vramWaddr)
+allocateTmpWord(vramWaddr2)
 
 
 // SOA table for handling transfer information.
@@ -280,174 +285,322 @@ scope FunctionTable: {
 }
 
 
-// Buffers one 16x16px tile transfer for VBlank
+
+// Buffers one 16x16px tile from a tile list
 //
 // REQUIRES: 8 bit A, 16 bit Index, DB = $7E
 //
-// INPUT: A:X the tile address
-// INPUT: Y the VRAM word address
+// ASSUMES: The number of tiles in the list is 1
+//          Will always transfer one tile
+//
+// INPUT:
+//      tileListAddr - the address of the tile list (within `TileListBank`)
+//      vramWaddr - the VRAM word address (MUST on an even VRAM tile row)
+//
+// OUTPUT: Changes register size
+//
+// Tile list format:
+//    byte: number of tiles
+//    word: (tileAddress >> 7) * nTiles
 //
 // OUTPUT: C set if successful
+// OUTPUT: Changes register size to 8 bit A, 16 bit Index
 code()
+scope BufferOneTileFromList: {
+    rep     #$30
+    sep     #$20
 a8()
 i16()
-scope BufferOneTile: {
-    sty.w   tmp0
 
-    ldy.w   dmaBufferIndex
-    cpy.w   #DMA_BUFFER_INDEX_END
-    bcs     Fail8
+    ldx.w   tileListAddr
 
-    sta.w   dmaBuffer.tileBank,y
+AfterLoadTileset:
 
-    rep     #$30
-a16()
-    txa
-    sta.w   dmaBuffer.tileAddress + 0,y
+    // Check if we can upload 1 tile
 
+    lda.w   dmaBufferIndex
+    cmp.b   #DMA_BUFFER_INDEX_END
+    bcs     Fail
 
-    ldx.w   tableIndex
-    cpx.w   #TABLE_INDEX_END
-    bcs     Fail16
+    ldy.w   tableIndex
+    cpy.w   #TABLE_INDEX_END
+    bcs     Fail
 
 
     lda.w   Dma.transfersLeft
     dec
-    dec                     // VBlank code overhead
-    bmi     Fail16
+    dec
+    bmi     Fail
     sta.w   Dma.transfersLeft
 
 
-    lda.w   tmp0
-    sta.w   table.wordVramAddress,x
+    // Y = tableIndex
 
-    lda.w   #1 * 2
-    sta.w   table.vblankFunctionAddr,x
+    lda.b   #1 << 1
+    sta.w   table.vblankFunctionAddr,y
+
+    rep     #$30
+a16()
+    lda.w   vramWaddr
+    sta.w   table.wordVramAddress,y
+
+    iny
+    iny
+    sty.w   tableIndex
 
 
-    inx
-    inx
-    stx.w   tableIndex
+    sep     #$20
+a8()
+    ldy     dmaBufferIndex
 
+    // tileBank = (tileList.addr << 7) >> 16
+    // tileAddress = word(tileList.addr << 7)
+    lda.l   TileListOffset + 1 + 1,x
+    lsr
+    sta.w   dmaBuffer.tileBank,y
+
+    lda.l   TileListOffset + 1,x
+
+    rep     #$30
+a16()
+    xba
+    ror
+    and.w   #0xff80
+    sta.w   dmaBuffer.tileAddress,y
+
+
+
+    sep     #$21
+a8()
     iny
     iny
     sty.w   dmaBufferIndex
 
-    sep     #$21
-    // C set
-a8()
+    // carry set (iny does not affect carry)
     rts
 
-Fail16:
-    sep     #$20
-Fail8:
+Fail:
     clc
-a8()
     rts
+
 }
 
 
-
-// Buffers many 16x16px tiles for a transfer during VBlank
+// Buffers two 16x16px tiles from a tile list to two different vram Addresses
 //
-// Tile list format:
-//  * byte: n tiles
-//    * word: (tileAddress >> 7) * n tiles
+// NOTE: Will transfer a MAXIMUM of 2 tiles.
 //
 // REQUIRES: 8 bit A, 16 bit Index, DB = $7E
 //
 // INPUT:
-//      X - the address of the tile list data (Within `TileListBank`)
-//      Y - the VRAM word address (MUST on an even VRAM tile row)
+//      tileListAddr - the address of the tile list (within `TileListBank`)
+//      vramWaddr - the VRAM word address (MUST on an even VRAM tile row)
+//      vramWaddr2 - the second VRAM word address (MUST on an even VRAM tile row)
+//
+// Tile list format:
+//    byte: number of tiles
+//    word: (tileAddress >> 7) * nTiles
 //
 // OUTPUT: C set if successful
+// OUTPUT: Changes register size to 8 bit A, 16 bit Index
 code()
 a8()
 i16()
-scope BufferTileList: {
+scope BufferTwoTilesFromList: {
+constant Fail(BufferOneTileFromList.Fail)
+    rep     #$30
+    sep     #$20
+a8()
+i16()
+
+    ldx.w   tileListAddr
     lda.l   TileListOffset,x
-    inx
-End:
+    dec
+    beq     BufferOneTileFromList.AfterLoadTileset
+
+
+    // Check if we can upload 2 tiles
+    lda.w   dmaBufferIndex
+    cmp.b   #DMA_BUFFER_INDEX_END - 2
+    bcs     Fail
+
+    ldy.w   tableIndex
+    cpy.w   #TABLE_INDEX_END - 2
+    bcs     Fail
+
+
+    lda.w   Dma.transfersLeft
+    sec
+    sbc.b   #2 + 1
+    bcc     Fail
+    sta.w   Dma.transfersLeft
+
+
+    // Y = tableIndex
+    // X = tileListAddr
+
+    lda.b   #1 << 1
+    sta.w   table.vblankFunctionAddr,y
+    sta.w   table.vblankFunctionAddr + 2,y
+
+    rep     #$31
+a16()
+    lda.w   vramWaddr
+    sta.w   table.wordVramAddress,y
+    lda.w   vramWaddr2
+    sta.w   table.wordVramAddress + 2,y
+
+    tya
+    // carry clear
+    adc     #4
+    sta.w   tableIndex
+
+    sep     #$20
+a8()
+    ldy     dmaBufferIndex
+
+    // tileBank = (tileList.addr << 7) >> 16
+    // tileAddress = word(tileList.addr << 7)
+
+    // First tile
+
+    lda.l   TileListOffset + 2,x
+    lsr
+    sta.w   dmaBuffer.tileBank,y
+
+    lda.l   TileListOffset + 1,x
+
+    rep     #$30
+a16()
+    xba
+    ror
+    and.w   #0xff80
+    sta.w   dmaBuffer.tileAddress,y
+
+
+
+    // Second tile
+    sep     #$20
+a8()
+    lda.l   TileListOffset + 2 + 2,x
+    lsr
+    sta.w   dmaBuffer.tileBank + 2,y
+
+    lda.l   TileListOffset + 2 + 1,x
+
+    rep     #$30
+a16()
+    xba
+    ror
+    and.w   #0xff80
+    sta.w   dmaBuffer.tileAddress + 2,y
+
+
+
+    tya
+    clc
+    adc.w   #4
+    sta.w   dmaBufferIndex
+
+    sep     #$21
+a8()
+    // c set
+    rts
 }
 
 
 
-
-// Buffers many 16x16px tiles from a list of a given size
+// Buffers a single row of 16x16px tiles from a tile list
 //
-// NOTE: Will transfer a MAXIMUM of 8 tiles.
+// NOTE: Will transfer a MAXIMUM of 8 tiles
 //
 // REQUIRES: 8 bit A, 16 bit Index, DB = $7E
 //
 // INPUT:
-//      X - the address of the tile list (within `TileListBank`)
-//      Y - the VRAM word address (MUST on an even VRAM tile row)
-//      A - the number of tiles to render
+//      tileListAddr - the address of the tile list (within `TileListBank`)
+//      vramWaddr - the VRAM word address (MUST on an even VRAM tile row)
 //
-// Tile list is a word list, containing (tileAddresses >> 7)
+// Tile list format:
+//    byte: number of tiles
+//    word: (tileAddress >> 7) * nTiles
 //
 // OUTPUT: C set if successful
+// OUTPUT: Changes register size to 8 bit A, 16 bit Index
+code()
+scope BufferOneRowFromList: {
+constant tmp_nTiles(tmp0)
+    rep     #$30
+    sep     #$20
 a8()
 i16()
-scope BufferTileListGivenSize: {
-constant tmpVram(tmp0)
-constant tmpNtiles(tmp1)
 
-    assert(pc() == BufferTileList.End)
+    ldx.w   tileListAddr
 
-    sty.w   tmpVram
-
-    // assert 1 <= a <= 8
+    // ensure 1 <= nTiles <= 8
+    lda.l   TileListOffset,x
     dec
     and.b   #7
     inc
-    sta.w   tmpNtiles
+
+NTilesA:
+    sta.w   tmp_nTiles
+
 
     asl
     // C clear
     adc.w   dmaBufferIndex
     cmp.b   #DMA_BUFFER_INDEX_END
-    bcs     Fail8
+    bcs     Fail
 
 
     ldy.w   tableIndex
     cpy.w   #TABLE_INDEX_END
-    bcs     Fail8
+    bcs     Fail
+
 
     lda.w   Dma.transfersLeft
     clc                 // -1 code overhead
-    sbc.w   tmpNtiles
-    bcc     Fail8
+    sbc.w   tmp_nTiles
+    bcc     Fail
+
     sta.w   Dma.transfersLeft
 
 
-    lda.w   tmpNtiles
+
+    // Y = tableIndex
+
+    lda.w   tmp_nTiles
     asl
     sta.w   table.vblankFunctionAddr,y
 
+
     rep     #$30
 a16()
-    lda.w   tmpVram
+    lda.w   vramWaddr
     sta.w   table.wordVramAddress,y
+
+    iny
+    iny
+    sty.w   tableIndex
+
+
+BuildDmaBuffer:
+    // X = tileListAddr
 
     sep     #$20
 a8()
 
-    iny
-    iny
-    sty     tableIndex
-
     ldy     dmaBufferIndex
 
     Loop:
-        // tileBank = tileList << 7 >> 16
-        // tileAddress = word(tileList << 7)
+        // tileBank = (tileList.addr << 7) >> 16
+        // tileAddress = word(tileList.addr << 7)
 
-        lda.l   TileListOffset + 1,x
+        lda.l   TileListOffset + 1 + 1,x
         lsr
         sta.w   dmaBuffer.tileBank,y
 
-        lda.l   TileListOffset,x
+        lda.l   TileListOffset + 1,x
 
         rep     #$30
 a16()
@@ -458,25 +611,114 @@ a16()
 
         sep     #$20
 a8()
-
         inx
         inx
 
         iny
         iny
 
-        dec.w   tmpNtiles
+        dec.w   tmp_nTiles
         bne     Loop
 
 
     sty.w   dmaBufferIndex
-
     sec
     rts
 
-Fail8:
+Fail:
     clc
     rts
+}
+
+
+// Buffers two row of 16x16px tiles from a tile list
+//
+// NOTE: Will transfer a MAXIMUM of 16 tiles
+//
+// REQUIRES: 8 bit A, 16 bit Index, DB = $7E
+//
+// INPUT:
+//      tileListAddr - the address of the tile list (within `TileListBank`)
+//      vramWaddr - the VRAM word address (MUST on an even VRAM tile row)
+//      vramWaddr2 - the VRAM word address of the second row (MUST on an even VRAM tile row)
+//
+// Tile list format:
+//    byte: number of tiles
+//    word: (tileAddress >> 7) * nTiles
+//
+// OUTPUT: C set if successful
+// OUTPUT: Changes register size to 8 bit A, 16 bit Index
+code()
+scope BufferTwoRowsFromList: {
+constant tmp_nTiles(BufferOneRowFromList.tmp_nTiles)
+constant Fail(BufferOneRowFromList.Fail)
+
+    rep     #$30
+    sep     #$20
+a8()
+i16()
+
+    ldx.w   tileListAddr
+
+    lda.l   TileListOffset,x
+    cmp.b   #8 + 1
+    bcc     BufferOneRowFromList.NTilesA
+
+
+    // ensure 8 <= nTiles <= 16
+    dec
+    and.b   #15
+    inc
+    sta.w   tmp_nTiles
+
+
+    asl
+    // C clear
+    adc.w   dmaBufferIndex
+    cmp.b   #DMA_BUFFER_INDEX_END
+    bcs     Fail
+
+
+    ldy.w   tableIndex
+    cpy.w   #TABLE_INDEX_END - 2
+    bcs     Fail
+
+
+    lda.w   Dma.transfersLeft
+    dec
+    clc                 // -2 code overhead
+    sbc.w   tmp_nTiles
+    bcc     Fail
+
+    sta.w   Dma.transfersLeft
+
+
+
+    // Y = tableIndex
+
+    lda.b   #8 << 1
+    sta.w   table.vblankFunctionAddr,y
+
+    lda.w   tmp_nTiles
+    sec
+    sbc.b   #8
+    asl
+    sta.w   table.vblankFunctionAddr + 2,y
+
+
+    rep     #$31
+a16()
+    lda.w   vramWaddr
+    sta.w   table.wordVramAddress,y
+    lda.w   vramWaddr2
+    sta.w   table.wordVramAddress + 2,y
+
+    tya
+    // carry clear
+    adc.w   #4
+    sta.w   tableIndex
+
+    jmp     BufferOneRowFromList.BuildDmaBuffer
 }
 
 }

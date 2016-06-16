@@ -3,7 +3,9 @@
 scope MetaSprite {
 scope Vram {
 
-allocateTmpWord(tmp_tileset)
+// Reuse tilesetAddr address with the upload routines
+constant tilesetAddr(Dma.Tile16.tileListAddr)
+
 
 // Resets allocation lists
 //
@@ -103,7 +105,7 @@ macro _Activate() {
                 tay
 
                 lda.l   MetaSprite.Format.FrameSet.tileset,x
-                sta.w   MetaSprite.Vram.tmp_tileset
+                sta.w   MetaSprite.Vram.tilesetAddr
 
                 tya
                 and.w   #3 << 1
@@ -269,7 +271,7 @@ scope _UploadDynamicTileset: {
 GivenFrame:
     lda.l   MetaSprite.Format.Frame.Tileset,x
     beq     ReturnTrue
-    sta.w   tmp_tileset
+    sta.w   tilesetAddr
     tay
 
         lda.b   BaseEntity.MetaSprite.status
@@ -286,12 +288,32 @@ i8()
 
     pea     ReturnFromUploadRoutine - 1
 
-    ldy.w   slots.pair,x
-    bmi     _Upload.OneSlot
 
-    cpx.b   #slots.ROW_SLOTS_MIN_INDEX
-    bcc     _Upload.TwoTiles
-    bcs     _Upload.TwoRows
+    lda.l   slots.VramAddress,x
+    sta.w   Dma.Tile16.vramWaddr
+
+    ldy.w   slots.pair,x
+    bpl     TwoSlots
+
+        // One Slot
+        cpx.b   #slots.ROW_SLOTS_MIN_INDEX
+        bcs     +
+            jmp     Dma.Tile16.BufferOneTileFromList
+        +
+            jmp     Dma.Tile16.BufferOneRowFromList
+
+
+    TwoSlots:
+        tyx
+        lda.l   slots.VramAddress,x
+        sta.w   Dma.Tile16.vramWaddr2
+
+        // Two Slots
+        cpx.b   #slots.ROW_SLOTS_MIN_INDEX
+        bcs     +
+            jmp     Dma.Tile16.BufferTwoTilesFromList
+        +
+            jmp     Dma.Tile16.BufferTwoRowsFromList
 
 
 ReturnFromUploadRoutine:
@@ -306,7 +328,7 @@ i16()
         and.w   #MetaSprite.StatusFlags.vramSlotMask
         tax
 
-        lda.w   tmp_tileset
+        lda.w   tilesetAddr
         sta.w   slots.tileset,x
 
         sec
@@ -326,162 +348,6 @@ Return:
 }
 
 
-scope _Upload {
-    allocateTmpWord(tmp_vramSlot1Address)
-    allocateTmpWord(tmp_nTiles)
-
-    // Uploads a single tileset slot to VRAM
-    //
-    // REQUIRES: 16 bit A, 8 bit Index, DB = 0x7e
-    // REQUIRES: Dma module initialized
-    //
-    // INPUT: tmp_tileset = tileset to upload
-    // INPUT: x = slot index
-    // OUTPUT: C set on success
-    // MODIFIES: Register size
-    code()
-    a16()
-    i8()
-    scope OneSlot: {
-        lda.l   slots.VramAddress,x
-
-        rep     #$30
-    i16()
-        tay
-        sep     #$20
-    a8()
-    i16()
-        // Y = vram Address
-        ldx.w   tmp_tileset
-
-        jmp     Dma.Tile16.BufferTileList
-    }
-
-
-    // Uploads two tile slots to VRAM
-    //
-    // REQUIRES: 16 bit A, 8 bit Index, DB = 0x7e
-    // REQUIRES: Dma module initialized
-    //
-    // INPUT: tmp_tileset = tileset to upload
-    // INPUT: x = slot 1 index
-    // INPUT: y = slot 2 index
-    //
-    // OUTPUT: C set on success
-    // MODIFIES: Register size
-    code()
-    a16()
-    i8()
-    scope TwoTiles: {
-
-        lda.l   slots.VramAddress,x
-        sta.w   tmp_vramSlot1Address
-
-        tyx
-        lda.l   slots.VramAddress,x
-
-        rep     #$10
-    i16()
-        tay
-
-        sep     #$20
-    a8()
-
-        ldx.w   tmp_tileset
-
-        // ::TODO Check Dma.transfersLeft::
-
-        // transfer second tile first
-        inx
-        inx
-        inx
-        lda.b   #1
-        jsr     Dma.Tile16.BufferTileListGivenSize
-        bcc     NoDmaTime
-
-        ldx.w   tmp_tileset
-        inx
-        ldy     tmp_vramSlot1Address
-        lda.b   #1
-        jmp     Dma.Tile16.BufferTileListGivenSize
-
-    NoDmaTime:
-        // c clear
-        rts
-    }
-
-
-    // Uploads two row slots to VRAM
-    //
-    // REQUIRES: 16 bit A, 8 bit Index, DB = 0x7e
-    // REQUIRES: Dma module initialized
-    //
-    // INPUT: tmp_tileset = tileset to upload
-    // INPUT: x = slot 1 index
-    // INPUT: y = slot 2 index
-    //
-    // OUTPUT: C set on success
-    // MODIFIES: Register size
-    code()
-    a16()
-    i8()
-    scope TwoRows: {
-        // first row is fixed (8 tiles)
-        // second row is unknown size
-
-        // ::TODO Check Dma.transfersLeft::
-
-        lda.l   slots.VramAddress,x
-        sta.w   tmp_vramSlot1Address
-
-        tyx
-        lda.l   slots.VramAddress,x
-
-        rep     #$31
-    i16()
-        tay
-        ldx.w   tmp_tileset
-        lda.l   Dma.Tile16.TileListOffset,x // nTiles
-        and.w   #0x00ff
-        cmp.w   #9
-        bcc     OnlyOneTransfer
-
-            txa
-            // c set
-            adc.w   #8 * 2
-            tax
-
-            // X = address of second slot
-            // Y = vram word address of second slot
-            // A will properly clipped in `Dma.BufferTileListGivenSize`
-
-            sep     #$21
-        a8()
-            lda.l   Dma.Tile16.TileListOffset - (8 * 2 + 1),x // nTiles
-            jsr     Dma.Tile16.BufferTileListGivenSize
-            bcc     NoDmaTime
-
-            ldx.w   tmp_tileset
-            inx
-            ldy.w   tmp_vramSlot1Address
-            lda.b   #8
-            jmp     Dma.Tile16.BufferTileListGivenSize
-
-
-        OnlyOneTransfer:
-            sep     #$21
-    a8()
-            inx
-            ldy.w   tmp_vramSlot1Address
-            jmp     Dma.Tile16.BufferTileListGivenSize
-
-    NoDmaTime:
-        // c clear
-        rts
-    }
-}
-
-
 
 // Processes a fixed metasprite
 //
@@ -496,7 +362,7 @@ scope _Upload {
 //
 // INPUT:
 //      DP: Entity
-//      tmp_tileset = Tileset Address
+//      tilesetAddr = Tileset Address
 //
 // OUTPUT:
 //      Carry set on success
@@ -512,7 +378,7 @@ scope _ActivateFixed {
         i16()
 
         scope {name}: {
-            lda.w   tmp_tileset
+            lda.w   tilesetAddr
 
             sep     #$10
         i8()
@@ -579,7 +445,10 @@ scope _ActivateFixed {
         bmi     NoSlotsFound
 
         // Upload to VRAM
-        jsr     {uploadRoutine}
+        lda.l   slots.VramAddress,x
+        sta.w   Dma.Tile16.vramWaddr
+
+        jsr     Dma.Tile16.{uploadRoutine}
         bcc     NoDmaTime
 
         // Insert slot into fixed tiles list
@@ -589,7 +458,7 @@ scope _ActivateFixed {
     i8()
         ldx.w   slotPool.{freeSlotPool}
 
-        // current->tileset = tmp_tileset
+        // current->tileset = tilesetAddr
         // current->count = 1
         // current->prev = NULL
         // current->pair = NULL
@@ -601,7 +470,7 @@ scope _ActivateFixed {
         // usedSlotPool = current
 
         rep     #$20
-            lda.w   tmp_tileset
+            lda.w   tilesetAddr
             sta.w   slots.tileset,x
         sep     #$20
 
@@ -642,7 +511,14 @@ scope _ActivateFixed {
         bmi     NoSlotsFound
 
         // Upload to VRAM
-        jsr     {uploadRoutine}
+        lda.l   slots.VramAddress,x
+        sta.w   Dma.Tile16.vramWaddr
+
+        tyx
+        lda.l   slots.VramAddress,x
+        sta.w   Dma.Tile16.vramWaddr2
+
+        jsr     Dma.Tile16.{uploadRoutine}
         bcc     NoDmaTime
 
         sep     #$30
@@ -655,7 +531,7 @@ scope _ActivateFixed {
         // Connect second slot to first slot (pair).
         // Insert first slot into fixed tiles list
         //
-        // first->tileset = tmp_tileset
+        // first->tileset = tilesetAddr
         // first->count = 1
         // first->prev = NULL
         // first->pair = second
@@ -670,7 +546,7 @@ scope _ActivateFixed {
         // Y = second
 
         rep     #$20
-            lda.w   tmp_tileset
+            lda.w   tilesetAddr
             sta.w   slots.tileset,x
         sep     #$20
 
@@ -767,7 +643,6 @@ scope _ActivateFixed {
         txy
         ldx.w   slots.pair,y
 
-        lda.b   BaseEntity.MetaSprite.blockTwoCharAttrOffset
         and.w   #~OamFormat.charAttr.char.mask
         ora.l   slots.CharAttrOffset,x
         sta.b   BaseEntity.MetaSprite.blockTwoCharAttrOffset
@@ -777,10 +652,10 @@ scope _ActivateFixed {
     }
 
 
-    Process(OneTile, freeTiles, oneTile, 1, _Upload.OneSlot)
-    Process(TwoTiles, freeTiles, twoTiles, 2, _Upload.TwoTiles)
-    Process(OneRow, freeRows, oneRow, 1, _Upload.OneSlot)
-    Process(TwoRows, freeRows, twoRows, 2, _Upload.TwoRows)
+    Process(OneTile, freeTiles, oneTile, 1, BufferOneTileFromList)
+    Process(TwoTiles, freeTiles, twoTiles, 2, BufferTwoTilesFromList)
+    Process(OneRow, freeRows, oneRow, 1, BufferOneRowFromList)
+    Process(TwoRows, freeRows, twoRows, 2, BufferTwoRowsFromList)
 
     code()
     scope Table: {
@@ -1003,7 +878,6 @@ scope _AllocateDynamic {
         sta.b   BaseEntity.MetaSprite.blockOneCharAttrOffset
 
         tyx
-        lda.b   BaseEntity.MetaSprite.blockTwoCharAttrOffset
         and.w   #~OamFormat.charAttr.char.mask
         ora.l   slots.CharAttrOffset,x
         sta.b   BaseEntity.MetaSprite.blockTwoCharAttrOffset

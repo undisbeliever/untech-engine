@@ -1,41 +1,28 @@
 
 scope DmaTest {
-
 scope Tile16 {
 
 constant VRAM_BLOCK(0x6000)
 
+
 code()
 a16()
 i16()
-//DB=0x7e
-Test.add("Dma.Tile16.BufferOneTile")
-scope BufferOneTile: {
-    constant VRAM_TILE1(VRAM_BLOCK)
-    constant VRAM_TILE2(VRAM_BLOCK + 16 * 4)
+Test.add("Dma.Tile16.BufferOneTileFromList")
+scope BufferOneTileFromList: {
+    constant VRAM_1(VRAM_BLOCK + 32 * 2)
 
     jsr     Dma.Init
 
-    lda.w   Dma.transfersLeft
-    bne     +
-        jsr     WaitFrame
-    +
+    ldx.w   #TileData.TileList2
+    stx.w   Dma.Tile16.tileListAddr
 
-    sep     #$20
-a8()
-    ldx.w   #TileData.Tile1
-    lda.b   #TileData.Tile1 >> 16
-    ldy.w   #VRAM_TILE1
+    ldy.w   #VRAM_1
+    sty.w   Dma.Tile16.vramWaddr
 
-    jsr     Dma.Tile16.BufferOneTile
+    jsr     Dma.Tile16.BufferOneTileFromList
     bcc     Fail
 
-    ldx.w   #TileData.Tile2
-    lda.b   #TileData.Tile2 >> 16
-    ldy.w   #VRAM_TILE2
-
-    jsr     Dma.Tile16.BufferOneTile
-    bcc     Fail
 
     rep     #$30
 a16()
@@ -43,16 +30,56 @@ a16()
 
     jsr     WaitFrame
 
-    rep     #$30
-a16()
-i16()
-    ldx.w   #TileData.Tile1
-    ldy.w   #VRAM_TILE1
+    ldx.w   #TileData.Tile2
+    ldy.w   #VRAM_1 + 32 * 0
     jsr     _CheckTile
     bcc     Fail
 
-    ldx.w   #TileData.Tile2
-    ldy.w   #VRAM_TILE2
+    sec
+    rts
+
+Fail:
+    clc
+    rts
+}
+
+
+code()
+a16()
+i16()
+Test.add("Dma.Tile16.BufferTwoTilesFromList")
+scope BufferTwoTilesFromList: {
+    constant VRAM_1(VRAM_BLOCK + 32 * 7)
+    constant VRAM_2(VRAM_BLOCK + 32 * 6)
+
+    jsr     Dma.Init
+
+    ldx.w   #TileData.TileList10
+    stx.w   Dma.Tile16.tileListAddr
+
+    ldy.w   #VRAM_1
+    sty.w   Dma.Tile16.vramWaddr
+
+    ldy.w   #VRAM_2
+    sty.w   Dma.Tile16.vramWaddr2
+
+    jsr     Dma.Tile16.BufferTwoTilesFromList
+    bcc     Fail
+
+
+    rep     #$30
+a16()
+    jsr     Dma.TransferOnNextVBlank
+
+    jsr     WaitFrame
+
+    ldx.w   #TileData.Tile7
+    ldy.w   #VRAM_1
+    jsr     _CheckTile
+    bcc     Fail
+
+    ldx.w   #TileData.Tile6
+    ldy.w   #VRAM_2
     jsr     _CheckTile
     bcc     Fail
 
@@ -69,25 +96,113 @@ code()
 a16()
 i16()
 //DB=0x7e
-Test.add("Dma.Tile16.BufferTileList")
-scope BufferTileList: {
+Test.add("Dma.Tile16.BufferOneRowFromList")
+scope BufferOneRowFromList: {
+    constant VRAM_1(VRAM_BLOCK)
+
+    jsr     Dma.Init
+
+    ldx.w   #TileData.TileList3
+    stx.w   Dma.Tile16.tileListAddr
+    ldy.w   #VRAM_1
+    sty.w   Dma.Tile16.vramWaddr
+
+    jsr     Dma.Tile16.BufferOneRowFromList
+    bcc     Fail
+
+
+    rep     #$30
+a16()
+    jsr     Dma.TransferOnNextVBlank
+
+    jsr     WaitFrame
+
+    ldx.w   #TileData.Tile4
+    ldy.w   #VRAM_1 + 32 * 0
+    jsr     _CheckTile
+    bcc     Fail
+
+    ldx.w   #TileData.Tile5
+    ldy.w   #VRAM_1 + 32 * 1
+    jsr     _CheckTile
+    bcc     Fail
+
+    ldx.w   #TileData.Tile6
+    ldy.w   #VRAM_1 + 32 * 2
+    jsr     _CheckTile
+    bcc     Fail
+
+    sec
+    rts
+
+Fail:
+    clc
+    rts
+}
+
+
+code()
+a16()
+i16()
+Test.add("Dma.Tile16.BufferTwoRowsFromList (one row)")
+scope BufferTwoRowsFromList_one: {
+    constant VRAM_1(VRAM_BLOCK + 32 * 4)
+
+    jsr     Dma.Init
+
+    ldx.w   #TileData.TileList2
+    stx.w   Dma.Tile16.tileListAddr
+
+    ldy.w   #VRAM_1
+    sty.w   Dma.Tile16.vramWaddr
+    sty.w   Dma.Tile16.vramWaddr2
+
+    jsr     Dma.Tile16.BufferTwoRowsFromList
+    bcc     Fail
+
+
+    rep     #$30
+a16()
+    jsr     Dma.TransferOnNextVBlank
+
+    jsr     WaitFrame
+
+    ldx.w   #TileData.Tile2
+    ldy.w   #VRAM_1 + 32 * 0
+    jsr     _CheckTile
+    bcc     Fail
+
+    ldx.w   #TileData.Tile3
+    ldy.w   #VRAM_1 + 32 * 1
+    jsr     _CheckTile
+    bcc     Fail
+
+    sec
+    rts
+
+Fail:
+    clc
+    rts
+}
+
+
+code()
+a16()
+i16()
+//Test.add("Dma.Tile16.BufferTwoRowsFromList (two rows)")
+scope BufferTwoRowsFromList_two: {
     constant VRAM_1(VRAM_BLOCK)
     constant VRAM_2(VRAM_BLOCK + 3 * 32 * 16)
 
     jsr     Dma.Init
 
-    sep     #$20
-a8()
-    ldx.w   #TileData.TileList
+    ldx.w   #TileData.TileList10
     ldy.w   #VRAM_1
-    jsr     Dma.Tile16.BufferTileList
-    bcc     Fail
-
-    ldx.w   #TileData.TileList + 1 + 2 * 3
+    sty.w   Dma.Tile16.vramWaddr
     ldy.w   #VRAM_2
-    lda.b   #3
+    sty.w   Dma.Tile16.vramWaddr2
 
-    jsr     Dma.Tile16.BufferTileListGivenSize
+    jsr     Dma.Tile16.BufferTwoRowsFromList
     bcc     Fail
 
 
@@ -100,68 +215,63 @@ a16()
     rep     #$30
 a16()
 i16()
-    ldx.w   #TileData.Tile0
+    ldx.w   #TileData.Tile7
     ldy.w   #VRAM_1 + 32 * 0
     jsr     _CheckTile
-    bcs     +
-Fail:
-        clc
-        rts
-    +
+    bcs     Fail
 
-    ldx.w   #TileData.Tile1
+    ldx.w   #TileData.Tile6
     ldy.w   #VRAM_1 + 32 * 1
     jsr     _CheckTile
     bcc     Fail
 
-    ldx.w   #TileData.Tile2
+    ldx.w   #TileData.Tile5
     ldy.w   #VRAM_1 + 32 * 2
     jsr     _CheckTile
     bcc     Fail
 
-    ldx.w   #TileData.Tile3
+    ldx.w   #TileData.Tile4
     ldy.w   #VRAM_1 + 32 * 3
     jsr     _CheckTile
     bcc     Fail
 
-    ldx.w   #TileData.Tile4
+    ldx.w   #TileData.Tile3
     ldy.w   #VRAM_1 + 32 * 4
     jsr     _CheckTile
     bcc     Fail
 
-    ldx.w   #TileData.Tile5
+    ldx.w   #TileData.Tile2
     ldy.w   #VRAM_1 + 32 * 5
     jsr     _CheckTile
     bcc     Fail
 
-    ldx.w   #TileData.Tile6
+    ldx.w   #TileData.Tile1
     ldy.w   #VRAM_1 + 32 * 6
     jsr     _CheckTile
     bcc     Fail
 
-    ldx.w   #TileData.Tile7
+    ldx.w   #TileData.Tile0
     ldy.w   #VRAM_1 + 32 * 7
     jsr     _CheckTile
     bcc     Fail
 
-    // Check Second Transfer
+    // Check Second Row
 
-    ldx.w   #TileData.Tile3
+    ldx.w   #TileData.Tile1
     ldy.w   #VRAM_2 + 32 * 0
     jsr     _CheckTile
     bcc     Fail
 
-    ldx.w   #TileData.Tile4
+    ldx.w   #TileData.Tile2
     ldy.w   #VRAM_2 + 32 * 1
     jsr     _CheckTile
     bcc     Fail
 
-    ldx.w   #TileData.Tile5
-    ldy.w   #VRAM_2 + 32 * 2
-    jsr     _CheckTile
-    bcc     Fail
-
     sec
+    rts
+
+Fail:
+    clc
     rts
 }
 
@@ -302,16 +412,32 @@ Tile7:
 
 
 rodata(DMA_Tile16Data)
-TileList:
-    db  8
-    dw  Tile0 >> 7
-    dw  Tile1 >> 7
+TileList2:
+    db  2
     dw  Tile2 >> 7
     dw  Tile3 >> 7
+
+
+rodata(DMA_Tile16Data)
+TileList3:
+    db  3
     dw  Tile4 >> 7
     dw  Tile5 >> 7
     dw  Tile6 >> 7
+
+rodata(DMA_Tile16Data)
+TileList10:
+    db  10
     dw  Tile7 >> 7
+    dw  Tile6 >> 7
+    dw  Tile5 >> 7
+    dw  Tile4 >> 7
+    dw  Tile3 >> 7
+    dw  Tile2 >> 7
+    dw  Tile1 >> 7
+    dw  Tile0 >> 7
+    dw  Tile1 >> 7
+    dw  Tile2 >> 7
 }
 
 }
