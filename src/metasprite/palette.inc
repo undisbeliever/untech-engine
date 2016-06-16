@@ -300,7 +300,7 @@ a16()
     adc.w   #Dma.Palette.buffer + 129 * 2
     tay
 
-    ldx.b   tmp_paletteAddr
+    ldx.w   tmp_paletteAddr
     lda.w   #15 * 2 - 1
     mvn     0x7e=MetaSprite.Data.PaletteBank
 
