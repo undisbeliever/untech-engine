@@ -11,7 +11,18 @@ scope Dma {
 scope Tile16 {
 
 rodata(DMA_Tile16Data)
-    constant TileListOffset(pc() & 0xff0000)
+
+    // Tile list format:
+    //    byte: number of tiles
+    //    word: (tileAddress >> 7) * nTiles
+
+    scope TileListData {
+        struct(pc() & 0xff0000)
+            field(count, 1)
+            field(addr, 2)
+            constant addr.h(addr + 1)
+        endstruct()
+    }
 code()
 
 constant BUFFER_SIZE(30)
@@ -299,10 +310,6 @@ scope FunctionTable: {
 //
 // OUTPUT: Changes register size
 //
-// Tile list format:
-//    byte: number of tiles
-//    word: (tileAddress >> 7) * nTiles
-//
 // OUTPUT: C set if successful
 // OUTPUT: Changes register size to 8 bit A, 16 bit Index
 code()
@@ -355,11 +362,11 @@ a8()
 
     // tileBank = (tileList.addr << 7) >> 16
     // tileAddress = word(tileList.addr << 7)
-    lda.l   TileListOffset + 1 + 1,x
+    lda.l   TileListData.addr.h,x
     lsr
     sta.w   dmaBuffer.tileBank,y
 
-    lda.l   TileListOffset + 1,x
+    lda.l   TileListData.addr,x
 
     rep     #$30
 a16()
@@ -397,10 +404,6 @@ Fail:
 //      vramWaddr - the VRAM word address (MUST on an even VRAM tile row)
 //      vramWaddr2 - the second VRAM word address (MUST on an even VRAM tile row)
 //
-// Tile list format:
-//    byte: number of tiles
-//    word: (tileAddress >> 7) * nTiles
-//
 // OUTPUT: C set if successful
 // OUTPUT: Changes register size to 8 bit A, 16 bit Index
 code()
@@ -414,7 +417,7 @@ a8()
 i16()
 
     ldx.w   tileListAddr
-    lda.l   TileListOffset,x
+    lda.l   TileListData.count,x
     dec
     beq     BufferOneTileFromList.AfterLoadTileset
 
@@ -464,11 +467,11 @@ a8()
 
     // First tile
 
-    lda.l   TileListOffset + 2,x
+    lda.l   TileListData.addr.h,x
     lsr
     sta.w   dmaBuffer.tileBank,y
 
-    lda.l   TileListOffset + 1,x
+    lda.l   TileListData.addr,x
 
     rep     #$30
 a16()
@@ -482,11 +485,11 @@ a16()
     // Second tile
     sep     #$20
 a8()
-    lda.l   TileListOffset + 2 + 2,x
+    lda.l   TileListData.addr + 2 + 1,x
     lsr
     sta.w   dmaBuffer.tileBank + 2,y
 
-    lda.l   TileListOffset + 2 + 1,x
+    lda.l   TileListData.addr + 2,x
 
     rep     #$30
 a16()
@@ -520,10 +523,6 @@ a8()
 //      tileListAddr - the address of the tile list (within `TileListBank`)
 //      vramWaddr - the VRAM word address (MUST on an even VRAM tile row)
 //
-// Tile list format:
-//    byte: number of tiles
-//    word: (tileAddress >> 7) * nTiles
-//
 // OUTPUT: C set if successful
 // OUTPUT: Changes register size to 8 bit A, 16 bit Index
 code()
@@ -537,7 +536,7 @@ i16()
     ldx.w   tileListAddr
 
     // ensure 1 <= nTiles <= 8
-    lda.l   TileListOffset,x
+    lda.l   TileListData.count,x
     dec
     and.b   #7
     inc
@@ -596,11 +595,11 @@ a8()
         // tileBank = (tileList.addr << 7) >> 16
         // tileAddress = word(tileList.addr << 7)
 
-        lda.l   TileListOffset + 1 + 1,x
+        lda.l   TileListData.addr.h,x
         lsr
         sta.w   dmaBuffer.tileBank,y
 
-        lda.l   TileListOffset + 1,x
+        lda.l   TileListData.addr,x
 
         rep     #$30
 a16()
@@ -642,10 +641,6 @@ Fail:
 //      vramWaddr - the VRAM word address (MUST on an even VRAM tile row)
 //      vramWaddr2 - the VRAM word address of the second row (MUST on an even VRAM tile row)
 //
-// Tile list format:
-//    byte: number of tiles
-//    word: (tileAddress >> 7) * nTiles
-//
 // OUTPUT: C set if successful
 // OUTPUT: Changes register size to 8 bit A, 16 bit Index
 code()
@@ -660,7 +655,7 @@ i16()
 
     ldx.w   tileListAddr
 
-    lda.l   TileListOffset,x
+    lda.l   TileListData.count,x
     cmp.b   #8 + 1
     bcc     BufferOneRowFromList.NTilesA
 
