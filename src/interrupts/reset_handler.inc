@@ -123,44 +123,18 @@ i16()
 
     // Fill VRAM with 0 bytes
 
-    lda.b   #VMAIN.incrementMode.high | VMAIN.increment.by1
-    sta.w   VMAIN
-
     ldx.w   #0
-    stx.w   VMADD
-
-    ldy.w   #DMAP.direction.toPpu | DMAP.fixed | DMAP.transfer.two | (VMDATA << 8)
-    sty.b   DMAP0       // also sets BBAD0
-
-    // X = 0
-    stx.w   DAS0
-
-    ldx.w   #SnesHeader.EmptyBytes
-    stx.b   A1T0
-    stz.w   A1B0
-
-    lda.b   #MDMAEN.dma0
-    sta.w   MDMAEN
+    ldy.w   #0
+    jsr     Dma.ForceBlank.ClearVram
 
 
     // Fill palette with 0 bytes
-
-    stz.w   CGADD
-
-    ldy.w   #DMAP.direction.toPpu | DMAP.fixed | DMAP.transfer.one | (CGDATA << 8)
-    sty.w   DMAP0       // also sets BBAD0
-
-    ldx.w   #256 * 2
-    stx.w   DAS0
-
-    // source already set
-
-    lda.b   #MDMAEN.dma0
-    sta.w   MDMAEN
+    ldx.w   #0
+    ldy.w   #0
+    jsr     Dma.ForceBlank.ClearCgram
 
 
     // Move all objects in the OAM offscreen
-
     rep     #$30
 a16()
     lda     #$2100

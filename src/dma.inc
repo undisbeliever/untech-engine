@@ -1,4 +1,5 @@
 
+include "dma/forceblank.inc"
 include "dma/metasprite.inc"
 include "dma/palette.inc"
 include "dma/tile16.inc"
