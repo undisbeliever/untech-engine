@@ -17,6 +17,9 @@ scope manyObjEntity {
     constant nObjects(nLargeObjects + nSmallObjects)
 }
 
+constant SCREEN_WIDTH(256)
+constant SCREEN_HEIGHT(224)
+
 
 code()
 a16()
@@ -77,11 +80,11 @@ scope RenderEntity_OneSmall: {
     sep     #$20
 a8()
     lda.w   MetaSprite.Render.oamBuffer.xPos
-    cmp.b   #(256 - 8) / 2
+    cmp.b   #(SCREEN_WIDTH - 8) / 2
     bne     Fail
 
     lda.w   MetaSprite.Render.oamBuffer.yPos
-    cmp.b   #(224 - 8) / 2
+    cmp.b   #(SCREEN_HEIGHT - 8) / 2
     bne     Fail
 
     lda.w   MetaSprite.Render.oamHiBuffer
@@ -123,11 +126,11 @@ scope RenderEntity_OneLarge: {
     sep     #$20
 a8()
     lda.w   MetaSprite.Render.oamBuffer.xPos
-    cmp.b   #(256 - 16) / 2
+    cmp.b   #(SCREEN_WIDTH - 16) / 2
     bne     Fail
 
     lda.w   MetaSprite.Render.oamBuffer.yPos
-    cmp.b   #(224 - 16) / 2
+    cmp.b   #(SCREEN_HEIGHT - 16) / 2
     bne     Fail
 
     lda.w   MetaSprite.Render.oamHiBuffer
@@ -211,7 +214,7 @@ scope RenderEntity_Offscreen: {
 
     lda.w   #oneSmallObjEntity
     tcd
-    lda.w   #256 + 8/2 - INT_MS8_OFFSET
+    lda.w   #SCREEN_WIDTH + 8/2 - INT_MS8_OFFSET
     sta.w   MetaSprite.Render.xPos
     lda.w   #128 - INT_MS8_OFFSET
     sta.w   MetaSprite.Render.yPos
@@ -231,7 +234,7 @@ scope RenderEntity_Offscreen: {
 
     lda.w   #128 + INT_MS8_OFFSET
     sta.w   MetaSprite.Render.xPos
-    lda.w   #224 + 8/2 - INT_MS8_OFFSET
+    lda.w   #SCREEN_HEIGHT + 8/2 - INT_MS8_OFFSET
     sta.w   MetaSprite.Render.yPos
     jsr     MetaSprite.Render.RenderEntity
 
@@ -485,9 +488,9 @@ code()
 a16()
 i16()
 scope _RenderEntityCenter: {
-    lda.w   #256/2 - INT_MS8_OFFSET
+    lda.w   #SCREEN_WIDTH/2 - INT_MS8_OFFSET
     sta.w   MetaSprite.Render.xPos
-    lda.w   #224/2 - INT_MS8_OFFSET
+    lda.w   #SCREEN_HEIGHT/2 - INT_MS8_OFFSET
     sta.w   MetaSprite.Render.yPos
 
     jmp     MetaSprite.Render.RenderEntity
@@ -510,7 +513,7 @@ scope _CheckSpritesOffscreen: {
 a8()
     Loop:
         lda.w   MetaSprite.Render.oamBuffer.yPos,x
-        cmp.b   #224
+        cmp.b   #SCREEN_HEIGHT
         bcc     Fail
 
         inx

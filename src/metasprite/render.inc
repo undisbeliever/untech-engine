@@ -15,6 +15,9 @@
 scope MetaSprite {
 scope Render {
 
+constant SCREEN_WIDTH(256)
+constant SCREEN_HEIGHT(224)
+
 // Resets the oamXposBuffer, prevent possible bugs
 //
 // REQUITES: 16 bit A, 16 bit Index, DB = $7e
@@ -60,7 +63,7 @@ Return:
 //
 // ASSUMES: Entity has a frameSet
 //          Entity has a tileset and palette loaded into the PPU
-//          Screen is 224 pixels tall
+//          Screen is `SCREEN_HEIGHT` pixels tall
 //
 // INPUT: DP: Entity
 //        xPos: entity xPos - INT_MS8_OFFSET
@@ -83,7 +86,7 @@ End:
 // ASSUMES: Entity has a frameSet
 //          Entity has the frame's tileset loaded in VRAM
 //          Entity had a palette loaded into the PPU
-//          Screen is 224 pixels tall
+//          Screen is `SCREEN_HEIGHT` pixels tall
 //
 // REQUITES: 16 bit A, 16 bit Index, DB = $7e
 //
@@ -140,10 +143,10 @@ constant Return(InitLoop.Return)
         clc
         adc.w   xPos
 
-        // don't render if xPos <= -16 || xpos >= 256
+        // don't render if xPos <= -16 || xpos >= SCREEN_WIDTH
         cmp.w   #-16 + 1
         bcs     +
-            cmp.w   #256
+            cmp.w   #SCREEN_WIDTH
             bcs     SkipSprite
         +
 
@@ -162,10 +165,10 @@ constant Return(InitLoop.Return)
         clc
         adc.w   yPos
 
-        // don't render if yPos <= -16 || ypos >= 224
+        // don't render if yPos <= -16 || ypos >= SCREEN_HEIGHT
         cmp.w   #-16 + 1
         bcs     +
-            cmp.w   #224
+            cmp.w   #SCREEN_HEIGHT
             bcs     SkipSprite
         +
 
@@ -261,7 +264,7 @@ SkipHiTable:
 
         sep     #$20
     a8()
-        lda.b   #224
+        lda.b   #SCREEN_HEIGHT
         -
             sta.w   oamBuffer.yPos,x
             inx
@@ -284,7 +287,7 @@ SkipHiTable:
             // processed by `Render` has a valid xPos, but an
             // invalid yPos.
 
-            lda.b   #224
+            lda.b   #SCREEN_HEIGHT
             sta.w   oamBuffer.yPos,x
         +
 EndIf:
