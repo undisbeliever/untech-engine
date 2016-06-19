@@ -22,6 +22,11 @@ scope Text {
     // (dp)
     constant vars.size(4)
     allocate(vars, dp, vars.size)
+
+    // A temporary string to print
+    // (wram7e)
+    constant tmpString.size(12)
+    allocate(tmpString, wram7e, tmpString.size)
 }
 
 // vim: ft=asm ts=4 sw=4 et:

@@ -135,10 +135,184 @@ a8()
 }
 
 
+// Prints an 8 bit hex address to the buffer
+//
+// INPUT: A = hex address to print
+code()
+// P & DB unknown
+scope PrintHex8A: {
+    php
+
+    rep     #$30
+a16()
+    sta.l   tmpString
+    ldy.w   #1
+    bra     PrintHexString._AfterPhp
+}
+
+
+// Prints an 16 bit hex address to the buffer
+//
+// INPUT: A = hex address to print
+// REQUIRES: 16 bit A
+code()
+// P & DB unknown
+scope PrintHex16A: {
+    php
+
+    rep     #$30
+a16()
+    sta.l   tmpString
+
+    ldy.w   #2
+    bra     PrintHexString._AfterPhp
+}
+
+
+// Prints an 16 bit hex address to the buffer
+//
+// INPUT: Y = hex address to print
+code()
+// P & DB unknown
+scope PrintHex16Y: {
+    php
+
+    rep     #$30
+a16()
+    tya
+    sta.l   tmpString
+
+    ldy.w   #2
+    bra     PrintHexString._AfterPhp
+}
+
+
+// Prints an 32 bit hex address to the buffer
+//
+// INPUT: XY = hex address to print
+code()
+// P & DB unknown
+scope PrintHex32XY: {
+    php
+
+    rep     #$30
+a16()
+    tya
+    sta.l   tmpString
+
+    txa
+    sta.l   tmpString + 2
+
+    ldy.w   #4
+    bra     PrintHexString._AfterPhp
+}
+
+
+// Prints a 24 bit hex address to the buffer
+//
+// REQUIRES: 16 bit Index
+//
+// INPUT: A:X = hex address to print
+code()
+i16()
+// P & DB unknown
+scope PrintFarAddr: {
+    php
+
+    sta.l   tmpString + 2
+
+    rep     #$30
+a16()
+    txa
+    sta.l   tmpString
+
+    ldy.w   #3
+    bra     PrintHexString._AfterPhp
+}
+
+
+// Prints a byte array has a hex string.
+//
+// Ensures the entire hex string exists on a single line
+//
+// REQUIRES: 16 bit Index
+// INPUT: tmpString - the byte string to print
+//        Y number of bytes to print (MUST BE < tmpString.size)
+code()
+a8()
+i16()
+scope PrintHexString: {
+    php
+_AfterPhp:
+    phb
+
+    sep     #$20
+a8()
+    lda.b   #0x7e
+    pha
+    plb
+// DB = 0x7e
+
+
+    // Ensure that hex string fits in the current line
+    rep     #$31
+a16()
+    tya
+    asl
+    // c clear
+    adc.w   bufferPos
+    cmp.w   bufferEndLinePos
+    bcc     +
+        phy
+        jsr     NewLine
+        ply
++
+
+    // Print the string
+    sep     #$20
+a8()
+    // Y = number of bytes
+    ldx.w   bufferPos
+    Loop:
+        assert(Font.ZERO == 1)
+        assert(Font.CAPITAL_A == 1 + 10)
+
+        lda.w   tmpString - 1,y
+        lsr
+        lsr
+        lsr
+        lsr
+        inc
+        sta.w   buffer,x
+        inx
+
+        lda.w   tmpString - 1,y
+        and.b   #0x0f
+        inc
+        sta.w   buffer,x
+        inx
+
+        dey
+        bne     Loop
+
+    stx.w   bufferPos
+    cpx.w   bufferEndLinePos
+    bcc     +
+        jsr     NewLine
++
+
+    lda.b   #1
+    sta.w   bufferDirty
+
+    plb
+    plp
+    rts
+}
+
 
 // Prints a string to the buffer
 //
-// REQUIRES: 16 bit Index, DB = 0x7e
+// REQUIRES: 16 bit Index
 //
 // INPUT: A:X = string address
 code()
