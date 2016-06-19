@@ -219,12 +219,6 @@ i16()
 
 // A test failed.
 // The test can jump to this code at any time
-//
-// Currently shows a red screen
-//
-// ::SHOULDO display error message::
-// ::TODO display failed test name::
-// ::TODO display failed test message::
 code()
 scope Fail: {
     jsr     ResetPpuState
@@ -267,8 +261,23 @@ i16()
     jsr     Text.Console.NewLine
     jsr     Text.Console.NewLine
 
-    // ::TODO print hex address of test
 
+    // Print Address of failed test
+    rep     #$30
+a16()
+    lda.w   testId
+    asl
+    tax
+    lda.l   AddrTable,x
+    tax
+    lda.w   #AddrTable >> 16
+    jsr     Text.Console.PrintFarAddr
+
+    jsr     Text.Console.NewLine
+
+    // Print Test name
+    sep     #$20
+a8()
     ldx.w   currentTestName
     lda.b   #TestNameList >> 16
     jsr     Text.Console.PrintString
