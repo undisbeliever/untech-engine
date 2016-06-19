@@ -345,7 +345,7 @@ scope BGXSC {
 // bbbb - Base address for BG2(Addr>>13)
 constant BG12NBA(0x210B)
 
-scope BG12NMA {
+scope BG12NBA {
     scope bg1 {
         constant mask(%00001111)
         constant shift(0)
@@ -372,7 +372,7 @@ scope BG12NMA {
 // bbbb - Base address for BG4(Addr>>13)
 constant BG34NBA(0x210C)
 
-scope BG34NMA {
+scope BG34NBA {
     scope bg1 {
         constant mask(%00001111)
         constant shift(0)
@@ -465,7 +465,7 @@ scope VMAIN {
     scope incrementMode {
         constant mask(%10000000)
 
-        constant low(%10000000)
+        constant low(%00000000)
         constant high(%10000000)
     }
 }
