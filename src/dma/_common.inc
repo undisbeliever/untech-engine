@@ -48,9 +48,14 @@ macro VBlank() {
         Dma.Palette._VBlank()
         Dma.Tile16._VBlank()
 
+        // Text module is low priority.
+        // Must be done last
+        Dma.Text._VBlank()
+
         Dma.ResetTransfersLeft()
     }
 }
+
 
 // Initializes the tables.
 //

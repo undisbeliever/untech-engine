@@ -1,0 +1,269 @@
+// console.inc
+// ===========
+//
+// A *simple* text tile console
+//
+
+scope Text {
+scope Console {
+    constant BUFFER_WIDTH(32)
+    constant BUFFER_HEIGHT(28)
+
+    constant MARGIN_LEFT(3)
+    constant MARGIN_TOP(2)
+
+    constant MARGIN_RIGHT(BUFFER_WIDTH - MARGIN_LEFT)
+    constant MARGIN_BOTTOM(BUFFER_HEIGHT - MARGIN_TOP)
+
+    constant TEXT_WIDTH(MARGIN_RIGHT - MARGIN_LEFT)
+    constant TEXT_HEIGHT(MARGIN_BOTTOM - MARGIN_TOP)
+
+
+// Buffer
+// Each byte in the buffer represents a single character
+constant buffer(Text.buffer)
+
+// Location in the buffer
+// (word dp)
+constant bufferPos(Text.vars)
+
+// End position of the buffer for current event
+// (word dp)
+constant bufferEndLinePos(Text.vars + 2)
+
+assert(Text.vars >= 4)
+
+
+// Sets the console cursor to a fixed location
+//
+// REQUIRES: 16 bit A, DB access shadow
+macro SetCursor(evaluate x, evaluate y) {
+    assert16a()
+    assert({x} >= 0 && {x} < Text.Console.TEXT_WIDTH)
+    assert({y} >= 0 && {y} < Text.Console.TEXT_HEIGHT)
+
+    evaluate r((Text.Console.MARGIN_TOP + {y}) * Text.Console.BUFFER_WIDTH)
+
+    lda.w   #{r} + Text.Console.MARGIN_LEFT + {x}
+    sta.w   Text.Console.bufferPos
+
+    lda.w   #{r} + Text.Console.MARGIN_RIGHT
+    sta.w   Text.Console.bufferEndLinePos
+}
+
+
+
+// Initialize the console and copy font to VRAM.
+//
+// NOTE: This does not setup the Tilemap Addresses or
+//       size registers
+//
+// DMA: Uses DMA channel 0
+// REQUIRES: 8 bit A, 16 bit Index, DB access registers
+// REQUIRES: screen blank
+code()
+a8()
+i16()
+scope Init: {
+    // Transfer the font to the VRAM
+
+    if Text.Font.FixedTiles.bitDepth == 2 {
+        ldx.w   #VRAM_CONSOLE_TILES_WADDR
+        stx.w   VMADD
+
+        Dma.ForceBlank.ToVram(Text.Font.FixedTiles)
+
+    } else {
+        // ::TODO 1bpp bit depth::
+
+        error "Invalid Text.Font.FixedTiles bitDepth"
+    }
+
+    // Clear the vram tilemap
+
+    ldx.w   #VRAM_CONSOLE_MAP_WADDR
+    ldy.w   #32 * 32 * 2
+    jsr     Dma.ForceBlank.ClearVram
+
+
+    ldx.w   #VRAM_CONSOLE_MAP_WADDR
+    stx.w   Text.bufferVramWaddr
+
+End:
+    // CleanBuffer
+}
+
+
+
+// Clear the Buffer
+// REQUIRES: 8 bit A, 16 bit Index
+code()
+// P & DP & DB unknown
+scope ClearBuffer: {
+    assert(pc() == Init.End)
+
+    php
+
+    rep     #$30
+a16()
+i16()
+    lda.w   #0
+    sta.l   buffer
+
+    // Clear the buffer
+    lda.w   #0
+    ldx.w   #0
+    ldy.w   #32 * 32 / 2
+    Loop:
+        sta.l   buffer,x
+        inx
+        inx
+        dey
+        bne     Loop
+
+
+    SetCursor(0, 0)
+
+
+    sep     #$20
+a8()
+    lda.b   #1
+    sta.l   bufferDirty
+
+    plp
+    rts
+}
+
+
+
+// Prints a string to the buffer
+//
+// REQUIRES: 16 bit Index, DB = 0x7e
+//
+// INPUT: A:X = string address
+code()
+i16()
+// DP & DB unknown
+scope PrintString: {
+    php
+    phb
+    phd
+
+    txy
+
+    sep     #$20
+a8()
+    pha
+    plb
+
+    pea     0
+    pld
+
+
+    ldx.b   bufferPos
+
+    Loop:
+        lda.w   0,y
+        beq     EndLoop
+
+        sta.l   buffer,x
+
+        iny
+
+        inx
+        cpx.b   bufferEndLinePos
+        bcc     Loop
+            phy
+            jsr     NewLine
+            ldx.b   bufferPos
+            ply
+            bra     Loop
+    EndLoop:
+
+    // A = 0
+    inc
+    sta.b   bufferDirty
+
+    stx.b   bufferPos
+
+    pld
+    plb
+    plp
+    rts
+}
+
+
+
+// Prints a new line
+code()
+// P & DP & DB unknown
+scope NewLine: {
+    php
+
+    assert(BUFFER_WIDTH == 32)
+
+    assert(MARGIN_LEFT >= 0)
+    assert(MARGIN_LEFT < MARGIN_RIGHT)
+    assert(MARGIN_RIGHT <= BUFFER_WIDTH)
+    assert(MARGIN_TOP >= 0)
+    assert(MARGIN_TOP < MARGIN_BOTTOM)
+    assert(MARGIN_BOTTOM <= BUFFER_HEIGHT)
+
+    sep     #$20
+a8()
+    // Mark buffer as clean
+    // Prevents a line glitch if this routine is interrupted by VBlank
+    lda.b   #0
+    sta.l   bufferDirty
+
+
+    rep     #$31
+a16()
+i16()
+    lda.l   bufferPos
+    and.w   #~(BUFFER_WIDTH - 1)
+    // carry clear
+    adc.w   #BUFFER_WIDTH + MARGIN_LEFT
+
+    cmp.w   #MARGIN_BOTTOM * BUFFER_WIDTH
+    bcc     +
+        lda.w   #MARGIN_TOP * BUFFER_WIDTH + MARGIN_LEFT
+    +
+    sta.l   bufferPos
+
+    clc
+    adc.w   #MARGIN_RIGHT - MARGIN_LEFT
+    sta.l   bufferEndLinePos
+
+
+    // Empty the next line
+
+    assert(BUFFER_WIDTH % 2 == 0)
+
+    lda.w   #0
+    ldy.w   #BUFFER_WIDTH / 2
+    ldx.w   bufferPos
+
+    Loop:
+        sta.l   buffer,x
+        inx
+        inx
+        dey
+        bne     Loop
+
+    sep     #$20
+a8()
+    // A = 0
+    inc
+    sta.l   bufferDirty
+
+    plp
+    rts
+}
+
+
+}
+}
+
+// vim: ft=asm ts=4 sw=4 et:
+

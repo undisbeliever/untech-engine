@@ -9,7 +9,7 @@ INCLUDES       += $(wildcard tests/*.* tests/*/*.* tests/*/*/*.*)
 STATIC_TESTS    = $(wildcard static-tests/*.success.asm static-tests/*/*.success.asm)
 STATIC_TESTS   += $(wildcard static-tests/*.error*.asm static-tests/*/*.error*.asm)
 
-RESOURCE_DIRS   = tests/resources/metasprite
+RESOURCE_DIRS   = tests/resources/metasprite tests/resources/text
 
 
 ifeq ($(OS),Windows_NT)
