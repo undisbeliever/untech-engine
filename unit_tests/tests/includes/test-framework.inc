@@ -28,13 +28,15 @@ allocate(tmp, shadow, 32)
 rodata(testTableBlock)
 AddrTable:
 
-rodata(testTableBlock)
-NameTable:
+rodata(testNameBlock)
+// A NULL separated list of strings for each test
+TestNameList:
 
 // MEMORY ALLOCATIONS
 // ==================
 
 allocate(testId, shadow, 2)
+allocate(currentTestName, shadow, 2)
 
 // MACROS
 // ======
@@ -69,7 +71,7 @@ macro add(name) {
         dw  {loc}
 
     rodata(testNameBlock)
-        db  "{name}", 0
+        db  {name}, 0
 
     popBlock()
 
@@ -92,42 +94,26 @@ macro finalizeTable() {
 // Process all of the tests in the table one by one
 code()
 scope ProcessTests: {
-    sep     #$20
-a8()
-    pea     (0x7e << 8) | REGISTER_DB
-    plb
-
-// DB = REGISTER_DB
-    jsr     ResetRegisters
-
-    scope {
-        // set BG color
-        stz.w   CGADD
-
-        lda.b   #TESTING_COLOR & 0xff
-        sta.w   CGDATA
-
-        lda.b   #TESTING_COLOR >> 8
-        sta.w   CGDATA
-
-        lda.b   #15
-        sta.w   INIDISP
-    }
-
-    plb
-// DB = 0x7e
+    jsr     ResetPpuState
 
     rep     #$30
 a16()
 i16()
     lda.w   #0
+    sta.w   testId
     tcd
 
-    scope Loop: {
-        sta.w   testId
+    ldx.w   #TestNameList
+    stx.w   currentTestName
 
-        // ::TODO display test Id::
-        // ::TODO add test name Id::
+    scope Loop: {
+        // ::TODO print test number
+
+        Text.Console.SetCursor(0, 2)
+
+        ldx.w   currentTestName
+        lda.w   #TestNameList >> 16
+        jsr     Text.Console.PrintString
 
         jsr     EnableVBlank
 
@@ -142,9 +128,34 @@ i16()
         jsr     (AddrTable,x)
         bcc     Fail
 
-        // restore screen brightness
+
+        rep     #$30
+    a16()
+        // Clears the test name
+        Text.Console.SetCursor(0, 1)
+        jsr     Text.Console.NewLine
+        jsr     Text.Console.NewLine
+        jsr     Text.Console.NewLine
+
+
         sep     #$20
     a8()
+        // Increment currentTestName
+        scope {
+            ldx.w   currentTestName
+            dex
+
+            Loop:
+                inx
+                lda.l   TestNameList & 0xff0000,x
+                bne     Loop
+
+            inx
+            stx.w   currentTestName
+        }
+
+
+        // restore screen brightness (if necessary)
         lda.b   #15
         sta.l   INIDISP
 
@@ -156,21 +167,28 @@ i16()
 
         lda.w   testId
         inc
+        sta.w   testId
+
         cmp.w   #N_TESTS
         bcc     Loop
     }
 
 
 AllTestsPassed:
+    jsr     ResetPpuState
+
     rep     #$30
     sep     #$20
 a8()
 i16()
+    // Change text color to green
+
     lda.b   #REGISTER_DB
     pha
     plb
 
-    jsr     ResetRegisters
+    lda.b   #INIDISP.force
+    sta.w   INIDISP
 
     stz.w   CGADD
 
@@ -180,8 +198,17 @@ i16()
     lda.b   #SUCCESS_COLOR >> 8
     sta.w   CGDATA
 
+
+    // Print passed text
+
+    ldx.w   #Strings.Passed
+    lda.b   #Strings.Passed >> 16
+    jsr     Text.Console.PrintString
+
+
     lda.b   #15
     sta.w   INIDISP
+
 
     // Don't use STP, it causes some versions of snes9x to stall
 -
@@ -200,6 +227,8 @@ i16()
 // ::TODO display failed test message::
 code()
 scope Fail: {
+    jsr     ResetPpuState
+
     rep     #$30
     sep     #$20
 a8()
@@ -208,7 +237,8 @@ i16()
     pha
     plb
 
-    jsr     ResetRegisters
+    lda.b   #INIDISP.force
+    sta.w   INIDISP
 
     // Show failure color
 
@@ -220,7 +250,28 @@ i16()
     lda.b   #FAILURE_COLOR >> 8
     sta.w   CGDATA
 
-    // ::TODO display failed test name::
+    // text color (white)
+    lda.b   #0xff
+    sta.w   CGDATA
+    sta.w   CGDATA
+
+
+    // Print Failed message
+    // --------------------
+
+    ldx.w   #Strings.Failed
+    lda.b   #Strings.Failed >> 16
+    jsr     Text.Console.PrintString
+
+    jsr     Text.Console.NewLine
+    jsr     Text.Console.NewLine
+    jsr     Text.Console.NewLine
+
+    // ::TODO print hex address of test
+
+    ldx.w   currentTestName
+    lda.b   #TestNameList >> 16
+    jsr     Text.Console.PrintString
 
     lda.b   #15
     sta.w   INIDISP
@@ -230,6 +281,90 @@ i16()
     wai
     bra     -
 }
+
+
+// Resets the PPU registers to initial state
+//
+// All tests that change PPU registers MUST call this routine upon clean-up
+//
+// OUTPUT: Carry always clear
+scope ResetPpuState: {
+    php
+    rep     #$30
+    sep     #$20
+a8()
+i16()
+    pea     (0x7e << 8) | REGISTER_DB
+    plb
+// DB = REGISTER_DB
+
+    jsr     ResetRegisters
+
+
+    // Setup Screen
+    //
+    // MODE1
+    // BG1 - text console buffer
+
+    // ::TODO move elsewhere::
+    // ::TODO design how to do this, I'm thinking of a macro that generates for each map layout::
+
+    stz.w   BGMODE
+    lda.b   #((VRAM_CONSOLE_MAP_WADDR / BGXSC.base.walign) << BGXSC.base.shift) | BGXSC.map.s32x32
+    sta.w   BG1SC
+
+    lda.b   #(VRAM_CONSOLE_TILES_WADDR / BG12NBA.walign) << BG12NBA.bg1.shift
+    sta.w   BG12NBA
+
+    lda.b   #TM.bg1
+    sta.w   TM
+
+
+    // set BG color
+    stz.w   CGADD
+
+    lda.b   #TESTING_COLOR & 0xff
+    sta.w   CGDATA
+
+    lda.b   #TESTING_COLOR >> 8
+    sta.w   CGDATA
+
+    // text color (black)
+    stz.w   CGDATA
+    stz.w   CGDATA
+
+    jsr     Text.Console.Init
+
+
+    lda.b   #15
+    sta.w   INIDISP
+
+    plb
+// DB = 0x7e
+
+    ldx.w   #Strings.Header
+    lda.b   #Strings.Header >> 16
+    jsr     Text.Console.PrintString
+
+    plp
+    sec
+    rts
+}
+
+
+rodata(rom0)
+scope Strings {
+
+    Header:
+        db  "UnTech Unit Tests:", 0
+
+    Passed:
+        db  " PASSED", 0
+
+    Failed:
+        db  " FAILED", 0
+}
+
 }
 
 // vim: ft=asm ts=4 sw=4 et:

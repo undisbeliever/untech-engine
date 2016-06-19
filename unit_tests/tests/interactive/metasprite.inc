@@ -49,7 +49,7 @@ scope EntityTable: {
     data(FST_OneTile, 150, 40, 100)
     data(FST_TwoTiles, 150, 256 - 40, 100)
 
-    data(FST_TwoRows, 200, 256 / 2, 30)
+    data(FST_TwoRows, 200, 256 / 2, 45)
 }
 
 constant N_ENTITIES((pc() - EntityTable) / EntityTable.size)
@@ -77,7 +77,7 @@ macro Init() {
         lda.b   #(VRAM_OBJ_WADDR / OBSEL.base.walign) | OBSEL.size.s8_16
         sta.w   OBSEL
 
-        lda.b   #TM.obj
+        lda.b   #TM.bg1 | TM.obj
         sta.w   TM
 
         jsr     EnableVBlank
@@ -244,8 +244,6 @@ a16()
 i16()
 Test.add("MetaSprite")  // ::TODO replace with something better::
 scope Test: {
-    Init()
-
     -
         jsr     WaitFrame
 
@@ -253,6 +251,7 @@ scope Test: {
         and.w   #JOY.buttons
         bne     -
 
+    Init()
 
     Loop:
         jsr     MetaSprite.Render.InitLoop
@@ -271,6 +270,8 @@ scope Test: {
         jmp     Loop
 
 End:
+    jsr     Test.ResetPpuState
+
     sec
     rts
 }

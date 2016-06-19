@@ -63,6 +63,8 @@ a8()
     jsr     _CheckCgram
     bcc     Fail
 
+    jsr     Test.ResetPpuState
+
     sec
     rts
 
@@ -128,6 +130,8 @@ a8()
     ldy.w   #0x38
     jsr     _CheckCgram
     bcc     Fail
+
+    jsr     Test.ResetPpuState
 
     sec
     rts

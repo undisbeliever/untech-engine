@@ -44,15 +44,18 @@ createRamBlock(wram7e, 0x7e2000, 0x7effff)
 // ::DEBUG::
 // ::TODO move somewhere else::
 constant VRAM_OBJ_WADDR(0x6000)
+constant VRAM_CONSOLE_TILES_WADDR(0x1000)
+constant VRAM_CONSOLE_MAP_WADDR(0x0000)
+
+include "resources/metasprite/metasprites.gen.inc"
+include "resources/text/text.inc"
 
 
 include "../../src/dma.inc"
 include "../../src/interrupts.inc"
 include "../../src/math.inc"
 include "../../src/metasprite.inc"
-
-
-include "resources/metasprite/metasprites.gen.inc"
+include "../../src/text.inc"
 
 
 // ::DEBUG::

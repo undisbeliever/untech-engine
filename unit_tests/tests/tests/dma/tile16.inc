@@ -13,6 +13,7 @@ scope BufferOneTileFromList: {
     constant VRAM_1(VRAM_BLOCK + 32 * 2)
 
     jsr     Dma.Init
+    jsr     WaitFrame       // Reset Dma.transfersLeft
 
     ldx.w   #TileData.TileList2
     stx.w   Dma.Tile16.tileListAddr
@@ -53,6 +54,7 @@ scope BufferTwoTilesFromList: {
     constant VRAM_2(VRAM_BLOCK + 32 * 6)
 
     jsr     Dma.Init
+    jsr     WaitFrame       // Reset Dma.transfersLeft
 
     ldx.w   #TileData.TileList10
     stx.w   Dma.Tile16.tileListAddr
@@ -72,6 +74,7 @@ a16()
     jsr     Dma.TransferOnNextVBlank
 
     jsr     WaitFrame
+
 
     ldx.w   #TileData.Tile7
     ldy.w   #VRAM_1
@@ -101,6 +104,7 @@ scope BufferOneRowFromList: {
     constant VRAM_1(VRAM_BLOCK)
 
     jsr     Dma.Init
+    jsr     WaitFrame       // Reset Dma.transfersLeft
 
     ldx.w   #TileData.TileList3
     stx.w   Dma.Tile16.tileListAddr
@@ -149,6 +153,7 @@ scope BufferTwoRowsFromList_one: {
     constant VRAM_1(VRAM_BLOCK + 32 * 4)
 
     jsr     Dma.Init
+    jsr     WaitFrame       // Reset Dma.transfersLeft
 
     ldx.w   #TileData.TileList2
     stx.w   Dma.Tile16.tileListAddr
@@ -195,6 +200,7 @@ scope BufferTwoRowsFromList_two: {
     constant VRAM_2(VRAM_BLOCK + 3 * 32 * 16)
 
     jsr     Dma.Init
+    jsr     WaitFrame       // Reset Dma.transfersLeft
 
     ldx.w   #TileData.TileList10
     ldy.w   #VRAM_1
