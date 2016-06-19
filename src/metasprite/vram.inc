@@ -466,7 +466,8 @@ scope _ActivateFixed {
         // freeSlotPool = current->next
         //
         // current->next = usedSlotPool
-        // current->next->prev = current
+        // if current->next != null:
+        //     current->next->prev = current
         // usedSlotPool = current
 
         rep     #$20
@@ -488,8 +489,11 @@ scope _ActivateFixed {
         sta.w   slots.next,x
 
         tay
+        bmi     +
+            txa
+            sta.w   slots.prev,y
+    +
         txa
-        sta.w   slots.prev,y
         sta.w   slotPool.{usedSlotPool}
     }
 
@@ -539,7 +543,8 @@ scope _ActivateFixed {
         // freeSlotPool = second->next
         //
         // first->next = usedSlotPool
-        // first->next->prev = first
+        // if first->next:
+        //     first->next->prev = first
         // usedSlotPool = first
 
         // X = first
@@ -565,8 +570,11 @@ scope _ActivateFixed {
         sta.w   slots.next,x
 
         tay
+        bmi     +
+            txa
+            sta.w   slots.prev,y
+    +
         txa
-        sta.w   slots.prev,y
         sta.w   slotPool.{usedSlotPool}
     }
 

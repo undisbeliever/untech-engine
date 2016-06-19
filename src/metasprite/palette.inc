@@ -264,8 +264,11 @@ NotFound:
     // current->count = 1
     //
     // current->prev = NULL
+    // slotPool.free = current->next
+    //
     // current->next = slotPool.used
-    // current->next->prev = current
+    // if current->next != null:
+    //     current->next->prev = current
     // slotPool.used = current
 
     sta.w   slots.paletteAddress,x
@@ -284,8 +287,11 @@ a8()
     sta.w   slots.next,x
 
     tay
+    bmi     +
+        txa
+        sta.w   slots.prev,y
++
     txa
-    sta.w   slots.prev,y
     sta.w   slotPool.used
 
     rep     #$30
