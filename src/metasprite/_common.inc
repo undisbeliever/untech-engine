@@ -18,6 +18,7 @@ a8()
 i8()
     MetaSprite.Palette._Init()
     MetaSprite.Vram._Init()
+    MetaSprite.Animation._Init()
 
     rep     #$30
 a16()
@@ -42,6 +43,7 @@ macro _InitEntity() {
     scope InitEntity: {
         stz.b   BaseEntity.MetaSprite.status
         stz.b   BaseEntity.MetaSprite.currentFrame
+        stz.b   BaseEntity.MetaSprite.Animation.pc
 
         // Determine FrameSet address
         cmp.w   #MetaSprite.Data.FrameSetListCount
@@ -58,6 +60,9 @@ macro _InitEntity() {
         sep     #$10
     i8()
         sty.b   BaseEntity.MetaSprite.palette
+
+        ldx.b   #$00ff
+        stx.b   BaseEntity.MetaSprite.Animation.id
 
         rep     #$30
     a16()
@@ -79,6 +84,7 @@ macro EntityDestructor() {
         jsr     MetaSprite.Deactivate
         stz.b   BaseEntity.MetaSprite.frameSet
         stz.b   BaseEntity.MetaSprite.currentFrame
+        stz.b   BaseEntity.MetaSprite.Animation.pc
     }
 }
 
@@ -139,6 +145,18 @@ a16()
 a16()
     rts
 }
+
+
+// Sets the entity's animation.
+//
+// Does not reset the animation pc if the animation Id is unchanged.
+//
+// REQUIRES: 16 bit A, 16 bit Index
+//
+// INPUT: dp = Entity
+// INPUT: A = animation Id
+// OUTPUT: C set on success
+constant SetAnimation(Animation.SetAnimationId)
 
 
 // Sets the entity's metasprite frame.

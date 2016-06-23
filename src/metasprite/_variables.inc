@@ -29,6 +29,28 @@ scope MetaSprite {
 
             // Offset between frame object data and the OAM charattr data (second block)
             field(blockTwoCharAttrOffset, 2)
+
+            scope Animation {
+                // Current animation Id
+                field(id, 1)
+
+                // The animation bytecode program counter.
+                //
+                // If NULL (0) then there is no animation.
+                //
+                // (word addr)
+                field(pc, 2)
+
+                // Delay state for processing next animation bytecode
+                //
+                //      fnnnnnnn nnnnnnnn
+                //
+                //  f = If true then MS Frame has not been set.
+                //      Set MS Frame on next animation process.
+                //  n = current delay value.
+                //      Value depends on the animation instruction being processed.
+                field(delay, 2)
+            }
         }
     }
 
@@ -214,6 +236,14 @@ scope MetaSprite {
             // The freeList
             constant free(used + 1)
         }
+    }
+
+    scope Animation {
+        // The speed of the animations in Wait Timer mode
+        //
+        // This variable is set to 5 (NTSC) or 6 (PAL)
+        // (word)
+        allocateTmpWord(timerSpeed)
     }
 }
 

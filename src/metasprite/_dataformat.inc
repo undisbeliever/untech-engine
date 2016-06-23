@@ -12,23 +12,27 @@ constant INT_MS8_OFFSET(128)
 
 scope MetaSprite {
 
-    scope Data {
-        storeBlockStart(FrameSetList, MS_FrameSetList)
-        storeBlockStart(FrameList,    MS_FrameList)
-        storeBlockStart(PaletteList,  MS_PaletteList)
+scope Data {
+    storeBlockStart(FrameSetList, MS_FrameSetList)
+    storeBlockStart(PaletteList,  MS_PaletteList)
+    storeBlockStart(FrameList,    MS_FrameList)
+    storeBlockStart(AnimationList,MS_AnimationList)
 
-        rodata(MS_FrameSetData)
-            constant FrameSetOffset(pc() & 0xff0000)
+    rodata(MS_FrameSetData)
+        constant FrameSetOffset(pc() & 0xff0000)
 
-        rodata(MS_PaletteData)
-            constant PaletteBank(pc() >> 16)
-            constant PaletteOffset(pc() & 0xff0000)
+    rodata(MS_PaletteData)
+        constant PaletteBank(pc() >> 16)
+        constant PaletteOffset(pc() & 0xff0000)
 
-        rodata(MS_FrameData)
+    rodata(MS_FrameData)
         constant FrameOffset(pc() & 0xff0000)
 
     rodata(MS_FrameObjectsData)
         constant FrameObjectsOffset(pc() & 0xff0000)
+
+    rodata(MS_AnimationData)
+        constant AnimationBytecodeOffset(pc() & 0xff0000)
 
     rodata(MS_TileHitboxData)
         constant TileHitboxOffset(pc() & 0xff0000)
@@ -265,6 +269,65 @@ scope Format {
                 field(yPos, 1) // int_ms8
             }
         endstruct()
+    }
+
+
+    scope Animation {
+        scope Bytecode {
+            createEnum(0, 2)
+
+            // Stops the animation.
+            enum(STOP)
+
+            // Goto the start of the animation
+            enum(GOTO_START)
+
+            // Goto a specific animation
+            // param: (uint8) animation Id
+            enum(GOTO_ANIMATION)
+
+            // Updates the animation PC by a specific offset
+            // param: (int_ms8) byte offset
+            enum(GOTO_OFFSET)
+
+            // Sets the given frame and waits a given amount of frames.
+            //
+            // If the metasprite frame could not be set, then the engine will
+            // try again in the next display frame.
+            //
+            // param: (uint8) frame Id
+            // param: (uint8) number of frames to wait
+            enum(SET_FRAME_AND_WAIT_FRAMES)
+
+            // Sets the given frame and waits a given amount of time.
+            //
+            // If the metasprite frame could not be set, then the engine will
+            // try again in the next display frame.
+            //
+            // param: (uint8) frame Id
+            // param: (uint8) time to wait (1/75ths of a second)
+            enum(SET_FRAME_AND_WAIT_TIME)
+
+            // Sets the given frame and waits until the entity has moved a given
+            // distance horizontally.
+            //
+            // If the metasprite frame could not be set, then the engine will
+            // try again in the next display frame.
+            //
+            // param: (uint8) frame Id
+            // param: (0:3:5 fixed point) distance to wait
+            enum(SET_FRAME_AND_WAIT_XVECL)
+
+            // Sets the given frame and waits until the entity has moved a given
+            // distance vertically.
+            //
+            // If the metasprite frame could not be set, then the engine will
+            // try again in the next display frame.
+            //
+            // param: (uint8) frame Id
+            // param: (0:3:5 fixed point) distance to wait
+            enum(SET_FRAME_AND_WAIT_YVECL)
+        }
     }
 }
 

@@ -19,6 +19,7 @@ createDataBlock(MS_AnimationList,       0xc10300, 0xc103ff)
 
 createDataBlock(MS_FrameSetData,        0xc10400, 0xc10fff)
 createDataBlock(MS_FrameData,           0xc11000, 0xc117ff)
+createDataBlock(MS_AnimationData,       0xc11800, 0xc11fff)
 createDataBlock(MS_FrameObjectsData,    0xc12000, 0xc127ff)
 createDataBlock(MS_TileHitboxData,      0xc12800, 0xc12fff)
 createDataBlock(MS_EntityHitboxData,    0xc13000, 0xc137ff)
@@ -82,6 +83,12 @@ scope Entities {
 }
 scope BaseEntity {
     struct()
+        field(xPos, 3)
+        field(yPos, 3)
+
+        field(xVecl, 2)
+        field(yVecl, 2)
+
         MetaSprite.EntityData()
     endstruct()
 

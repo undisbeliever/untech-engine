@@ -8,15 +8,18 @@ allocateTmpWord(tmp)
 // ::TODO find a proper way to do this::
 scope EntityStruct: {
     struct()
+        field(xPos, 3)
+        field(yPos, 3)
+
+        field(xVecl, 2)
+        field(yVecl, 2)
+
         MetaSprite.EntityData()
 
         field(frameId, 2)
         field(frameCount, 2)
 
         field(frameDelay, 2)
-
-        field(xPos, 2)
-        field(yPos, 2)
     endstruct()
 
     assert(size <= Entities.ENTITY_SIZE)
