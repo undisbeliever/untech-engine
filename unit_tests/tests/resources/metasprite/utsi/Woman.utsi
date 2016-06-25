@@ -80,4 +80,13 @@
     <entityhitbox parameter="0" x="4" y="16" width="17" height="13"/>
     <entityhitbox parameter="0" x="8" y="3" width="13" height="15"/>
   </frame>
+  <animation id="Walk_Right">
+    <instruction op="SET_FRAME_AND_WAIT_XVECL" frame="Walk_Right_0" parameter="20"/>
+    <instruction op="SET_FRAME_AND_WAIT_XVECL" frame="Walk_Right_1" parameter="20"/>
+    <instruction op="SET_FRAME_AND_WAIT_XVECL" frame="Walk_Right_2" parameter="20"/>
+    <instruction op="SET_FRAME_AND_WAIT_XVECL" frame="Walk_Right_3" parameter="20"/>
+    <instruction op="SET_FRAME_AND_WAIT_XVECL" frame="Walk_Right_4" parameter="20"/>
+    <instruction op="SET_FRAME_AND_WAIT_XVECL" frame="Walk_Right_5" parameter="20"/>
+    <instruction op="GOTO_START"/>
+  </animation>
 </spriteimporter>

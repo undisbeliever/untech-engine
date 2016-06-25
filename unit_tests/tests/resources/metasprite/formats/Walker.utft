@@ -19,36 +19,10 @@
   <frame id="TouchPlayer_Left">
     <alt name="TouchPlayer_Right" hflip="true"/>
   </frame>
-
-<!-- ::TODO replace these with two animations -->
-  <frame id="Walk_Right_0">
-    <alt name="Walk_Left_0" hflip="true"/>
-  </frame>
-  <frame id="Walk_Left_0">
-    <alt name="Walk_Right_0" hflip="true"/>
-  </frame>
-  <frame id="Walk_Right_1">
-    <alt name="Walk_Left_1" hflip="true"/>
-  </frame>
-  <frame id="Walk_Left_1">
-    <alt name="Walk_Right_1" hflip="true"/>
-  </frame>
-  <frame id="Walk_Left_2">
-    <alt name="Walk_Right_2" hflip="true"/>
-  </frame>
-  <frame id="Walk_Right_2">
-    <alt name="Walk_Left_2" hflip="true"/>
-  </frame>
-  <frame id="Walk_Right_3">
-    <alt name="Walk_Left_3" hflip="true"/>
-  </frame>
-  <frame id="Walk_Left_3">
-    <alt name="Walk_Right_3" hflip="true"/>
-  </frame>
-  <frame id="Walk_Right_4">
-    <alt name="Walk_Left_4" hflip="true"/>
-  </frame>
-  <frame id="Walk_Left_4">
-    <alt name="Walk_Right_4" hflip="true"/>
-  </frame>
+  <animation id="Walk_Right">
+    <alt name="Walk_Left" hflip="true"/>
+  </animation>
+  <animation id="Walk_Left">
+    <alt name="Walk_Right" hflip="true"/>
+  </animation>
 </framesettype>

@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF_8"?>
+<!DOCTYPE untech>
+<framesettype name="AnimationTest">
+  <frame id="frame1"/>
+  <frame id="frame2"/>
+  <animation id="Stop"/>
+  <animation id="GotoStart"/>
+  <animation id="GotoAnimation"/>
+  <animation id="GotoOffset"/>
+  <animation id="SetFrameWaitFrames"/>
+  <animation id="SetFrameWaitTime"/>
+  <animation id="SetFrameWaitVecl"/>
+</framesettype>

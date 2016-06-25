@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF_8"?>
+<!DOCTYPE untech>
+<metasprite id="FST_Animations" tilesettype="TWO_TILES_FIXED">
+  <exportorder src="../formats/AnimationTest.utft"/>
+  <smalltileset>
+    GAA8AGYAwwDDAGYAPAAYAAAAAAAAAAAAAAAAAAAAAAA=
+  </smalltileset>
+  <largetileset>
+    gABAACAAEAAIAAQAAgABAAAAAAAAAAAAAAAAAAAAAAABAAIABAAIABAAIABAAIAA
+    AAAAAAAAAAAAAAAAAAAAAAEAAgAEAAgAEAAgAEAAgAAAAAAAAAAAAAAAAAAAAAAA
+    gABAACAAEAAIAAQAAgABAAAAAAAAAAAAAAAAAAAAAAA=
+  </largetileset>
+  <palette>
+    4AMjEAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=
+  </palette>
+  <frame id="frame1">
+    <object size="large" x="-8" y="-8" tile="0" order="2"/>
+  </frame>
+  <frame id="frame2">
+    <object size="small" x="-4" y="-4" tile="0" order="2"/>
+  </frame>
+  <animation id="Stop">
+    <instruction op="STOP"/>
+  </animation>
+  <animation id="GotoStart">
+    <instruction op="SET_FRAME_AND_WAIT_FRAMES" frame="frame1" parameter="0"/>
+    <instruction op="SET_FRAME_AND_WAIT_FRAMES" frame="frame2" parameter="0"/>
+    <instruction op="GOTO_START"/>
+  </animation>
+  <animation id="GotoAnimation">
+    <instruction op="GOTO_ANIMATION" goto="SetFrameWaitFrames"/>
+  </animation>
+  <animation id="GotoOffset">
+    <instruction op="GOTO_OFFSET" parameter="5"/>
+    <instruction op="SET_FRAME_AND_WAIT_FRAMES" frame="frame1" parameter="0"/>
+    <instruction op="GOTO_ANIMATION" goto="Stop"/>
+    <instruction op="GOTO_OFFSET" parameter="-1"/>
+    <instruction op="SET_FRAME_AND_WAIT_FRAMES" frame="frame2" parameter="0"/>
+    <instruction op="GOTO_OFFSET" parameter="-2"/>
+  </animation>
+  <animation id="SetFrameWaitFrames">
+    <instruction op="SET_FRAME_AND_WAIT_FRAMES" frame="frame1" parameter="5"/>
+    <instruction op="SET_FRAME_AND_WAIT_FRAMES" frame="frame2" parameter="2"/>
+    <instruction op="STOP"/>
+  </animation>
+  <animation id="SetFrameWaitTime">
+    <instruction op="SET_FRAME_AND_WAIT_TIME" frame="frame1" parameter="25"/>
+    <instruction op="SET_FRAME_AND_WAIT_TIME" frame="frame2" parameter="25"/>
+    <instruction op="STOP"/>
+  </animation>
+  <animation id="SetFrameWaitVecl">
+    <instruction op="SET_FRAME_AND_WAIT_XVECL" frame="frame1" parameter="79"/>
+    <instruction op="SET_FRAME_AND_WAIT_YVECL" frame="frame2" parameter="79"/>
+    <instruction op="GOTO_START"/>
+  </animation>
+</metasprite>

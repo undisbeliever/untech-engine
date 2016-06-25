@@ -21,4 +21,5 @@
   <frameset src="utms-gen/Woman.utms"/>
   <frameset src="utms-gen/FST_TwoRows.utms"/>
 
+  <frameset src="utms/FST_Animations.utms"/>
 </metaspriteexport>
