@@ -109,6 +109,7 @@ scope SuccessTest: {
 include "tests/dma.inc"
 include "tests/math.inc"
 include "tests/metasprite.inc"
+include "tests/text.inc"
 
 include "interactive/metasprite.inc"
 

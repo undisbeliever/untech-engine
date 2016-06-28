@@ -23,10 +23,22 @@ scope Text {
     constant vars.size(4)
     allocate(vars, dp, vars.size)
 
-    // A temporary string to print
+    // string pointer 1
+    // (dp far addr)
+    allocate(str1, dp, 3)
+
+    // string pointer 2
+    // (dp far addr)
+    allocate(str2, dp, 3)
+
+    // A temporary buffer used for string generation
     // (wram7e)
     constant tmpString.size(12)
     allocate(tmpString, wram7e, tmpString.size)
+
+    // Padding character
+    // (wram7e)
+    allocate(paddingChar, wram7e, 1)
 }
 
 // vim: ft=asm ts=4 sw=4 et:

@@ -79,6 +79,10 @@ scope Init: {
         error "Invalid Text.Font.FixedTiles bitDepth"
     }
 
+    // Reset padding character
+    lda.b   #Text.Font.SPACE
+    sta.l   Text.paddingChar
+
     // Clear the vram tilemap
 
     ldx.w   #VRAM_CONSOLE_MAP_WADDR
@@ -309,6 +313,102 @@ a8()
     rts
 }
 
+// Prints an unsigned 16 bit integer to buffer
+//
+// REQUIRES: 16 bit Index
+//
+// INPUT: Y - uint16 number to print
+code()
+i16()
+// P, DP, DB unknown
+scope PrintU16Y: {
+    php
+    phb
+    phd
+
+    sep     #$20
+a8()
+    lda.b   #0x7e
+    pha
+    plb
+
+    pea     PrintString.AfterSetBank - 1
+    jmp     Text.String.U16Y_ToString
+}
+
+
+// Prints an unsigned 16 bit padded integer to buffer
+//
+// REQUIRES: 16 bit Index
+//
+// INPUT: Y - uint16 number to print
+//        A - number of digits to print
+code()
+i16()
+// P, DP, DB unknown
+scope PrintPaddedU16Y: {
+    php
+    phb
+    phd
+
+    sep     #$20
+a8()
+    pea     0x7e7e
+    plb
+    plb
+
+    pea     PrintString.AfterSetBank - 1
+    jmp     Text.String.U16Y_ToPaddedString
+}
+
+// Prints an unsigned 32 bit integer to buffer
+//
+// REQUIRES: 32 bit Index
+//
+// INPUT: XY - uint32 number to print
+code()
+i16()
+// P, DP, DB unknown
+scope PrintU32XY: {
+    php
+    phb
+    phd
+
+    sep     #$20
+a8()
+    lda.b   #0x7e
+    pha
+    plb
+
+    pea     PrintString.AfterSetBank - 1
+    jmp     Text.String.U32XY_ToString
+}
+
+
+// Prints an unsigned 32 bit padded integer to buffer
+//
+// REQUIRES: 16 bit Index
+//
+// INPUT: XY - uint16 number to print
+//        A - number of digits to print
+code()
+i16()
+// P, DP, DB unknown
+scope PrintPaddedU32XY: {
+    php
+    phb
+    phd
+
+    sep     #$20
+a8()
+    pea     0x7e7e
+    plb
+    plb
+
+    pea     PrintString.AfterSetBank - 1
+    jmp     Text.String.U32XY_ToPaddedString
+}
+
 
 // Prints a string to the buffer
 //
@@ -323,16 +423,16 @@ scope PrintString: {
     phb
     phd
 
-    txy
-
     sep     #$20
 a8()
     pha
     plb
 
+AfterSetBank:
+    txy
+
     pea     0
     pld
-
 
     ldx.b   bufferPos
 

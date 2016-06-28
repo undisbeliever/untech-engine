@@ -121,8 +121,10 @@ i16()
         asl
         tax
 
+        lda.w   #0
+        tcd
+
         php
-        phd
         phb
 
         jsr     (AddrTable,x)
@@ -160,7 +162,6 @@ i16()
         sta.l   INIDISP
 
         plb
-        pld
         plp
 
     a16()
@@ -199,12 +200,14 @@ i16()
     sta.w   CGDATA
 
 
-    // Print passed text
+    jsr     Text.Console.NewLine
+
+    ldy.w   testId
+    jsr     Text.Console.PrintU16Y
 
     ldx.w   #Strings.Passed
     lda.b   #Strings.Passed >> 16
     jsr     Text.Console.PrintString
-
 
     lda.b   #15
     sta.w   INIDISP
@@ -368,7 +371,7 @@ scope Strings {
         db  "UnTech Unit Tests:", 0
 
     Passed:
-        db  " PASSED", 0
+        db  " tests passed", 0
 
     Failed:
         db  " FAILED", 0
