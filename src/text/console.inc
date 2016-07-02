@@ -31,7 +31,7 @@ constant bufferPos(Text.vars)
 // (word dp)
 constant bufferEndLinePos(Text.vars + 2)
 
-assert(Text.vars >= 4)
+assert(Text.vars.size >= 4)
 
 
 // Sets the console cursor to a fixed location
