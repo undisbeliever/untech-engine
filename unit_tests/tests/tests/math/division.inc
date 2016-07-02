@@ -31,7 +31,7 @@ Fail:
 
 rodata(rom0)
 scope Table: {
-    macro   row(evaluate a, evaluate b) {
+    macro row(evaluate a, evaluate b) {
         dw  {a}
         db  {b}
         dw  {a} / {b}
@@ -72,7 +72,7 @@ Fail:
 
 rodata(rom0)
 scope Table: {
-    macro   row(evaluate a, evaluate b) {
+    macro row(evaluate a, evaluate b) {
         evaluate rem({a} % {b})
         if ({rem} < 0) {
             evaluate rem(0-{rem})
@@ -174,7 +174,7 @@ Fail:
 
 rodata(rom0)
 scope Table: {
-    macro   row(evaluate a, evaluate b) {
+    macro row(evaluate a, evaluate b) {
         evaluate rem({a} % {b})
         if ({rem} < 0) {
             evaluate rem(0-{rem})
@@ -225,7 +225,7 @@ Fail:
 
 rodata(rom0)
 scope Table: {
-    macro   row(evaluate a, evaluate b) {
+    macro row(evaluate a, evaluate b) {
         dw  {a}, {b}
         dw  {a} / {b}
         dw  {a} % {b}

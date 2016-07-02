@@ -106,6 +106,7 @@ scope SuccessTest: {
     rts
 }
 
+
 include "tests/dma.inc"
 include "tests/math.inc"
 include "tests/metasprite.inc"

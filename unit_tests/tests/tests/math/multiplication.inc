@@ -22,7 +22,7 @@ scope Multiply.u8y_u8x_y: {
 
 rodata(rom0)
 scope Table: {
-    macro   row(evaluate a, evaluate b) {
+    macro row(evaluate a, evaluate b) {
         db  {a}, {b}
         dw  {a} * {b}
     }
@@ -64,7 +64,7 @@ scope Multiply.16y_u8a_16y: {
 
 rodata(rom0)
 scope Table: {
-    macro   row(evaluate a, evaluate b) {
+    macro row(evaluate a, evaluate b) {
         dw  {a}
         db  {b}
         dw  {a} * {b}
@@ -124,7 +124,7 @@ Fail:
 
 rodata(rom0)
 scope Table: {
-    macro   row(evaluate a, evaluate b) {
+    macro row(evaluate a, evaluate b) {
         dw  {a}
         db  {b}
         dd  {a} * {b}
@@ -163,7 +163,7 @@ Fail:
 
 rodata(rom0)
 scope Table: {
-    macro   row(evaluate a, evaluate b) {
+    macro row(evaluate a, evaluate b) {
         dw  {a}, {b}, {a} * {b}
     }
 
@@ -224,7 +224,7 @@ Fail:
 
 rodata(rom0)
 scope Table: {
-    macro   row(evaluate a, evaluate b) {
+    macro row(evaluate a, evaluate b) {
         dw  {a}, {b}
         dd  {a} * {b}
     }
@@ -273,7 +273,7 @@ Fail:
 
 rodata(rom0)
 scope Table: {
-    macro   row(evaluate a, evaluate b) {
+    macro row(evaluate a, evaluate b) {
         dw  {a}, {b}
         dd  {a} * {b}
     }
@@ -334,7 +334,7 @@ Fail:
 
 rodata(rom0)
 scope Table: {
-    macro   row(evaluate a, evaluate b) {
+    macro row(evaluate a, evaluate b) {
         dd  {a}, {b}, {a} * {b}
     }
 
@@ -406,7 +406,7 @@ Fail:
 
 rodata(rom0)
 scope Table: {
-    macro   row(evaluate a, evaluate b) {
+    macro row(evaluate a, evaluate b) {
         dd  {a}
         db  {b}
         dd  {a} * {b}
