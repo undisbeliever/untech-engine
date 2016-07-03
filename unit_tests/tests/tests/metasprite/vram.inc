@@ -20,13 +20,13 @@ macro _ActivateFixedTest(FrameSet, nSlots) {
     i16()
     Test.add("MetaSprite.Vram.Activate ({FrameSet})")
     scope Activate_{FrameSet}: {
-        jsr     _Init
+        jsr     _Init_MetaSpriteModule
 
         lda.w   #Entities.entity0
         tcd
 
         lda.w   #MSFS.{FrameSet}
-        jsr     _InitEntityAndActivate
+        jsr     _InitEntity0PaletteAndActivate
         bcc     Fail
 
         // Test vramSet set and dynamic clear
@@ -45,7 +45,7 @@ macro _ActivateFixedTest(FrameSet, nSlots) {
         tcd
 
         lda.w   #MSFS.{FrameSet}
-        jsr     _InitEntityAndActivate
+        jsr     _InitEntity0PaletteAndActivate
         bcc     Fail
 
         // Test that no extra uploads were done
@@ -91,13 +91,13 @@ macro _ActivateDynamicTest(FrameSet, nSlots) {
     i16()
     Test.add("MetaSprite.Vram.Activate ({FrameSet})")
     scope Activate_{FrameSet}: {
-        jsr     _Init
+        jsr     _Init_MetaSpriteModule
 
         lda.w   #Entities.entity0
         tcd
 
         lda.w   #MSFS.{FrameSet}
-        jsr     _InitEntity
+        jsr     _InitEntity0Palette
 
         lda.w   #0
         jsr     MetaSprite.SetFrame
@@ -123,7 +123,7 @@ macro _ActivateDynamicTest(FrameSet, nSlots) {
         tcd
 
         lda.w   #MSFS.{FrameSet}
-        jsr     _InitEntity
+        jsr     _InitEntity0Palette
 
         jsr     MetaSprite.Activate
         bcc     Fail
@@ -182,7 +182,7 @@ macro _DeallocateTest(type) {
         lda.w   #Entities.entity10
         tcd
         lda.w   #MSFS.FST_One{type}
-        jsr     _InitEntity
+        jsr     _InitEntity0Palette
 
         jsr     MetaSprite.Activate
         bcs     Fail
@@ -208,7 +208,7 @@ macro _DeallocateTest(type) {
         lda.w   #Entities.entity11
         tcd
         lda.w   #MSFS.FST_Two{type}s
-        jsr     _InitEntity
+        jsr     _InitEntity0Palette
 
         jsr     MetaSprite.Activate
         bcs     Fail
@@ -230,7 +230,7 @@ macro _DeallocateTest(type) {
         lda.w   #Entities.entity12
         tcd
         lda.w   #MSFS.FST_Two{type}s
-        jsr     _InitEntity
+        jsr     _InitEntity0Palette
 
         jsr     MetaSprite.Activate
         bcs     Fail
@@ -269,7 +269,7 @@ macro _DeallocateTest(type) {
         lda.w   #Entities.entity13
         tcd
         lda.w   #MSFS.FST_One{type}
-        jsr     _InitEntityAndActivate
+        jsr     _InitEntity0PaletteAndActivate
         bcc     Fail
 
 
@@ -278,7 +278,7 @@ macro _DeallocateTest(type) {
         lda.w   #Entities.entity14
         tcd
         lda.w   #MSFS.FST_One{type}
-        jsr     _InitEntityAndActivate
+        jsr     _InitEntity0PaletteAndActivate
         bcs     Fail
 
         sec
@@ -303,7 +303,7 @@ macro _ReferenceCountTest(type) {
         lda.w   #Entities.entity10
         tcd
         lda.w   #MSFS.FST_One{type}Fixed
-        jsr     _InitEntityAndActivate
+        jsr     _InitEntity0PaletteAndActivate
         bcc     Fail
 
         // entity 0: single fixed, count = 2
@@ -311,7 +311,7 @@ macro _ReferenceCountTest(type) {
         lda.w   #Entities.entity11
         tcd
         lda.w   #MSFS.FST_One{type}Fixed
-        jsr     _InitEntityAndActivate
+        jsr     _InitEntity0PaletteAndActivate
         bcc     Fail
 
         // entity 0: single fixed, count = 3
@@ -331,7 +331,7 @@ macro _ReferenceCountTest(type) {
         lda.w   #Entities.entity14
         tcd
         lda.w   #MSFS.FST_One{type}
-        jsr     _InitEntityAndActivate
+        jsr     _InitEntity0PaletteAndActivate
         bcs     Fail
 
         lda.w   #Entities.entity0
@@ -344,7 +344,7 @@ macro _ReferenceCountTest(type) {
         lda.w   #Entities.entity14
         tcd
         lda.w   #MSFS.FST_One{type}
-        jsr     _InitEntityAndActivate
+        jsr     _InitEntity0PaletteAndActivate
         bcc     Fail
 
 
@@ -353,7 +353,7 @@ macro _ReferenceCountTest(type) {
         lda.w   #Entities.entity10
         tcd
         lda.w   #MSFS.FST_Two{type}sFixed
-        jsr     _InitEntityAndActivate
+        jsr     _InitEntity0PaletteAndActivate
         bcc     Fail
 
         // entity 0: single fixed, count = 2
@@ -362,7 +362,7 @@ macro _ReferenceCountTest(type) {
         lda.w   #Entities.entity13
         tcd
         lda.w   #MSFS.FST_One{type}
-        jsr     _InitEntityAndActivate
+        jsr     _InitEntity0PaletteAndActivate
         bcs     Fail
 
 
@@ -382,7 +382,7 @@ macro _ReferenceCountTest(type) {
         lda.w   #Entities.entity13
         tcd
         lda.w   #MSFS.FST_One{type}
-        jsr     _InitEntityAndActivate
+        jsr     _InitEntity0PaletteAndActivate
         bcc     Fail
 
 
@@ -397,45 +397,6 @@ _ReferenceCountTest(Tile)
 _ReferenceCountTest(Row)
 
 
-
-// REQUIRES: 16 bit A, 16 bit Index, DB = 0x7E
-code()
-a16()
-i16()
-scope _Init: {
-    jsr     Dma.Init
-
-    MetaSprite.Init()
-
-    rts
-}
-
-
-// REQUIRES: 16 bit A, 16 bit Index, DB = 0x7E
-// INPUT: DP = Entity address
-// INPUT:  A = frameSet Id
-code()
-a16()
-i16()
-scope _InitEntity: {
-    ldy.w   #0
-    MetaSprite._InitEntity()
-    rts
-}
-
-
-// REQUIRES: 16 bit A, 16 bit Index, DB = 0x7E
-// INPUT: DP = Entity address
-// INPUT:  A = frameSet Id
-code()
-a16()
-i16()
-scope _InitEntityAndActivate: {
-    jsr     _InitEntity
-    jmp     MetaSprite.Activate
-}
-
-
 // initializes the metasprite engine and fills all the tile slots.
 //
 // Entity 0 uses a single fixed slots
@@ -447,24 +408,24 @@ macro __Init_Fill(type, nSlots) {
     a16()
     i16()
     scope _Init_Fill{type}: {
-        jsr     _Init
+        jsr     _Init_MetaSpriteModule
 
         lda.w   #Entities.entity0
         tcd
         lda.w   #MSFS.FST_One{type}Fixed
-        jsr     _InitEntityAndActivate
+        jsr     _InitEntity0PaletteAndActivate
         bcc     Fail
 
         lda.w   #Entities.entity1
         tcd
         lda.w   #MSFS.FST_Two{type}sFixed
-        jsr     _InitEntityAndActivate
+        jsr     _InitEntity0PaletteAndActivate
         bcc     Fail
 
         lda.w   #Entities.entity2
         tcd
         lda.w   #MSFS.FST_One{type}
-        jsr     _InitEntityAndActivate
+        jsr     _InitEntity0PaletteAndActivate
         bcc     Fail
 
         lda.w   #Entities.entity3
@@ -472,7 +433,7 @@ macro __Init_Fill(type, nSlots) {
             tcd
 
             lda.w   #MSFS.FST_Two{type}s
-            jsr     _InitEntityAndActivate
+            jsr     _InitEntity0PaletteAndActivate
             bcc     Fail
 
             tdc

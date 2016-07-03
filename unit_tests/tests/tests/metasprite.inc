@@ -1,4 +1,6 @@
 
+include "metasprite/_common.inc"
+
 include "metasprite/palette.inc"
 include "metasprite/vram.inc"
 include "metasprite/render.inc"

@@ -16,7 +16,7 @@ scope Activate: {
 constant tmp_paletteBits(tmp0)
     assert(MetaSprite.StatusFlags.paletteSet == 0x80)
 
-    jsr     _Init
+    jsr     _Init_MetaSpriteModule
 
     lda.w   #Entities.entity0
     tcd
@@ -318,47 +318,6 @@ Fail:
 }
 
 
-// REQUIRES: 16 bit A, 16 bit Index, DB = 0x7E
-code()
-a16()
-i16()
-scope _Init: {
-    jsr     Dma.Init
-
-    MetaSprite.Init()
-
-    stz.w   Dma.Palette.dirty
-
-    rts
-}
-
-
-// REQUIRES: 16 bit A, 16 bit Index, DB = 0x7E
-// INPUT: DP = Entity address
-// INPUT:  A = frameSet Id
-// INPUT:  Y = palette Id
-code()
-a16()
-i16()
-scope _InitEntity: {
-    MetaSprite._InitEntity()
-    rts
-}
-
-
-// REQUIRES: 16 bit A, 16 bit Index, DB = 0x7E
-// INPUT: DP = Entity address
-// INPUT:  A = frameSet Id
-// INPUT:  Y = palette Id
-code()
-a16()
-i16()
-scope _InitEntityAndActivate: {
-    jsr     _InitEntity
-    jmp     MetaSprite.Activate
-}
-
-
 // Initializes the MetaSprite Engine and
 // creates entities 0 - 7, using palettes 0 - 7
 code()
@@ -367,7 +326,7 @@ i16()
 scope _Init_8Palettes: {
     constant tmp_palleteId(tmp0)
 
-    jsr     _Init
+    jsr     _Init_MetaSpriteModule
 
     stz.w   tmp_palleteId
 

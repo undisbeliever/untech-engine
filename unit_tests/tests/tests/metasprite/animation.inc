@@ -266,9 +266,7 @@ constant tmp_animation(Test.tmp)
 
     sta.w   tmp_animation
 
-    jsr     Dma.Init
-
-    MetaSprite.Init()
+    jsr     _Init_MetaSpriteModule
 
     lda.w   #Entities.entity0
     tcd

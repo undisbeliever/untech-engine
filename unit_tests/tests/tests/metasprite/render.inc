@@ -419,16 +419,14 @@ code()
 a16()
 i16()
 scope _Init: {
-    jsr     Dma.Init
-
-    MetaSprite.Init()
+    jsr     _Init_MetaSpriteModule
 
     lda.w   #oneSmallObjEntity
     tcd
     lda.w   #MSFS.FST_TwoTilesFixed
     ldx.w   #MSEO.OneSmallAndLarge.Frames.OneSmallObj
     ldy.w   #0
-    jsr     _InitEntityAndActivate
+    jsr     _InitEntityFrameActivate
     bcc     Fail
 
     lda.w   #oneLargeObjEntity
@@ -436,7 +434,7 @@ scope _Init: {
     lda.w   #MSFS.FST_TwoTilesFixed
     ldx.w   #MSEO.OneSmallAndLarge.Frames.OneLargeObj
     ldy.w   #0
-    jsr     _InitEntityAndActivate
+    jsr     _InitEntityFrameActivate
     bcc     Fail
 
     lda.w   #manyObjEntity
@@ -444,7 +442,7 @@ scope _Init: {
     lda.w   #manyObjEntity.frameSet
     ldx.w   #manyObjEntity.frame
     ldy.w   #0
-    jsr     _InitEntityAndActivate
+    jsr     _InitEntityFrameActivate
     bcc     Fail
 
     jsr     MetaSprite.Render.InitLoop
@@ -454,30 +452,6 @@ scope _Init: {
 
 Fail:
     clc
-    rts
-}
-
-
-// REQUIRES: 16 bit A, 16 bit Index, DB = 0x7E
-// INPUT: DP = Entity address
-// INPUT:  A = frameSet Id
-// INPUT:  Y = palette Id
-// INPUT:  X = frame Id
-// OUTPUT: C set on success
-code()
-a16()
-i16()
-scope _InitEntityAndActivate: {
-    phx
-        jsr     Vram._InitEntity
-    pla
-
-    jsr     MetaSprite.SetFrame
-    bcc     Fail
-
-    jmp     MetaSprite.Activate
-
-Fail:
     rts
 }
 
