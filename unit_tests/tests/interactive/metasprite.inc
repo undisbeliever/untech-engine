@@ -4,25 +4,14 @@ scope MetaSpriteInteractiveTest {
 
 allocateTmpWord(tmp)
 
-// ::DEBUG::
-// ::TODO find a proper way to do this::
 scope EntityStruct: {
-    struct()
-        field(xPos, 3)
-        field(yPos, 3)
-
-        field(xVecl, 2)
-        field(yVecl, 2)
-
-        MetaSprite.EntityData()
-
+    childstruct(BaseEntity)
         field(frameId, 2)
         field(frameCount, 2)
 
         field(frameDelay, 2)
     endstruct()
 
-    assert(size <= Entities.ENTITY_SIZE)
     assert(MetaSprite.status == BaseEntity.MetaSprite.status)
 }
 

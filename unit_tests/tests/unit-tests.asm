@@ -82,7 +82,9 @@ scope Entities {
     allocate(entity14, shadow, ENTITY_SIZE)
 }
 scope BaseEntity {
-    struct()
+    basestruct(BaseEntity)
+        struct_maxsize(Entities.ENTITY_SIZE)
+
         field(xPos, 3)
         field(yPos, 3)
 

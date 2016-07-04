@@ -5,6 +5,7 @@ include "../../../src/common/struct.inc"
 
 scope point {
     struct()
+    struct_maxsize(12)
 
     field(xPos, 2)
     field(yPos, 2)
@@ -51,4 +52,44 @@ assert(startTest.A == 0x1337)
 assert(startTest.nest.B == 0x1337 + 1)
 assert(startTest.C == 0x1337 + 11)
 assert(startTest.size == 13)
+
+// test struct inheritance.
+scope Base {
+    basestruct(Base)
+        field(a, 3)
+    endstruct()
+}
+scope BaseWithParent {
+    basestruct(BaseWithParent, Base)
+        field(b, 3)
+    endstruct()
+}
+
+scope Child1 {
+    childstruct(Base)
+        field(c, 2)
+    endstruct()
+}
+
+scope Child2 {
+    childstruct(BaseWithParent)
+        field(d, 2)
+    endstruct()
+}
+
+assert(Base.a == 0)
+assert(Base.size == 3)
+
+assert(BaseWithParent.a == 0)
+assert(BaseWithParent.b == 3)
+assert(BaseWithParent.size == 6)
+
+assert(Child1.a == 0)
+assert(Child1.c == 3)
+assert(Child1.size == 5)
+
+assert(Child2.a == 0)
+assert(Child2.b == 3)
+assert(Child2.d == 6)
+assert(Child2.size == 8)
 

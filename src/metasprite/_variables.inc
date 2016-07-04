@@ -4,54 +4,50 @@ scope MetaSprite {
     // The MetaSprite entity data
     // MUST BE called inside the BaseEntity struct
     macro EntityData() {
-        scope MetaSprite {
-            // The frameSet that the metasprite belongs to
-            field(frameSet, 2)
+        // The frameSet that the metasprite belongs to
+        field(MetaSprite.frameSet, 2)
 
-            // The state of the MetaSprite's VRAM/Palette allocations
-            //
-            // 	    %pdiiiiiv
-            //
-            //      p: palette set
-            //      d: dynamic tileset active (MUST NOT be set if vram is clear)
-            //      iiiii: vram slot table number (equal to vram slot index)
-            //      v: vram set
-            field(status, 1)
+        // The state of the MetaSprite's VRAM/Palette allocations
+        //
+        // 	    %pdiiiiiv
+        //
+        //      p: palette set
+        //      d: dynamic tileset active (MUST NOT be set if vram is clear)
+        //      iiiii: vram slot table number (equal to vram slot index)
+        //      v: vram set
+        field(MetaSprite.status, 1)
 
-            // Palette id
-            field(palette, 1)
+        // Palette id
+        field(MetaSprite.palette, 1)
 
-            // Frame address
-            field(currentFrame, 2)
+        // Frame address
+        field(MetaSprite.currentFrame, 2)
 
-            // Offset between frame object data and the OAM charattr data
-            field(blockOneCharAttrOffset, 2)
+        // Offset between frame object data and the OAM charattr data
+        field(MetaSprite.blockOneCharAttrOffset, 2)
 
-            // Offset between frame object data and the OAM charattr data (second block)
-            field(blockTwoCharAttrOffset, 2)
+        // Offset between frame object data and the OAM charattr data (second block)
+        field(MetaSprite.blockTwoCharAttrOffset, 2)
 
-            scope Animation {
-                // Current animation Id
-                field(id, 1)
+        // Current animation Id
+        field(MetaSprite.Animation.id, 1)
 
-                // The animation bytecode program counter.
-                //
-                // If NULL (0) then there is no animation.
-                //
-                // (word addr)
-                field(pc, 2)
+        // The animation bytecode program counter.
+        //
+        // If NULL (0) then there is no animation.
+        //
+        // (word addr)
+        field(MetaSprite.Animation.pc, 2)
 
-                // Delay state for processing next animation bytecode
-                //
-                //      fnnnnnnn nnnnnnnn
-                //
-                //  f = If true then MS Frame has not been set.
-                //      Set MS Frame on next animation process.
-                //  n = current delay value.
-                //      Value depends on the animation instruction being processed.
-                field(delay, 2)
-            }
-        }
+        // Delay state for processing next animation bytecode
+        //
+        //      fnnnnnnn nnnnnnnn
+        //
+        //  f = If true then MS Frame has not been set.
+        //      Set MS Frame on next animation process.
+        //  n = current delay value.
+        //      Value depends on the animation instruction being processed.
+        field(MetaSprite.Animation.delay, 2)
     }
 
     scope StatusFlags {
