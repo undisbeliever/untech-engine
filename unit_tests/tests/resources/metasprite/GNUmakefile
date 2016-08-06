@@ -13,11 +13,10 @@ all: dirs metasprites.gen.inc
 metasprites.gen.inc: $(UTMS_SRC) $(UTMS_GEN) $(FORMATS_SRC)
 
 metasprites.gen.inc: metasprites.utex
-	untech-msc "$<" >| "$@"
-
+	untech-msc -o "$@" "$<"
 
 utms-gen/%.utms: utsi/%.utsi utsi/%.png
-	untech-utsi2utms "$<" >| "$@"
+	untech-utsi2utms -o "$@" "$<"
 
 
 .PHONY: dirs
