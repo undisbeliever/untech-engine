@@ -36,8 +36,8 @@ createDataBlock(rom0,                   0xc19000, 0xc1cfff)
 createDataBlock(testNameBlock,          0xc1d000, 0xc1ffff)
 
 
-createRamBlock(dp,     0x000000, 0x000100)
-createRamBlock(shadow, 0x7e0100, 0x7e1f80)
+createRamBlock(dp,     0x000000, 0x0000ff)
+createRamBlock(shadow, 0x7e0100, 0x7e1f7f)
 createRamBlock(stack,  0x7e1f80, 0x7e1fff)
 createRamBlock(wram7e, 0x7e2000, 0x7effff)
 

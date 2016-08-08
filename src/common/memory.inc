@@ -176,7 +176,7 @@ macro createRamBlock(id, evaluate start, evaluate end) {
     global evaluate ::blocks.{id}.end({end})
 
     global evaluate ::blocks.{id}.pos({start})
-    global evaluate ::blocks.{id}.remaining({end} - {start})
+    global evaluate ::blocks.{id}.remaining({end} - {start} + 1)
     global evaluate ::blocks.{id}.size(0)
 
     global define blocks.{id}.size(::blocks.{id}.size)
