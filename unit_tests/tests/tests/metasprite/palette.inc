@@ -277,6 +277,9 @@ a8()
 
     lda.b   #8
     jsr     MetaSprite.Palette.SetPalette
+
+    rep     #$20
+a16()
     jsr     MetaSprite.Activate
     bcs     Fail
 
@@ -293,8 +296,13 @@ a8()
 
 
     // Check that activating a duplicate palette works
-    lda.w   #4
+    sep     #$20
+a8()
+    lda.b   #4
     jsr     MetaSprite.Palette.SetPalette
+
+    rep     #$20
+a16()
     jsr     MetaSprite.Activate
     bcc     Fail
 
