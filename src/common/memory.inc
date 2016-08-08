@@ -86,6 +86,9 @@ macro createDataBlock(name, evaluate start, evaluate end) {
     if ({start} >> 16) != ({end} >> 16) {
         error "ROM Block `{name}` can not cross data banks"
     }
+    if ({start} & 0x3fffff) <= 0x00ffff && ({end} & 0x3fffff) >= 0x00ffb0 {
+        error "ROM Block `{name}` cannot touch the SNES Header"
+    }
 
     global evaluate ::romBlocks.{name}.pos({start})
     global evaluate ::romBlocks.{name}.start({start})
