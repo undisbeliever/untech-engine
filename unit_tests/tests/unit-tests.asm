@@ -36,11 +36,16 @@ createDataBlock(rom0,                   0xc19000, 0xc1cfff)
 createDataBlock(testNameBlock,          0xc1d000, 0xc1ffff)
 
 
-createRamBlock(dp,     0x000000, 0x0000ff)
-createRamBlock(shadow, 0x7e0100, 0x7e1f7f)
-createRamBlock(stack,  0x7e1f80, 0x7e1fff)
-createRamBlock(wram7e, 0x7e2000, 0x7effff)
+createRamBlock(dp,          0x000000, 0x0000ff)
+createRamBlock(entityBlock, 0x7e0100, 0x7e10ff)
+createRamBlock(shadow,      0x7e1100, 0x7e1f7f)
+createRamBlock(stack,       0x7e1f80, 0x7e1fff)
+createRamBlock(wram7e,      0x7e2000, 0x7effff)
 
+scope Entities {
+    constant ENTITY_SIZE(64)
+    constant N_ENTITIES(64)
+}
 
 // ::DEBUG::
 // ::TODO move somewhere else::
@@ -51,52 +56,23 @@ constant VRAM_CONSOLE_MAP_WADDR(0x0000)
 include "resources/metasprite/metasprites.gen.inc"
 include "resources/text/text.inc"
 
-
 include "../../src/dma.inc"
 include "../../src/interrupts.inc"
 include "../../src/math.inc"
 include "../../src/metasprite.inc"
 include "../../src/text.inc"
+include "../../src/entities.inc"
 
-
-// ::DEBUG::
-// ::TODO move into src/includes somehow::
+// Allow tests to access entity pool
 scope Entities {
-    constant ENTITY_SIZE(64)
-    constant N_ENTITIES(15)
-
-    allocate(entity0, shadow, ENTITY_SIZE)
-    allocate(entity1, shadow, ENTITY_SIZE)
-    allocate(entity2, shadow, ENTITY_SIZE)
-    allocate(entity3, shadow, ENTITY_SIZE)
-    allocate(entity4, shadow, ENTITY_SIZE)
-    allocate(entity5, shadow, ENTITY_SIZE)
-    allocate(entity6, shadow, ENTITY_SIZE)
-    allocate(entity7, shadow, ENTITY_SIZE)
-    allocate(entity8, shadow, ENTITY_SIZE)
-    allocate(entity9, shadow, ENTITY_SIZE)
-    allocate(entity10, shadow, ENTITY_SIZE)
-    allocate(entity11, shadow, ENTITY_SIZE)
-    allocate(entity12, shadow, ENTITY_SIZE)
-    allocate(entity13, shadow, ENTITY_SIZE)
-    allocate(entity14, shadow, ENTITY_SIZE)
+    macro _repeat(evaluate n) {
+        if {n} < N_ENTITIES {
+            constant entity{n}(entityPool + {n} * ENTITY_SIZE)
+            _repeat({n} + 1)
+        }
+    }
+    _repeat(0)
 }
-scope BaseEntity {
-    basestruct(BaseEntity)
-        struct_maxsize(Entities.ENTITY_SIZE)
-
-        field(xPos, 3)
-        field(yPos, 3)
-
-        field(xVecl, 2)
-        field(yVecl, 2)
-
-        MetaSprite.EntityData()
-    endstruct()
-
-    assert(size <= Entities.ENTITY_SIZE)
-}
-
 
 include "includes/test-framework.inc"
 

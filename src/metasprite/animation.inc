@@ -383,7 +383,7 @@ scope SetFrameAndWait_xVecl_Continue: {
     lda.b   BaseEntity.MetaSprite.Animation.delay
     bmi     SetFrameAndWait_Vecl_Start
 
-    lda.b   BaseEntity.xVecl
+    lda.b   BaseEntity.xVecl.hw
     bmi     +
         // invert if positive
         eor.w   #0xffff
@@ -415,7 +415,7 @@ scope SetFrameAndWait_yVecl_Continue: {
     lda.b   BaseEntity.MetaSprite.Animation.delay
     bmi     SetFrameAndWait_Vecl_Start
 
-    lda.b   BaseEntity.yVecl
+    lda.b   BaseEntity.yVecl.hw
     bmi     +
         eor.w   #0xffff
         inc

@@ -194,7 +194,9 @@ constant tmp_frame(tmp0)
     bcc     Fail
 
     stz.b   BaseEntity.xVecl
+    stz.b   BaseEntity.xVecl.hw
     stz.b   BaseEntity.yVecl
+    stz.b   BaseEntity.yVecl.hw
 
     jsr     MetaSprite.Animation.Process
 
@@ -217,7 +219,7 @@ constant tmp_frame(tmp0)
 
         // Increment the velocity and try again
         lda.w   #0x0080
-        sta.b   BaseEntity.{vecl}
+        sta.b   BaseEntity.{vecl}.hw
 
         jsr     MetaSprite.Animation.Process
         jsr     MetaSprite.Animation.Process
