@@ -85,8 +85,7 @@ macro Init() {
         // Setup the modules
         // -----------------
         jsr     Dma.Init
-
-        MetaSprite.Init()
+        jsr     MetaSprite.Init
 
 
         // Setup the entities

@@ -7,8 +7,7 @@ a16()
 i16()
 scope _Init_MetaSpriteModule: {
     jsr     Dma.Init
-
-    MetaSprite.Init()
+    jsr     MetaSprite.Init
 
     stz.w   Dma.Palette.dirty
 

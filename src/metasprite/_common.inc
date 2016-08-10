@@ -7,10 +7,7 @@ scope MetaSprite {
 //
 // REQUIRES: 16 bit A, 16 bit Index, DB = $7E
 code()
-macro Init() {
-    assert16a()
-    assert16i()
-
+scope Init: {
     MetaSprite.Render._Init()
 
     sep     #$30
@@ -23,6 +20,7 @@ i8()
     rep     #$30
 a16()
 i16()
+    rts
 }
 
 
