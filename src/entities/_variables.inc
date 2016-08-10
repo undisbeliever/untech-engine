@@ -54,5 +54,72 @@ scope BaseEntity {
     endstruct()
 }
 
+scope Entities {
+    // A linked list of entity types
+    // (word addr)
+    scope lists {
+        // Unallocated Entities
+        allocate(free, wram7e, 2)
+
+        constant _FIRST(deactivated)
+
+        // Deactivated entities
+        //  - will not be processed
+        //  - will be reactivated when the camera moves the entity inside
+        //  active window
+        //
+        // NOTE: The engine will reuse the variable `BaseEntity.functionTable`
+        // to store the original list id.  The functionTable will be retrieved
+        // from the entity's `romPtr`
+        allocate(deactivated, wram7e, 2)
+
+        // Entities that are to be deleted
+        //  - not processed
+        //  - no collisions
+        //  - not displayed on screen
+        //  - will be destructed and move to free list at the end of frame
+        allocate(toDelete, wram7e, 2)
+
+        // Player entity and allies
+        //  - collides with: platforms, enemies, bosses, enemyProjectiles
+        //  - will never be deactivated
+        allocate(players, wram7e, 2)
+
+        // Player projectiles
+        //  - will be deleted when moved outside active window
+        allocate(playerProjectiles, wram7e, 2)
+
+        // Enemies
+        //  - collides with: playerProjectiles
+        //  - deactivated when moved outside active window
+        allocate(enemies, wram7e, 2)
+
+        // Enemy projectiles
+        //  - deactivated when moved outside active window
+        allocate(enemyProjectiles, wram7e, 2)
+
+        // Bosses
+        //  - will never be deactivated
+        allocate(bosses, wram7e, 2)
+
+        // NPCs
+        //  - no entity collisions
+        //  - deactivated when moved outside active window
+        allocate(npcs, wram7e, 2)
+
+        // Platforms
+        //  - collides with: players, enemies (using the tileHitbox)
+        //  - deactivated when moved outside active window
+        allocate(platforms, wram7e, 2)
+
+        // Particles
+        //  - no entity collisions
+        //  - will never be deactivated
+        allocate(particles, wram7e, 2)
+
+        constant _LAST(particles)
+    }
+}
+
 // vim: ft=asm ts=4 sw=4 et:
 
