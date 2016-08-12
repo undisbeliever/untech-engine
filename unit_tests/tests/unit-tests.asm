@@ -32,7 +32,10 @@ createDataBlock(DMA_Tile16Data,         0xc14800, 0xc14fff)
 createDataBlock(MS_TileBlock_0,         0xc15000, 0xc16fff)
 createDataBlock(MS_TileBlock_1,         0xc17000, 0xc18fff)
 
-createDataBlock(rom0,                   0xc19000, 0xc1cfff)
+createDataBlock(EN_RomDataList,         0xc19000, 0xc190ff)
+createDataBlock(EN_RomData,             0xc19100, 0xc19fff)
+
+createDataBlock(rom0,                   0xc1a000, 0xc1cfff)
 createDataBlock(testNameBlock,          0xc1d000, 0xc1ffff)
 
 
