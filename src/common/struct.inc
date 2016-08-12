@@ -55,17 +55,21 @@ macro struct() {
     struct(0)
 }
 
-macro basestruct(name) {
+macro basestruct-offset(name, evaluate start) {
     if {defined ::struct.bases.{name}.size} {
         error "basestruct {name} already exists."
     }
 
-    struct()
+    struct({start})
 
     global evaluate ::struct.inBase(1)
     global define ::struct.currentBase({name})
 
+    global evaluate ::struct.bases.{name}.start({start})
     global evaluate ::struct.bases.{name}.size(0)
+}
+macro basestruct(name) {
+    basestruct-offset({name}, 0)
 }
 
 macro basestruct(name, parent) {
@@ -93,6 +97,12 @@ macro childstruct(parent) {
 macro _childstruct_parents(parent) {
     if {defined ::struct.bases.{parent}.parent} {
         _childstruct_parents({::struct.bases.{parent}.parent})
+    } else {
+        if {defined ::struct.bases.{parent}.start} {
+            global evaluate ::struct.pos({::struct.bases.{parent}.start})
+        } else {
+            error "Unknown start of basestruct `{parent}`"
+        }
     }
     if {defined ::struct.bases.{parent}.maxSize} {
         struct_maxsize({::struct.bases.{parent}.maxSize})
