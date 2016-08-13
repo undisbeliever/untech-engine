@@ -127,5 +127,18 @@ scope Entities {
     }
 }
 
+
+scope Entities {
+    // Current list address being processed
+    allocateTmpWord(currentList)
+
+    // Change the list of the entity after processing it
+    //
+    // If 0 then no list change occurs
+    //
+    // (word address of list)
+    allocateTmpWord(changeList)
+}
+
 // vim: ft=asm ts=4 sw=4 et:
 

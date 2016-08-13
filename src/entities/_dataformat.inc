@@ -55,10 +55,30 @@ scope BaseEntityFunctionTable {
         //         n: set if parameter is 0
         field(Init, 2)
 
-        // Process 1 frame of the entity loop
+        // Entity destructor routine
+        //
+        // This function is called after cleanup and the MetaSprite has been
+        // de-allocated.
         //
         // REGS: 16 bit A, 16 bit Index, DB = $7e
         // INPUT: dp: entity
+        field(Destructor, 2)
+
+        // Process 1 frame of the entity loop
+        //
+        //
+        // REGS: 16 bit A, 16 bit Index, DB = $7e
+        // INPUT: dp: entity
+        //        `Entities.currentList` (const) current list being processed
+        //
+        // OPTIONAL OUTPUT:
+        //   * set `Entities.changeList` to address of entity loop
+        //     to change the entity list.
+        //
+        // After this function is called:
+        //   * MetaSprite.Animation.Process is called
+        //   * if `Entities.changeList` is set, the list this entity belongs
+        //     to will change
         field(Process, 2)
 
         // Render entity to screen

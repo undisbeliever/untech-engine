@@ -20,6 +20,16 @@ scope Init: {
     rts
 }
 
+
+// IN: A = parameter
+a16()
+i16()
+code()
+scope Destructor: {
+    rts
+}
+
+
 a16()
 i16()
 code()
