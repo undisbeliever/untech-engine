@@ -34,13 +34,117 @@ scope Init: {
 
 
     // clear the other lists
-    ldx.w   #lists._LAST - lists._FIRST - 2
+    ldx.w   #lists.LAST - lists.deactivated
     -
-        stz.w   lists._LAST,x
+        stz.w   lists.deactivated,x
         dex
         dex
         bpl     -
 
+    rts
+}
+
+
+// Spawns a new entity and inserts it into its default list
+//
+// REQUIRES: 16 bit A, 16 bit Index, DB = $7E
+//
+// INPUT: A - Entity Id
+//        Y - entity parameter (passed to entity init function)
+//        Create.xPos - entity x Position (word)
+//        Create.yPos - entity y Position (word)
+//
+// OUTPUT: Y - address of new entity
+//         C - set if entity created successfully
+code()
+a16()
+i16()
+scope Spawn: {
+
+allocateTmpWord(xPos)
+allocateTmpWord(yPos)
+
+    // ::TODO limit entity Id
+    asl
+    tax
+
+    lda.w   lists.free
+    beq     ReturnFalse
+
+    phd
+        phy
+
+        // Move entity from free list to initial list
+        //
+        // dp = lists.free
+        // lists.free = dp->next
+        // initialList = BaseEntityData->initialList & MASK
+        // dp->next = list[initialList]
+        // list[initialList] = dp
+
+        tcd
+        lda.b   BaseEntity.next
+        sta.w   lists.free
+
+        assert(lists.N_LISTS & (lists.N_LISTS - 1) == 0)
+        lda.l   BaseEntityData.initialList,x
+        and.w   #(lists.N_LISTS - 1) * 2
+        tay
+
+        lda.w   lists.FIRST,y
+        sta.b   BaseEntity.next
+        tdc
+        sta.w   lists.FIRST,y
+
+
+        // Setup BaseEntity
+        // X = entity list offset
+
+        lda.l   Entities.Data.List,x
+        tax
+        stx.b   BaseEntity.romPtr
+
+        lda.l   BaseEntityData.functionTable,x
+        sta.b   BaseEntity.functionTable
+
+        lda.w   xPos
+        sta.b   BaseEntity.xPos.px
+        stz.b   BaseEntity.xPos
+
+        lda.w   yPos
+        sta.b   BaseEntity.yPos.px
+        stz.b   BaseEntity.yPos
+
+        stz.b   BaseEntity.xVecl
+        stz.b   BaseEntity.xVecl + 2
+        stz.b   BaseEntity.xVecl + 4
+        stz.b   BaseEntity.xVecl + 6
+
+
+        lda.l   BaseEntityData.defaultPalette,x
+        tay
+        lda.l   BaseEntityData.frameSetId,x
+
+        MetaSprite._InitEntity()
+
+
+        // Call Entity Init function
+        ldx.b   BaseEntity.functionTable
+        pla
+        jsr     (BaseEntityFunctionTable.Init,x)
+
+
+        // ::TODO activate if inside active window::
+
+        tdc
+        tay
+    pld
+
+    sec
+    rts
+
+ReturnFalse:
+    clc
     rts
 }
 

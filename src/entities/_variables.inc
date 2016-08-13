@@ -22,6 +22,9 @@ scope BaseEntity {
         field(next, 2)
 
         // address of the function table of the entity
+        //
+        // If entity is in deactivated list, this address is reused as the
+        // address of the entity list to move into when reactivated.
         // (word addr)
         field(functionTable, 2)
 
@@ -61,8 +64,6 @@ scope Entities {
         // Unallocated Entities
         allocate(free, wram7e, 2)
 
-        constant _FIRST(deactivated)
-
         // Deactivated entities
         //  - will not be processed
         //  - will be reactivated when the camera moves the entity inside
@@ -80,6 +81,7 @@ scope Entities {
         //  - will be destructed and move to free list at the end of frame
         allocate(toDelete, wram7e, 2)
 
+    constant FIRST(players)
         // Player entity and allies
         //  - collides with: platforms, enemies, bosses, enemyProjectiles
         //  - will never be deactivated
@@ -117,7 +119,8 @@ scope Entities {
         //  - will never be deactivated
         allocate(particles, wram7e, 2)
 
-        constant _LAST(particles)
+    constant LAST(particles)
+    constant N_LISTS((LAST - FIRST) / 2 + 1)
     }
 }
 

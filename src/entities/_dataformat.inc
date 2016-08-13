@@ -41,8 +41,18 @@ scope BaseEntityFunctionTable {
     basestruct(BaseEntityFunctionTable)
         // Initialise entity variables.
         //
+        // When this function is called the following is already set:
+        //    * Entity position
+        //    * Entity velocity set to 0
+        //    * MetaSprite frameSet and palette initialized
+        //
+        // After this function is called
+        //    * Entity will be activated if inside the active window
+        //
         // REGS: 16 bit A, 16 bit Index, DB = $7e
         // INPUT: dp: entity
+        //         A: parameter
+        //         n: set if parameter is 0
         field(Init, 2)
 
         // Process 1 frame of the entity loop
