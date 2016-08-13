@@ -2,16 +2,21 @@
 scope EntitiesTest {
 
 scope BlankEntity {
+
     buildFunctionTable(BaseEntityFunctionTable, BlankEntity)
     Entities.useDefaultRenderer()
 
-allocateTmpWord(nInits)
+allocateTmpWord(parameterSum)
 
+// IN: A = parameter
 a16()
 i16()
 code()
 scope Init: {
-    inc.w   nInits
+    clc
+    adc.w   parameterSum
+    sta.w   parameterSum
+
     rts
 }
 
@@ -22,6 +27,21 @@ scope Process: {
     rts
 }
 
+
+rodata(EN_RomData)
+scope RomData: {
+    dw  FunctionTable
+    db  0               // initial List
+    db  0               // frameSetId
+    db  0               // defaultPalette
+}
+
+rodata(EN_RomDataList)
+    dw  RomData
+
+constant EntityId((pc() - Entities.Data.List) / 2 - 1)
+
+code()
 }
 }
 
