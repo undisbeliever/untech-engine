@@ -5,11 +5,18 @@ scope Entities {
 //
 // This MUST be called before using this module
 //
+// This module will also initialize:
+//   * DMA module
+//   * MetaSprite module
+//
 // REQUIRES: 16 bit A, 16 bit Index, DB = $7E
 a16()
 i16()
 code()
 scope Init: {
+    jsr     Dma.Init
+    jsr     MetaSprite.Init
+
     // create and chain the free linked list
 
     assert(N_ENTITIES > 2)
