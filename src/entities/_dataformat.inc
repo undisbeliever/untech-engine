@@ -73,6 +73,11 @@ scope BaseEntityFunctionTable {
     endstruct()
 }
 
+// Uses the default renderer in the function table
+macro useDefaultRenderer() {
+    constant Render(MetaSprite.Render.RenderEntity)
+}
+
 }
 
 // vim: ft=asm ts=4 sw=4 et:

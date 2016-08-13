@@ -6,6 +6,7 @@ include "common/memory.inc"
 include "common/registers.inc"
 include "common/snes_header.inc"
 include "common/struct.inc"
+include "common/functiontable.inc"
 include "common/tmp_words.inc"
 
 // vim: ft=asm ts=4 sw=4 et:
