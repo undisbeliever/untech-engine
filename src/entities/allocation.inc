@@ -81,17 +81,22 @@ allocateTmpWord(yPos)
     phd
         phy
 
-        // Move entity from free list to initial list
-        //
-        // dp = lists.free
-        // lists.free = dp->next
-        // initialList = BaseEntityData->initialList & MASK
-        // dp->next = list[initialList]
-        // list[initialList] = dp
+        // Remove Entity from free list
 
         tcd
         lda.b   BaseEntity.next
         sta.w   lists.free
+
+
+        // Get Entity ROM Data
+
+        lda.l   Entities.Data.List,x
+        tax
+        stx.b   BaseEntity.romPtr
+
+        // X = entity ROM data address
+
+        // Insert Entity into initial List
 
         assert(lists.N_LISTS & (lists.N_LISTS - 1) == 0)
         lda.l   BaseEntityData.initialList,x
@@ -105,11 +110,6 @@ allocateTmpWord(yPos)
 
 
         // Setup BaseEntity
-        // X = entity list offset
-
-        lda.l   Entities.Data.List,x
-        tax
-        stx.b   BaseEntity.romPtr
 
         lda.l   BaseEntityData.functionTable,x
         sta.b   BaseEntity.functionTable
