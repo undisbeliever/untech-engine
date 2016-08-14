@@ -37,19 +37,24 @@ scope Process: {
     rts
 }
 
+macro _repeat(evaluate n) {
+    if {n} < Entities.lists.N_LISTS {
+        rodata(EN_RomData)
+        scope RomData{n}: {
+            dw  FunctionTable
+            db  {n} * 2         // initial List
+            dw  {n}             // frameSetId
+            db  0               // defaultPalette
+        }
 
-rodata(EN_RomData)
-scope RomData: {
-    dw  FunctionTable
-    db  0               // initial List
-    db  0               // frameSetId
-    db  0               // defaultPalette
+        rodata(EN_RomDataList)
+        constant EntityId_{n}((pc() - Entities.Data.List) / 2)
+            dw  RomData{n}
+
+        _repeat({n} + 1)
+    }
 }
-
-rodata(EN_RomDataList)
-    dw  RomData
-
-constant EntityId((pc() - Entities.Data.List) / 2 - 1)
+_repeat(0)
 
 code()
 }

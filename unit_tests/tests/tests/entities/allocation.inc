@@ -34,7 +34,7 @@ scope Spawn: {
     lda.w   #0x5678
     sta.w   Entities.Spawn.yPos
 
-    lda.w   BlankEntity.EntityId
+    lda.w   BlankEntity.EntityId_0
     ldy.w   #0x1337
     jsr     Entities.Spawn
     bcc     Fail
@@ -75,8 +75,10 @@ Fail:
 a16()
 i16()
 code()
-Test.add("Entities.Spawn Overflow")
+Test.add("Entities.Spawn (Overflow)")
 scope Spawn_Overflow: {
+constant tmp(Test.tmp)
+
     jsr     Entities.Init
 
     stz.w   BlankEntity.parameterSum
@@ -84,20 +86,20 @@ scope Spawn_Overflow: {
     ldx.w   #Entities.N_ENTITIES
 
     Loop:
-        phx
+        stx.w   tmp
 
-        lda.w   BlankEntity.EntityId
+        lda.w   BlankEntity.EntityId_0
         ldy.w   #5
         jsr     Entities.Spawn
         bcc     Fail
 
-        plx
+        ldx.w   tmp
         dex
         bne     Loop
 
 
     // Test cannot make new entity
-    lda.w   BlankEntity.EntityId
+    lda.w   BlankEntity.EntityId_0
     jsr     Entities.Spawn
     bcs     Fail
 
@@ -123,6 +125,76 @@ Fail:
     rts
 }
 
+a16()
+i16()
+code()
+Test.add("Entities.Spawn (Multiple Lists)")
+scope Spawn_MultipleLists: {
+constant tmp(Test.tmp)
+
+    jsr     Entities.Init
+
+    stz.w   BlankEntity.parameterSum
+
+    lda.w   #0x1000
+    sta.w   Entities.Spawn.xPos
+    sta.w   Entities.Spawn.yPos
+
+    assert(Entities.N_ENTITIES >= Entities.lists.N_LISTS * 2)
+
+    // spawn 2 entities per list
+    lda.w   #BlankEntity.EntityId_0
+    Loop:
+        sta.w   tmp
+
+        ldy.w   #1
+        jsr     Entities.Spawn
+        bcc     Fail
+
+        lda.w   tmp
+        ldy.w   #1
+        jsr     Entities.Spawn
+        bcc     Fail
+
+        lda.w   tmp
+        inc
+        cmp.w   #BlankEntity.EntityId_0 + Entities.lists.N_LISTS
+        bcc     Loop
+
+
+    // Test parameter Sum is correct value
+    lda.w   BlankEntity.parameterSum
+    cmp.w   #2 * Entities.lists.N_LISTS
+    bne     Fail
+
+
+    // test list decreased by N_LISTS
+    jsr     _FreeListLength
+    cmp     #Entities.N_ENTITIES - Entities.lists.N_LISTS * 2
+    bne     Fail
+
+    // Test each list length
+    ldy     #0
+    ListLoop:
+        phy
+            jsr     _ListLength_Y
+        ply
+
+        cmp     #2
+        bne     Fail
+
+        iny
+        cpy.w   #Entities.lists.N_LISTS
+        bcc     ListLoop
+
+    sec
+    rts
+
+Fail:
+    clc
+    rts
+}
+
 
 // OUT: A = number of entities in free list
 scope _FreeListLength: {
@@ -133,6 +205,16 @@ scope _FreeListLength: {
 // OUT: A = number of entities in player list
 scope _FirstListLength: {
     ldx.w   Entities.lists.FIRST
+    bra     __ListLength
+}
+
+// IN: Y = list id
+// OUT: A = number of entities in player list
+scope _ListLength_Y: {
+    tya
+    asl
+    tay
+    ldx.w   Entities.lists.FIRST,y
     bra     __ListLength
 }
 
