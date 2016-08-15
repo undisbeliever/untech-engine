@@ -107,6 +107,97 @@ scope ExpectedSizes: {
 }
 }
 
+
+
+a16()
+i16()
+code()
+Test.add("Entities.GameLoop (Delete)")
+scope GameLoop_Delete: {
+constant tmp(Test.tmp)
+
+    jsr     Entities.Init
+
+    assert(Entities.lists.N_LISTS * 3 <= Entities.N_ENTITIES)
+
+    lda.w   #0x1000
+    sta.w   Entities.Spawn.xPos
+    sta.w   Entities.Spawn.yPos
+
+    // spawn 3 entities per list
+    // these entities will delete themselves after Y frames
+    lda.w   #DeleteAfterDelayEntity.EntityId_0
+    Loop:
+        sta.w   tmp
+
+        ldy.w   #1
+        jsr     Entities.Spawn
+        bcc     Fail
+
+        lda.w   tmp
+        ldy.w   #4
+        jsr     Entities.Spawn
+        bcc     Fail
+
+        lda.w   tmp
+        ldy.w   #2
+        jsr     Entities.Spawn
+        bcc     Fail
+
+        lda.w   tmp
+        ldy.w   #2
+        jsr     Entities.Spawn
+        bcc     Fail
+
+        lda.w   tmp
+        inc
+        cmp.w   #DeleteAfterDelayEntity.EntityId_0 + Entities.lists.N_LISTS
+        bcc     Loop
+
+    // Test list lengths
+
+    jsr     _FreeListLength
+    cmp     #Entities.N_ENTITIES - Entities.lists.N_LISTS * 4
+    bne     Fail
+
+    // frame 1 - 1 list of entities deleted
+    jsr     Entities.ProcessGameLoop
+    jsr     _FreeListLength
+    cmp     #Entities.N_ENTITIES - Entities.lists.N_LISTS * 3
+    bne     Fail
+
+    // frame 2 - 2 lists of entities deleted
+    jsr     Entities.ProcessGameLoop
+    jsr     _FreeListLength
+    cmp     #Entities.N_ENTITIES - Entities.lists.N_LISTS * 1
+    bne     Fail
+
+    // frame 3 - no entities deleted
+    jsr     Entities.ProcessGameLoop
+    jsr     _FreeListLength
+    cmp     #Entities.N_ENTITIES - Entities.lists.N_LISTS * 1
+    bne     Fail
+
+    // frame 4 - 1 list of entities deleted
+    jsr     Entities.ProcessGameLoop
+    jsr     _FreeListLength
+    cmp     #Entities.N_ENTITIES - Entities.lists.N_LISTS * 0
+    bne     Fail
+
+    // frame 5 - no entities deleted
+    jsr     Entities.ProcessGameLoop
+    jsr     _FreeListLength
+    cmp     #Entities.N_ENTITIES - Entities.lists.N_LISTS * 0
+    bne     Fail
+
+    sec
+    rts
+
+Fail:
+    clc
+    rts
+}
+
 }
 
 // vim: ft=asm ts=4 sw=4 et:
