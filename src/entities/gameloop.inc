@@ -103,6 +103,15 @@ scope ProcessEntityList_DeactivateOffscreen: {
         ldx.b   BaseEntity.functionTable
         jsr     (BaseEntityFunctionTable.Process,x)
 
+        // Skip Offscreen tests and animation if entity list changes.
+        //
+        // This is to prevent glitches/unnecessary processing.
+        // Animation frame skips that occur if entity turns into a
+        // particle should not be noticeable
+
+        ldy.w   changeList
+        bne     ChangeEntityList
+
         // ::TODO offscreen test::
         bra     Else
 
@@ -136,6 +145,15 @@ scope ProcessEntityList_DeleteOffscreen: {
         ldx.b   BaseEntity.functionTable
         jsr     (BaseEntityFunctionTable.Process,x)
 
+        // Skip Offscreen tests and animation if entity list changes.
+        //
+        // This is to prevent glitches/unnecessary processing.
+        // Animation frame skips that occur if entity turns into a
+        // particle should not be noticeable
+
+        ldy.w   changeList
+        bne     ChangeEntityList
+
         // ::TODO offscreen test::
         bra     Else
 
@@ -165,6 +183,15 @@ macro _ProcessEnemyList(list, doDeactivateTest) {
             ldx.b   BaseEntity.functionTable
             jsr     (BaseEntityFunctionTable.Process,x)
 
+            // Skip collision/offscreen tests if entity list changes
+            //
+            // Still process the animation as the most common list
+            // change is to the `npc` or `particle` list so the death
+            // animation can be processed.
+
+            ldy.w   changeList
+            bne     SkipCollision
+
             if {doDeactivateTest} == 1 {
                 // ::TODO offscreen test::
                 bra EndIf
@@ -179,6 +206,8 @@ macro _ProcessEnemyList(list, doDeactivateTest) {
             }
 
             // ::TODO do collisions with playerProjectiles
+
+        SkipCollision:
 
             jsr     MetaSprite.Animation.Process
         _NEXT()
@@ -199,10 +228,20 @@ macro _ProcessPlayerList() {
             ldx.b   BaseEntity.functionTable
             jsr     (BaseEntityFunctionTable.Process,x)
 
-            // ::TODO collisions with enemies
-            // ::TODO collisions with bosses
-            // ::TODO collisions with enemyProjectiles
+            // skip collisions/animations if entity list changes
+            //
+            // Still process the animation as the most common list
+            // change is to the `particle` list so the death animation
+            // can be processed.
 
+            ldy.w   changeList
+            bne     SkipCollisions
+
+                // ::TODO collisions with enemies
+                // ::TODO collisions with bosses
+                // ::TODO collisions with enemyProjectiles
+
+        SkipCollisions:
             jsr     MetaSprite.Animation.Process
         _NEXT()
     }
@@ -222,12 +261,17 @@ macro _ProcessParticleList() {
         _LOOP(lists.particles)
             ldx.b   BaseEntity.functionTable
             jsr     (BaseEntityFunctionTable.Process,x)
+
+            // skip animation if entity list changes
+            ldy.w   changeList
+            bne     ChangeEntityList
+
             jsr     MetaSprite.Animation.Process
         _NEXT()
     }
 }
 
-// Process to Delete list
+// Process the to Delete list
 //
 // REQUIRES: 16 bit A, 16 bit Index, DB = 0x7e
 //
