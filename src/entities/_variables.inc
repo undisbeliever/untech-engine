@@ -85,7 +85,7 @@ scope Entities {
 
     constant FIRST(players)
         // Player entity and allies
-        //  - collides with: platforms, enemies, bosses, enemyProjectiles
+        //  - collides with: enemies, bosses, enemyProjectiles
         //  - will never be deactivated
         allocate(players, wram7e, 2)
 
@@ -104,7 +104,7 @@ scope Entities {
         allocate(playerProjectiles, wram7e, 2)
 
         // Enemy projectiles
-        //  - deactivated when moved outside active window
+        //  - will be deleted when moved outside active window
         allocate(enemyProjectiles, wram7e, 2)
 
         // NPCs
@@ -113,7 +113,11 @@ scope Entities {
         allocate(npcs, wram7e, 2)
 
         // Platforms
-        //  - collides with: players, enemies (using the tileHitbox)
+        //  - no collision detection in entity gameloop.
+        //     * The process routine of the player entities is is
+        //       responsible for collision detection between entity and
+        //       platforms as some entities won't have collision with
+        //       platforms
         //  - deactivated when moved outside active window
         allocate(platforms, wram7e, 2)
 

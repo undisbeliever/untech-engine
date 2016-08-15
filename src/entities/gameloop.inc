@@ -199,12 +199,29 @@ macro _ProcessPlayerList() {
             ldx.b   BaseEntity.functionTable
             jsr     (BaseEntityFunctionTable.Process,x)
 
-            // ::TODO collisions with platforms
-
             // ::TODO collisions with enemies
             // ::TODO collisions with bosses
             // ::TODO collisions with enemyProjectiles
 
+            jsr     MetaSprite.Animation.Process
+        _NEXT()
+    }
+}
+
+
+// Process the particle list
+//
+// REQUIRES: 16 bit A, 16 bit Index, DB = 0x7e
+//
+// MODIFIES: DP
+macro _ProcessParticleList() {
+    assert16a()
+    assert16i()
+
+    scope particles: {
+        _LOOP(lists.particles)
+            ldx.b   BaseEntity.functionTable
+            jsr     (BaseEntityFunctionTable.Process,x)
             jsr     MetaSprite.Animation.Process
         _NEXT()
     }
@@ -278,9 +295,7 @@ scope ProcessGameLoop: {
     ldy.w   #lists.npcs
     jsr     ProcessEntityList_DeactivateOffscreen
 
-    ldy.w   #lists.particles
-    jsr     ProcessEntityList_DeactivateOffscreen
-
+    _ProcessParticleList()
 
 
     _ProcessToDeleteList()
