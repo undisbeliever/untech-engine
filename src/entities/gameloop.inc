@@ -9,6 +9,8 @@ macro _LOOP(list) {
     assert16a()
     assert16i()
 
+    global evaluate _LOOP_LIST({list})
+
     // this allows previousEntity variable to work on first item
     assert(BaseEntity.next == 0)
 
@@ -28,6 +30,8 @@ macro _LOOP(list) {
 macro _LOOP_Y() {
     assert16a()
     assert16i()
+
+    global evaluate _LOOP_LIST(-1)
 
     // this allows previousEntity variable to work on first item
     assert(BaseEntity.next == 0)
@@ -51,6 +55,7 @@ macro _NEXT() {
         ldy.w   changeList
         bne     ChangeEntityList
             // Continue loop as normal
+        _GotoNext:
             tdc
             sta.w   previousEntity
             lda.b   BaseEntity.next
@@ -61,6 +66,15 @@ macro _NEXT() {
         ChangeEntityList:
             // Change the list the entity is in THEN return
             // Y = list to change to (NOT NULL)
+
+            // don't reorder list if unnecessary
+            if {_LOOP_LIST} == -1 {
+                cpy.w   currentList
+                beq     _GotoNext
+            } else {
+                cpy.w   #{_LOOP_LIST}
+                beq     _GotoNext
+            }
 
             // previousEntity->next = dp->next
             // dp->next = *changeList
