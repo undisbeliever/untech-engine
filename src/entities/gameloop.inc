@@ -1,6 +1,9 @@
 
 scope Entities {
 
+// ENTITY ITERATION MACROS
+// =======================
+
 // Previous entity being processed
 // (word address)
 allocateTmpWord(previousEntity)
@@ -103,7 +106,12 @@ EndLoop:
 }
 
 
-// Render a list of entities
+// PROCESS ENTITY LISTS
+// ====================
+
+// Processes a list of entities with no collisions,
+// entities that move outside the inactive window will be
+// deactivated.
 //
 // REQUIRES: 16 bit A, 16 bit Index, DB = 0x7e
 //
@@ -146,7 +154,9 @@ scope ProcessEntityList_DeactivateOffscreen: {
     rts
 }
 
-// Render a list of entities
+// Processes a list of entities with no collisions,
+// entities that move outside the inactive window will be
+// deleted.
 //
 // REQUIRES: 16 bit A, 16 bit Index, DB = 0x7e
 //
@@ -183,10 +193,19 @@ scope ProcessEntityList_DeleteOffscreen: {
     rts
 }
 
-// Process an enemy list
+
+// Process the enemy/boss list.
+//
+// For each entity in the list:
+//   - Executes entity's Process routine
+//   - Deactivates the entity if moved outside the active window.
+//   - Tests for collisions between entity and player projectiles.
+//
+// PARAM: list - the name of the list to execute
+// PARAM: doDeactivateTest - if true then the entity
+//        is deactivated if outside the inactive window.
 //
 // REQUIRES: 16 bit A, 16 bit Index, DB = 0x7e
-//
 // MODIFIES: DP
 macro _ProcessEnemyList(list, doDeactivateTest) {
     assert16a()
@@ -222,7 +241,7 @@ macro _ProcessEnemyList(list, doDeactivateTest) {
                 StillActive:
             }
 
-            // ::TODO do collisions with playerProjectiles
+            // ::TODO collisions with playerProjectiles
 
         SkipCollision:
             jsr     MetaSprite.Animation.Process
@@ -230,7 +249,16 @@ macro _ProcessEnemyList(list, doDeactivateTest) {
     }
 }
 
-// Process player list
+
+
+// Process the player entity list.
+//
+// For each entity in the list:
+//   - Executes entity's Process routine
+//   - Tests for collisions between the entity and:
+//      * bosses
+//      * enemies
+//      * enemy projectiles
 //
 // REQUIRES: 16 bit A, 16 bit Index, DB = 0x7e
 //
@@ -253,8 +281,8 @@ macro _ProcessPlayerList() {
             ldy.w   changeList
             bne     SkipCollisions
 
-                // ::TODO collisions with enemies
                 // ::TODO collisions with bosses
+                // ::TODO collisions with enemies
                 // ::TODO collisions with enemyProjectiles
 
         SkipCollisions:
@@ -262,6 +290,7 @@ macro _ProcessPlayerList() {
         _NEXT()
     }
 }
+
 
 
 // Process the particle list
@@ -287,7 +316,11 @@ macro _ProcessParticleList() {
     }
 }
 
-// Process the to Delete list
+
+// Process the to Delete list.
+//
+// Entities in this list will be destructed and
+// have their resources freed.
 //
 // REQUIRES: 16 bit A, 16 bit Index, DB = 0x7e
 //
@@ -328,8 +361,11 @@ macro _ProcessToDeleteList() {
 }
 
 
-// Try to reactivate an entity that could not be
-// activated in the previous frame
+
+// Processes the tryToActivateAgain entity list
+//
+// For each entity in the list it will try to reactivate the entity and
+// if it succeeds move it into its designated entity list.
 //
 // REQUIRES: 16 bit A, 16 bit Index, DB = 0x7e
 //
@@ -353,7 +389,8 @@ macro _ProcessTryToActivateAgainList() {
             jsr     MetaSprite.Activate
             bcc     Continue
 
-            // MetaSprite.Activate was successful, move to correct list
+            // MetaSprite.Activate was successful.
+            // move to the designated list.
 
             // list = BaseEntity.functionTable
             // previousEntity->next = dp->next
@@ -385,7 +422,7 @@ macro _ProcessTryToActivateAgainList() {
             bra     EndLoop
 
         Continue:
-            // could not activate, just go to next entity
+            // could not activate, goto next entity
             tdc
             sta.w   previousEntity
             lda.b   BaseEntity.next
@@ -395,6 +432,7 @@ macro _ProcessTryToActivateAgainList() {
     EndLoop:
     }
 }
+
 
 
 // Process the entity gameloop
@@ -412,6 +450,8 @@ scope ProcessGameLoop: {
     Camera._UpdateWindows()
 
     _ProcessTryToActivateAgainList()
+
+
 
     ldy.w   #lists.playerProjectiles
     jsr     ProcessEntityList_DeleteOffscreen
@@ -431,6 +471,7 @@ scope ProcessGameLoop: {
     jsr     ProcessEntityList_DeactivateOffscreen
 
     _ProcessParticleList()
+
 
 
     _ProcessToDeleteList()
