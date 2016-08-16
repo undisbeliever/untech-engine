@@ -74,6 +74,14 @@ scope Entities {
         // from the entity's `romPtr`
         allocate(deactivated, wram7e, 2)
 
+        // Entities that could not be activated in this frame
+        //  - Gameloop will try and reactivate them on next frame
+        //
+        // NOTE: The engine will reuse the variable `BaseEntity.functionTable`
+        // to store the original list id.  The functionTable will be retrieved
+        // from the entity's `romPtr`
+        allocate(tryToActivateAgain, wram7e, 2)
+
         // Entities that are to be deleted
         //  - not processed
         //  - no collisions

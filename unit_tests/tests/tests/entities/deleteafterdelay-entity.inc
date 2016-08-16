@@ -50,7 +50,7 @@ macro _repeat(evaluate n) {
         scope RomData{n}: {
             dw  FunctionTable
             db  {n} * 2         // initial List
-            dw  {n}             // frameSetId
+            dw  0               // frameSetId
             db  0               // defaultPalette
         }
 

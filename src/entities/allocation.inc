@@ -160,6 +160,7 @@ allocateTmpWord(yPos)
                 phx
                     jsr     MetaSprite.Activate
                 plx
+                bcc     CouldNotActivate
 
                 // x = list index
                 lda.w   lists.FIRST,x
@@ -169,21 +170,28 @@ allocateTmpWord(yPos)
 
                 bra     EndIf
 
+            CouldNotActivate:
+                ldy.w   #lists.tryToActivateAgain
+                bra     InsertIntoInactiveList
+
             IsInactive:
-                // entity is inactivate.
+                ldy.w   #lists.deactivated
+
+            InsertIntoInactiveList:
                 // Insert into deactivated list, remembering the list
-                // address for when it is reactived
+                // address for when it is reactivated
 
                 // x = list index
+                // y = deactivated list address
                 txa
                 clc
                 adc.w   #lists.FIRST
                 sta.b   BaseEntity.functionTable
 
-                lda.w   lists.deactivated
+                lda.w   0,y
                 sta.b   BaseEntity.next
                 tdc
-                sta.w   lists.deactivated
+                sta.w   0,y
 
             EndIf:
 

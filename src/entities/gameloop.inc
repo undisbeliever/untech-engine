@@ -328,6 +328,75 @@ macro _ProcessToDeleteList() {
 }
 
 
+// Try to reactivate an entity that could not be
+// activated in the previous frame
+//
+// REQUIRES: 16 bit A, 16 bit Index, DB = 0x7e
+//
+// MODIFIES: DP
+a16()
+i16()
+code()
+macro _ProcessTryToActivateAgainList() {
+    assert16a()
+    assert16i()
+
+    scope TryToActivateAgain: {
+        lda.w   lists.tryToActivateAgain
+        beq     EndLoop
+
+        sta.w   previousEntity
+
+        Loop:
+            tcd
+
+            jsr     MetaSprite.Activate
+            bcc     Continue
+
+            // MetaSprite.Activate was successful, move to correct list
+
+            // list = BaseEntity.functionTable
+            // previousEntity->next = dp->next
+            // dp->next = *list
+            // *list = this
+            // next = previousEntity->next
+
+            ldx.w   previousEntity
+
+            lda.b   BaseEntity.next
+            sta.w   BaseEntity.next,x
+
+            ldy.b   BaseEntity.functionTable
+            lda.w   0,y
+            sta.b   BaseEntity.next
+
+            tdc
+            sta.w   0,y
+
+            ldy.w   BaseEntity.next,x
+
+            // restore entity functionPtr
+            ldx.b   BaseEntity.romPtr
+            lda.l   BaseEntityData.functionTable,x
+            sta.b   BaseEntity.functionTable
+
+            tya
+            bne     Loop
+            bra     EndLoop
+
+        Continue:
+            // could not activate, just go to next entity
+            tdc
+            sta.w   previousEntity
+            lda.b   BaseEntity.next
+
+            bne     Loop
+
+    EndLoop:
+    }
+}
+
+
 // Process the entity gameloop
 //
 // REQUIRES: 16 bit A, 16 bit Index, DB = 0x7e
@@ -341,6 +410,8 @@ scope ProcessGameLoop: {
     // ::DEBUG::
     // ::TODO move into Camera Game Loop::
     Camera._UpdateWindows()
+
+    _ProcessTryToActivateAgainList()
 
     ldy.w   #lists.playerProjectiles
     jsr     ProcessEntityList_DeleteOffscreen
