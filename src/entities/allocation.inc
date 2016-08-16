@@ -8,6 +8,7 @@ scope Entities {
 // This module will also initialize:
 //   * DMA module
 //   * MetaSprite module
+//   * Camera module
 //
 // REQUIRES: 16 bit A, 16 bit Index, DB = $7E
 a16()
@@ -16,6 +17,7 @@ code()
 scope Init: {
     jsr     Dma.Init
     jsr     MetaSprite.Init
+    jsr     Camera.Init
 
     // create and chain the free linked list
 

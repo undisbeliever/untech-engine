@@ -126,20 +126,21 @@ scope ProcessEntityList_DeactivateOffscreen: {
         ldy.w   changeList
         bne     ChangeEntityList
 
-        // ::TODO offscreen test::
-        bra     Else
+        Camera.BranchEntityOutsideInactiveWindow(Deactivate)
+        bra     StillActive
 
         Deactivate:
+            // deactivate entity
+            jsr     MetaSprite.Deactivate
+
             ldy.w   currentList
             sta.b   BaseEntity.functionTable
 
             ldy.w   #lists.deactivated
             bra     ChangeEntityList
 
-        Else:
+        StillActive:
             jsr     MetaSprite.Animation.Process
-
-
     _NEXT()
 
     rts
@@ -168,16 +169,15 @@ scope ProcessEntityList_DeleteOffscreen: {
         ldy.w   changeList
         bne     ChangeEntityList
 
-        // ::TODO offscreen test::
-        bra     Else
+        Camera.BranchEntityOutsideInactiveWindow(Delete)
+        bra     StillActive
 
         Delete:
             ldy.w   #lists.toDelete
             bra     ChangeEntityList
 
-        Else:
+        StillActive:
             jsr     MetaSprite.Animation.Process
-
     _NEXT()
 
     rts
@@ -207,22 +207,24 @@ macro _ProcessEnemyList(list, doDeactivateTest) {
             bne     SkipCollision
 
             if {doDeactivateTest} == 1 {
-                // ::TODO offscreen test::
-                bra EndIf
+                Camera.BranchEntityOutsideInactiveWindow(Deactivate)
+                bra     StillActive
 
                 Deactivate:
+                    jsr     MetaSprite.Deactivate
+
                     ldy.w   #lists.{list}
                     sta.b   BaseEntity.functionTable
 
                     ldy.w   #lists.deactivated
                     bra     ChangeEntityList
-                EndIf:
+
+                StillActive:
             }
 
             // ::TODO do collisions with playerProjectiles
 
         SkipCollision:
-
             jsr     MetaSprite.Animation.Process
         _NEXT()
     }
@@ -336,6 +338,10 @@ a16()
 i16()
 code()
 scope ProcessGameLoop: {
+    // ::DEBUG::
+    // ::TODO move into Camera Game Loop::
+    Camera._UpdateWindows()
+
     ldy.w   #lists.playerProjectiles
     jsr     ProcessEntityList_DeleteOffscreen
 

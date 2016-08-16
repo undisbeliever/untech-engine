@@ -15,16 +15,36 @@ scope Camera {
 
     // Active window size (beyond camera display)
     // inactive entities inside this window will become active.
-    constant ACTIVE_WINDOW_EXTEND(96)
+    constant ACTIVE_WINDOW_EXTEND_HORIZONTAL(96)
+    constant ACTIVE_WINDOW_EXTEND_VERTICAL(96)
 
-    // Active window size (beyond camera display)
+    // Inactive window size (beyond camera display)
     // Active entities that leave the window will deactivate.
-    constant INACTIVE_WINDOW_EXTEND(128)
+    constant INACTIVE_WINDOW_EXTEND_HORIZONTAL(128)
+    constant INACTIVE_WINDOW_EXTEND_VERTICAL(128)
 
     // Camera position
     // (2x uint16)
     allocate(xPos, wram7e, 2)
     allocate(yPos, wram7e, 2)
+
+    // Activate window
+    // (4x uint16)
+    scope activeWindow {
+        allocate(top, wram7e, 2)
+        allocate(bottom, wram7e, 2)
+        allocate(left, wram7e, 2)
+        allocate(right, wram7e, 2)
+    }
+
+    // Inactivate window
+    // (4x uint16)
+    scope inactiveWindow {
+        allocate(top, wram7e, 2)
+        allocate(bottom, wram7e, 2)
+        allocate(left, wram7e, 2)
+        allocate(right, wram7e, 2)
+    }
 }
 
 // vim: ft=asm ts=4 sw=4 et:
