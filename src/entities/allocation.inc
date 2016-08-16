@@ -53,6 +53,11 @@ scope Init: {
     rts
 }
 
+scope Spawn {
+ReturnFalse:
+    clc
+    rts
+}
 
 // Spawns a new entity and inserts it into its default list
 //
@@ -96,20 +101,6 @@ allocateTmpWord(yPos)
         tax
         stx.b   BaseEntity.romPtr
 
-        // X = entity ROM data address
-
-        // Insert Entity into initial List
-
-        assert(lists.N_LISTS & (lists.N_LISTS - 1) == 0)
-        lda.l   BaseEntityData.initialList,x
-        and.w   #(lists.N_LISTS - 1) * 2
-        tay
-
-        lda.w   lists.FIRST,y
-        sta.b   BaseEntity.next
-        tdc
-        sta.w   lists.FIRST,y
-
 
         // Setup BaseEntity
 
@@ -143,18 +134,84 @@ allocateTmpWord(yPos)
         jsr     (BaseEntityFunctionTable.Init,x)
 
 
-        // ::TODO activate if inside active window::
+        // Insert entity into the appropriate list
 
-        tdc
+        scope ActiveTest {
+            // entity is active if:
+            //   entity list only contains active entities
+            //   OR entity is inside active window
+
+            // get initial list index
+            assert(lists.N_LISTS & (lists.N_LISTS - 1) == 0)
+            ldx.b   BaseEntity.romPtr
+            lda.l   BaseEntityData.initialList,x
+            and.w   #(lists.N_LISTS - 1) * 2
+            tax
+
+            lda.l   EntityAlwaysActiveList,x
+            bne     IsActive
+
+            Camera.BranchEntityOutsideActiveWindow(IsInactive)
+
+            IsActive:
+                // entity is activate.
+                // Insert into its active list
+
+                phx
+                    jsr     MetaSprite.Activate
+                plx
+
+                // x = list index
+                lda.w   lists.FIRST,x
+                sta.b   BaseEntity.next
+                tdc
+                sta.w   lists.FIRST,x
+
+                bra     EndIf
+
+            IsInactive:
+                // entity is inactivate.
+                // Insert into deactivated list, remembering the list
+                // address for when it is reactived
+
+                // x = list index
+                txa
+                clc
+                adc.w   #lists.FIRST
+                sta.b   BaseEntity.functionTable
+
+                lda.w   lists.deactivated
+                sta.b   BaseEntity.next
+                tdc
+                sta.w   lists.deactivated
+
+            EndIf:
+
+            // A = DP
+        }
         tay
     pld
 
     sec
     rts
 
-ReturnFalse:
-    clc
-    rts
+rodata(rom0)
+// one if the entity list is always active
+// zero if entity list can be deactivated
+scope EntityAlwaysActiveList: {
+    dw  1       // players
+    dw  1       // bosses
+    dw  0       // enemies
+    dw  1       // playerProjectiles
+    dw  1       // enemyProjectiles
+    dw  0       // npcs
+    dw  0       // platforms
+    dw  1       // particles
+
+    assert((pc() - EntityAlwaysActiveList) == lists.N_LISTS * 2)
+}
+
+code()
 }
 
 }

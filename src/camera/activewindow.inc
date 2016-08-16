@@ -46,6 +46,8 @@ macro _UpdateWindows() {
 // Branches to the given label if the current entity is outside the active window
 //
 // REQUIRES: 16 bit A, DB = 0x7e
+// MODIFIES: A
+// DOES NOT MODIFY: X, Y
 // INPUT: dp = entity
 // BRANCHES: to label if entity is outside active window
 macro BranchEntityOutsideActiveWindow(label) {
@@ -68,6 +70,8 @@ macro BranchEntityOutsideActiveWindow(label) {
 // Branches to the given label if the current entity is outside the inactive window
 //
 // REQUIRES: 16 bit A, DB = 0x7e
+// MODIFIES: A
+// DOES NOT MODIFY: X, Y
 // INPUT: dp = entity
 // BRANCHES: to label if entity is outside active window
 macro BranchEntityOutsideInactiveWindow(label) {
