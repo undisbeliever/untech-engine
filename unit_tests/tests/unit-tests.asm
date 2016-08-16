@@ -64,6 +64,8 @@ include "../../src/interrupts.inc"
 include "../../src/math.inc"
 include "../../src/metasprite.inc"
 include "../../src/text.inc"
+
+include "../../src/camera.inc"
 include "../../src/entities.inc"
 
 // Allow tests to access entity pool

@@ -46,16 +46,19 @@ scope RenderList: {
         tcd
         ldx.b   BaseEntity.functionTable
         beq     Continue
-            // ::TODO subtract camera
 
             lda.b   BaseEntity.xPos.px
             sec
-            sbc     #INT_MS8_OFFSET
+            sbc.w   #INT_MS8_OFFSET + Camera.ORIGIN
+            sec
+            sbc.w   Camera.xPos
             sta.w   MetaSprite.Render.xPos
 
             lda.b   BaseEntity.yPos.px
             sec
-            sbc     #INT_MS8_OFFSET
+            sbc.w   #INT_MS8_OFFSET + Camera.ORIGIN
+            sec
+            sbc.w   Camera.yPos
             sta.w   MetaSprite.Render.yPos
 
             jsr     (BaseEntityFunctionTable.Render,x)
