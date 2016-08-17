@@ -1,4 +1,8 @@
 
+// Data format may be subject to changes
+if MetaSprite.Data.EDITOR_VERSION < 17 {
+    error "Invalid UnTech Editor Version"
+}
 
 // In order to simplify processing of the MetaSprites, there are no
 // signed integers in the MetaSprite data structures.
