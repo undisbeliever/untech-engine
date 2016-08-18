@@ -3,6 +3,7 @@ include "entities/blank-entity.inc"
 include "entities/changetoparticle-entity.inc"
 include "entities/deleteafterdelay-entity.inc"
 
+include "entities/_common.inc"
 include "entities/allocation.inc"
 include "entities/gameloop.inc"
 
