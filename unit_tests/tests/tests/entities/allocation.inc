@@ -192,6 +192,112 @@ Fail:
     rts
 }
 
+
+
+a16()
+i16()
+code()
+Test.add("Entities.Spawn (Offscreen)")
+scope Spawn_Offscreen: {
+constant tmp_index(Test.tmp)
+constant tmp_listId(Test.tmp + 2)
+
+constant ONSCREEN(0x1080)
+
+    jsr     Entities.Init
+
+    // spawn 2 entities on-screen and 4 entities off-screen per entity list
+
+    assert(Entities.N_ENTITIES >= Entities.lists.N_LISTS * 6)
+
+    lda.w   #BlankEntity.EntityId_0
+    Loop:
+        sta.w   tmp_listId
+
+        macro spawn(xPos, yPos) {
+            ldx.w   #{xPos}
+            ldy.w   #{yPos}
+            jsr     SpawnEntity_XY
+            bcc     Fail
+        }
+
+        spawn(ONSCREEN, ONSCREEN)
+        spawn(ONSCREEN + 0x200, ONSCREEN)
+        spawn(ONSCREEN, ONSCREEN + 0x200)
+        spawn(ONSCREEN, ONSCREEN)
+        spawn(ONSCREEN - 0x200, ONSCREEN)
+        spawn(ONSCREEN, ONSCREEN - 0x200)
+
+        lda.w   tmp_listId
+        inc
+        cmp.w   #BlankEntity.EntityId_0 + Entities.lists.N_LISTS
+        bcc     Loop
+
+
+
+    // Verify list sizes
+
+    jsr     _FreeListLength
+    cmp.w   #ExpectedSizes.FREE
+    bne     Fail
+
+    jsr     _DeactivatedListLength
+    cmp.w   #ExpectedSizes.DEACTIVATED
+    bne     Fail
+
+    ldx.w   #0
+    ldy.w   #0
+    ListSizeLoop:
+        stx.w   tmp_index
+        sty.w   tmp_listId
+
+        jsr     _ListLength_Y
+
+        ldx.w   tmp_index
+        cmp.l   ExpectedSizes,x
+        bne     Fail
+
+        ldy.w   tmp_listId
+        iny
+
+        inx
+        inx
+        cpx.w   #ExpectedSizes.size
+        bcc     ListSizeLoop
+
+
+    jmp     _TestCorrectListsActive
+
+Fail:
+    clc
+    rts
+
+scope SpawnEntity_XY: {
+    stx.w   Entities.Spawn.xPos
+    sty.w   Entities.Spawn.yPos
+    lda.w   tmp_listId
+    jmp     Entities.Spawn
+}
+
+rodata(rom0)
+scope ExpectedSizes: {
+// NOTE: projectiles are always spawned, even if offscreen
+    dw  6
+    dw  6
+    dw  2
+    dw  6
+    dw  6
+    dw  2
+    dw  2
+    dw  6
+
+    constant DEACTIVATED(4 * 3)
+    constant FREE(Entities.N_ENTITIES - 5 * 6 - 3 * 2 - DEACTIVATED)
+
+    constant size(pc() - ExpectedSizes)
+}
+}
+
 }
 
 // vim: ft=asm ts=4 sw=4 et:
