@@ -79,6 +79,7 @@ macro _NEXT() {
                 beq     _GotoNext
             }
 
+        ChangeEntityList_SkipTest:
             // previousEntity->next = dp->next
             // dp->next = *changeList
             // *changeList = this
@@ -115,7 +116,7 @@ EndLoop:
 //
 // REQUIRES: 16 bit A, 16 bit Index, DB = 0x7e
 //
-// INPUT: Y - address of list
+// INPUT: Y - address of list (MUST NOT be the deactivated list)
 // MODIFIES: DP
 a16()
 i16()
@@ -145,7 +146,7 @@ scope ProcessEntityList_DeactivateOffscreen: {
             sta.b   BaseEntity.functionTable
 
             ldy.w   #lists.deactivated
-            bra     ChangeEntityList
+            bra     ChangeEntityList_SkipTest
 
         StillActive:
             jsr     MetaSprite.Animation.Process
@@ -160,7 +161,7 @@ scope ProcessEntityList_DeactivateOffscreen: {
 //
 // REQUIRES: 16 bit A, 16 bit Index, DB = 0x7e
 //
-// INPUT: Y - address of list
+// INPUT: Y - address of list (MUST NOT be the toDelete list)
 // MODIFIES: DP
 a16()
 i16()
@@ -184,7 +185,7 @@ scope ProcessEntityList_DeleteOffscreen: {
 
         Delete:
             ldy.w   #lists.toDelete
-            bra     ChangeEntityList
+            bra     ChangeEntityList_SkipTest
 
         StillActive:
             jsr     MetaSprite.Animation.Process
@@ -236,7 +237,7 @@ macro _ProcessEnemyList(list, doDeactivateTest) {
                     sta.b   BaseEntity.functionTable
 
                     ldy.w   #lists.deactivated
-                    bra     ChangeEntityList
+                    bra     ChangeEntityList_SkipTest
 
                 StillActive:
             }
