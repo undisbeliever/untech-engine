@@ -68,8 +68,7 @@ constant tmp_test(Test.tmp + 4)
         dec.w   tmp_test
         bne     TestLoop
 
-    sec
-    rts
+    jmp     _TestCorrectListsActive
 
 Fail:
     clc
@@ -190,8 +189,7 @@ constant tmp(Test.tmp)
     cmp     #Entities.N_ENTITIES - Entities.lists.N_LISTS * 0
     bne     Fail
 
-    sec
-    rts
+    jmp     _TestCorrectListsActive
 
 Fail:
     clc

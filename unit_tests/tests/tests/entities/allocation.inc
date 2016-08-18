@@ -63,8 +63,7 @@ scope Spawn: {
     cmp     #1
     bne     Fail
 
-    sec
-    rts
+    jmp     _TestCorrectListsActive
 
 Fail:
     clc
@@ -117,8 +116,7 @@ constant tmp(Test.tmp)
     cmp     #Entities.N_ENTITIES
     bne     Fail
 
-    sec
-    rts
+    jmp     _TestCorrectListsActive
 
 Fail:
     clc
@@ -187,8 +185,7 @@ constant tmp(Test.tmp)
         cpy.w   #Entities.lists.N_LISTS
         bcc     ListLoop
 
-    sec
-    rts
+    jmp     _TestCorrectListsActive
 
 Fail:
     clc

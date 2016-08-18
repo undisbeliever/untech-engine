@@ -10,6 +10,15 @@ scope _FreeListLength: {
     bra     __ListLength
 }
 
+// OUT: A = number of entities in deactivated list
+a16()
+i16()
+code()
+scope _DeactivatedListLength: {
+    ldx.w   Entities.lists.deactivated
+    bra     __ListLength
+}
+
 // OUT: A = number of entities in player list
 a16()
 i16()
@@ -51,6 +60,64 @@ scope __ListLength: {
         bne     Loop
 
 EndLoop:
+    rts
+}
+
+
+
+// OUT: C set if deactivated lists have no metasprite data
+//               AND all other lists have metasprite daata
+a16()
+i16()
+code()
+scope _TestCorrectListsActive: {
+allocateTmpWord(tmp_index)
+
+    // test deactivated entity is not active
+    lda.w   Entities.lists.deactivated
+    InactiveLoop:
+        tcd
+
+        lda.b   BaseEntity.MetaSprite.status
+        and.w   #MetaSprite.StatusFlags.paletteSet | MetaSprite.StatusFlags.vramSet
+        bne     Fail
+
+        lda.b   BaseEntity.next
+        bne     InactiveLoop
+
+
+    // test all other entities are active
+    scope ActiveListTest: {
+        ldx.w   #Entities.lists.FIRST
+        Loop:
+            stx.w   tmp_index
+
+            lda.w   0,x
+            beq     Skip
+            EntityLoop:
+                tcd
+
+                lda.b   BaseEntity.MetaSprite.status
+                and.w   #MetaSprite.StatusFlags.paletteSet | MetaSprite.StatusFlags.vramSet
+                cmp.w   #MetaSprite.StatusFlags.paletteSet | MetaSprite.StatusFlags.vramSet
+                bne     Fail
+
+                lda.b   BaseEntity.next
+                bne     EntityLoop
+            Skip:
+
+            ldx.w   tmp_index
+            inx
+            inx
+            cpx.w   #Entities.lists.LAST + 1
+            bcc     Loop
+    }
+
+    sec
+    rts
+
+Fail:
+    clc
     rts
 }
 
