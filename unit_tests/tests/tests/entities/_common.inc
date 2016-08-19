@@ -19,6 +19,15 @@ scope _DeactivatedListLength: {
     bra     __ListLength
 }
 
+// OUT: A = number of entities in the tryToActivateAgain list
+a16()
+i16()
+code()
+scope _TryToActivateAgainListLength: {
+    ldx.w   Entities.lists.tryToActivateAgain
+    bra     __ListLength
+}
+
 // OUT: A = number of entities in player list
 a16()
 i16()

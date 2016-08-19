@@ -196,6 +196,110 @@ Fail:
     rts
 }
 
+
+
+a16()
+i16()
+code()
+Test.add("Entities.GameLoop.TryToActivateAgain")
+scope GameLoop_TryToActivateAgain: {
+constant tmp(Test.tmp)
+
+    jsr     Entities.Init
+
+    // Prevent the entities from spawning
+    jsr     WaitFrame
+    stz.w   Dma.transfersLeft
+
+    scope CreateEntities: {
+        lda.w   #0x1000
+        sta.w   Entities.Spawn.xPos
+        sta.w   Entities.Spawn.yPos
+
+        assert(Entities.N_ENTITIES >= Entities.lists.N_LISTS)
+
+        lda.w   #DeleteAfterDelayEntity.EntityId_0
+        Loop:
+            sta.w   tmp
+
+            ldy.w   #2
+            jsr     Entities.Spawn
+            bcc     Fail
+
+            lda.w   tmp
+            inc
+            cmp.w   #DeleteAfterDelayEntity.EntityId_0 + Entities.lists.N_LISTS
+            bcc     Loop
+
+
+        jsr     _TryToActivateAgainListLength
+        cmp     #Entities.lists.N_LISTS
+        bne     Fail
+
+        // Test each list has no entities in them (not active)
+        ldy     #0
+        ListLoop:
+            phy
+                jsr     _ListLength_Y
+            ply
+
+            cmp.w   #0
+            bne     Fail
+
+            iny
+            cpy.w   #Entities.lists.N_LISTS
+            bcc     ListLoop
+
+        jsr     _TestCorrectListsActive
+        bcc     Fail
+    }
+
+    // Test that entities are allocated in the next frame
+    scope TestActivateNextFrame: {
+        jsr     Dma.Init
+        jsr     WaitFrame
+
+        jsr     Entities.ProcessGameLoop
+
+        jsr     _TryToActivateAgainListLength
+        cmp.w   #0
+        bne     Fail
+
+        // Test each list has no entities in them (not active)
+        ldy     #0
+        Loop:
+            phy
+                jsr     _ListLength_Y
+            ply
+
+            cmp.w   #1
+            bne     Fail
+
+            iny
+            cpy.w   #Entities.lists.N_LISTS
+            bcc     Loop
+
+        jsr     _TestCorrectListsActive
+        bcc     Fail
+    }
+
+    // After the second frame the entities should be deleted
+    // Tests that they were actually processed
+    scope TestNextFrame: {
+        jsr     Entities.ProcessGameLoop
+
+        jsr     _FreeListLength
+        cmp.w   #Entities.N_ENTITIES
+        bne     Fail
+    }
+
+    jmp     _TestCorrectListsActive
+
+Fail:
+    clc
+    rts
+}
+
 }
 
 // vim: ft=asm ts=4 sw=4 et:
