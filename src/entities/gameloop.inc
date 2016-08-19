@@ -382,7 +382,11 @@ macro _ProcessTryToActivateAgainList() {
         lda.w   lists.tryToActivateAgain
         beq     EndLoop
 
-        sta.w   previousEntity
+        // this allows previousEntity variable to work on first item
+        assert(BaseEntity.next == 0)
+
+        ldy.w   #lists.tryToActivateAgain
+        sty.w   previousEntity
 
         Loop:
             tcd
