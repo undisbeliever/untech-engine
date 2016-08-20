@@ -336,7 +336,7 @@ i16()
         // negate dividend
         // y is high work of dividend
         lda.b   dividend32
-        eor     #0xffff
+        eor.w   #0xffff
         clc
         adc.w   #1
         sta.b   dividend32

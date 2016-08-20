@@ -137,7 +137,7 @@ i16()
     // Move all objects in the OAM offscreen
     rep     #$30
 a16()
-    lda     #$2100
+    lda.w   #$2100
     tcd
 
     sep #$30

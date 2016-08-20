@@ -22,7 +22,7 @@ macro ResetTransfersLeft() {
     assert16a()
 
     lda.w   STAT77
-    and     #STAT78.pal << 8
+    and.w   #STAT78.pal << 8
     beq     +
         lda.w   #Dma.TRANSFERS_PER_PAL_FRAME
         bra     ++

@@ -494,7 +494,7 @@ a8()
         inx
         inx
         inx
-        cpx     #128 * 4
+        cpx.w   #128 * 4
         bcc     Loop
 
     rep     #$20

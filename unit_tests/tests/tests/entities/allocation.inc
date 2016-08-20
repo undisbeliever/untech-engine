@@ -9,7 +9,7 @@ scope Init: {
     jsr     Entities.Init
 
     jsr     _FreeListLength
-    cmp     #Entities.N_ENTITIES
+    cmp.w   #Entities.N_ENTITIES
     bne     Fail
 
     sec
@@ -55,12 +55,12 @@ scope Spawn: {
 
     // test list decreased by one
     jsr     _FreeListLength
-    cmp     #Entities.N_ENTITIES - 1
+    cmp.w   #Entities.N_ENTITIES - 1
     bne     Fail
 
     // Test first list length
     jsr     _FirstListLength
-    cmp     #1
+    cmp.w   #1
     bne     Fail
 
     jmp     _TestCorrectListsActive
@@ -113,7 +113,7 @@ constant tmp(Test.tmp)
 
     // Test first list length
     jsr     _FirstListLength
-    cmp     #Entities.N_ENTITIES
+    cmp.w   #Entities.N_ENTITIES
     bne     Fail
 
     jmp     _TestCorrectListsActive
@@ -168,17 +168,17 @@ constant tmp(Test.tmp)
 
     // test list decreased by N_LISTS
     jsr     _FreeListLength
-    cmp     #Entities.N_ENTITIES - Entities.lists.N_LISTS * 2
+    cmp.w   #Entities.N_ENTITIES - Entities.lists.N_LISTS * 2
     bne     Fail
 
     // Test each list length
-    ldy     #0
+    ldy.w   #0
     ListLoop:
         phy
             jsr     _ListLength_Y
         ply
 
-        cmp     #2
+        cmp.w   #2
         bne     Fail
 
         iny

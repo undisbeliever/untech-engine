@@ -455,7 +455,7 @@ a16()
 
     tya
     // carry clear
-    adc     #4
+    adc.w   #4
     sta.w   tableIndex
 
     sep     #$20

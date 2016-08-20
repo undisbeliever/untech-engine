@@ -50,7 +50,7 @@ macro _Init() {
         lda.b   #MetaSprite.Vram.slots.ROW_SLOTS_MIN_INDEX
         sta.w   MetaSprite.Vram.slotPool.freeRows
 
-        stz     MetaSprite.Vram.slotPool.freeTiles
+        stz.w   MetaSprite.Vram.slotPool.freeTiles
     }
 }
 

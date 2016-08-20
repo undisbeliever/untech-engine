@@ -172,7 +172,7 @@ constant tmpX(tmp2)
     rep     #$30
 a16()
 i16()
-    lda     #WRMPYA & 0xff00
+    lda.w   #WRMPYA & 0xff00
     tcd
 
     sep     #$20
@@ -249,7 +249,7 @@ constant tmpX(tmp2)
     rep     #$30
 a16()
 i16()
-    lda     #WRMPYA & 0xff00
+    lda.w   #WRMPYA & 0xff00
     tcd
 
     sep     #$20

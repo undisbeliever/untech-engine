@@ -40,7 +40,7 @@ constant tmp_pc(tmp0)
     bcc     Fail
 
     lda.b   BaseEntity.MetaSprite.Animation.pc
-    sta     tmp_pc
+    sta.w   tmp_pc
 
     jsr     MetaSprite.Animation.Process
 

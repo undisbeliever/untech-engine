@@ -156,37 +156,37 @@ constant tmp(Test.tmp)
     // Test list lengths
 
     jsr     _FreeListLength
-    cmp     #Entities.N_ENTITIES - Entities.lists.N_LISTS * 4
+    cmp.w   #Entities.N_ENTITIES - Entities.lists.N_LISTS * 4
     bne     Fail
 
     // frame 1 - 1 list of entities deleted
     jsr     Entities.ProcessGameLoop
     jsr     _FreeListLength
-    cmp     #Entities.N_ENTITIES - Entities.lists.N_LISTS * 3
+    cmp.w   #Entities.N_ENTITIES - Entities.lists.N_LISTS * 3
     bne     Fail
 
     // frame 2 - 2 lists of entities deleted
     jsr     Entities.ProcessGameLoop
     jsr     _FreeListLength
-    cmp     #Entities.N_ENTITIES - Entities.lists.N_LISTS * 1
+    cmp.w   #Entities.N_ENTITIES - Entities.lists.N_LISTS * 1
     bne     Fail
 
     // frame 3 - no entities deleted
     jsr     Entities.ProcessGameLoop
     jsr     _FreeListLength
-    cmp     #Entities.N_ENTITIES - Entities.lists.N_LISTS * 1
+    cmp.w   #Entities.N_ENTITIES - Entities.lists.N_LISTS * 1
     bne     Fail
 
     // frame 4 - 1 list of entities deleted
     jsr     Entities.ProcessGameLoop
     jsr     _FreeListLength
-    cmp     #Entities.N_ENTITIES - Entities.lists.N_LISTS * 0
+    cmp.w   #Entities.N_ENTITIES - Entities.lists.N_LISTS * 0
     bne     Fail
 
     // frame 5 - no entities deleted
     jsr     Entities.ProcessGameLoop
     jsr     _FreeListLength
-    cmp     #Entities.N_ENTITIES - Entities.lists.N_LISTS * 0
+    cmp.w   #Entities.N_ENTITIES - Entities.lists.N_LISTS * 0
     bne     Fail
 
     jmp     _TestCorrectListsActive
@@ -233,11 +233,11 @@ constant tmp(Test.tmp)
 
 
         jsr     _TryToActivateAgainListLength
-        cmp     #Entities.lists.N_LISTS
+        cmp.w   #Entities.lists.N_LISTS
         bne     Fail
 
         // Test each list has no entities in them (not active)
-        ldy     #0
+        ldy.w   #0
         ListLoop:
             phy
                 jsr     _ListLength_Y
@@ -266,7 +266,7 @@ constant tmp(Test.tmp)
         bne     Fail
 
         // Test each list has no entities in them (not active)
-        ldy     #0
+        ldy.w   #0
         Loop:
             phy
                 jsr     _ListLength_Y

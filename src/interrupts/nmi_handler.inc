@@ -20,7 +20,7 @@ i16()
     phk
     plb
 
-    lda     #$4300
+    lda.w   #$4300
     tcd
 
     sep     #$10

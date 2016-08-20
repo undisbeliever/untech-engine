@@ -307,7 +307,7 @@ scope SetFrameAndWait_Time_Continue: {
     bmi     SetFrameAndWait_Time_Start
 
     sec
-    sbc     timerSpeed
+    sbc.w   timerSpeed
     bcc     _SetFrameAndWait_NextInstruction
 
     sta.b   BaseEntity.MetaSprite.Animation.delay

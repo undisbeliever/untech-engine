@@ -20,8 +20,8 @@ scope test {
     allocateTmpWord(tmp0)
     allocateTmpWord(tmp1)
 
-    lda     tmp0
-    sta     tmp1
+    lda.w   tmp0
+    sta.w   tmp1
 }
 
 allocate(dataBlock, shadow, 0x200)
@@ -41,8 +41,8 @@ scope test {
     allocateTmpWord(tmp2)
     allocateTmpWord(tmp3)
 
-    lda     tmp2
-    sta     tmp3
+    lda.w   tmp2
+    sta.w   tmp3
 }
 
 assert(test.tmp2 == dataBlock + 0x2e)
