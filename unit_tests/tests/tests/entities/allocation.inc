@@ -298,6 +298,62 @@ scope ExpectedSizes: {
 }
 }
 
+
+
+a16()
+i16()
+code()
+Test.add("Entities.ClearTryToActivateAgainList")
+scope ClearTryToActivateAgainList: {
+constant tmp(Test.tmp)
+
+    jsr     Entities.Init
+
+    // Prevent the entities from spawning
+    jsr     WaitFrame
+    stz.w   Dma.transfersLeft
+
+    // Create many try to activate again entities
+
+    lda.w   #0x1000
+    sta.w   Entities.Spawn.xPos
+    sta.w   Entities.Spawn.yPos
+
+    assert(Entities.N_ENTITIES >= Entities.lists.N_LISTS)
+
+    lda.w   #BlankEntity.EntityId_0
+    Loop:
+        sta.w   tmp
+
+        jsr     Entities.Spawn
+        bcc     Fail
+
+        lda.w   tmp
+        inc
+        cmp.w   #BlankEntity.EntityId_0 + Entities.lists.N_LISTS
+        bcc     Loop
+
+
+    jsr     _TryToActivateAgainListLength
+    cmp.w   #Entities.lists.N_LISTS
+    bne     Fail
+
+
+    jsr     Entities.ClearTryToActivateAgainList
+
+
+    jsr     _FreeListLength
+    cmp.w   #Entities.N_ENTITIES
+    bne     Fail
+
+    jmp     _TestCorrectListsActive
+
+
+Fail:
+    clc
+    rts
+}
+
 }
 
 // vim: ft=asm ts=4 sw=4 et:
