@@ -152,6 +152,18 @@ scope Entities {
     //
     // (word address of list)
     allocateTmpWord(changeList)
+
+
+    // Previous window position mask that the active window was tested
+    //
+    // Is not reset on Init (doesn't have to be)
+    //
+    // (2x uint16)
+    allocate(prevActiveWindowX, wram7e, 2)
+    allocate(prevActiveWindowY, wram7e, 2)
+
+    // The mask which the Camera pos is compared to prevActiveWindow.
+    constant TEST_ACTIVE_WINDOW_MASK(~3)
 }
 
 // vim: ft=asm ts=4 sw=4 et:

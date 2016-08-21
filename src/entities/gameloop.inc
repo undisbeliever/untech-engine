@@ -59,6 +59,7 @@ macro _NEXT() {
         bne     ChangeEntityList
             // Continue loop as normal
         _GotoNext:
+        Continue:
             tdc
             sta.w   previousEntity
             lda.b   BaseEntity.next
@@ -440,6 +441,76 @@ macro _ProcessTryToActivateAgainList() {
 
 
 
+// Processes the deactivated list if the camera has moved enough.
+//
+// For each entity in the list it will check to see if the entity is
+// inside the active window, and if so activate it and moved the entity
+// into the appropriate list.
+//
+// REQUIRES: 16 bit A, 16 bit Index, DB = 0x7e
+//
+// MODIFIES: DP
+a16()
+i16()
+code()
+macro _ProcessActiveWindow() {
+
+    scope ProcessActiveWindow: {
+        lda.w   Camera.xPos
+        and.w   #TEST_ACTIVE_WINDOW_MASK
+        cmp.w   prevActiveWindowX
+        bne     XChanged
+        tax
+
+        lda.w   Camera.yPos
+        and.w   #TEST_ACTIVE_WINDOW_MASK
+        cmp.w   prevActiveWindowY
+        bne     YChanged
+
+        bra     SkipTests
+
+            XChanged:
+                tax
+                lda.w   Camera.yPos
+                and.w   #~3
+
+            YChanged:
+                stx.w   prevActiveWindowX
+                sta.w   prevActiveWindowY
+
+
+            _LOOP(lists.deactivated)
+                Camera.BranchEntityOutsideActiveWindow(Continue)
+
+                    // entity is now inside active window
+                    // try to activate if possible
+                    jsr     MetaSprite.Activate
+                    bcc     CouldNotActivate
+
+                    // Entity is Active
+                    //  get list to move entity to
+                    //  restore functionPtr
+                    //  move entity to correct list
+
+                    ldy.b   BaseEntity._ft_currentList
+
+                    ldx.b   BaseEntity.romPtr
+                    lda.l   BaseEntityData.functionTable,x
+                    sta.b   BaseEntity.functionTable
+
+                    bra     ChangeEntityList_SkipTest
+
+            CouldNotActivate:
+                    // try again in next frame
+
+                    ldy.w   #lists.tryToActivateAgain
+                    bra     ChangeEntityList_SkipTest
+            _NEXT()
+    SkipTests:
+    }
+}
+
+
 // Process the entity gameloop
 //
 // REQUIRES: 16 bit A, 16 bit Index, DB = 0x7e
@@ -456,6 +527,7 @@ scope ProcessGameLoop: {
 
     _ProcessTryToActivateAgainList()
 
+    _ProcessActiveWindow()
 
 
     ldy.w   #lists.playerProjectiles
