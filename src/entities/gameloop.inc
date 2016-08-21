@@ -143,7 +143,7 @@ scope ProcessEntityList_DeactivateOffscreen: {
             jsr     MetaSprite.Deactivate
 
             ldy.w   currentList
-            sta.b   BaseEntity.functionTable
+            sta.b   BaseEntity._ft_currentList
 
             ldy.w   #lists.deactivated
             bra     ChangeEntityList_SkipTest
@@ -234,7 +234,7 @@ macro _ProcessEnemyList(list, doDeactivateTest) {
                     jsr     MetaSprite.Deactivate
 
                     ldy.w   #lists.{list}
-                    sta.b   BaseEntity.functionTable
+                    sta.b   BaseEntity._ft_currentList
 
                     ldy.w   #lists.deactivated
                     bra     ChangeEntityList_SkipTest
@@ -397,7 +397,7 @@ macro _ProcessTryToActivateAgainList() {
             // MetaSprite.Activate was successful.
             // move to the designated list.
 
-            // list = BaseEntity.functionTable
+            // list = BaseEntity._ft_currentList
             // previousEntity->next = dp->next
             // dp->next = *list
             // *list = this
@@ -408,7 +408,7 @@ macro _ProcessTryToActivateAgainList() {
             lda.b   BaseEntity.next
             sta.w   BaseEntity.next,x
 
-            ldy.b   BaseEntity.functionTable
+            ldy.b   BaseEntity._ft_currentList
             lda.w   0,y
             sta.b   BaseEntity.next
 

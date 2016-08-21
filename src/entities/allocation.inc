@@ -186,7 +186,7 @@ allocateTmpWord(yPos)
                 txa
                 clc
                 adc.w   #lists.FIRST
-                sta.b   BaseEntity.functionTable
+                sta.b   BaseEntity._ft_currentList
 
                 lda.w   0,y
                 sta.b   BaseEntity.next

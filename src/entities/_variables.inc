@@ -22,11 +22,13 @@ scope BaseEntity {
         field(next, 2)
 
         // address of the function table of the entity
-        //
-        // If entity is in deactivated list, this address is reused as the
-        // address of the entity list to move into when reactivated.
         // (word addr)
         field(functionTable, 2)
+
+        // If entity is in deactivated list, `functionTable` is reused as the
+        // address of the entity list to move into when reactivated.
+        // (word addr - union with functionTable)
+        constant _ft_currentList(functionTable)
 
         // pointer to the ROM data used by the entity code
         // (word addr)
