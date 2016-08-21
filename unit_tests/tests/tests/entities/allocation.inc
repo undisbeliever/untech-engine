@@ -63,7 +63,7 @@ scope Spawn: {
     cmp.w   #1
     bne     Fail
 
-    jmp     _TestCorrectListsActive
+    jmp     _TestEntityListsValid
 
 Fail:
     clc
@@ -116,7 +116,7 @@ constant tmp(Test.tmp)
     cmp.w   #Entities.N_ENTITIES
     bne     Fail
 
-    jmp     _TestCorrectListsActive
+    jmp     _TestEntityListsValid
 
 Fail:
     clc
@@ -185,7 +185,7 @@ constant tmp(Test.tmp)
         cpy.w   #Entities.lists.N_LISTS
         bcc     ListLoop
 
-    jmp     _TestCorrectListsActive
+    jmp     _TestEntityListsValid
 
 Fail:
     clc
@@ -250,7 +250,7 @@ constant ONSCREEN(0x1080)
     bcc     Fail
 
 
-    jmp     _TestCorrectListsActive
+    jmp     _TestEntityListsValid
 
 Fail:
     clc
@@ -331,7 +331,7 @@ constant tmp(Test.tmp)
     cmp.w   #Entities.N_ENTITIES
     bne     Fail
 
-    jmp     _TestCorrectListsActive
+    jmp     _TestEntityListsValid
 
 
 Fail:

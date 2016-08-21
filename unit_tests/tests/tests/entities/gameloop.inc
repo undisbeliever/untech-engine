@@ -51,7 +51,7 @@ constant tmp_test(Test.tmp + 2)
         dec.w   tmp_test
         bne     TestLoop
 
-    jmp     _TestCorrectListsActive
+    jmp     _TestEntityListsValid
 
 Fail:
     clc
@@ -173,7 +173,7 @@ constant tmp(Test.tmp)
     cmp.w   #Entities.N_ENTITIES - Entities.lists.N_LISTS * 0
     bne     Fail
 
-    jmp     _TestCorrectListsActive
+    jmp     _TestEntityListsValid
 
 Fail:
     clc
@@ -234,7 +234,7 @@ constant tmp(Test.tmp)
             cpy.w   #Entities.lists.N_LISTS
             bcc     ListLoop
 
-        jsr     _TestCorrectListsActive
+        jsr     _TestEntityListsValid
         bcc     Fail
     }
 
@@ -263,7 +263,7 @@ constant tmp(Test.tmp)
             cpy.w   #Entities.lists.N_LISTS
             bcc     Loop
 
-        jsr     _TestCorrectListsActive
+        jsr     _TestEntityListsValid
         bcc     Fail
     }
 
@@ -277,7 +277,7 @@ constant tmp(Test.tmp)
         bne     Fail
     }
 
-    jmp     _TestCorrectListsActive
+    jmp     _TestEntityListsValid
 
 Fail:
     clc
@@ -328,7 +328,7 @@ constant tmp_listId(Test.tmp + 2)
     jsr     _TestListLengthTable
     bcc     Fail
 
-    jsr     _TestCorrectListsActive
+    jsr     _TestEntityListsValid
     bcc     Fail
 
 
@@ -358,7 +358,7 @@ constant tmp_listId(Test.tmp + 2)
             bcc     Fail
 
 
-            jsr     _TestCorrectListsActive
+            jsr     _TestEntityListsValid
             bcc     Fail
 
 
@@ -370,7 +370,7 @@ constant tmp_listId(Test.tmp + 2)
             bcc     Loop
     }
 
-    jmp     _TestCorrectListsActive
+    jmp     _TestEntityListsValid
 
 Fail:
     clc

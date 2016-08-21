@@ -80,26 +80,45 @@ EndLoop:
 
 
 
-// OUT: C set if deactivated lists have no metasprite data
-//               AND all other lists have metasprite data
+// Tests that:
+//  * deactivated lists have no metasprite data
+//  * active lists have metasprite data
+//  * total number of entities in all lists == Entities.N_ENTITIES
+// OUT: C set if entity list OK
 // MODIFIES: DP
 a16()
 i16()
 code()
-scope _TestCorrectListsActive: {
+scope _TestEntityListsValid: {
 allocateTmpWord(tmp_index)
+allocateTmpWord(tmp_count)
+
+    stz.w   tmp_count
 
     // test deactivated entity is not active
-    lda.w   Entities.lists.deactivated
-    InactiveLoop:
-        tcd
+    macro _TestDeactivated(list) {
+        scope Test_{list} {
+            lda.w   Entities.lists.{list}
+            beq     Skip
 
-        lda.b   BaseEntity.MetaSprite.status
-        and.w   #MetaSprite.StatusFlags.paletteSet | MetaSprite.StatusFlags.vramSet
-        bne     Fail
+            Loop:
+                tcd
 
-        lda.b   BaseEntity.next
-        bne     InactiveLoop
+                inc.w   tmp_count
+
+                lda.b   BaseEntity.MetaSprite.status
+                and.w   #MetaSprite.StatusFlags.paletteSet | MetaSprite.StatusFlags.vramSet
+                bne     Fail
+
+                lda.b   BaseEntity.next
+                bne     Loop
+
+            Skip:
+        }
+    }
+
+    _TestDeactivated(deactivated)
+    _TestDeactivated(tryToActivateAgain)
 
 
     // test all other entities are active
@@ -112,6 +131,8 @@ allocateTmpWord(tmp_index)
             beq     Skip
             EntityLoop:
                 tcd
+
+                inc.w   tmp_count
 
                 lda.b   BaseEntity.MetaSprite.status
                 and.w   #MetaSprite.StatusFlags.paletteSet | MetaSprite.StatusFlags.vramSet
@@ -128,6 +149,20 @@ allocateTmpWord(tmp_index)
             cpx.w   #Entities.lists.LAST + 1
             bcc     Loop
     }
+
+
+    ldx.w   Entities.lists.toDelete
+    jsr     __ListLength
+    clc
+    adc.w   tmp_count
+    sta.w   tmp_count
+
+
+    jsr     _FreeListLength
+    clc
+    adc.w   tmp_count
+    cmp.w   #Entities.N_ENTITIES
+    bne     Fail
 
     sec
     rts
