@@ -300,6 +300,169 @@ Fail:
     rts
 }
 
+
+
+a16()
+i16()
+code()
+Test.add("GameLoop (Move Camera)")
+scope GameLoop_MoveCamera: {
+constant tmp_index(Test.tmp)
+constant tmp_listId(Test.tmp + 2)
+
+constant FailB(GameLoop_TryToActivateAgain.Fail)
+
+    jsr     Entities.Init
+
+    // Spawn 4 entities at different point on the screen
+    assert(Entities.N_ENTITIES >= Entities.lists.N_LISTS * 6)
+
+    lda.w   #BlankEntity.EntityId_0
+    Loop:
+        sta.w   tmp_listId
+
+        macro spawn(xPos, yPos) {
+            ldx.w   #{xPos}
+            ldy.w   #{yPos}
+            jsr     SpawnEntity_XY
+            bcc     FailB
+        }
+
+        spawn(0x1000 + 40, 0x1000 - 40)
+        spawn(0x1000 - 40, 0x2000 + 40)
+        spawn(0x2000 - 40, 0x1000 + 40)
+        spawn(0x2000 + 40, 0x1000 + Camera.DISPLAY_HEIGHT + Camera.ACTIVE_WINDOW_EXTEND_VERTICAL + 1)
+
+        lda.w   tmp_listId
+        inc
+        cmp.w   #BlankEntity.EntityId_0 + Entities.lists.N_LISTS
+        bcc     Loop
+
+
+    // Test Initial Entity counts
+    scope TestInitialListSize: {
+        jsr     Entities.ProcessGameLoop
+
+        ldx.w   #0
+        ldy.w   #0
+        Loop:
+            stx.w   tmp_index
+            sty.w   tmp_listId
+
+            jsr     _ListLength_Y
+
+            ldx.w   tmp_index
+            cmp.l   InitialExpectedSizes,x
+            bne     Fail
+
+            ldy.w   tmp_listId
+            iny
+
+            inx
+            inx
+            cpx.w   #Entities.lists.N_LISTS * 2
+            bcc     Loop
+
+        jsr     _TestCorrectListsActive
+        bcc     Fail
+    }
+
+
+    // Test move camera
+    // Only test NPCs and Entities
+    // (as they are the ones that deactivate)
+    scope TestMoveCamera: {
+        ldx.w   #0
+        Loop:
+            stx.w   tmp_index
+
+            lda.l   MoveCameraTable + 0,x
+            sta.w   Camera.xPos
+
+            lda.l   MoveCameraTable + 2,x
+            sta.w   Camera.yPos
+
+            jsr     Entities.ProcessGameLoop
+
+
+            ldx.w   tmp_index
+            inx
+            inx
+            inx
+            inx
+            ldy.w   #0
+            ListTestLoop:
+                stx.w   tmp_index
+                sty.w   tmp_listId
+
+                jsr     _ListLength_Y
+
+                ldx.w   tmp_index
+                cmp.l   MoveCameraTable,x
+                bne     Fail
+
+                inx
+                inx
+
+                ldy.w   tmp_listId
+                iny
+                cpy.w   #Entities.lists.N_LISTS
+                bcc     ListTestLoop
+
+            jsr     _TestCorrectListsActive
+            bcc     Fail
+
+
+            cpx.w   #MoveCameraTable.size
+            bcc     Loop
+    }
+
+    jmp     _TestCorrectListsActive
+
+Fail:
+    clc
+    rts
+
+scope SpawnEntity_XY: {
+    stx.w   Entities.Spawn.xPos
+    sty.w   Entities.Spawn.yPos
+    lda.w   tmp_listId
+    jmp     Entities.Spawn
+}
+
+rodata(rom0)
+scope InitialExpectedSizes: {
+    dw  4
+    dw  4
+    dw  1
+    dw  1
+    dw  1
+    dw  1
+    dw  1
+    dw  4
+
+    constant size(pc() - InitialExpectedSizes)
+}
+
+rodata(rom0)
+scope MoveCameraTable: {
+    macro _row(xPos, yPos, e) {
+        dw  {xPos}, {yPos}
+        dw  4, 4, {e}, 0, 0, {e}, {e}, 4
+    }
+
+    _row(0x1000, 0x2000, 1)
+    _row(0x2000, 0x2000, 0)
+    _row(0x2000, 0x1000, 1)
+    _row(0x2000, 0x1010, 2)
+    _row(0x2000, 0x1000, 2) // Still inside inactive window
+    _row(0x3000, 0x3000, 0)
+
+    constant rowSize(2 + 8)
+    constant size(pc() - MoveCameraTable)
+}
+}
+
 }
 
 // vim: ft=asm ts=4 sw=4 et:
