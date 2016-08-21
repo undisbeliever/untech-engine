@@ -199,8 +199,7 @@ i16()
 code()
 Test.add("Entities.Spawn (Offscreen)")
 scope Spawn_Offscreen: {
-constant tmp_index(Test.tmp)
-constant tmp_listId(Test.tmp + 2)
+constant tmp_listId(Test.tmp)
 
 constant ONSCREEN(0x1080)
 
@@ -245,25 +244,10 @@ constant ONSCREEN(0x1080)
     cmp.w   #ExpectedSizes.DEACTIVATED
     bne     Fail
 
-    ldx.w   #0
-    ldy.w   #0
-    ListSizeLoop:
-        stx.w   tmp_index
-        sty.w   tmp_listId
 
-        jsr     _ListLength_Y
-
-        ldx.w   tmp_index
-        cmp.l   ExpectedSizes,x
-        bne     Fail
-
-        ldy.w   tmp_listId
-        iny
-
-        inx
-        inx
-        cpx.w   #ExpectedSizes.size
-        bcc     ListSizeLoop
+    ldx.w   #ExpectedSizes
+    jsr     _TestListLengthTable
+    bcc     Fail
 
 
     jmp     _TestCorrectListsActive
@@ -295,6 +279,7 @@ scope ExpectedSizes: {
     constant FREE(Entities.N_ENTITIES - 5 * 6 - 3 * 2 - DEACTIVATED)
 
     constant size(pc() - ExpectedSizes)
+    assert(size / 2 == Entities.lists.N_LISTS)
 }
 }
 

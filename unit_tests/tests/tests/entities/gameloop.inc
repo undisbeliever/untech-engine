@@ -7,8 +7,7 @@ code()
 Test.add("Entities.GameLoop (ChangeList)")
 scope GameLoop_ChangeList: {
 constant tmp_index(Test.tmp)
-constant tmp_listId(Test.tmp + 2)
-constant tmp_test(Test.tmp + 4)
+constant tmp_test(Test.tmp + 2)
 
     // Spawns many entities that will just change their
     // list to the particle list, processes one Entity
@@ -45,25 +44,9 @@ constant tmp_test(Test.tmp + 4)
     TestLoop:
         jsr     Entities.ProcessGameLoop
 
-        ldx.w   #0
-        ldy.w   #0
-        ListSizeLoop:
-            stx.w   tmp_index
-            sty.w   tmp_listId
-
-            jsr     _ListLength_Y
-
-            ldx.w   tmp_index
-            cmp.l   ExpectedSizes,x
-            bne     Fail
-
-            ldy.w   tmp_listId
-            iny
-
-            inx
-            inx
-            cpx.w   #ExpectedSizes.size
-            bcc     ListSizeLoop
+        ldx.w   #ExpectedSizes
+        jsr     _TestListLengthTable
+        bcc     Fail
 
         dec.w   tmp_test
         bne     TestLoop
@@ -103,6 +86,7 @@ scope ExpectedSizes: {
     dw  40 - (3 * 4 + 5 + 1)
 
     constant size(pc() - ExpectedSizes)
+    assert(size / 2 == Entities.lists.N_LISTS)
 }
 }
 
@@ -310,12 +294,10 @@ scope GameLoop_MoveCamera: {
 constant tmp_index(Test.tmp)
 constant tmp_listId(Test.tmp + 2)
 
-constant FailB(GameLoop_TryToActivateAgain.Fail)
-
     jsr     Entities.Init
 
     // Spawn 4 entities at different point on the screen
-    assert(Entities.N_ENTITIES >= Entities.lists.N_LISTS * 6)
+    assert(Entities.N_ENTITIES >= Entities.lists.N_LISTS * 4)
 
     lda.w   #BlankEntity.EntityId_0
     Loop:
@@ -325,7 +307,7 @@ constant FailB(GameLoop_TryToActivateAgain.Fail)
             ldx.w   #{xPos}
             ldy.w   #{yPos}
             jsr     SpawnEntity_XY
-            bcc     FailB
+            bcc     Fail
         }
 
         spawn(0x1000 + 40, 0x1000 - 40)
@@ -340,32 +322,14 @@ constant FailB(GameLoop_TryToActivateAgain.Fail)
 
 
     // Test Initial Entity counts
-    scope TestInitialListSize: {
-        jsr     Entities.ProcessGameLoop
+    jsr     Entities.ProcessGameLoop
 
-        ldx.w   #0
-        ldy.w   #0
-        Loop:
-            stx.w   tmp_index
-            sty.w   tmp_listId
+    ldx.w   #InitialExpectedSizes
+    jsr     _TestListLengthTable
+    bcc     Fail
 
-            jsr     _ListLength_Y
-
-            ldx.w   tmp_index
-            cmp.l   InitialExpectedSizes,x
-            bne     Fail
-
-            ldy.w   tmp_listId
-            iny
-
-            inx
-            inx
-            cpx.w   #Entities.lists.N_LISTS * 2
-            bcc     Loop
-
-        jsr     _TestCorrectListsActive
-        bcc     Fail
-    }
+    jsr     _TestCorrectListsActive
+    bcc     Fail
 
 
     // Test move camera
@@ -385,34 +349,23 @@ constant FailB(GameLoop_TryToActivateAgain.Fail)
             jsr     Entities.ProcessGameLoop
 
 
-            ldx.w   tmp_index
-            inx
-            inx
-            inx
-            inx
-            ldy.w   #0
-            ListTestLoop:
-                stx.w   tmp_index
-                sty.w   tmp_listId
+            // Test list lengths
+            lda.w   tmp_index
+            clc
+            adc.w   #MoveCameraTable + 4
+            tax
+            jsr     _TestListLengthTable
+            bcc     Fail
 
-                jsr     _ListLength_Y
-
-                ldx.w   tmp_index
-                cmp.l   MoveCameraTable,x
-                bne     Fail
-
-                inx
-                inx
-
-                ldy.w   tmp_listId
-                iny
-                cpy.w   #Entities.lists.N_LISTS
-                bcc     ListTestLoop
 
             jsr     _TestCorrectListsActive
             bcc     Fail
 
 
+            lda.w   tmp_index
+            clc
+            adc.w   #MoveCameraTable.rowSize
+            tax
             cpx.w   #MoveCameraTable.size
             bcc     Loop
     }
@@ -442,6 +395,7 @@ scope InitialExpectedSizes: {
     dw  4
 
     constant size(pc() - InitialExpectedSizes)
+    assert(size / 2 == Entities.lists.N_LISTS)
 }
 
 rodata(rom0)
@@ -458,7 +412,7 @@ scope MoveCameraTable: {
     _row(0x2000, 0x1000, 2) // Still inside inactive window
     _row(0x3000, 0x3000, 0)
 
-    constant rowSize(2 + 8)
+    constant rowSize((2 + 8) * 2)
     constant size(pc() - MoveCameraTable)
 }
 }
