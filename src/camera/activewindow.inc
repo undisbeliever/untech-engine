@@ -6,6 +6,9 @@ scope Camera {
 macro _UpdateWindows() {
     assert16a()
 
+    assert(Camera.INACTIVE_WINDOW_EXTEND_HORIZONTAL > Camera.ACTIVE_WINDOW_EXTEND_HORIZONTAL)
+    assert(Camera.INACTIVE_WINDOW_EXTEND_VERTICAL > Camera.ACTIVE_WINDOW_EXTEND_VERTICAL)
+
     lda.w   Camera.xPos
     sec
     sbc.w   #Camera.ACTIVE_WINDOW_EXTEND_HORIZONTAL
@@ -34,7 +37,7 @@ macro _UpdateWindows() {
     sta.w   Camera.inactiveWindow.top
 
     clc
-    adc.w   #Camera.INACTIVE_WINDOW_EXTEND_VERTICAL + Camera.DISPLAY_WIDTH + Camera.ACTIVE_WINDOW_EXTEND_VERTICAL + 1
+    adc.w   #Camera.INACTIVE_WINDOW_EXTEND_VERTICAL + Camera.DISPLAY_HEIGHT + Camera.ACTIVE_WINDOW_EXTEND_VERTICAL + 1
     sta.w   Camera.activeWindow.bottom
 
     clc
