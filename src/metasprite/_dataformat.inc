@@ -1,6 +1,6 @@
 
 // Data format may be subject to changes
-if MetaSprite.Data.EDITOR_VERSION < 17 {
+if MetaSprite.Data.EDITOR_VERSION < 19 {
     error "Invalid UnTech Editor Version"
 }
 
@@ -186,9 +186,12 @@ scope Format {
     //      * a body AABB (where normal damage would occur if hit)
     //
     //
-    // In order to save processing an "outer" hitbox is used. This hitbox
-    // is tested first, then only if that hits, will the inner hitboxes
-    // be tested.
+    // This data structure uses 16 bit values for the width and height,
+    // as it saves 20% cpu time in the check collision code (on average).
+    //
+    // In order to save processing an "outer" hitbox is used. This
+    // hitbox is tested first, then only if that hits, will the inner
+    // hitboxes be tested.
     //
     // Some hitboxes only involve one AABB. In this case count is 0 and
     // the outer hitbox is checked.
@@ -206,8 +209,8 @@ scope Format {
             scope Outer {
                 field(xOffset, 1) // int_ms8 format
                 field(yOffset, 1) // int_ms8 format
-                field(width, 1) // uint8
-                field(height, 1) // uint8
+                field(width, 2) // uint16
+                field(height, 2) // uint16
             }
 
             // The inner hitboxes, repeated `count` times
@@ -216,19 +219,34 @@ scope Format {
             scope Inner {
                 field(xOffset, 1) // int_ms8 format
                 field(yOffset, 1) // int_ms8 format
-                field(width, 1) // uint8
-                field(height, 1) // uint8
+                field(width, 2) // uint16
+                field(height, 2) // uint16
 
-                // parameter of the hitbox, passed to the entity's ProcessCollision function.
-                // uint8
-                field(parameter, 1)
+                // type of hitbox
+                // (EntityHitboxType uint8 value)
+                field(type, 1)
             }
 
-            // The parameter of a single hitbox
+            // The type of a single hitbox
             //
             // Only set if count == 0
-            constant singleHitboxParameter(Inner.xOffset)
+            constant singleHitboxType(Inner.xOffset)
         endstruct()
+    }
+
+    // The entity hitbox type
+    // See entity collision code for collision table
+    scope EntityHitboxType {
+        createEnum(0, 2)
+
+        enum(BODY)
+        enum(BODY_WEAK)
+        enum(SHIELD)
+        enum(SHIELD_ATTACK)
+        enum(ATTACK)
+        enum(PROJECTILE)    // will phase through other projectiles
+
+        assert({__enum.current} < 8 * 2)
     }
 
 
@@ -246,13 +264,12 @@ scope Format {
     }
 
 
-    // Action points used by the metasprite animation engine
+    // Action points used by the metasprite animation engine.
     //
-    // This is used by the animator to tell the game-loop
-    // when to preform certain actions.
+    // The data structure is NULL terminated.
     //
-    // Action points only occur for one frame. On the next processing frame the
-    // pointer to the ActionPoints data location is reset to NULL.
+    // This is used by the animator to tell the game-loop when to
+    // preform certain actions.
     //
     // Examples of action points include:
     //      * Fire weapon frame - would includes the position and direction
@@ -261,17 +278,14 @@ scope Format {
     //
     scope ActionPoints {
         struct(Data.ActionPointsOffset)
-            field(count, 1) // uint8
+            // The type of action point
+            // Value passed to the entity's ProcessPoint routine
+            //
+            // MUST NOT BE 0. If Parameter is 0, the loop is terminated
+            field(parameter, 1)
 
-            // repeated `count` times
-            scope Point {
-                // The type of action point
-                // Value passed to the entity's ProcessPoint routine
-                field(parameter, 1)
-
-                field(xPos, 1)  // int_ms8
-                field(yPos, 1) // int_ms8
-            }
+            field(xPos, 1)  // int_ms8
+            field(yPos, 1) // int_ms8
         endstruct()
     }
 
