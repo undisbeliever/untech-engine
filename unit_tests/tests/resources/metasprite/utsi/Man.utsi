@@ -9,7 +9,7 @@
     <object size="small" x="0" y="8"/>
     <object size="small" x="8" y="8"/>
     <object size="large" x="0" y="16"/>
-    <entityhitbox parameter="0" x="4" y="10" width="8" height="21"/>
+    <entityhitbox type="BODY" x="4" y="10" width="8" height="21"/>
   </frame>
   <frame id="Fall_Right" order="2">
     <gridlocation x="4" y="0"/>
@@ -17,7 +17,7 @@
     <object size="small" x="0" y="8"/>
     <object size="small" x="8" y="8"/>
     <object size="large" x="0" y="16"/>
-    <entityhitbox parameter="0" x="4" y="9" width="8" height="20"/>
+    <entityhitbox type="BODY" x="4" y="9" width="8" height="20"/>
   </frame>
   <frame id="Jump_Right" order="2">
     <gridlocation x="3" y="0"/>
@@ -25,7 +25,7 @@
     <object size="small" x="0" y="8"/>
     <object size="small" x="8" y="8"/>
     <object size="large" x="0" y="16"/>
-    <entityhitbox parameter="0" x="2" y="9" width="11" height="20"/>
+    <entityhitbox type="BODY" x="2" y="9" width="11" height="20"/>
   </frame>
   <frame id="Stand_Right" order="2">
     <gridlocation x="0" y="0"/>
@@ -33,7 +33,7 @@
     <object size="small" x="0" y="8"/>
     <object size="small" x="8" y="8"/>
     <object size="large" x="0" y="16"/>
-    <entityhitbox parameter="0" x="4" y="10" width="8" height="21"/>
+    <entityhitbox type="BODY" x="4" y="10" width="8" height="21"/>
   </frame>
   <frame id="TouchEnemy_Right" order="2">
     <gridlocation x="5" y="0"/>
@@ -47,7 +47,7 @@
     <object size="small" x="0" y="8"/>
     <object size="small" x="8" y="8"/>
     <object size="large" x="0" y="16"/>
-    <entityhitbox parameter="0" x="4" y="10" width="9" height="21"/>
+    <entityhitbox type="BODY" x="4" y="10" width="9" height="21"/>
   </frame>
   <frame id="Walk_Right_1" order="2">
     <gridlocation x="1" y="1"/>
@@ -55,7 +55,7 @@
     <object size="small" x="0" y="8"/>
     <object size="small" x="8" y="8"/>
     <object size="large" x="0" y="16"/>
-    <entityhitbox parameter="0" x="4" y="9" width="9" height="21"/>
+    <entityhitbox type="BODY" x="4" y="9" width="9" height="21"/>
   </frame>
   <frame id="Walk_Right_2" order="2">
     <gridlocation x="2" y="1"/>
@@ -63,7 +63,7 @@
     <object size="small" x="0" y="8"/>
     <object size="small" x="8" y="8"/>
     <object size="large" x="0" y="16"/>
-    <entityhitbox parameter="0" x="4" y="10" width="9" height="21"/>
+    <entityhitbox type="BODY" x="4" y="10" width="9" height="21"/>
   </frame>
   <frame id="Walk_Right_3" order="2">
     <gridlocation x="3" y="1"/>
@@ -71,7 +71,7 @@
     <object size="small" x="0" y="8"/>
     <object size="small" x="8" y="8"/>
     <object size="large" x="0" y="16"/>
-    <entityhitbox parameter="0" x="4" y="10" width="9" height="21"/>
+    <entityhitbox type="BODY" x="4" y="10" width="9" height="21"/>
   </frame>
   <frame id="Walk_Right_4" order="2">
     <gridlocation x="4" y="1"/>
@@ -79,7 +79,7 @@
     <object size="small" x="0" y="8"/>
     <object size="small" x="8" y="8"/>
     <object size="large" x="0" y="16"/>
-    <entityhitbox parameter="0" x="4" y="9" width="9" height="21"/>
+    <entityhitbox type="BODY" x="4" y="9" width="9" height="21"/>
   </frame>
   <frame id="Walk_Right_5" order="2">
     <gridlocation x="5" y="1"/>
@@ -87,7 +87,7 @@
     <object size="small" x="0" y="8"/>
     <object size="small" x="8" y="8"/>
     <object size="large" x="0" y="16"/>
-    <entityhitbox parameter="0" x="4" y="10" width="10" height="21"/>
+    <entityhitbox type="BODY" x="4" y="10" width="10" height="21"/>
   </frame>
   <animation id="Walk_Right">
     <instruction op="SET_FRAME_AND_WAIT_XVECL" frame="Walk_Right_0" parameter="20"/>
