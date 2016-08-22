@@ -22,7 +22,6 @@ scope Init: {
 }
 
 
-// IN: A = parameter
 a16()
 i16()
 code()
