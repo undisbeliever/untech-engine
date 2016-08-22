@@ -19,7 +19,7 @@ scope RenderLoop: {
         if {n} < 8 {
             scope _{n} {
                 lda.w   lists.FIRST + {n} * 2
-                jsr RenderList
+                jsr     RenderList
             }
             _repeat({n} + 1)
         }
