@@ -96,7 +96,7 @@ include "tests/math.inc"
 include "tests/metasprite.inc"
 include "tests/text.inc"
 
-include "interactive/metasprite.inc"
+include "interactive/entity-metasprite.inc"
 
 Test.finalizeTable()
 
