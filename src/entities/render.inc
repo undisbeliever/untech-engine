@@ -49,14 +49,14 @@ scope RenderList: {
 
             lda.b   BaseEntity.xPos.px
             sec
-            sbc.w   #INT_MS8_OFFSET + Camera.ORIGIN
+            sbc.w   #INT_MS8_OFFSET
             sec
             sbc.w   Camera.xPos
             sta.w   MetaSprite.Render.xPos
 
             lda.b   BaseEntity.yPos.px
             sec
-            sbc.w   #INT_MS8_OFFSET + Camera.ORIGIN
+            sbc.w   #INT_MS8_OFFSET
             sec
             sbc.w   Camera.yPos
             sta.w   MetaSprite.Render.yPos
