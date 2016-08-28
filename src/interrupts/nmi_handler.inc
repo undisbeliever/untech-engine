@@ -1,9 +1,10 @@
 // nmi_handler.inc
 // =================
 
-arch snes.cpu
+include "nmi/scrollbuffer.inc"
+include "nmi/framecounter.inc"
 
-allocate(frameCounter, shadow, 2)
+arch snes.cpu
 
 code()
 scope NmiHandler: {
@@ -32,9 +33,8 @@ i8()
 
     Dma.VBlank()
     ScrollBuffer.VBlank()
+    FrameCounter.VBlank()
 
-
-    inc.w   frameCounter
 
     rep     #$30
 
@@ -65,20 +65,6 @@ a16()
     plp
     rts
 }
-
-// REQUIRES: DB access shadow, VBlank Enabled
-code()
-scope WaitFrame: {
-    lda.w   frameCounter
-
-    -
-        wai
-        cmp.w   frameCounter
-        beq     -
-
-    rts
-}
-
 
 // vim: ft=asm ts=4 sw=4 et:
 
