@@ -27,10 +27,11 @@ i16()
 i8()
 
     // Reset NMI Flag.
-	ldy.w	RDNMI
+    ldy.w   RDNMI
 
 
     Dma.VBlank()
+    ScrollBuffer.VBlank()
 
 
     inc.w   frameCounter
