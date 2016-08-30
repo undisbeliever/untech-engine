@@ -241,6 +241,12 @@ scope MetaSprite {
         // (word)
         allocateTmpWord(timerSpeed)
     }
+
+    scope ActionPoint {
+        // The address of the last action Point that was processed
+        // Used by Entity Init routine to determine location of action point.
+        allocateTmpWord(address)
+    }
 }
 
 // vim: ft=asm ts=4 sw=4 et:
