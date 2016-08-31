@@ -59,13 +59,13 @@ a8()
             adc.b   BaseEntity.yPos.px
             sta.w   Entities.Spawn.yPos
 
-            phx
-                stx.w   MetaSprite.ActionPoint.address
-                tdc
-                tay
-                lda.w   tmp_entityToSpawn
-                jsr     Entities.Spawn
-            plx
+            stx.w   MetaSprite.ActionPoint.address
+            tdc
+            tay
+            lda.w   tmp_entityToSpawn
+            jsr     Entities.Spawn
+
+            ldx.w   MetaSprite.ActionPoint.address
 
             sep     #$20
         a8()

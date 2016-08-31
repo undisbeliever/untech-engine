@@ -243,8 +243,12 @@ scope MetaSprite {
     }
 
     scope ActionPoint {
-        // The address of the last action Point that was processed
-        // Used by Entity Init routine to determine location of action point.
+        // The address of the last action Point that was processed.
+        //
+        // Exposed so an Entity Init routine can determine location of
+        // action point (ie, for direction information)
+        //
+        // (index, MUST NOT be modified outside ActionPoint routines)
         allocateTmpWord(address)
     }
 }
