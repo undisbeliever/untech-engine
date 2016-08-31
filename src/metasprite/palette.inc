@@ -114,7 +114,7 @@ scope _RemoveSlot: {
 
     lda.w   slotPool.free
     stx.w   slotPool.free
-    sta.w   slots.next
+    sta.w   slots.next,x
 
     rts
 }
