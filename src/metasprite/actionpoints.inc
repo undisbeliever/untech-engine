@@ -49,7 +49,7 @@ a8()
             // carry clear, will set carry on overflow (thus the -1)
             adc.w   #-INT_MS8_OFFSET - 1
             adc.b   BaseEntity.xPos.px
-            sta.w   Entities.Spawn.xPos
+            sta.w   Entity.Spawn.xPos
 
             clc
             lda.l   Format.ActionPoints.yPos,x
@@ -57,13 +57,13 @@ a8()
             // carry clear, will set carry on overflow (thus the -1)
             adc.w   #-INT_MS8_OFFSET - 1
             adc.b   BaseEntity.yPos.px
-            sta.w   Entities.Spawn.yPos
+            sta.w   Entity.Spawn.yPos
 
             stx.w   MetaSprite.ActionPoint.address
             tdc
             tay
             lda.w   tmp_entityToSpawn
-            jsr     Entities.Spawn
+            jsr     Entity.Spawn
 
             ldx.w   MetaSprite.ActionPoint.address
 

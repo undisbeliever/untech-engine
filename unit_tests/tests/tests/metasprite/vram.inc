@@ -22,7 +22,7 @@ macro _ActivateFixedTest(FrameSet, nSlots) {
     scope Activate_{FrameSet}: {
         jsr     _Init_MetaSpriteModule
 
-        lda.w   #Entities.entity0
+        lda.w   #EntityPool.entity0
         tcd
 
         lda.w   #MSFS.{FrameSet}
@@ -41,7 +41,7 @@ macro _ActivateFixedTest(FrameSet, nSlots) {
 
 
         // Second entity
-        lda.w   #Entities.entity1
+        lda.w   #EntityPool.entity1
         tcd
 
         lda.w   #MSFS.{FrameSet}
@@ -61,12 +61,12 @@ macro _ActivateFixedTest(FrameSet, nSlots) {
 
         // Test that both entities use same charAttr
         lda.b   BaseEntity.MetaSprite.blockOneCharAttrOffset
-        cmp.w   Entities.entity0 + BaseEntity.MetaSprite.blockOneCharAttrOffset
+        cmp.w   EntityPool.entity0 + BaseEntity.MetaSprite.blockOneCharAttrOffset
         bne     Fail
 
         if {nSlots} == 2 {
             lda.b   BaseEntity.MetaSprite.blockTwoCharAttrOffset
-            cmp.w   Entities.entity0 + BaseEntity.MetaSprite.blockTwoCharAttrOffset
+            cmp.w   EntityPool.entity0 + BaseEntity.MetaSprite.blockTwoCharAttrOffset
             bne     Fail
         }
 
@@ -93,7 +93,7 @@ macro _ActivateDynamicTest(FrameSet, nSlots) {
     scope Activate_{FrameSet}: {
         jsr     _Init_MetaSpriteModule
 
-        lda.w   #Entities.entity0
+        lda.w   #EntityPool.entity0
         tcd
 
         lda.w   #MSFS.{FrameSet}
@@ -119,7 +119,7 @@ macro _ActivateDynamicTest(FrameSet, nSlots) {
 
         // Second entity
         // NULL frame upload
-        lda.w   #Entities.entity1
+        lda.w   #EntityPool.entity1
         tcd
 
         lda.w   #MSFS.{FrameSet}
@@ -141,12 +141,12 @@ macro _ActivateDynamicTest(FrameSet, nSlots) {
 
         // Test that both entities use different charAttr
         lda.b   BaseEntity.MetaSprite.blockOneCharAttrOffset
-        cmp.w   Entities.entity0 + BaseEntity.MetaSprite.blockOneCharAttrOffset
+        cmp.w   EntityPool.entity0 + BaseEntity.MetaSprite.blockOneCharAttrOffset
         beq     Fail
 
         if {nSlots} == 2 {
             lda.b   BaseEntity.MetaSprite.blockTwoCharAttrOffset
-            cmp.w   Entities.entity0 + BaseEntity.MetaSprite.blockTwoCharAttrOffset
+            cmp.w   EntityPool.entity0 + BaseEntity.MetaSprite.blockTwoCharAttrOffset
             beq     Fail
         }
 
@@ -179,7 +179,7 @@ macro _DeallocateTest(type) {
         // This should fail
 
 
-        lda.w   #Entities.entity10
+        lda.w   #EntityPool.entity10
         tcd
         lda.w   #MSFS.FST_One{type}
         jsr     _InitEntity0Palette
@@ -188,11 +188,11 @@ macro _DeallocateTest(type) {
         bcs     Fail
 
         // Now if I remove the double fixed tile the activate will succeed
-        lda.w   #Entities.entity1
+        lda.w   #EntityPool.entity1
         tcd
         jsr     MetaSprite.Deactivate
 
-        lda.w   #Entities.entity10
+        lda.w   #EntityPool.entity10
         tcd
         jsr     MetaSprite.Activate
         bcs     _Pass
@@ -205,7 +205,7 @@ macro _DeallocateTest(type) {
         // Now there is only one free slot
         // Trying to activate a dual slot will fail
 
-        lda.w   #Entities.entity11
+        lda.w   #EntityPool.entity11
         tcd
         lda.w   #MSFS.FST_Two{type}s
         jsr     _InitEntity0Palette
@@ -215,11 +215,11 @@ macro _DeallocateTest(type) {
 
 
         // Now if I remove a single dynamic tile the activate will succeed
-        lda.w   #Entities.entity2
+        lda.w   #EntityPool.entity2
         tcd
         jsr     MetaSprite.Deactivate
 
-        lda.w   #Entities.entity11
+        lda.w   #EntityPool.entity11
         tcd
         jsr     MetaSprite.Activate
         bcc     Fail
@@ -227,7 +227,7 @@ macro _DeallocateTest(type) {
 
         // Now there is no free slots
 
-        lda.w   #Entities.entity12
+        lda.w   #EntityPool.entity12
         tcd
         lda.w   #MSFS.FST_Two{type}s
         jsr     _InitEntity0Palette
@@ -238,35 +238,35 @@ macro _DeallocateTest(type) {
 
         // Deactivate single fixed tileset
         // And try a double free
-        lda.w   #Entities.entity0
+        lda.w   #EntityPool.entity0
         tcd
         jsr     MetaSprite.Deactivate
         jsr     MetaSprite.Deactivate
 
 
         // One tile free - still fail
-        lda.w   #Entities.entity12
+        lda.w   #EntityPool.entity12
         tcd
         jsr     MetaSprite.Activate
         bcs     Fail
 
 
         // Finally deactivate a double dynamic
-        lda.w   #Entities.entity6
+        lda.w   #EntityPool.entity6
         tcd
         jsr     MetaSprite.Deactivate
         jsr     MetaSprite.Deactivate
 
 
         // Finally create single slot
-        lda.w   #Entities.entity12
+        lda.w   #EntityPool.entity12
         tcd
         jsr     MetaSprite.Activate
         bcc     Fail
 
 
         // Fill the other one
-        lda.w   #Entities.entity13
+        lda.w   #EntityPool.entity13
         tcd
         lda.w   #MSFS.FST_One{type}
         jsr     _InitEntity0PaletteAndActivate
@@ -275,7 +275,7 @@ macro _DeallocateTest(type) {
 
         // We are full again
         // This will fail
-        lda.w   #Entities.entity14
+        lda.w   #EntityPool.entity14
         tcd
         lda.w   #MSFS.FST_One{type}
         jsr     _InitEntity0PaletteAndActivate
@@ -300,7 +300,7 @@ macro _ReferenceCountTest(type) {
 
         // entity 1: single fixed, count = 1
 
-        lda.w   #Entities.entity10
+        lda.w   #EntityPool.entity10
         tcd
         lda.w   #MSFS.FST_One{type}Fixed
         jsr     _InitEntity0PaletteAndActivate
@@ -308,7 +308,7 @@ macro _ReferenceCountTest(type) {
 
         // entity 0: single fixed, count = 2
 
-        lda.w   #Entities.entity11
+        lda.w   #EntityPool.entity11
         tcd
         lda.w   #MSFS.FST_One{type}Fixed
         jsr     _InitEntity0PaletteAndActivate
@@ -320,7 +320,7 @@ macro _ReferenceCountTest(type) {
 
         // entity 0: single fixed, count = 2
 
-        lda.w   #Entities.entity10
+        lda.w   #EntityPool.entity10
         tcd
         jsr     MetaSprite.Deactivate
 
@@ -328,20 +328,20 @@ macro _ReferenceCountTest(type) {
 
 
         // Try and fail to create a dynamic entity (we're full)
-        lda.w   #Entities.entity14
+        lda.w   #EntityPool.entity14
         tcd
         lda.w   #MSFS.FST_One{type}
         jsr     _InitEntity0PaletteAndActivate
         bcs     Fail
 
-        lda.w   #Entities.entity0
+        lda.w   #EntityPool.entity0
         tcd
         jsr     MetaSprite.Deactivate
 
         // entity 0: single fixed, count = 0
 
         // Can now create entity
-        lda.w   #Entities.entity14
+        lda.w   #EntityPool.entity14
         tcd
         lda.w   #MSFS.FST_One{type}
         jsr     _InitEntity0PaletteAndActivate
@@ -350,7 +350,7 @@ macro _ReferenceCountTest(type) {
 
         // entity 1: double fixed, count = 1
 
-        lda.w   #Entities.entity10
+        lda.w   #EntityPool.entity10
         tcd
         lda.w   #MSFS.FST_Two{type}sFixed
         jsr     _InitEntity0PaletteAndActivate
@@ -359,27 +359,27 @@ macro _ReferenceCountTest(type) {
         // entity 0: single fixed, count = 2
 
         // Try and fail to create a dynamic entity (we're full)
-        lda.w   #Entities.entity13
+        lda.w   #EntityPool.entity13
         tcd
         lda.w   #MSFS.FST_One{type}
         jsr     _InitEntity0PaletteAndActivate
         bcs     Fail
 
 
-        lda.w   #Entities.entity10
+        lda.w   #EntityPool.entity10
         tcd
         jsr     MetaSprite.Deactivate
 
         // entity 0: single fixed, count = 1
 
-        lda.w   #Entities.entity1
+        lda.w   #EntityPool.entity1
         tcd
         jsr     MetaSprite.Deactivate
 
         // entity 0: single fixed, count = 0
 
         // Can now create entity
-        lda.w   #Entities.entity13
+        lda.w   #EntityPool.entity13
         tcd
         lda.w   #MSFS.FST_One{type}
         jsr     _InitEntity0PaletteAndActivate
@@ -410,25 +410,25 @@ macro __Init_Fill(type, nSlots) {
     scope _Init_Fill{type}: {
         jsr     _Init_MetaSpriteModule
 
-        lda.w   #Entities.entity0
+        lda.w   #EntityPool.entity0
         tcd
         lda.w   #MSFS.FST_One{type}Fixed
         jsr     _InitEntity0PaletteAndActivate
         bcc     Fail
 
-        lda.w   #Entities.entity1
+        lda.w   #EntityPool.entity1
         tcd
         lda.w   #MSFS.FST_Two{type}sFixed
         jsr     _InitEntity0PaletteAndActivate
         bcc     Fail
 
-        lda.w   #Entities.entity2
+        lda.w   #EntityPool.entity2
         tcd
         lda.w   #MSFS.FST_One{type}
         jsr     _InitEntity0PaletteAndActivate
         bcc     Fail
 
-        lda.w   #Entities.entity3
+        lda.w   #EntityPool.entity3
         Loop:
             tcd
 
@@ -438,8 +438,8 @@ macro __Init_Fill(type, nSlots) {
 
             tdc
             clc
-            adc.w   #Entities.ENTITY_SIZE
-            cmp.w   #Entities.entity3 + Entities.ENTITY_SIZE * ({nSlots} - 4) / 2
+            adc.w   #Entity.ENTITY_SIZE
+            cmp.w   #EntityPool.entity3 + Entity.ENTITY_SIZE * ({nSlots} - 4) / 2
             bcc     Loop
 
         sec

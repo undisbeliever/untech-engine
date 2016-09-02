@@ -1,10 +1,10 @@
 
-scope EntitiesTest {
+scope EntityTest {
 
 a16()
 i16()
 code()
-Test.add("Entities.GameLoop (ChangeList)")
+Test.add("Entity.GameLoop (ChangeList)")
 scope GameLoop_ChangeList: {
 constant tmp_index(Test.tmp)
 constant tmp_test(Test.tmp + 2)
@@ -14,11 +14,11 @@ constant tmp_test(Test.tmp + 2)
     // Game Loop frame and verifies that the list sizes
     // are correct.
 
-    jsr     Entities.Init
+    jsr     Entity.Init
 
     lda.w   #0x1000
-    sta.w   Entities.Spawn.xPos
-    sta.w   Entities.Spawn.yPos
+    sta.w   Entity.Spawn.xPos
+    sta.w   Entity.Spawn.yPos
 
     ldx.w   #0
     SpawnLoop:
@@ -26,7 +26,7 @@ constant tmp_test(Test.tmp + 2)
 
         lda.l   SpawnList,x
         ldy.w   #1
-        jsr     Entities.Spawn
+        jsr     Entity.Spawn
         bcc     Fail
 
         ldx.w   tmp_index
@@ -42,7 +42,7 @@ constant tmp_test(Test.tmp + 2)
     sta.w   tmp_test
 
     TestLoop:
-        jsr     Entities.ProcessGameLoop
+        jsr     Entity.ProcessGameLoop
 
         ldx.w   #ExpectedSizes
         jsr     _TestListLengthTable
@@ -59,8 +59,8 @@ Fail:
 
 rodata(rom0)
 scope SpawnList: {
-    define C(ChangeToParticleEntity.EntityId_)
-    define B(BlankEntity.EntityId_)
+    define C(Entities.ChangeToParticleEntity.EntityId_)
+    define B(Entities.BlankEntity.EntityId_)
 
     dw  {C}0, {C}0, {B}0, {B}0, {B}0
     dw  {B}1, {C}1, {C}1, {B}1, {B}1
@@ -72,7 +72,7 @@ scope SpawnList: {
     dw  {B}7, {B}7, {C}7, {B}7, {C}7
 
     constant size(pc() - SpawnList)
-    assert(size/2 <= Entities.N_ENTITIES)
+    assert(size/2 <= Entity.N_ENTITIES)
 }
 
 scope ExpectedSizes: {
@@ -86,7 +86,7 @@ scope ExpectedSizes: {
     dw  40 - (3 * 4 + 5 + 1)
 
     constant size(pc() - ExpectedSizes)
-    assert(size / 2 == Entities.lists.N_LISTS)
+    assert(size / 2 == Entity.lists.N_LISTS)
 }
 }
 
@@ -95,82 +95,82 @@ scope ExpectedSizes: {
 a16()
 i16()
 code()
-Test.add("Entities.GameLoop (Delete)")
+Test.add("Entity.GameLoop (Delete)")
 scope GameLoop_Delete: {
 constant tmp(Test.tmp)
 
-    jsr     Entities.Init
+    jsr     Entity.Init
 
-    assert(Entities.lists.N_LISTS * 3 <= Entities.N_ENTITIES)
+    assert(Entity.lists.N_LISTS * 3 <= Entity.N_ENTITIES)
 
     lda.w   #0x1000
-    sta.w   Entities.Spawn.xPos
-    sta.w   Entities.Spawn.yPos
+    sta.w   Entity.Spawn.xPos
+    sta.w   Entity.Spawn.yPos
 
     // spawn 3 entities per list
     // these entities will delete themselves after Y frames
-    lda.w   #DeleteAfterDelayEntity.EntityId_0
+    lda.w   #Entities.DeleteAfterDelayEntity.EntityId_0
     Loop:
         sta.w   tmp
 
         ldy.w   #1
-        jsr     Entities.Spawn
+        jsr     Entity.Spawn
         bcc     Fail
 
         lda.w   tmp
         ldy.w   #4
-        jsr     Entities.Spawn
+        jsr     Entity.Spawn
         bcc     Fail
 
         lda.w   tmp
         ldy.w   #2
-        jsr     Entities.Spawn
+        jsr     Entity.Spawn
         bcc     Fail
 
         lda.w   tmp
         ldy.w   #2
-        jsr     Entities.Spawn
+        jsr     Entity.Spawn
         bcc     Fail
 
         lda.w   tmp
         inc
-        cmp.w   #DeleteAfterDelayEntity.EntityId_0 + Entities.lists.N_LISTS
+        cmp.w   #Entities.DeleteAfterDelayEntity.EntityId_0 + Entity.lists.N_LISTS
         bcc     Loop
 
     // Test list lengths
 
     jsr     _FreeListLength
-    cmp.w   #Entities.N_ENTITIES - Entities.lists.N_LISTS * 4
+    cmp.w   #Entity.N_ENTITIES - Entity.lists.N_LISTS * 4
     bne     Fail
 
     // frame 1 - 1 list of entities deleted
-    jsr     Entities.ProcessGameLoop
+    jsr     Entity.ProcessGameLoop
     jsr     _FreeListLength
-    cmp.w   #Entities.N_ENTITIES - Entities.lists.N_LISTS * 3
+    cmp.w   #Entity.N_ENTITIES - Entity.lists.N_LISTS * 3
     bne     Fail
 
     // frame 2 - 2 lists of entities deleted
-    jsr     Entities.ProcessGameLoop
+    jsr     Entity.ProcessGameLoop
     jsr     _FreeListLength
-    cmp.w   #Entities.N_ENTITIES - Entities.lists.N_LISTS * 1
+    cmp.w   #Entity.N_ENTITIES - Entity.lists.N_LISTS * 1
     bne     Fail
 
     // frame 3 - no entities deleted
-    jsr     Entities.ProcessGameLoop
+    jsr     Entity.ProcessGameLoop
     jsr     _FreeListLength
-    cmp.w   #Entities.N_ENTITIES - Entities.lists.N_LISTS * 1
+    cmp.w   #Entity.N_ENTITIES - Entity.lists.N_LISTS * 1
     bne     Fail
 
     // frame 4 - 1 list of entities deleted
-    jsr     Entities.ProcessGameLoop
+    jsr     Entity.ProcessGameLoop
     jsr     _FreeListLength
-    cmp.w   #Entities.N_ENTITIES - Entities.lists.N_LISTS * 0
+    cmp.w   #Entity.N_ENTITIES - Entity.lists.N_LISTS * 0
     bne     Fail
 
     // frame 5 - no entities deleted
-    jsr     Entities.ProcessGameLoop
+    jsr     Entity.ProcessGameLoop
     jsr     _FreeListLength
-    cmp.w   #Entities.N_ENTITIES - Entities.lists.N_LISTS * 0
+    cmp.w   #Entity.N_ENTITIES - Entity.lists.N_LISTS * 0
     bne     Fail
 
     jmp     _TestEntityListsValid
@@ -185,11 +185,11 @@ Fail:
 a16()
 i16()
 code()
-Test.add("Entities.GameLoop.TryToActivateAgain")
+Test.add("Entity.GameLoop.TryToActivateAgain")
 scope GameLoop_TryToActivateAgain: {
 constant tmp(Test.tmp)
 
-    jsr     Entities.Init
+    jsr     Entity.Init
 
     // Prevent the entities from spawning
     jsr     WaitFrame
@@ -197,27 +197,27 @@ constant tmp(Test.tmp)
 
     scope CreateEntities: {
         lda.w   #0x1000
-        sta.w   Entities.Spawn.xPos
-        sta.w   Entities.Spawn.yPos
+        sta.w   Entity.Spawn.xPos
+        sta.w   Entity.Spawn.yPos
 
-        assert(Entities.N_ENTITIES >= Entities.lists.N_LISTS)
+        assert(Entity.N_ENTITIES >= Entity.lists.N_LISTS)
 
-        lda.w   #DeleteAfterDelayEntity.EntityId_0
+        lda.w   #Entities.DeleteAfterDelayEntity.EntityId_0
         Loop:
             sta.w   tmp
 
             ldy.w   #2
-            jsr     Entities.Spawn
+            jsr     Entity.Spawn
             bcc     Fail
 
             lda.w   tmp
             inc
-            cmp.w   #DeleteAfterDelayEntity.EntityId_0 + Entities.lists.N_LISTS
+            cmp.w   #Entities.DeleteAfterDelayEntity.EntityId_0 + Entity.lists.N_LISTS
             bcc     Loop
 
 
         jsr     _TryToActivateAgainListLength
-        cmp.w   #Entities.lists.N_LISTS
+        cmp.w   #Entity.lists.N_LISTS
         bne     Fail
 
         // Test each list has no entities in them (not active)
@@ -231,7 +231,7 @@ constant tmp(Test.tmp)
             bne     Fail
 
             iny
-            cpy.w   #Entities.lists.N_LISTS
+            cpy.w   #Entity.lists.N_LISTS
             bcc     ListLoop
 
         jsr     _TestEntityListsValid
@@ -243,7 +243,7 @@ constant tmp(Test.tmp)
         jsr     Dma.Init
         jsr     WaitFrame
 
-        jsr     Entities.ProcessGameLoop
+        jsr     Entity.ProcessGameLoop
 
         jsr     _TryToActivateAgainListLength
         cmp.w   #0
@@ -260,7 +260,7 @@ constant tmp(Test.tmp)
             bne     Fail
 
             iny
-            cpy.w   #Entities.lists.N_LISTS
+            cpy.w   #Entity.lists.N_LISTS
             bcc     Loop
 
         jsr     _TestEntityListsValid
@@ -270,10 +270,10 @@ constant tmp(Test.tmp)
     // After the second frame the entities should be deleted
     // Tests that they were actually processed
     scope TestNextFrame: {
-        jsr     Entities.ProcessGameLoop
+        jsr     Entity.ProcessGameLoop
 
         jsr     _FreeListLength
-        cmp.w   #Entities.N_ENTITIES
+        cmp.w   #Entity.N_ENTITIES
         bne     Fail
     }
 
@@ -294,12 +294,12 @@ scope GameLoop_MoveCamera: {
 constant tmp_index(Test.tmp)
 constant tmp_listId(Test.tmp + 2)
 
-    jsr     Entities.Init
+    jsr     Entity.Init
 
     // Spawn 4 entities at different point on the screen
-    assert(Entities.N_ENTITIES >= Entities.lists.N_LISTS * 4)
+    assert(Entity.N_ENTITIES >= Entity.lists.N_LISTS * 4)
 
-    lda.w   #BlankEntity.EntityId_0
+    lda.w   #Entities.BlankEntity.EntityId_0
     Loop:
         sta.w   tmp_listId
 
@@ -317,12 +317,12 @@ constant tmp_listId(Test.tmp + 2)
 
         lda.w   tmp_listId
         inc
-        cmp.w   #BlankEntity.EntityId_0 + Entities.lists.N_LISTS
+        cmp.w   #Entities.BlankEntity.EntityId_0 + Entity.lists.N_LISTS
         bcc     Loop
 
 
     // Test Initial Entity counts
-    jsr     Entities.ProcessGameLoop
+    jsr     Entity.ProcessGameLoop
 
     ldx.w   #InitialExpectedSizes
     jsr     _TestListLengthTable
@@ -346,7 +346,7 @@ constant tmp_listId(Test.tmp + 2)
             lda.l   MoveCameraTable + 2,x
             sta.w   Camera.yPos
 
-            jsr     Entities.ProcessGameLoop
+            jsr     Entity.ProcessGameLoop
 
 
             // Test list lengths
@@ -377,10 +377,10 @@ Fail:
     rts
 
 scope SpawnEntity_XY: {
-    stx.w   Entities.Spawn.xPos
-    sty.w   Entities.Spawn.yPos
+    stx.w   Entity.Spawn.xPos
+    sty.w   Entity.Spawn.yPos
     lda.w   tmp_listId
-    jmp     Entities.Spawn
+    jmp     Entity.Spawn
 }
 
 rodata(rom0)
@@ -395,7 +395,7 @@ scope InitialExpectedSizes: {
     dw  4
 
     constant size(pc() - InitialExpectedSizes)
-    assert(size / 2 == Entities.lists.N_LISTS)
+    assert(size / 2 == Entity.lists.N_LISTS)
 }
 
 rodata(rom0)

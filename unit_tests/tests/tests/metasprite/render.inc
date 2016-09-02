@@ -5,9 +5,9 @@
 scope MetaSpriteTest {
 scope Render {
 
-constant oneSmallObjEntity(Entities.entity0)
-constant oneLargeObjEntity(Entities.entity1)
-constant manyObjEntity(Entities.entity2)
+constant oneSmallObjEntity(EntityPool.entity0)
+constant oneLargeObjEntity(EntityPool.entity1)
+constant manyObjEntity(EntityPool.entity2)
 
 scope manyObjEntity {
     constant frameSet(MSFS.FST_TwoRows)
@@ -30,13 +30,13 @@ scope RenderEntity_Null: {
     bcc     Fail
 
     // Try render a destroyed frameset
-    lda.w   #Entities.entity0
+    lda.w   #EntityPool.entity0
     tcd
     MetaSprite.EntityDestructor()
     jsr     _RenderEntityCenter
 
     // Then a metasprite with no frame
-    lda.w   #Entities.entity1
+    lda.w   #EntityPool.entity1
     tcd
     stz.b   BaseEntity.MetaSprite.currentFrame
     jsr     _RenderEntityCenter

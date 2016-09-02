@@ -1,5 +1,5 @@
 
-scope Entities {
+scope Entity {
 
 // ENTITY ITERATION MACROS
 // =======================

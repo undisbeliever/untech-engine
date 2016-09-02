@@ -1,15 +1,15 @@
 
-scope EntitiesTest {
+scope EntityTest {
 
 a16()
 i16()
 code()
-Test.add("Entities.Init")
+Test.add("Entity.Init")
 scope Init: {
-    jsr     Entities.Init
+    jsr     Entity.Init
 
     jsr     _FreeListLength
-    cmp.w   #Entities.N_ENTITIES
+    cmp.w   #Entity.N_ENTITIES
     bne     Fail
 
     sec
@@ -23,20 +23,20 @@ Fail:
 a16()
 i16()
 code()
-Test.add("Entities.Spawn")
+Test.add("Entity.Spawn")
 scope Spawn: {
-    jsr     Entities.Init
+    jsr     Entity.Init
 
-    stz.w   BlankEntity.parameterSum
+    stz.w   Entities.BlankEntity.parameterSum
 
     lda.w   #0x1234
-    sta.w   Entities.Spawn.xPos
+    sta.w   Entity.Spawn.xPos
     lda.w   #0x5678
-    sta.w   Entities.Spawn.yPos
+    sta.w   Entity.Spawn.yPos
 
-    lda.w   BlankEntity.EntityId_0
+    lda.w   Entities.BlankEntity.EntityId_0
     ldy.w   #0x1337
-    jsr     Entities.Spawn
+    jsr     Entity.Spawn
     bcc     Fail
 
     // test x/y pos
@@ -49,13 +49,13 @@ scope Spawn: {
     bne     Fail
 
     // test parameter worked
-    lda.w   BlankEntity.parameterSum
+    lda.w   Entities.BlankEntity.parameterSum
     cmp.w   #0x1337
     bne     Fail
 
     // test list decreased by one
     jsr     _FreeListLength
-    cmp.w   #Entities.N_ENTITIES - 1
+    cmp.w   #Entity.N_ENTITIES - 1
     bne     Fail
 
     // Test first list length
@@ -74,22 +74,22 @@ Fail:
 a16()
 i16()
 code()
-Test.add("Entities.Spawn (Overflow)")
+Test.add("Entity.Spawn (Overflow)")
 scope Spawn_Overflow: {
 constant tmp(Test.tmp)
 
-    jsr     Entities.Init
+    jsr     Entity.Init
 
-    stz.w   BlankEntity.parameterSum
+    stz.w   Entities.BlankEntity.parameterSum
 
-    ldx.w   #Entities.N_ENTITIES
+    ldx.w   #Entity.N_ENTITIES
 
     Loop:
         stx.w   tmp
 
-        lda.w   BlankEntity.EntityId_0
+        lda.w   Entities.BlankEntity.EntityId_0
         ldy.w   #5
-        jsr     Entities.Spawn
+        jsr     Entity.Spawn
         bcc     Fail
 
         ldx.w   tmp
@@ -98,8 +98,8 @@ constant tmp(Test.tmp)
 
 
     // Test cannot make new entity
-    lda.w   BlankEntity.EntityId_0
-    jsr     Entities.Spawn
+    lda.w   Entities.BlankEntity.EntityId_0
+    jsr     Entity.Spawn
     bcs     Fail
 
     // Test free list is 0
@@ -107,13 +107,13 @@ constant tmp(Test.tmp)
     bne     Fail
 
     // Test parameter Sum is correct value
-    lda.w   BlankEntity.parameterSum
-    cmp.w   #5 * Entities.N_ENTITIES
+    lda.w   Entities.BlankEntity.parameterSum
+    cmp.w   #5 * Entity.N_ENTITIES
     bne     Fail
 
     // Test first list length
     jsr     _FirstListLength
-    cmp.w   #Entities.N_ENTITIES
+    cmp.w   #Entity.N_ENTITIES
     bne     Fail
 
     jmp     _TestEntityListsValid
@@ -126,49 +126,49 @@ Fail:
 a16()
 i16()
 code()
-Test.add("Entities.Spawn (Multiple Lists)")
+Test.add("Entity.Spawn (Multiple Lists)")
 scope Spawn_MultipleLists: {
 constant tmp(Test.tmp)
 
-    jsr     Entities.Init
+    jsr     Entity.Init
 
-    stz.w   BlankEntity.parameterSum
+    stz.w   Entities.BlankEntity.parameterSum
 
     lda.w   #0x1000
-    sta.w   Entities.Spawn.xPos
-    sta.w   Entities.Spawn.yPos
+    sta.w   Entity.Spawn.xPos
+    sta.w   Entity.Spawn.yPos
 
-    assert(Entities.N_ENTITIES >= Entities.lists.N_LISTS * 2)
+    assert(Entity.N_ENTITIES >= Entity.lists.N_LISTS * 2)
 
     // spawn 2 entities per list
-    lda.w   #BlankEntity.EntityId_0
+    lda.w   #Entities.BlankEntity.EntityId_0
     Loop:
         sta.w   tmp
 
         ldy.w   #1
-        jsr     Entities.Spawn
+        jsr     Entity.Spawn
         bcc     Fail
 
         lda.w   tmp
         ldy.w   #1
-        jsr     Entities.Spawn
+        jsr     Entity.Spawn
         bcc     Fail
 
         lda.w   tmp
         inc
-        cmp.w   #BlankEntity.EntityId_0 + Entities.lists.N_LISTS
+        cmp.w   #Entities.BlankEntity.EntityId_0 + Entity.lists.N_LISTS
         bcc     Loop
 
 
     // Test parameter Sum is correct value
-    lda.w   BlankEntity.parameterSum
-    cmp.w   #2 * Entities.lists.N_LISTS
+    lda.w   Entities.BlankEntity.parameterSum
+    cmp.w   #2 * Entity.lists.N_LISTS
     bne     Fail
 
 
     // test list decreased by N_LISTS
     jsr     _FreeListLength
-    cmp.w   #Entities.N_ENTITIES - Entities.lists.N_LISTS * 2
+    cmp.w   #Entity.N_ENTITIES - Entity.lists.N_LISTS * 2
     bne     Fail
 
     // Test each list length
@@ -182,7 +182,7 @@ constant tmp(Test.tmp)
         bne     Fail
 
         iny
-        cpy.w   #Entities.lists.N_LISTS
+        cpy.w   #Entity.lists.N_LISTS
         bcc     ListLoop
 
     jmp     _TestEntityListsValid
@@ -197,19 +197,19 @@ Fail:
 a16()
 i16()
 code()
-Test.add("Entities.Spawn (Offscreen)")
+Test.add("Entity.Spawn (Offscreen)")
 scope Spawn_Offscreen: {
 constant tmp_listId(Test.tmp)
 
 constant ONSCREEN(0x1080)
 
-    jsr     Entities.Init
+    jsr     Entity.Init
 
     // spawn 2 entities on-screen and 4 entities off-screen per entity list
 
-    assert(Entities.N_ENTITIES >= Entities.lists.N_LISTS * 6)
+    assert(Entity.N_ENTITIES >= Entity.lists.N_LISTS * 6)
 
-    lda.w   #BlankEntity.EntityId_0
+    lda.w   #Entities.BlankEntity.EntityId_0
     Loop:
         sta.w   tmp_listId
 
@@ -229,7 +229,7 @@ constant ONSCREEN(0x1080)
 
         lda.w   tmp_listId
         inc
-        cmp.w   #BlankEntity.EntityId_0 + Entities.lists.N_LISTS
+        cmp.w   #Entities.BlankEntity.EntityId_0 + Entity.lists.N_LISTS
         bcc     Loop
 
 
@@ -257,10 +257,10 @@ Fail:
     rts
 
 scope SpawnEntity_XY: {
-    stx.w   Entities.Spawn.xPos
-    sty.w   Entities.Spawn.yPos
+    stx.w   Entity.Spawn.xPos
+    sty.w   Entity.Spawn.yPos
     lda.w   tmp_listId
-    jmp     Entities.Spawn
+    jmp     Entity.Spawn
 }
 
 rodata(rom0)
@@ -276,10 +276,10 @@ scope ExpectedSizes: {
     dw  6
 
     constant DEACTIVATED(4 * 3)
-    constant FREE(Entities.N_ENTITIES - 5 * 6 - 3 * 2 - DEACTIVATED)
+    constant FREE(Entity.N_ENTITIES - 5 * 6 - 3 * 2 - DEACTIVATED)
 
     constant size(pc() - ExpectedSizes)
-    assert(size / 2 == Entities.lists.N_LISTS)
+    assert(size / 2 == Entity.lists.N_LISTS)
 }
 }
 
@@ -292,7 +292,7 @@ Test.add("Entities.ClearTryToActivateAgainList")
 scope ClearTryToActivateAgainList: {
 constant tmp(Test.tmp)
 
-    jsr     Entities.Init
+    jsr     Entity.Init
 
     // Prevent the entities from spawning
     jsr     WaitFrame
@@ -301,34 +301,34 @@ constant tmp(Test.tmp)
     // Create many try to activate again entities
 
     lda.w   #0x1000
-    sta.w   Entities.Spawn.xPos
-    sta.w   Entities.Spawn.yPos
+    sta.w   Entity.Spawn.xPos
+    sta.w   Entity.Spawn.yPos
 
-    assert(Entities.N_ENTITIES >= Entities.lists.N_LISTS)
+    assert(Entity.N_ENTITIES >= Entity.lists.N_LISTS)
 
-    lda.w   #BlankEntity.EntityId_0
+    lda.w   #Entities.BlankEntity.EntityId_0
     Loop:
         sta.w   tmp
 
-        jsr     Entities.Spawn
+        jsr     Entity.Spawn
         bcc     Fail
 
         lda.w   tmp
         inc
-        cmp.w   #BlankEntity.EntityId_0 + Entities.lists.N_LISTS
+        cmp.w   #Entities.BlankEntity.EntityId_0 + Entity.lists.N_LISTS
         bcc     Loop
 
 
     jsr     _TryToActivateAgainListLength
-    cmp.w   #Entities.lists.N_LISTS
+    cmp.w   #Entity.lists.N_LISTS
     bne     Fail
 
 
-    jsr     Entities.ClearTryToActivateAgainList
+    jsr     Entity.ClearTryToActivateAgainList
 
 
     jsr     _FreeListLength
-    cmp.w   #Entities.N_ENTITIES
+    cmp.w   #Entity.N_ENTITIES
     bne     Fail
 
     jmp     _TestEntityListsValid

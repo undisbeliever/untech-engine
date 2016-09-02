@@ -1,5 +1,5 @@
 
-scope Entities {
+scope Entity {
 
 scope Data {
     storeBlockStart(List,  EN_RomDataList)
@@ -69,15 +69,15 @@ scope BaseEntityFunctionTable {
         //
         // REGS: 16 bit A, 16 bit Index, DB = $7e
         // INPUT: dp: entity
-        //        `Entities.currentList` (const) current list being processed
+        //        `Entity.currentList` (const) current list being processed
         //
         // OPTIONAL OUTPUT:
-        //   * set `Entities.changeList` to address of entity loop
+        //   * set `Entity.changeList` to address of entity loop
         //     to change the entity list.
         //
         // After this function is called:
         //   * MetaSprite.Animation.Process is called
-        //   * if `Entities.changeList` is set, the list this entity belongs
+        //   * if `Entity.changeList` is set, the list this entity belongs
         //     to will change
         field(Process, 2)
 

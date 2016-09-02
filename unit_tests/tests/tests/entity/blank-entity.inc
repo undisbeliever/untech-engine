@@ -1,21 +1,27 @@
 
-scope EntitiesTest {
+scope EntityTest {
+scope Entities {
 
-scope ChangeToParticleEntity {
+scope BlankEntity {
 
-    buildFunctionTable(BaseEntityFunctionTable, ChangeToParticleEntity)
-    Entities.useDefaultRenderer()
+    buildFunctionTable(BaseEntityFunctionTable, BlankEntity)
+    Entity.useDefaultRenderer()
+
+allocateTmpWord(parameterSum)
 
 // IN: A = parameter
 a16()
 i16()
 code()
 scope Init: {
+    clc
+    adc.w   parameterSum
+    sta.w   parameterSum
+
     rts
 }
 
 
-// IN: A = parameter
 a16()
 i16()
 code()
@@ -28,15 +34,11 @@ a16()
 i16()
 code()
 scope Process: {
-    // change to particle list
-    lda.w   #Entities.lists.particles
-    sta.w   Entities.changeList
-
     rts
 }
 
 macro _repeat(evaluate n) {
-    if {n} < Entities.lists.N_LISTS {
+    if {n} < Entity.lists.N_LISTS {
         rodata(EN_RomData)
         scope RomData{n}: {
             dw  FunctionTable
@@ -46,7 +48,7 @@ macro _repeat(evaluate n) {
         }
 
         rodata(EN_RomDataList)
-        constant EntityId_{n}((pc() - Entities.Data.List) / 2)
+        constant EntityId_{n}((pc() - Entity.Data.List) / 2)
             dw  RomData{n}
 
         _repeat({n} + 1)
@@ -55,6 +57,8 @@ macro _repeat(evaluate n) {
 _repeat(0)
 
 code()
+}
+
 }
 }
 

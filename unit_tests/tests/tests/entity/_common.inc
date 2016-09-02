@@ -1,5 +1,5 @@
 
-scope EntitiesTest {
+scope EntityTest {
 
 // OUT: A = number of entities in free list
 // MODIFIES: DP
@@ -7,7 +7,7 @@ a16()
 i16()
 code()
 scope _FreeListLength: {
-    ldx.w   Entities.lists.free
+    ldx.w   Entity.lists.free
     bra     __ListLength
 }
 
@@ -17,7 +17,7 @@ a16()
 i16()
 code()
 scope _DeactivatedListLength: {
-    ldx.w   Entities.lists.deactivated
+    ldx.w   Entity.lists.deactivated
     bra     __ListLength
 }
 
@@ -27,7 +27,7 @@ a16()
 i16()
 code()
 scope _TryToActivateAgainListLength: {
-    ldx.w   Entities.lists.tryToActivateAgain
+    ldx.w   Entity.lists.tryToActivateAgain
     bra     __ListLength
 }
 
@@ -37,7 +37,7 @@ a16()
 i16()
 code()
 scope _FirstListLength: {
-    ldx.w   Entities.lists.FIRST
+    ldx.w   Entity.lists.FIRST
     bra     __ListLength
 }
 
@@ -51,7 +51,7 @@ scope _ListLength_Y: {
     tya
     asl
     tay
-    ldx.w   Entities.lists.FIRST,y
+    ldx.w   Entity.lists.FIRST,y
     bra     __ListLength
 }
 
@@ -83,7 +83,7 @@ EndLoop:
 // Tests that:
 //  * deactivated lists have no metasprite data
 //  * active lists have metasprite data
-//  * total number of entities in all lists == Entities.N_ENTITIES
+//  * total number of entities in all lists == Entity.N_ENTITIES
 // OUT: C set if entity list OK
 // MODIFIES: DP
 a16()
@@ -98,7 +98,7 @@ allocateTmpWord(tmp_count)
     // test deactivated entity is not active
     macro _TestDeactivated(list) {
         scope Test_{list} {
-            lda.w   Entities.lists.{list}
+            lda.w   Entity.lists.{list}
             beq     Skip
 
             Loop:
@@ -123,7 +123,7 @@ allocateTmpWord(tmp_count)
 
     // test all other entities are active
     scope ActiveListTest: {
-        ldx.w   #Entities.lists.FIRST
+        ldx.w   #Entity.lists.FIRST
         Loop:
             stx.w   tmp_index
 
@@ -146,12 +146,12 @@ allocateTmpWord(tmp_count)
             ldx.w   tmp_index
             inx
             inx
-            cpx.w   #Entities.lists.LAST + 1
+            cpx.w   #Entity.lists.LAST + 1
             bcc     Loop
     }
 
 
-    ldx.w   Entities.lists.toDelete
+    ldx.w   Entity.lists.toDelete
     jsr     __ListLength
     clc
     adc.w   tmp_count
@@ -161,7 +161,7 @@ allocateTmpWord(tmp_count)
     jsr     _FreeListLength
     clc
     adc.w   tmp_count
-    cmp.w   #Entities.N_ENTITIES
+    cmp.w   #Entity.N_ENTITIES
     bne     Fail
 
     sec
@@ -201,7 +201,7 @@ allocateTmpWord(tmp_listId)
 
         ldy.w   tmp_listId
         iny
-        cpy.w   #Entities.lists.N_LISTS
+        cpy.w   #Entity.lists.N_LISTS
         bcc     ListSizeLoop
 
     sec

@@ -18,7 +18,7 @@ constant tmp_paletteBits(tmp0)
 
     jsr     _Init_MetaSpriteModule
 
-    lda.w   #Entities.entity0
+    lda.w   #EntityPool.entity0
     tcd
 
     ldy.w   #0
@@ -62,7 +62,7 @@ a8()
 
     rep     #$30
 a16()
-    lda.w   #Entities.entity1
+    lda.w   #EntityPool.entity1
     tcd
 
     ldy.w   #0
@@ -87,7 +87,7 @@ a8()
     // will use different palette bits
     rep     #$30
 a16()
-    lda.w   #Entities.entity2
+    lda.w   #EntityPool.entity2
     tcd
 
     ldy.w   #1
@@ -129,7 +129,7 @@ constant tmp_paletteBits(tmp0)
     // Test that changing the entity's palette does not change pallete ID,
     // but does upload a new palette.
 
-    lda.w   #Entities.entity0
+    lda.w   #EntityPool.entity0
     tcd
 
     sep     #$20
@@ -158,7 +158,7 @@ a8()
 
     // Test that changing the entity's palette to something that already
     // exists will find the existing palette and not upload a new palette.
-    lda.w   Entities.entity3 + BaseEntity.MetaSprite.blockOneCharAttrOffset + 1
+    lda.w   EntityPool.entity3 + BaseEntity.MetaSprite.blockOneCharAttrOffset + 1
     and.b   #OamFormat.attr.palette.mask
     sta.w   tmp_paletteBits
 
@@ -216,7 +216,7 @@ scope Deactivate: {
     jsr     _Init_8Palettes
     bcc     Fail
 
-    lda.w   #Entities.entity4
+    lda.w   #EntityPool.entity4
     tcd
 
     jsr     MetaSprite.Deactivate
@@ -253,7 +253,7 @@ scope Overflow: {
 
     // Test that overflowing the palettes slots fails
 
-    lda.w   #Entities.entity8
+    lda.w   #EntityPool.entity8
     tcd
 
     ldy.w   #8
@@ -262,7 +262,7 @@ scope Overflow: {
     bcs     Fail
 
 
-    lda.w   #Entities.entity9
+    lda.w   #EntityPool.entity9
     tcd
 
     ldy.w   #9
@@ -285,11 +285,11 @@ a16()
 
 
     // Deactivate an already inactive entity should do nothing
-    lda.w   #Entities.entity9
+    lda.w   #EntityPool.entity9
     tcd
     jsr     MetaSprite.Deactivate
 
-    lda.w   #Entities.entity8
+    lda.w   #EntityPool.entity8
     tcd
     jsr     MetaSprite.Activate
     bcs     Fail
@@ -308,11 +308,11 @@ a16()
 
 
     // Check that activate works after deactivating an existing one
-    lda.w   #Entities.entity0
+    lda.w   #EntityPool.entity0
     tcd
     jsr     MetaSprite.Deactivate
 
-    lda.w   #Entities.entity9
+    lda.w   #EntityPool.entity9
     tcd
     jsr     MetaSprite.Activate
     bcc     Fail
@@ -338,7 +338,7 @@ scope _Init_8Palettes: {
 
     stz.w   tmp_palleteId
 
-    lda.w   #Entities.entity0
+    lda.w   #EntityPool.entity0
 
     Loop:
         tcd
@@ -352,8 +352,8 @@ scope _Init_8Palettes: {
 
         tdc
         clc
-        adc.w   #Entities.ENTITY_SIZE
-        cmp.w   #Entities.entity8
+        adc.w   #Entity.ENTITY_SIZE
+        cmp.w   #EntityPool.entity8
         bcc     Loop
 
     sec

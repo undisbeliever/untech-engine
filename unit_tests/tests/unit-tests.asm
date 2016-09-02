@@ -45,7 +45,7 @@ createRamBlock(shadow,      0x7e1100, 0x7e1f7f)
 createRamBlock(stack,       0x7e1f80, 0x7e1fff)
 createRamBlock(wram7e,      0x7e2000, 0x7effff)
 
-scope Entities {
+scope Entity {
     constant ENTITY_SIZE(64)
     constant N_ENTITIES(64)
 }
@@ -66,13 +66,13 @@ include "../../src/metasprite.inc"
 include "../../src/text.inc"
 
 include "../../src/camera.inc"
-include "../../src/entities.inc"
+include "../../src/entity.inc"
 
 // Allow tests to access entity pool
-scope Entities {
+scope EntityPool {
     macro _repeat(evaluate n) {
-        if {n} < N_ENTITIES {
-            constant entity{n}(entityPool + {n} * ENTITY_SIZE)
+        if {n} < Entity.N_ENTITIES {
+            constant entity{n}(Entity.entityPool + {n} * Entity.ENTITY_SIZE)
             _repeat({n} + 1)
         }
     }
@@ -91,7 +91,7 @@ scope SuccessTest: {
 
 
 include "tests/dma.inc"
-include "tests/entities.inc"
+include "tests/entity.inc"
 include "tests/math.inc"
 include "tests/metasprite.inc"
 include "tests/text.inc"

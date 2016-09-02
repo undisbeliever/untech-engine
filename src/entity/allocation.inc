@@ -1,7 +1,7 @@
 
-scope Entities {
+scope Entity {
 
-// Initializes the Entities pool
+// Initializes the entity pool
 //
 // This MUST be called before using this module
 //
@@ -97,7 +97,7 @@ allocateTmpWord(yPos)
 
         // Get Entity ROM Data
 
-        lda.l   Entities.Data.List,x
+        lda.l   Entity.Data.List,x
         tax
         stx.b   BaseEntity.romPtr
 

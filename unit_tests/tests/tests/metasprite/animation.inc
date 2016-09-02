@@ -270,7 +270,7 @@ constant tmp_animation(Test.tmp)
 
     jsr     _Init_MetaSpriteModule
 
-    lda.w   #Entities.entity0
+    lda.w   #EntityPool.entity0
     tcd
 
     lda.w   #MSFS.FST_Animations

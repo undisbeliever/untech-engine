@@ -1,10 +1,11 @@
 
-scope EntitiesTest {
+scope EntityTest {
+scope Entities {
 
 scope DeleteAfterDelayEntity {
 
     buildFunctionTable(BaseEntityFunctionTable, DeleteAfterDelayEntity)
-    Entities.useDefaultRenderer()
+    Entity.useDefaultRenderer()
 
     scope EntityStruct {
         childstruct(BaseEntity)
@@ -36,15 +37,15 @@ code()
 scope Process: {
     dec.b   EntityStruct.frames
     bne     +
-        lda.w   #Entities.lists.toDelete
-        sta.w   Entities.changeList
+        lda.w   #Entity.lists.toDelete
+        sta.w   Entity.changeList
     +
 
     rts
 }
 
 macro _repeat(evaluate n) {
-    if {n} < Entities.lists.N_LISTS {
+    if {n} < Entity.lists.N_LISTS {
         rodata(EN_RomData)
         scope RomData{n}: {
             dw  FunctionTable
@@ -54,7 +55,7 @@ macro _repeat(evaluate n) {
         }
 
         rodata(EN_RomDataList)
-        constant EntityId_{n}((pc() - Entities.Data.List) / 2)
+        constant EntityId_{n}((pc() - Entity.Data.List) / 2)
             dw  RomData{n}
 
         _repeat({n} + 1)
@@ -63,6 +64,8 @@ macro _repeat(evaluate n) {
 _repeat(0)
 
 code()
+}
+
 }
 }
 

@@ -4,7 +4,7 @@ scope MetaSpriteInteractiveTest {
 
 scope ShowAllFramesEntity {
     buildFunctionTable(BaseEntityFunctionTable, ShowAllFramesEntity)
-    Entities.useDefaultRenderer()
+    Entity.useDefaultRenderer()
 
     scope EntityStruct: {
         childstruct(BaseEntity)
@@ -86,7 +86,7 @@ scope ShowAllFramesEntity {
         }
 
         rodata(EN_RomDataList)
-        constant {name}_entityId((pc() - Entities.Data.List) / 2)
+        constant {name}_entityId((pc() - Entity.Data.List) / 2)
             dw  RomData_{name}
     }
     BuildEntityData(Man)
@@ -179,7 +179,7 @@ a16()
 
     // Setup the modules
     // -----------------
-    jsr     Entities.Init
+    jsr     Entity.Init
 
 
     // Wait for button release
@@ -201,16 +201,16 @@ a16()
         stx.w   tmp_index
 
         lda.l   EntityTable.xPos,x
-        sta.w   Entities.Spawn.xPos
+        sta.w   Entity.Spawn.xPos
 
         lda.l   EntityTable.yPos,x
-        sta.w   Entities.Spawn.yPos
+        sta.w   Entity.Spawn.yPos
 
         lda.l   EntityTable.parameter,x
         tay
         lda.l   EntityTable.entityId,x
 
-        jsr     Entities.Spawn
+        jsr     Entity.Spawn
         bcc     Fail
 
         lda.w   tmp_index
@@ -227,8 +227,8 @@ a16()
     GameLoop:
         jsr     MetaSprite.Render.InitLoop
 
-        jsr     Entities.ProcessGameLoop
-        jsr     Entities.RenderLoop
+        jsr     Entity.ProcessGameLoop
+        jsr     Entity.RenderLoop
 
         jsr     MetaSprite.Render.EndLoop
 

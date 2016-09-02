@@ -1,21 +1,21 @@
 
-scope Entities {
-    assert(Entities.N_ENTITIES >= 10)
+scope Entity {
+    assert(N_ENTITIES >= 10)
 
     // assert ENTITY_SIZE is a power of 2
-    assert(Entities.ENTITY_SIZE > 0)
-    assert(Entities.ENTITY_SIZE & (Entities.ENTITY_SIZE - 1) == 0)
+    assert(ENTITY_SIZE > 0)
+    assert(ENTITY_SIZE & (ENTITY_SIZE - 1) == 0)
 
     allocate(entityPool, entityBlock, ENTITY_SIZE * N_ENTITIES)
 
     // assert that some entities will exist at the start of a page.
     // Entities that start on a page are faster than those that don't.
-    assert(entityPool & (Entities.ENTITY_SIZE - 1) == 0)
+    assert(entityPool & (ENTITY_SIZE - 1) == 0)
 }
 
 scope BaseEntity {
     basestruct(BaseEntity)
-        struct_maxsize(Entities.ENTITY_SIZE)
+        struct_maxsize(Entity.ENTITY_SIZE)
 
         // address of next entity in current list
         // (word addr)
@@ -59,7 +59,7 @@ scope BaseEntity {
     endstruct()
 }
 
-scope Entities {
+scope Entity {
     // A linked list of entity types
     // (word addr)
     scope lists {
@@ -139,10 +139,8 @@ scope Entities {
     constant LAST(particles)
     constant N_LISTS((LAST - FIRST) / 2 + 1)
     }
-}
 
 
-scope Entities {
     // Current list address being processed
     allocateTmpWord(currentList)
 
