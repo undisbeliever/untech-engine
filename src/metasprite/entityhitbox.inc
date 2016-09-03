@@ -303,9 +303,10 @@ scope _TestList_CurrentHasSingleHitbox: {
 
 
         InnerCollision:
-            // X = toTest inner collision
-
             // ::TODO process collision table::
+
+            // DP = toTest entity
+            // X = toTest inner collision
             stp
 
 
@@ -361,11 +362,15 @@ scope _TestList_CurrentHasMultipleHitboxes: {
 
         lda.l   Format.EntityHitbox.count,x
         and.w   #Format.EntityHitbox.COUNT_MASK
-        beq     _Multiple_Single_InnerCollisionTest
-        jmp     _Multiple_Multiple_InnerCollisionTest
+        beq     _InnerTest_Multiple_Single
+        jmp     _InnerTest_Multiple_Multiple
+
+    InnerTest_Return:
+        // restore dp
+        lda.w   toTestEntity.entityAddress
+        tcd
 
     NoEntityOuterCollision:
-    EntityLoop_Continue:
         lda.b   BaseEntity.next
         bne     EntityLoop
 
@@ -377,16 +382,16 @@ scope _TestList_CurrentHasMultipleHitboxes: {
     rts
 
 
-// INPUT: dp = entity to test
+// INPUT: dp = toTest entity
 //        tmp_count = number of hitboxes in current entity
 //        currentEntity values set
 //        toTestEntity.entityAddress set
 //        toTestEntity.hitboxAddress set
-// RETURN: EntityLoop_Continue
+// RETURN: InnerTest_Return
 a16()
 i16()
 code()
-scope _Multiple_Single_InnerCollisionTest: {
+scope _InnerTest_Multiple_Single: {
     // current entity has mutliple hitboxes
     // entity being tested has a single hitboxes
 
@@ -403,7 +408,7 @@ scope _Multiple_Single_InnerCollisionTest: {
 
         // count is number of inner hitboxes - 1
         dey
-        bmi     EndInnerLoop
+        bmi     Return
 
         txa
         clc
@@ -414,43 +419,34 @@ scope _Multiple_Single_InnerCollisionTest: {
 
 
     InnerCollision:
+        // DP = currentEntity
         // X = currentEntity inner collision
 
         // ::TODO process collision table::
         stp
 
-        jmp     EntityLoop_Continue
-
-
-EndInnerLoop:
-    jmp     EntityLoop_Continue
-}
-
-
-scope _Multiple_Multiple_InnerCollisionTest {
-NoCollisions:
-    // restore dp
-    lda.w   toTestEntity.entityAddress
-    tcd
-    jmp     EntityLoop_Continue
+Return:
+    jmp     InnerTest_Return
 }
 
 
 // INPUT: A = number of hitboxes in toTest entity
-//        DP = current entity
+// INPUT: dp = toTest entity
 //        tmp_count = number of hitboxes in current entity
 //        currentEntity values set
 //        toTestEntity.entityAddress set
 //        toTestEntity.hitboxAddress set
-// RETURN: EntityLoop_Continue
+// RETURN: InnerTest_Return
 a16()
 i16()
 code()
-scope _Multiple_Multiple_InnerCollisionTest: {
+scope _InnerTest_Multiple_Multiple: {
 allocateTmpWord(toTest_xPos)
 allocateTmpWord(toTest_yPos)
 allocateTmpWord(collisionTableIndex)
 allocateTmpWord(tmp_row)
+
+constant NoCollisions(_InnerTest_Multiple_Single.Return)
 
     // current entity has mutliple hitboxes
     // entity being tested has multiple hitboxes
@@ -523,13 +519,12 @@ allocateTmpWord(tmp_row)
 
 InnerCollision:
     // ::TODO Collision
+
+    // DP = currentEntity
+    // X = currentEntity inner collision
     stp
 
-    // restore dp
-    lda.w   toTestEntity.entityAddress
-    tcd
-
-    jmp     EntityLoop_Continue
+    jmp     InnerTest_Return
 }
 }
 
