@@ -1,6 +1,6 @@
 
 // Data format may be subject to changes
-if MetaSprite.Data.EDITOR_VERSION < 19 {
+if MetaSprite.Data.EDITOR_VERSION < 20 {
     error "Invalid UnTech Editor Version"
 }
 
@@ -217,20 +217,22 @@ scope Format {
             //
             // All inner hitboxes MUST be inside the outer hitbox.
             scope Inner {
+                // type of hitbox
+                // (EntityHitboxType uint8 value)
+                field(type, 1)
+
                 field(xOffset, 1) // int_ms8 format
                 field(yOffset, 1) // int_ms8 format
                 field(width, 2) // uint16
                 field(height, 2) // uint16
 
-                // type of hitbox
-                // (EntityHitboxType uint8 value)
-                field(type, 1)
+                constant size(7)
             }
 
             // The type of a single hitbox
             //
             // Only set if count == 0
-            constant singleHitboxType(Inner.xOffset)
+            constant singleHitboxType(Inner.type)
         endstruct()
     }
 
