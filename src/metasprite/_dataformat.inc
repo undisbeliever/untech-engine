@@ -1,6 +1,6 @@
 
 // Data format may be subject to changes
-if MetaSprite.Data.EDITOR_VERSION < 20 {
+if MetaSprite.Data.EDITOR_VERSION < 21 {
     error "Invalid UnTech Editor Version"
 }
 
@@ -197,13 +197,15 @@ scope Format {
     // the outer hitbox is checked.
     scope EntityHitbox {
         struct(Data.EntityHitboxOffset)
-            // Number of inner hitboxes used by the entity.
+            // Determines the number of hitboxes used by the entity.
             //
-            // If zero then only the outer hitbox is checked, the inner hitboxes
-            // are not processed
+            // Value is `number of hitboxes - 1`. The maximum allowed
+            // value is 3 (4 hitboxes).
             //
-            // uint8
+            // If zero then only the outer hitbox is checked, the inner
+            // hitboxes are not processed
             field(count, 1)
+            constant COUNT_MASK(3)
 
             // Outer hitbox, checked first
             scope Outer {
@@ -213,7 +215,7 @@ scope Format {
                 field(height, 2) // uint16
             }
 
-            // The inner hitboxes, repeated `count` times
+            // The inner hitboxes, repeated `count + 1` times
             //
             // All inner hitboxes MUST be inside the outer hitbox.
             scope Inner {

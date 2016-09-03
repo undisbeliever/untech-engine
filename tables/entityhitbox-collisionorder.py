@@ -2,8 +2,8 @@
 # -*- coding: utf-8 -*-
 # vim: set fenc=utf-8 ai ts=4 sw=4 sts=4 et:
 
-MAX_HITBOXES = 6
-LIST_SHIFT = 3
+MAX_INNER_HITBOXES = 4
+LIST_SHIFT = 2
 
 def main():
     pos = 0
@@ -24,11 +24,15 @@ def main():
 
     print("scope Tables {")
     print("scope EntityHitbox {")
+    print("constant MAX_INNER_HITBOXES (", MAX_INNER_HITBOXES, ")", sep="")
+
     print("rodata(rom0)")
     print("scope CollisionOrder: {")
 
-    for toTest in range(1, MAX_HITBOXES):
-        for current in range(1, MAX_HITBOXES):
+    # count == 1 is processed by other code
+
+    for toTest in range(1, MAX_INNER_HITBOXES):
+        for current in range(1, MAX_INNER_HITBOXES):
             matches[(toTest, current)] = pos
 
             print("//", toTest + 1, current + 1)
@@ -46,16 +50,20 @@ def main():
 
     print("}")
 
-    print("scope CollisionOrderList: {")
+    print("scope CollisionOrderTable: {")
     print("constant SHIFT(", LIST_SHIFT, ")", sep="")
-    print("// this lists ignores toTest.nhitboxes == 1")
+    print("// NOTE: this table ignores toTest EntityHitbox.count == 0")
+    print("// table index = (((toTest.count - 1) << LIST_SHIFT) | current.count) * 2")
 
     m = 1 << LIST_SHIFT
-    assert(MAX_HITBOXES <= m)
+    assert(MAX_INNER_HITBOXES <= m)
     for toTest in range(1, m):
+        l = list()
         for current in range(0, m):
-            t = (min(toTest, MAX_HITBOXES - 1), min(current, MAX_HITBOXES - 1))
-            print("\tdw", matches.get(t, 0))
+            t = (toTest, current)
+            l.append(str(matches.get(t, 0)))
+
+        print("\tdw ", ", ".join(l))
 
     print("}")
     print("\ncode()")

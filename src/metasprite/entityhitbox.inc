@@ -32,7 +32,6 @@ scope toTestEntity {
     }
 }
 
-constant COUNT_MASK(7)
 allocateTmpWord(tmp_count)
 
 
@@ -225,7 +224,7 @@ scope _TestList: {
     stx.w   currentEntity.hitboxAddress
 
     lda.l   Format.EntityHitbox.count,x
-    and.w   #COUNT_MASK
+    and.w   #Format.EntityHitbox.COUNT_MASK
     beq     _TestList_CurrentHasSingleHitbox
     jmp     _TestList_CurrentHasMultipleHitboxes
 }
@@ -278,7 +277,7 @@ scope _TestList_CurrentHasSingleHitbox: {
 
         // X = EntityHitbox Address
         lda.l   Format.EntityHitbox.count,x
-        and.w   #COUNT_MASK
+        and.w   #Format.EntityHitbox.COUNT_MASK
         beq     InnerCollision
 
 
@@ -291,8 +290,9 @@ scope _TestList_CurrentHasSingleHitbox: {
             _BranchOnInnerCollision(currentEntity.outer, InnerCollision)
 
         NoInnerCollision:
+            // count is number of inner hitboxes - 1
             dey
-            bne     EntityLoop_Continue
+            bmi     EntityLoop_Continue
 
             txa
             clc
@@ -360,7 +360,7 @@ scope _TestList_CurrentHasMultipleHitboxes: {
         stx.w   toTestEntity.hitboxAddress
 
         lda.l   Format.EntityHitbox.count,x
-        and.w   #COUNT_MASK
+        and.w   #Format.EntityHitbox.COUNT_MASK
         beq     _Multiple_Single_InnerCollisionTest
         jmp     _Multiple_Multiple_InnerCollisionTest
 
@@ -401,8 +401,9 @@ scope _Multiple_Single_InnerCollisionTest: {
         // DP = entity to test
         _BranchOnInnerCollision(toTestEntity.aabb, InnerCollision)
 
+        // count is number of inner hitboxes - 1
         dey
-        beq     EndInnerLoop
+        bmi     EndInnerLoop
 
         txa
         clc
@@ -463,14 +464,14 @@ allocateTmpWord(tmp_row)
 
     // A = toTest count
     // assume toTest is > 1
-    asl
+    assert(Tables.EntityHitbox.CollisionOrderTable.SHIFT == 2)
     asl
     asl
     ora.w   tmp_count
     asl
     tax
 
-    lda.l   Tables.EntityHitbox.CollisionOrderList - 2 * 16 - 2,x
+    lda.l   Tables.EntityHitbox.CollisionOrderTable - 2 * 4,x
     tay
 
     lda.w   currentEntity.entityAddress
