@@ -4,6 +4,7 @@ include "metasprite/_variables.inc"
 
 include "metasprite/actionpoints.inc"
 include "metasprite/animation.inc"
+include "metasprite/entityhitbox.inc"
 include "metasprite/palette.inc"
 include "metasprite/vram.inc"
 include "metasprite/render.inc"

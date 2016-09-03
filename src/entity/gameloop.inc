@@ -243,7 +243,7 @@ macro _ProcessEnemyList(list, doDeactivateTest) {
                 StillActive:
             }
 
-            // ::TODO collisions with playerProjectiles
+            MetaSprite.EntityHitbox.ProcessList(playerProjectiles)
 
         SkipCollision:
             jsr     MetaSprite.Animation.Process
@@ -283,9 +283,9 @@ macro _ProcessPlayerList() {
             ldy.w   changeList
             bne     SkipCollisions
 
-                // ::TODO collisions with bosses
-                // ::TODO collisions with enemies
-                // ::TODO collisions with enemyProjectiles
+                MetaSprite.EntityHitbox.ProcessList(bosses)
+                MetaSprite.EntityHitbox.ProcessList(enemies)
+                MetaSprite.EntityHitbox.ProcessList(enemyProjectiles)
 
         SkipCollisions:
             jsr     MetaSprite.Animation.Process
@@ -510,6 +510,8 @@ macro _ProcessActiveWindow() {
     }
 }
 
+// PUBLIC API
+// ==========
 
 // Process the entity gameloop
 //
