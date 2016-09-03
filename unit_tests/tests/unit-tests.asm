@@ -59,6 +59,8 @@ constant VRAM_CONSOLE_MAP_WADDR(0x0000)
 include "resources/metasprite/metasprites.gen.inc"
 include "resources/text/text.inc"
 
+include "../../tables/tables.inc"
+
 include "../../src/dma.inc"
 include "../../src/interrupts.inc"
 include "../../src/math.inc"

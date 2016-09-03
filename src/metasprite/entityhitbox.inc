@@ -426,8 +426,17 @@ EndInnerLoop:
 }
 
 
+scope _Multiple_Multiple_InnerCollisionTest {
+NoCollisions:
+    // restore dp
+    lda.w   toTestEntity.entityAddress
+    tcd
+    jmp     EntityLoop_Continue
+}
+
 
 // INPUT: A = number of hitboxes in toTest entity
+//        DP = current entity
 //        tmp_count = number of hitboxes in current entity
 //        currentEntity values set
 //        toTestEntity.entityAddress set
@@ -437,15 +446,90 @@ a16()
 i16()
 code()
 scope _Multiple_Multiple_InnerCollisionTest: {
+allocateTmpWord(toTest_xPos)
+allocateTmpWord(toTest_yPos)
+allocateTmpWord(collisionTableIndex)
+allocateTmpWord(tmp_row)
+
     // current entity has mutliple hitboxes
     // entity being tested has multiple hitboxes
 
-    // ::TODO multiple - multiple collision test::
+    ldy.b   BaseEntity.xPos.px
+    sty.w   toTest_xPos
+
+    ldy.b   BaseEntity.yPos.px
+    sty.w   toTest_yPos
+
+
+    // A = toTest count
+    // assume toTest is > 1
+    asl
+    asl
+    asl
+    ora.w   tmp_count
+    asl
+    tax
+
+    lda.l   Tables.EntityHitbox.CollisionOrderList - 2 * 16 - 2,x
+    tay
+
+    lda.w   currentEntity.entityAddress
+    tcd
+
+    InnerLoop:
+        tyx
+        lda.l   Tables.EntityHitbox.CollisionOrder,x
+        bmi     NoCollisions
+
+        sta.w   tmp_row
+
+        and.w   #0xff
+        clc
+        adc.w   toTestEntity.hitboxAddress
+        tax
+
+        lda.l   Format.EntityHitbox.Inner.xOffset,x
+        and.w   #0xff
+        clc
+        adc.w   toTest_xPos
+        sta.w   toTestEntity.aabb.xPos
+
+        lda.l   Format.EntityHitbox.Inner.width,x
+        sta.w   toTestEntity.aabb.width
+
+
+        lda.l   Format.EntityHitbox.Inner.yOffset,x
+        and.w   #0xff
+        clc
+        adc.w   toTest_yPos
+        sta.w   toTestEntity.aabb.yPos
+
+        lda.l   Format.EntityHitbox.Inner.height,x
+        sta.w   toTestEntity.aabb.height
+
+
+        lda.w   tmp_row + 1
+        and.w   #0xff
+        clc
+        adc.w   currentEntity.hitboxAddress
+        tax
+
+        _BranchOnInnerCollision(toTestEntity.aabb, InnerCollision)
+
+        iny
+        iny
+        jmp     InnerLoop
+
+InnerCollision:
+    // ::TODO Collision
     stp
+
+    // restore dp
+    lda.w   toTestEntity.entityAddress
+    tcd
 
     jmp     EntityLoop_Continue
 }
-
 }
 
 }
