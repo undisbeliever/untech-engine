@@ -210,7 +210,7 @@ scope _TestList: {
     ldx.b   BaseEntity.MetaSprite.currentFrame
     beq     NoHitbox
 
-    lda.l   Format.Frame.EntityHitbox,x
+    lda.l   Format.Frame.entityHitbox,x
     beq     NoHitbox
     tax
 
@@ -266,7 +266,7 @@ scope _TestList_CurrentHasSingleHitbox: {
         ldx.b   BaseEntity.MetaSprite.currentFrame
         beq     NoEntityOuterCollision
 
-        lda.l   Format.Frame.EntityHitbox,x
+        lda.l   Format.Frame.entityHitbox,x
         beq     NoEntityOuterCollision
         tax
 
@@ -345,7 +345,7 @@ scope _TestList_CurrentHasMultipleHitboxes: {
         ldx.b   BaseEntity.MetaSprite.currentFrame
         beq     NoEntityOuterCollision
 
-        lda.l   Format.Frame.EntityHitbox,x
+        lda.l   Format.Frame.entityHitbox,x
         beq     NoEntityOuterCollision
         tax
 

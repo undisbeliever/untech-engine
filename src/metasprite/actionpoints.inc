@@ -25,7 +25,7 @@ allocateTmpWord(tmp_entityToSpawn)
     ldx.b   BaseEntity.MetaSprite.currentFrame
     beq     Return
 
-    lda.l   Format.Frame.ActionPoints,x
+    lda.l   Format.Frame.actionPoints,x
     beq     Return
 
     tax

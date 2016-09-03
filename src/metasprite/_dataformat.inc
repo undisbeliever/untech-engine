@@ -104,22 +104,22 @@ scope Format {
 
             // Address of the EntityHitbox in the `MS_EntityHitboxData` block
             // May be NULL
-            field(EntityHitbox, 2)
+            field(entityHitbox, 2)
 
             // Address of the TileHitbox` in the `MS_TileHitboxData` block
             // May be NULL
-            field(TileHitbox, 2)
+            field(tileHitbox, 2)
 
             // Address of the ActionPoints in the `MS_ActionPointsData` block
             // May be NULL
-            field(ActionPoints, 2)
+            field(actionPoints, 2)
 
             // Address of the tileset in the `DMA_Tile16Data` block
             //
             // MUST exist if FrameSet is dynamic
             //
             // Optional: Never read on fixed tilesets
-            field(Tileset, 2)
+            field(tileset, 2)
         endstruct()
     }
 

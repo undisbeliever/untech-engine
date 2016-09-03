@@ -269,7 +269,7 @@ scope _UploadDynamicTileset: {
     beq     ReturnTrue
 
 GivenFrame:
-    lda.l   MetaSprite.Format.Frame.Tileset,x
+    lda.l   MetaSprite.Format.Frame.tileset,x
     beq     ReturnTrue
     sta.w   tilesetAddr
     tay
