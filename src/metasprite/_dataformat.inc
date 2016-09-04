@@ -1,6 +1,6 @@
 
 // Data format may be subject to changes
-if MetaSprite.Data.EDITOR_VERSION < 21 {
+if MetaSprite.Data.EDITOR_VERSION < 22 {
     error "Invalid UnTech Editor Version"
 }
 
@@ -245,12 +245,12 @@ scope Format {
 
         enum(BODY)
         enum(BODY_WEAK)
+        enum(BODY_ATTACK)   // can be hurt by attack types
         enum(SHIELD)
         enum(SHIELD_ATTACK)
-        enum(ATTACK)
-        enum(PROJECTILE)    // will phase through other projectiles
+        enum(ATTACK)        // will phase through other attack hitboxes
 
-        assert({__enum.current} < 8 * 2)
+        assert({__enum.current} <= 8 * 2)
     }
 
 
