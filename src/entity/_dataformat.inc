@@ -21,6 +21,7 @@ scope BaseEntityData {
         field(functionTable, 2)
 
         // Initial list to store the entity in
+        // (see Entity.ListId enum)
         // (byte index)
         field(initialList, 1)
 

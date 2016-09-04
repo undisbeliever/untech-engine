@@ -80,9 +80,9 @@ scope ShowAllFramesEntity {
         rodata(EN_RomData)
         scope RomData_{name}: {
             dw  FunctionTable
-            db  0               // initial List (player) ::TODO name these lists::
-            dw  MSFS.{name}     // frameSetId
-            db  0               // defaultPalette
+            db  Entity.ListId.PLAYER    // initial List
+            dw  MSFS.{name}             // frameSetId
+            db  0                       // defaultPalette
         }
 
         rodata(EN_RomDataList)

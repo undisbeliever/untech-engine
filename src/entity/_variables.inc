@@ -140,6 +140,21 @@ scope Entity {
     constant N_LISTS((LAST - FIRST) / 2 + 1)
     }
 
+    // Entity list Id used for the BaseEntityData struct
+    scope ListId {
+        createEnum(0, 2)
+            enum(PLAYER)
+            enum(BOSS)
+            enum(ENEMY)
+            enum(PLAYER_PROJECTILE)
+            enum(ENEMY_PROJECTILE)
+            enum(NPC)
+            enum(PLATFORM)
+            enum(PARTICLE)
+
+        assert({__enum.current} == lists.N_LISTS * 2)
+    }
+
 
     // Current list address being processed
     allocateTmpWord(currentList)
