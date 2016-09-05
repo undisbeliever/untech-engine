@@ -1,7 +1,7 @@
 
 // Data format may be subject to changes
-if MetaSprite.Data.EDITOR_VERSION < 22 {
-    error "Invalid UnTech Editor Version"
+if MetaSprite.Data.METASPRITE_FORMAT_VERSION != 23 {
+    error "Invalid UnTech MetaSprite Format"
 }
 
 // In order to simplify processing of the MetaSprites, there are no
