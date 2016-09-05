@@ -91,7 +91,7 @@ End:
 // REQUITES: 16 bit A, 16 bit Index, DB = $7e
 //
 // INPUT: DP: Entity
-//        X: frame address
+//        X: frame address (NOT NULL)
 //        xPos: entity xPos - INT_MS8_OFFSET
 //        yPos: entity yPos - INT_MS8_OFFSET
 code()
@@ -107,9 +107,9 @@ constant Return(InitLoop.Return)
     beq     Return
     tax
 
+    // count is `number of objects - 1`
     lda.l   MetaSprite.Format.FrameObjects.count,x
-    and.w   #0x001f
-    beq     Return
+    and.w   #MetaSprite.Format.FrameObjects.COUNT_MASK
     sta.w   nObjectsLeft
 
     // Do a single buffer overflow check
@@ -117,7 +117,7 @@ constant Return(InitLoop.Return)
     asl
     // carry clear
     adc.w   bufferPos
-    cmp.w   #128 * 4 + 1
+    cmp.w   #(128 - 1) * 4 + 1
     bcs     Return
 
     ldy.w   bufferPos
@@ -190,7 +190,7 @@ constant Return(InitLoop.Return)
         dec.w   nObjectsLeft
         rep     #$30
     a16()
-        bne     Loop
+        bpl     Loop
 
     sty.w   bufferPos
     rts

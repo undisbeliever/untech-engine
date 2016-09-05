@@ -1,6 +1,6 @@
 
 // Data format may be subject to changes
-if MetaSprite.Data.METASPRITE_FORMAT_VERSION != 23 {
+if MetaSprite.Data.METASPRITE_FORMAT_VERSION != 24 {
     error "Invalid UnTech MetaSprite Format"
 }
 
@@ -137,8 +137,12 @@ scope Format {
     //      oam.charAttr = (frameObject.charAttr & 0xF01F) + entity.blockTwoCharAttrOffset
     scope FrameObjects {
         struct(Data.FrameObjectsOffset)
-            // Number of objects
+            // Determines the number of objects used by the frame
+            //
+            // Value is `number of objects - 1`.
+            // The maximum allowed value is 31 (32 objects).
             field(count, 1)
+            constant COUNT_MASK(0x1f)
 
             scope Object {
                 // X offset relative origin
