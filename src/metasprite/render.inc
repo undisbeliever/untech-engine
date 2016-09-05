@@ -26,7 +26,7 @@ macro _Init() {
 	assert16i()
 
     scope Render: {
-        ldx.w   #127 * 4
+        ldx.w   #(128 - 1) * 4
 
         Loop:
             stz.w   MetaSprite.Render.oamXposBuffer,x
@@ -181,12 +181,12 @@ constant Return(InitLoop.Return)
         iny
         iny
 
+    SkipSprite:
         inx
         inx
         inx
         inx
 
-    SkipSprite:
         dec.w   nObjectsLeft
         rep     #$30
     a16()
