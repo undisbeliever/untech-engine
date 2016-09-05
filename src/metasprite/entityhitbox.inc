@@ -149,7 +149,7 @@ macro _BranchOnInnerCollision(aabb, Collision) {
     // x coordinate more likely to miss
 
     scope {#} {
-        lda.l   Format.EntityHitbox.Outer.xOffset,x
+        lda.l   Format.EntityHitbox.Inner.xOffset,x
         and.w   #0xff
         clc
         adc.b   BaseEntity.xPos.px
@@ -157,7 +157,7 @@ macro _BranchOnInnerCollision(aabb, Collision) {
         cmp.w   {aabb}.xPos
         bcs     XAhead
             // c clear
-            adc.l   Format.EntityHitbox.Outer.width,x
+            adc.l   Format.EntityHitbox.Inner.width,x
             cmp.w   {aabb}.xPos
             bcc     NoCollision
             bra     XMatch
@@ -169,14 +169,14 @@ macro _BranchOnInnerCollision(aabb, Collision) {
         XMatch:
 
 
-        lda.l   Format.EntityHitbox.Outer.yOffset,x
+        lda.l   Format.EntityHitbox.Inner.yOffset,x
         and.w   #0xff
         clc
         adc.b   BaseEntity.yPos.px
         cmp.w   {aabb}.yPos
         bcs     YAhead
             // c clear
-            adc.l   Format.EntityHitbox.Outer.height,x
+            adc.l   Format.EntityHitbox.Inner.height,x
             cmp.w   {aabb}.yPos
             bcs     {Collision}
             bra     NoCollision
