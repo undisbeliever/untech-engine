@@ -76,6 +76,15 @@ scope ShowAllFramesEntity {
     }
 
 
+    code()
+    CalculateAttackValue:
+    TakeDamageFromEntity:
+    BlockWithShield:
+    CollideWithBody:
+    CollideWithShield:
+        rts
+
+
     macro BuildEntityData(name) {
         rodata(EN_RomData)
         scope RomData_{name}: {

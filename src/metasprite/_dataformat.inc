@@ -254,7 +254,11 @@ scope Format {
         enum(SHIELD_ATTACK)
         enum(ATTACK)        // will phase through other attack hitboxes
 
-        assert({__enum.current} <= 8 * 2)
+        constant _TABLE_SHIFT(3)
+        constant _MASK((1 << (_TABLE_SHIFT + 1)) - 2)
+        constant _TABLE_MASK(_MASK << _TABLE_SHIFT | _MASK)
+
+        assert({__enum.current} <= 2 << _TABLE_SHIFT)
     }
 
 

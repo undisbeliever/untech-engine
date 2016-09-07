@@ -36,6 +36,20 @@ scope Process: {
     rts
 }
 
+
+// Empty hitbox collision hooks
+a16()
+i16()
+code()
+CalculateAttackValue:
+TakeDamageFromEntity:
+BlockWithShield:
+CollideWithBody:
+CollideWithShield:
+    rts
+
+
+
 macro _repeat(evaluate n) {
     if {n} < Entity.lists.N_LISTS {
         rodata(EN_RomData)

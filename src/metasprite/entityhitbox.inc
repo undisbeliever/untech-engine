@@ -303,12 +303,23 @@ scope _TestList_CurrentHasSingleHitbox: {
 
 
         InnerCollision:
-            // ::TODO process collision table::
-
             // DP = toTest entity
             // X = toTest inner collision
-            stp
 
+            assert(Format.EntityHitboxType._TABLE_SHIFT == 3)
+
+            lda.l   Format.EntityHitbox.Inner.type,x
+            asl
+            asl
+            asl
+            ldx.w   currentEntity.hitboxAddress
+            ora.l   Format.EntityHitbox.Inner.type,x
+            and.w   #CollisionTable.TABLE_MASK
+            tax
+
+            ldy     currentEntity.entityAddress
+            jsr     (CollisionTable.FunctionTable,x)
+            bra     EndEntityLoop
 
     EntityLoop_Continue:
         lda.b   BaseEntity.next
@@ -422,8 +433,19 @@ scope _InnerTest_Multiple_Single: {
         // DP = currentEntity
         // X = currentEntity inner collision
 
-        // ::TODO process collision table::
-        stp
+        assert(Format.EntityHitboxType._TABLE_SHIFT == 3)
+
+        lda.l   Format.EntityHitbox.Inner.type,x
+        asl
+        asl
+        asl
+        ldx.w   toTestEntity.hitboxAddress
+        ora.l   Format.EntityHitbox.Inner.type,x
+        and.w   #CollisionTable.TABLE_MASK
+        tax
+
+        ldy     toTestEntity.entityAddress
+        jsr     (CollisionTable.FunctionTable,x)
 
 Return:
     jmp     InnerTest_Return
@@ -518,11 +540,31 @@ constant NoCollisions(_InnerTest_Multiple_Single.Return)
         jmp     InnerLoop
 
 InnerCollision:
-    // ::TODO Collision
-
     // DP = currentEntity
     // X = currentEntity inner collision
-    stp
+
+    lda.w   tmp_row
+    and.w   #0xff
+    clc
+    adc.w   toTestEntity.hitboxAddress
+    tay
+
+
+    // Y = toTestEntity hitbox address
+    assert(Format.EntityHitboxType._TABLE_SHIFT == 3)
+
+    lda.l   Format.EntityHitbox.Inner.type,x
+    asl
+    asl
+    asl
+
+    tyx
+    ora.l   Format.EntityHitbox.Inner.type,x
+    and.w   #CollisionTable.TABLE_MASK
+    tax
+
+    ldy.w   toTestEntity.entityAddress
+    jsr     (CollisionTable.FunctionTable,x)
 
     jmp     InnerTest_Return
 }

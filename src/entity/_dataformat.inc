@@ -10,12 +10,19 @@ scope Data {
     code()
 }
 
+// Uses the default renderer in the function table
+macro useDefaultRenderer() {
+    constant Render(MetaSprite.Render.RenderEntity)
+}
+
+}
+
 // Read only data used by the entity.
 //
 // These structs are extendible and will be used to store entity
 // parameters.
 scope BaseEntityData {
-    basestruct-offset(BaseEntityData, Data.Offset)
+    basestruct-offset(BaseEntityData, Entity.Data.Offset)
         // Location of the entity's `functionPtr` table
         // (word addr - code bank)
         field(functionTable, 2)
@@ -82,6 +89,7 @@ scope BaseEntityFunctionTable {
         //     to will change
         field(Process, 2)
 
+
         // Render entity to screen
         //
         // Should point to `MetaSprite.Render.RenderEntity` by default
@@ -89,16 +97,60 @@ scope BaseEntityFunctionTable {
         // REGS: 16 bit A, 16 bit Index, DB = $7e
         // INPUT: dp: entity
         //        MetaSprite.Render.xPos: entity xPos - INT_MS8_OFFSET
-        //        MetaSprote.Render.yPos: entity yPos - INT_MS8_OFFSET
+        //        MetaSprite.Render.yPos: entity yPos - INT_MS8_OFFSET
         field(Render, 2)
+
+
+        // Return the entity's attack value
+        //
+        // REGS: 16 bit A, 16 bit Index, DB = 0x7e
+        // INPUT: dp: entity
+        //         Y: entity attacking
+        //         C: set if the attacker is a shield
+        // OUTPUT: A: attack value
+        field(CalculateAttackValue, 2)
+
+        // Called when the entity's body hitbox collides with an attack
+        // hitbox.
+        //
+        // This function is expected to reduce enemy HP after factoring
+        // in defence / I-frames.
+        //
+        // REGS: 16 bit A, 16 bit Index, DB = 0x7e
+        // INPUT: dp: entity
+        //         A: attack value (opponent's CalculateAttackValue)
+        //         Y: entity collided with
+        //         C: set if entity hit weak point
+        field(TakeDamageFromEntity, 2)
+
+        // Called when the entity's shield hitbox collides with a
+        // body/attack hitbox.
+        //
+        // REGS: 16 bit A, 16 bit Index, DB = 0x7e
+        // INPUT: dp: entity
+        //         Y: entity collided with
+        //         C: set if collide with an attack
+        //
+        // NOTE: C will not be set if a shield collides with a SHEILD_ATTACK hitbox
+        field(BlockWithShield, 2)
+
+        // Called when the entity's body hitbox collides with a body
+        // hitbox.
+        //
+        // REGS: 16 bit A, 16 bit Index, DB = 0x7e
+        // INPUT: dp: entity
+        //         Y: entity collided with
+        field(CollideWithBody, 2)
+
+        // Called when the entity's body hitbox collides with a shield
+        // hitbox.
+        //
+        // REGS: 16 bit A, 16 bit Index, DB = 0x7e
+        // INPUT: dp: entity
+        //         Y: entity collided with
+        //         A: address of the EntityHitboxAABB opponent's shield
+        field(CollideWithShield, 2)
     endstruct()
-}
-
-// Uses the default renderer in the function table
-macro useDefaultRenderer() {
-    constant Render(MetaSprite.Render.RenderEntity)
-}
-
 }
 
 // vim: ft=asm ts=4 sw=4 et:

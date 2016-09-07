@@ -37,6 +37,17 @@ scope Process: {
     rts
 }
 
+
+code()
+CalculateAttackValue:
+TakeDamageFromEntity:
+BlockWithShield:
+CollideWithBody:
+CollideWithShield:
+    rts
+
+
+
 macro _repeat(evaluate n) {
     if {n} < Entity.lists.N_LISTS {
         rodata(EN_RomData)
