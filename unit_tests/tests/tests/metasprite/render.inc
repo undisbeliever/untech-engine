@@ -335,6 +335,59 @@ Fail:
 code()
 a16()
 i16()
+Test.add("MetaSprite.RenderEntity (HiTable Size)")
+scope RenderEntity_HiTableSize: {
+
+// There was a bug where the size of an object with an
+// xPos < 0 would always be large. This tests for correct
+// behaviour
+
+    jsr     _Init
+    bcc     Fail
+
+    lda.w   #oneSmallObjEntity
+    tcd
+
+    lda.w   #-1 - INT_MS8_OFFSET
+    sta.w   MetaSprite.Render.xPos
+    lda.w   #SCREEN_HEIGHT/2 - INT_MS8_OFFSET
+    sta.w   MetaSprite.Render.yPos
+
+    jsr     MetaSprite.Render.RenderEntity
+
+
+
+    lda.w   #oneLargeObjEntity
+    tcd
+
+    lda.w   #-1 - INT_MS8_OFFSET
+    sta.w   MetaSprite.Render.xPos
+    lda.w   #SCREEN_HEIGHT/2 - INT_MS8_OFFSET
+    sta.w   MetaSprite.Render.yPos
+
+    jsr     MetaSprite.Render.RenderEntity
+
+
+
+    jsr     MetaSprite.Render.EndLoop
+
+    lda.w   MetaSprite.Render.oamHiBuffer
+    and.w   #%11'11
+    cmp.w   #%11'01
+    bne     Fail
+
+    lda.w   #2
+    jmp     _CheckSpritesOffscreen
+
+Fail:
+    clc
+    rts
+}
+
+
+code()
+a16()
+i16()
 Test.add("MetaSprite.EndLoop")
 scope EndLoop: {
 

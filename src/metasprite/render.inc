@@ -155,6 +155,7 @@ constant Return(InitLoop.Return)
         // store x8/size in oamXposBuffer
         // this works because FO.Object.charAttr size bit matches
         // oamXposBuffer size bit
+        and.w   #0x0100
         ora.l   MetaSprite.Format.FrameObjects.Object.charAttr,x
         and.w   #0x0300
         sta.w   oamXposBuffer,y
