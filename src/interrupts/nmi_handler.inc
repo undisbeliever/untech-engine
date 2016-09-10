@@ -1,6 +1,7 @@
 // nmi_handler.inc
 // =================
 
+include "nmi/controller.inc"
 include "nmi/scrollbuffer.inc"
 include "nmi/framecounter.inc"
 
@@ -34,6 +35,7 @@ i8()
     Dma.VBlank()
     ScrollBuffer.VBlank()
     FrameCounter.VBlank()
+    Controller.VBlank()
 
 
     rep     #$30
