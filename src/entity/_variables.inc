@@ -51,11 +51,6 @@ scope BaseEntity {
         field(xVecl.hw, 2)
         field(yVecl, 1)
         field(yVecl.hw, 2)
-
-        // invincibility frames.
-        // NOTE: iframes are ignored in projectiles and particles
-        // (byte - frame count)
-        field(iframes, 1)
     endstruct()
 }
 
