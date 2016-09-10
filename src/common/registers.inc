@@ -1299,7 +1299,7 @@ scope HVJOY {
 //
 // a = Pin 6 of Port 1
 // b = Pin 6 of Port 2
-constant RDIO(0x4201)
+constant RDIO(0x4213)
 
 scope RDIO {
     constant port1(%10000000)
