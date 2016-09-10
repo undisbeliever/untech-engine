@@ -148,7 +148,6 @@ scope BaseEntityFunctionTable {
         // REGS: 16 bit A, 16 bit Index, DB = 0x7e
         // INPUT: dp: entity
         //         Y: entity collided with
-        //         A: address of the EntityHitboxAABB opponent's shield
         field(CollideWithShield, 2)
     endstruct()
 }
