@@ -36,19 +36,19 @@ assert(Text.vars.size >= 4)
 
 // Sets the console cursor to a fixed location
 //
-// REQUIRES: 16 bit A, DB access shadow
+// REQUIRES: 16 bit Index, DB access shadow
 macro SetCursor(evaluate x, evaluate y) {
-    assert16a()
+    assert16i()
     assert({x} >= 0 && {x} < Text.Console.TEXT_WIDTH)
     assert({y} >= 0 && {y} < Text.Console.TEXT_HEIGHT)
 
     evaluate r((Text.Console.MARGIN_TOP + {y}) * Text.Console.BUFFER_WIDTH)
 
-    lda.w   #{r} + Text.Console.MARGIN_LEFT + {x}
-    sta.w   Text.Console.bufferPos
+    ldx.w   #{r} + Text.Console.MARGIN_LEFT + {x}
+    stx.w   Text.Console.bufferPos
 
-    lda.w   #{r} + Text.Console.MARGIN_RIGHT
-    sta.w   Text.Console.bufferEndLinePos
+    ldx.w   #{r} + Text.Console.MARGIN_RIGHT
+    stx.w   Text.Console.bufferEndLinePos
 }
 
 
