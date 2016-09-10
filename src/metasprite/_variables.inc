@@ -75,14 +75,13 @@ scope MetaSprite {
 
         scope {
             // Mark the unused word of `oamXposBuffer` as unused.
-            macro addUnused(variable n) {
-                if (n > 0) {
-                    n = n - 1
-                    markTmpWord(oamXposBuffer + n * 4 + 2)
-                    addUnused(n)
+            macro addUnused(evaluate n) {
+                if ({n} >= 0) {
+                    markTmpWord(oamXposBuffer + {n} * 4 + 2)
+                    addUnused({n} - 1)
                 }
             }
-            addUnused(128)
+            addUnused(127)
         }
 
         // The index of the buffer
