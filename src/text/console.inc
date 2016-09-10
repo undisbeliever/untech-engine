@@ -83,15 +83,13 @@ scope Init: {
     lda.b   #Text.Font.SPACE
     sta.l   Text.paddingChar
 
+
     // Clear the vram tilemap
+    // Sets the tilemap palette to 0 and priority to high
 
     ldx.w   #VRAM_CONSOLE_MAP_WADDR
-    ldy.w   #32 * 32 * 2
-    jsr     Dma.ForceBlank.ClearVram
-
-
-    ldx.w   #VRAM_CONSOLE_MAP_WADDR
-    stx.w   Text.bufferVramWaddr
+    ldy.w   #Tilemap.order
+    jsr     Dma.ForceBlank.FillTilemap
 
 End:
     // CleanBuffer

@@ -215,6 +215,72 @@ scope TransferToVramH: {
     rts
 }
 
+// Fills a 32x32 VRAM tilemap, setting each tile to a given word
+//
+// DMA: Uses DMA channel 0
+// REQUIRES: 8 bit A, 16 bit Index, DB access registers
+// REQUIRES: screen blank
+//
+// INPUT: X = VRAM word address
+// INPUT: Y = tile
+code()
+a8()
+i16()
+scope FillTilemap: {
+allocateTmpWord(tmp)
+
+    rep     #$30
+a16()
+    tya
+    sta.l   tmp
+
+    sep     #$20
+a8()
+
+    // Low byte
+    phx
+    stx.w   VMADD
+
+    assert(VMAIN.incrementMode.low | VMAIN.increment.by1 == 0)
+    stz.w   VMAIN
+
+    ldy.w   #DMAP.direction.toPpu | DMAP.fixed | DMAP.transfer.one | (VMDATAL << 8)
+    sty.w   DMAP0       // also sets BBAD0
+
+    ldx.w   #tmp
+    stx.w   A1T0
+    lda.b   #tmp >> 16
+    sta.w   A1B0
+
+    ldy.w   #32 * 32
+    sty.w   DAS0
+
+    lda.b   #MDMAEN.dma0
+    sta.w   MDMAEN
+
+
+    // High byte
+    plx
+    stx.w   VMADD
+
+    lda.b   #VMAIN.incrementMode.high | VMAIN.increment.by1
+    sta.w   VMAIN
+
+    lda.b   #VMDATAH
+    sta.w   BBAD0
+
+    ldx.w   #tmp + 1
+    stx.w   A1T0
+
+    ldy.w   #32 * 32
+    sty.w   DAS0
+
+    lda.b   #MDMAEN.dma0
+    sta.w   MDMAEN
+
+    rts
+}
+
 }
 }
 
