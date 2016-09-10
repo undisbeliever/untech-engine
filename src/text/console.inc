@@ -100,7 +100,7 @@ End:
 
 
 // Clear the Buffer
-// REQUIRES: 8 bit A, 16 bit Index
+// REQUIRES: 8 bit A, 16 bit Index, DB access shadow
 code()
 // P & DP & DB unknown
 scope ClearBuffer: {
@@ -111,19 +111,14 @@ scope ClearBuffer: {
     rep     #$30
 a16()
 i16()
-    lda.w   #0
-    sta.l   buffer
-
     // Clear the buffer
     lda.w   #0
-    ldx.w   #0
-    ldy.w   #32 * 32 / 2
+    ldx.w   #32 * 32 - 2
     Loop:
         sta.l   buffer,x
-        inx
-        inx
-        dey
-        bne     Loop
+        dex
+        dex
+        bpl     Loop
 
 
     SetCursor(0, 0)
@@ -132,7 +127,7 @@ i16()
     sep     #$20
 a8()
     lda.b   #1
-    sta.l   bufferDirty
+    sta.w   bufferDirty
 
     plp
     rts
