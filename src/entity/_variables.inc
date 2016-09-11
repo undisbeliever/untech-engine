@@ -86,8 +86,6 @@ scope Entity {
         //  - will be destructed and move to free list at the end of frame
         allocate(toDelete, wram7e, 2)
 
-        // this is in rendering order
-
     constant FIRST(players)
         // Player entity and allies
         //  - collides with: enemies, bosses, enemyProjectiles

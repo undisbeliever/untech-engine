@@ -11,22 +11,22 @@ a16()
 i16()
 code()
 scope RenderLoop: {
-    // using `lists.N_LISTS` directly causes unrecognized variable
-    // errors in bass, comparing value manually
-    assert(lists.N_LISTS == 8)
-
-    macro _repeat(evaluate n) {
-        if {n} < 8 {
-            scope _{n} {
-                lda.w   lists.FIRST + {n} * 2
-                jsr     RenderList
-            }
-            _repeat({n} + 1)
-        }
+    macro _jsr_RenderList(name) {
+        lda.w   lists.{name}
+        jsr     RenderList
     }
-    _repeat(0)
 
-    rts
+    _jsr_RenderList(particles)
+    _jsr_RenderList(playerProjectiles)
+    _jsr_RenderList(enemyProjectiles)
+    _jsr_RenderList(players)
+    _jsr_RenderList(bosses)
+    _jsr_RenderList(enemies)
+    _jsr_RenderList(npcs)
+
+    lda.w   lists.platforms
+End:
+    // RenderList
 }
 
 // Render a list of entities
@@ -40,6 +40,8 @@ a16()
 i16()
 code()
 scope RenderList: {
+assert(pc() == RenderLoop.End)
+
     beq     Skip
 
     Loop:
