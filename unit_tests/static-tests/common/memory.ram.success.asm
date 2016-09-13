@@ -35,5 +35,5 @@ assert({::blocks.shadow.size} == 0x160)
 assert({::blocks.shadow.pos} == 0x7e0260)
 assert({::blocks.shadow.remaining} == 0x1e80 - 0x160)
 
-// vim: ft=asm ts=4 sw=4 et:
+// vim: ft=bass-65816 ts=4 sw=4 et:
 

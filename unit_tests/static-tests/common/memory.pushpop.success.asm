@@ -59,5 +59,5 @@ popBlock()
 assert({::romBlock.stackSize} == 0)
 assert(pc() == 0xc08000)
 
-// vim: ft=asm ts=4 sw=4 et:
+// vim: ft=bass-65816 ts=4 sw=4 et:
 

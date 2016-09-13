@@ -32,5 +32,5 @@ macro _buildFunctionTable_field(struct, module, evaluate n) {
     }
 }
 
-// vim: ft=asm ts=4 sw=4 et:
+// vim: ft=bass-65816 ts=4 sw=4 et:
 

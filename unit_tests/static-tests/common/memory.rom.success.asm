@@ -57,5 +57,5 @@ assert(rom1Start == 0xc18000)
 storeBlockStart(rom2Start, rom2)
 assert(rom2Start == 0xc28000)
 
-// vim: ft=asm ts=4 sw=4 et:
+// vim: ft=bass-65816 ts=4 sw=4 et:
 

@@ -7,5 +7,5 @@ include "entity/_common.inc"
 include "entity/allocation.inc"
 include "entity/gameloop.inc"
 
-// vim: ft=asm ts=4 sw=4 et:
+// vim: ft=bass-65816 ts=4 sw=4 et:
 

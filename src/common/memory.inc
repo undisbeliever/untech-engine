@@ -202,5 +202,5 @@ macro allocate(name, blockId, evaluate size) {
     global evaluate ::blocks.{blockId}.remaining({::blocks.{blockId}.remaining} - {size})
 }
 
-// vim: ft=asm ts=4 sw=4 et:
+// vim: ft=bass-65816 ts=4 sw=4 et:
 

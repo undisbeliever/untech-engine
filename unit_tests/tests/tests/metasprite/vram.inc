@@ -456,5 +456,5 @@ __Init_Fill(Row, MetaSprite.Vram.VRAM_ROW_SLOTS)
 }
 }
 
-// vim: ft=asm ts=4 sw=4 et:
+// vim: ft=bass-65816 ts=4 sw=4 et:
 

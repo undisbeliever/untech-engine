@@ -122,5 +122,5 @@ private.seek(0x00ffd5)
 
 private.seek(0)
 
-// vim: ft=asm ts=4 sw=4 et:
+// vim: ft=bass-65816 ts=4 sw=4 et:
 

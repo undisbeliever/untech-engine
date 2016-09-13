@@ -9,5 +9,5 @@ include "common/struct.inc"
 include "common/functiontable.inc"
 include "common/tmp_words.inc"
 
-// vim: ft=asm ts=4 sw=4 et:
+// vim: ft=bass-65816 ts=4 sw=4 et:
 
