@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF_8"?>
 <!DOCTYPE untech>
-<metaspriteexport>
+<metaspriteproject>
   <frameset src="utms/FST_10Palettes.utms"/>
   <frameset/>
   <frameset/>
@@ -12,14 +12,14 @@
   <frameset/>
 
   <!-- ONE ROW FIXED -->
-  <frameset src="utms-gen/SpikedWalker.utms"/>
+  <frameset src="utsi/SpikedWalker.utsi"/>
 
   <!-- TWO ROWS FIXED -->
-  <frameset src="utms-gen/Man.utms"/>
+  <frameset src="utsi/Man.utsi"/>
 
   <!-- ONE ROW DYNAMIC -->
-  <frameset src="utms-gen/Woman.utms"/>
-  <frameset src="utms-gen/FST_TwoRows.utms"/>
+  <frameset src="utsi/Woman.utsi"/>
+  <frameset src="utsi/FST_TwoRows.utsi"/>
 
   <frameset src="utms/FST_Animations.utms"/>
-</metaspriteexport>
+</metaspriteproject>
