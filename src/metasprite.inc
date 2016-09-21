@@ -2,7 +2,6 @@
 include "metasprite/_dataformat.inc"
 include "metasprite/_variables.inc"
 
-include "metasprite/actionpoints.inc"
 include "metasprite/animation.inc"
 include "metasprite/entityhitbox.inc"
 include "metasprite/entityhitbox-collisions.inc"
