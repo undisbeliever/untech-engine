@@ -142,12 +142,13 @@ allocateTmpWord(yPos)
             //   OR entity is inside active window
 
             // get initial list index
-            assert(lists.N_LISTS & (lists.N_LISTS - 1) == 0)
             ldx.b   BaseEntity.romPtr
             lda.l   BaseEntityData.initialList,x
-            and.w   #(lists.N_LISTS - 1) * 2
-            tax
+            and.w   #0xfe
+            cmp.w   #lists.N_LISTS * 2
+            bcs     MoveToDeleteList
 
+            tax
             lda.l   EntityAlwaysActiveList,x
             bne     IsActive
 
@@ -169,6 +170,11 @@ allocateTmpWord(yPos)
                 sta.w   lists.FIRST,x
 
                 bra     EndIf
+
+            MoveToDeleteList:
+                // invalid list id, move to delete list
+                ldy.w   #lists.toDelete
+                bra     InsertIntoInactiveList
 
             CouldNotActivate:
                 ldy.w   #lists.tryToActivateAgain
@@ -210,8 +216,6 @@ scope EntityAlwaysActiveList: {
     dw  1       // players
     dw  1       // bosses
     dw  0       // enemies
-    dw  1       // playerProjectiles
-    dw  1       // enemyProjectiles
     dw  0       // npcs
     dw  0       // platforms
     dw  1       // particles
@@ -221,6 +225,7 @@ scope EntityAlwaysActiveList: {
 
 code()
 }
+
 
 
 // Clear the TryToActivateAgain entity list

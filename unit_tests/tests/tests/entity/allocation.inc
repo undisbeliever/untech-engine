@@ -232,8 +232,6 @@ constant ONSCREEN(0x1080)
         cmp.w   #Entities.BlankEntity.EntityId_0 + Entity.lists.N_LISTS
         bcc     Loop
 
-
-
     // Verify list sizes
 
     jsr     _FreeListLength
@@ -266,17 +264,16 @@ scope SpawnEntity_XY: {
 rodata(rom0)
 scope ExpectedSizes: {
 // NOTE: projectiles are always spawned, even if offscreen
-    dw  6
-    dw  6
-    dw  2
-    dw  6
-    dw  6
-    dw  2
-    dw  2
-    dw  6
+    dw  6   // player
+    dw  6   // boss
+    dw  2   // enemy
+    dw  2   // npc
+    dw  2   // platform
+    dw  6   // particle
 
+    constant ALIVE(6 * 3 + 2 * 3)
     constant DEACTIVATED(4 * 3)
-    constant FREE(Entity.N_ENTITIES - 5 * 6 - 3 * 2 - DEACTIVATED)
+    constant FREE(Entity.N_ENTITIES - ALIVE - DEACTIVATED)
 
     constant size(pc() - ExpectedSizes)
     assert(size / 2 == Entity.lists.N_LISTS)

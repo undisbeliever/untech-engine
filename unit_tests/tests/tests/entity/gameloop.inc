@@ -62,28 +62,24 @@ scope SpawnList: {
     define C(Entities.ChangeToParticleEntity.EntityId_)
     define B(Entities.BlankEntity.EntityId_)
 
-    dw  {C}0, {C}0, {B}0, {B}0, {B}0
-    dw  {B}1, {C}1, {C}1, {B}1, {B}1
-    dw  {B}2, {C}2, {B}2, {C}2, {B}2
-    dw  {B}3, {B}3, {B}3, {C}3, {C}3
-    dw  {C}4, {C}4, {C}4, {C}4, {C}4
-    dw  {B}5, {B}5, {B}5, {B}5, {B}5
-    dw  {C}6, {C}6, {B}6, {C}6, {C}6
-    dw  {B}7, {B}7, {C}7, {B}7, {C}7
+    dw  {C}0, {C}0, {B}0, {B}0, {B}0    // player
+    dw  {B}1, {C}1, {C}1, {B}1, {B}1    // boss
+    dw  {B}2, {C}2, {B}2, {C}2, {B}2    // enemy
+    dw  {B}3, {B}3, {B}3, {C}3, {C}3    // npc
+    dw  {C}4, {C}4, {C}4, {C}4, {C}4    // playform
+    dw  {B}5, {B}5, {B}5, {B}5, {B}5    // particle
 
     constant size(pc() - SpawnList)
     assert(size/2 <= Entity.N_ENTITIES)
 }
 
 scope ExpectedSizes: {
-    dw  3
-    dw  3
-    dw  3
-    dw  3
-    dw  0
-    dw  5
-    dw  1
-    dw  40 - (3 * 4 + 5 + 1)
+    dw  3                   // player
+    dw  3                   // boss
+    dw  3                   // enemy
+    dw  3                   // npc
+    dw  0                   // platform
+    dw  (6 * 5) - (3 * 4)   // particle
 
     constant size(pc() - ExpectedSizes)
     assert(size / 2 == Entity.lists.N_LISTS)
@@ -385,14 +381,12 @@ scope SpawnEntity_XY: {
 
 rodata(rom0)
 scope InitialExpectedSizes: {
-    dw  4
-    dw  4
-    dw  1
-    dw  1
-    dw  1
-    dw  1
-    dw  1
-    dw  4
+    dw  4   // player
+    dw  4   // boss
+    dw  1   // enemy
+    dw  1   // npc
+    dw  1   // platform
+    dw  4   // particle
 
     constant size(pc() - InitialExpectedSizes)
     assert(size / 2 == Entity.lists.N_LISTS)
@@ -402,7 +396,12 @@ rodata(rom0)
 scope MoveCameraTable: {
     macro _row(xPos, yPos, e) {
         dw  {xPos}, {yPos}
-        dw  4, 4, {e}, 0, 0, {e}, {e}, 4
+        dw  4   // player
+        dw  4   // boss
+        dw  {e} // enemy
+        dw  {e} // npc
+        dw  {e} // platform
+        dw  4   // particle
     }
 
     _row(0x1000, 0x2000, 1)
@@ -412,7 +411,7 @@ scope MoveCameraTable: {
     _row(0x2000, 0x1000, 2) // Still inside inactive window
     _row(0x3000, 0x3000, 0)
 
-    constant rowSize((2 + 8) * 2)
+    constant rowSize((2 + Entity.lists.N_LISTS) * 2)
     constant size(pc() - MoveCameraTable)
 }
 }

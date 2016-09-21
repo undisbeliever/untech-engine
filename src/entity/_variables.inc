@@ -86,6 +86,14 @@ scope Entity {
         //  - will be destructed and move to free list at the end of frame
         allocate(toDelete, wram7e, 2)
 
+        // Player projectiles
+        //  - will be deleted when moved outside active window
+        allocate(playerProjectiles, wram7e, 2)
+
+        // Enemy projectiles
+        //  - will be deleted when moved outside active window
+        allocate(enemyProjectiles, wram7e, 2)
+
     constant FIRST(players)
         // Player entity and allies
         //  - collides with: enemies, bosses, enemyProjectiles
@@ -101,14 +109,6 @@ scope Entity {
         //  - collides with: playerProjectiles
         //  - deactivated when moved outside active window
         allocate(enemies, wram7e, 2)
-
-        // Player projectiles
-        //  - will be deleted when moved outside active window
-        allocate(playerProjectiles, wram7e, 2)
-
-        // Enemy projectiles
-        //  - will be deleted when moved outside active window
-        allocate(enemyProjectiles, wram7e, 2)
 
         // NPCs
         //  - no entity collisions
@@ -139,8 +139,6 @@ scope Entity {
             enum(PLAYER)
             enum(BOSS)
             enum(ENEMY)
-            enum(PLAYER_PROJECTILE)
-            enum(ENEMY_PROJECTILE)
             enum(NPC)
             enum(PLATFORM)
             enum(PARTICLE)
