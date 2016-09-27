@@ -168,8 +168,8 @@ scope _DeallocateSlot_A: {
             //     else:
             //          current.prev.next = current.next
             //
-            //     if current.next
-            //          current.next.prev = current.next
+            //     if current.next:
+            //          current.next.prev = current.prev
             //
             // tmp = freeSlotPool
             // freeSlotPool = current
@@ -204,7 +204,7 @@ scope _DeallocateSlot_A: {
                 tay
                 bmi     NotLast
                     lda.w   slots.prev,x
-                    lda.w   slots.prev,y
+                    sta.w   slots.prev,y
                 NotLast:
             SkipPoolCheck:
 
