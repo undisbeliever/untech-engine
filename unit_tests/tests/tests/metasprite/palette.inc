@@ -108,6 +108,9 @@ a8()
     cmp.w   tmp_paletteBits
     beq     Fail
 
+    jsr     _ValidateUsedSlotList
+    bcc     Fail
+
     sec
     rts
 
@@ -199,6 +202,9 @@ a8()
     cmp.w   tmp_paletteBits
     bne     Fail
 
+    jsr     _ValidateUsedSlotList
+    bcc     Fail
+
     sec
     rts
 
@@ -233,6 +239,67 @@ a8()
 
     lda.w   Dma.Palette.dirty
     bne     Fail
+
+    jsr     _ValidateUsedSlotList
+    bcc     Fail
+
+    sec
+    rts
+
+Fail:
+    clc
+    rts
+}
+
+
+a16()
+i16()
+code()
+Test.add("MetaSprite.Palette.DeactivateAndTestList (First)")
+scope Deactivate_List_First: {
+    lda.w   #EntityPool.entity0
+    bra     _DeactivateAndTestList_A
+}
+
+
+a16()
+i16()
+code()
+Test.add("MetaSprite.Palette.DeactivateAndTestList (Middle)")
+scope Deactivate_List_Middle: {
+    lda.w   #EntityPool.entity4
+    bra     _DeactivateAndTestList_A
+}
+
+
+a16()
+i16()
+code()
+Test.add("MetaSprite.Palette.DeactivateAndTestList (Last)")
+scope Deactivate_List_Last: {
+    lda.w   #EntityPool.entity7
+    bra     _DeactivateAndTestList_A
+}
+
+// IN: A = entity to remove
+a16()
+i16()
+code()
+scope _DeactivateAndTestList_A: {
+allocateTmpWord(tmp_entityToRemove)
+
+    sta.w   tmp_entityToRemove
+
+    jsr     _Init_8Palettes
+    bcc     Fail
+
+    lda.w   tmp_entityToRemove
+    tcd
+
+    jsr     MetaSprite.Deactivate
+
+    jsr     _ValidateUsedSlotList
+    bcc     Fail
 
     sec
     rts
@@ -317,6 +384,9 @@ a16()
     jsr     MetaSprite.Activate
     bcc     Fail
 
+    jsr     _ValidateUsedSlotList
+    bcc     Fail
+
     sec
     rts
 
@@ -356,8 +426,50 @@ scope _Init_8Palettes: {
         cmp.w   #EntityPool.entity8
         bcc     Loop
 
+    jsr     _ValidateUsedSlotList
+    bcc     Return
+
     sec
 Return:
+    rts
+}
+
+
+// Loops through the used palette slot list,
+// verifies the prev/next pointers match.
+// This routine will loop forever if there is a circular reference
+code()
+scope _ValidateUsedSlotList: {
+    php
+
+    sep     #$30
+a8()
+i8()
+
+    ldx.w   MetaSprite.Palette.slotPool.used
+    bmi     ReturnTrue
+
+    ldy.b   #0x80
+
+    Loop:
+        tya
+        cmp.w   MetaSprite.Palette.slots.prev,x
+        bne     ReturnFalse
+
+        txy
+
+        lda.w   MetaSprite.Palette.slots.next,x
+        tax
+        bpl     Loop
+
+ReturnTrue:
+    plp
+    sec
+    rts
+
+ReturnFalse:
+    plp
+    clc
     rts
 }
 
