@@ -398,6 +398,17 @@ scope _ActivateFixed {
                 ldx.w   slots.next,y
                 bpl     -
 
+        NotFound:
+        a16()
+        i8()
+            if {nSlots} == 1 {
+                NotFound_Single({freeSlotPool}, {usedSlotPool}, {uploadRoutine})
+                jmp     SetState_OneSlot
+            } else {
+                NotFound_Dual({freeSlotPool}, {usedSlotPool}, {uploadRoutine})
+                jmp     SetState_TwoSlots
+            }
+
         Found_Y:
             tyx
         Found_X:
@@ -409,17 +420,6 @@ scope _ActivateFixed {
             if {nSlots} == 1 {
                 jmp     SetState_OneSlot
             } else {
-                jmp     SetState_TwoSlots
-            }
-
-        NotFound:
-        a16()
-        i8()
-            if {nSlots} == 1 {
-                NotFound_Single({freeSlotPool}, {usedSlotPool}, {uploadRoutine})
-                jmp     SetState_OneSlot
-            } else {
-                NotFound_Dual({freeSlotPool}, {usedSlotPool}, {uploadRoutine})
                 jmp     SetState_TwoSlots
             }
 
