@@ -90,7 +90,7 @@ scope _RemoveSlot: {
 	//	 current.prev.next = current.next
 	//
 	// if current.next:
-	//	 current.next.prev = current.next
+	//	 current.next.prev = current.prev
     //
     // tmp = slotPool.free
     // slotPool.free = current
