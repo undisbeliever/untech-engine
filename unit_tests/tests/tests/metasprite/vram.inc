@@ -16,6 +16,9 @@ scope MSFS {
 scope MetaSpriteTest {
 scope Vram {
 
+allocateTmpWord(tmp0)
+
+
 macro _ActivateFixedTest(FrameSet, nSlots) {
     code()
     a16()
@@ -71,6 +74,9 @@ macro _ActivateFixedTest(FrameSet, nSlots) {
             cmp.w   EntityPool.entity0 + BaseEntity.MetaSprite.blockTwoCharAttrOffset
             bne     Fail
         }
+
+        jsr     _ValidateUsedSlotLists
+        bcc     Fail
 
         sec
         rts
@@ -151,6 +157,9 @@ macro _ActivateDynamicTest(FrameSet, nSlots) {
             cmp.w   EntityPool.entity0 + BaseEntity.MetaSprite.blockTwoCharAttrOffset
             beq     Fail
         }
+
+        jsr     _ValidateUsedSlotLists
+        bcc     Fail
 
         sec
         rts
@@ -283,12 +292,101 @@ macro _DeallocateTest(type) {
         jsr     _InitEntity0PaletteAndActivate
         bcs     Fail
 
+        jsr     _ValidateUsedSlotLists
+        bcc     Fail
+
         sec
         rts
     }
 }
 _DeallocateTest(Tile)
 _DeallocateTest(Row)
+
+
+
+// Delete an entities start/middle/end of the list
+// and validate linked list is setup correctly
+macro _DeallocateAndTestListTest(type) {
+    // IN: A = entity to delete
+    code()
+    a16()
+    i16()
+    scope _DeallocateAndTestList_{type}: {
+    constant tmp_entityToRemove(tmp0)
+
+        sta.w   tmp_entityToRemove
+
+        jsr     _Init_MetaSpriteModule
+
+        lda.w   #EntityPool.entity0
+        tcd
+        lda.w   #MSFS.FST_{type}Fixed1
+        jsr     _InitEntity0PaletteAndActivate
+        bcc     Fail
+
+        // needed to prevent DMA buffer overflowing
+        jsr     Dma.Init
+
+        lda.w   #EntityPool.entity1
+        tcd
+        lda.w   #MSFS.FST_{type}Fixed2
+        jsr     _InitEntity0PaletteAndActivate
+        bcc     Fail
+
+        // needed to prevent DMA buffer overflowing
+        jsr     Dma.Init
+
+        lda.w   #EntityPool.entity2
+        tcd
+        lda.w   #MSFS.FST_{type}Fixed3
+        jsr     _InitEntity0PaletteAndActivate
+        bcc     Fail
+
+        lda.w   tmp_entityToRemove
+        tcd
+        jsr     MetaSprite.Deactivate
+        jsr     _ValidateUsedSlotLists
+        bcc     Fail
+
+        sec
+        rts
+
+    Fail:
+        clc
+        rts
+    }
+
+    code()
+    a16()
+    i16()
+    Test.add("MetaSprite.Vram.DeallocateAndTestList ({type}, First)")
+    scope DeallocateAndTestList_{type}_First: {
+        lda.w   #EntityPool.entity0
+        jmp     _DeallocateAndTestList_{type}
+    }
+
+    code()
+    a16()
+    i16()
+    Test.add("MetaSprite.Vram.DeallocateAndTestList ({type}, Middle)")
+    scope DeallocateAndTestList_{type}_Middle: {
+        lda.w   #EntityPool.entity1
+        jmp     _DeallocateAndTestList_{type}
+    }
+
+    code()
+    a16()
+    i16()
+    Test.add("MetaSprite.Vram.DeallocateAndTestList ({type}, Last)")
+    scope DeallocateAndTestList_{type}_Last: {
+        lda.w   #EntityPool.entity2
+        jmp     _DeallocateAndTestList_{type}
+    }
+}
+_DeallocateAndTestListTest(OneTile)
+_DeallocateAndTestListTest(OneRow)
+_DeallocateAndTestListTest(TwoTiles)
+_DeallocateAndTestListTest(TwoRows)
 
 
 macro _ReferenceCountTest(type) {
@@ -387,9 +485,12 @@ macro _ReferenceCountTest(type) {
         jsr     _InitEntity0PaletteAndActivate
         bcc     Fail
 
+        jsr     _ValidateUsedSlotLists
+        bcc     Fail
 
         sec
         rts
+
     Fail:
         clc
         rts
@@ -444,8 +545,12 @@ macro _ActivateThirdFixedSlot(name, FrameSet1, FrameSet2, FrameSet3) {
         cpx.w   Dma.Tile16.tableIndex
         beq     Fail
 
+        jsr     _ValidateUsedSlotLists
+        bcc     Fail
+
         sec
         rts
+
     Fail:
         clc
         rts
@@ -504,6 +609,9 @@ macro __Init_Fill(type, nSlots) {
             cmp.w   #EntityPool.entity3 + Entity.ENTITY_SIZE * ({nSlots} - 4) / 2
             bcc     Loop
 
+        jsr     _ValidateUsedSlotLists
+        bcc     Fail
+
         sec
         rts
 
@@ -514,6 +622,71 @@ macro __Init_Fill(type, nSlots) {
 }
 __Init_Fill(Tile, MetaSprite.Vram.VRAM_TILE_SLOTS)
 __Init_Fill(Row, MetaSprite.Vram.VRAM_ROW_SLOTS)
+
+
+// Loops through the used vram slots lists,
+// verifies the prev/next pointers match.
+// This routine will loop forever if there is a circular reference
+code()
+scope _ValidateUsedSlotLists: {
+    macro Test(list) {
+        assert8a()
+        assert8i()
+
+        ldx.w   MetaSprite.Vram.slotPool.{list}
+        bmi     +
+            jsr     _TestList
+            bcc     ReturnFalse
+        +
+    }
+
+    php
+
+    sep     #$30
+a8()
+i8()
+    Test(oneTile)
+    Test(twoTiles)
+    Test(oneRow)
+    Test(twoRows)
+
+    plp
+    sec
+    rts
+
+ReturnFalse:
+    plp
+    clc
+    rts
+
+
+
+    // IN: X = first list Index, must not be NULL
+    a8()
+    i8()
+    code()
+    scope _TestList: {
+        ldy.b   #0x80
+
+        Loop:
+            tya
+            cmp.w   MetaSprite.Vram.slots.prev,x
+            bne     ReturnFailure
+
+            txy
+
+            lda.w   MetaSprite.Vram.slots.next,x
+            tax
+            bpl     Loop
+
+        sec
+        rts
+
+    ReturnFailure:
+        clc
+        rts
+    }
+}
 
 }
 }
