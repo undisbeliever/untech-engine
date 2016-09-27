@@ -80,7 +80,7 @@ macro _Deallocate() {
 // Activates the given entity's vram table
 // REQUIRES: 8 bit A, 16 bit Index
 // INPUT: X = frameSet
-// BRANCH: ReturnRep on failure
+// BRANCH: ReturnRep on failure (with carry clear)
 // MODIFIES: Register size
 macro _Activate() {
     assert8a()
