@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF_8"?>
 <!DOCTYPE untech>
-<metasprite id="FST_TwoTilesFixed" tilesettype="TWO_TILES_FIXED">
+<metasprite id="FST_TwoTilesFixed1" tilesettype="TWO_TILES_FIXED">
   <exportorder src="../formats/OneSmallAndLarge.utft"/>
   <smalltileset>
     GAA8AGYAwwDDAGYAPAAYAAAAAAAAAAAAAAAAAAAAAAA=

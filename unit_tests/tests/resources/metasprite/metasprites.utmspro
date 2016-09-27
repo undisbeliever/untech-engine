@@ -4,8 +4,22 @@
   <frameset src="utms/FST_10Palettes.utms"/>
   <frameset/>
   <frameset/>
-  <frameset src="utms/FST_OneTileFixed.utms"/>
-  <frameset src="utms/FST_TwoTilesFixed.utms"/>
+  <frameset src="utms/FST_OneTileFixed1.utms"/>
+  <frameset src="utms/FST_OneTileFixed2.utms"/>
+  <frameset src="utms/FST_OneTileFixed3.utms"/>
+
+  <frameset src="utms/FST_OneRowFixed1.utms"/>
+  <frameset src="utms/FST_OneRowFixed2.utms"/>
+  <frameset src="utms/FST_OneRowFixed3.utms"/>
+
+  <frameset src="utms/FST_TwoTilesFixed1.utms"/>
+  <frameset src="utms/FST_TwoTilesFixed2.utms"/>
+  <frameset src="utms/FST_TwoTilesFixed3.utms"/>
+
+  <frameset src="utms/FST_TwoRowsFixed1.utms"/>
+  <frameset src="utms/FST_TwoRowsFixed2.utms"/>
+  <frameset src="utms/FST_TwoRowsFixed3.utms"/>
+
   <frameset/>
   <frameset src="utms/FST_OneTile.utms"/>
   <frameset src="utms/FST_TwoTiles.utms"/>

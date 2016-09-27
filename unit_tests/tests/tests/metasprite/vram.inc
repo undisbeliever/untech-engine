@@ -7,8 +7,10 @@
 
 scope MSFS {
     constant FST_OneRow(Woman)
-    constant FST_OneRowFixed(SpikedWalker)
-    constant FST_TwoRowsFixed(Man)
+    constant FST_OneTileFixed(FST_OneTileFixed1)
+    constant FST_OneRowFixed(FST_OneRowFixed1)
+    constant FST_TwoTilesFixed(FST_TwoTilesFixed1)
+    constant FST_TwoRowsFixed(FST_TwoRowsFixed1)
 }
 
 scope MetaSpriteTest {
@@ -395,6 +397,66 @@ macro _ReferenceCountTest(type) {
 }
 _ReferenceCountTest(Tile)
 _ReferenceCountTest(Row)
+
+
+// There is a bug that prevents the third fixed VRAM slot from
+// buffering the tiles correctly.
+macro _ActivateThirdFixedSlot(name, FrameSet1, FrameSet2, FrameSet3) {
+    code()
+    a16()
+    i16()
+    Test.add("MetaSprite.Vram.ActivateThirdSlot ({name})")
+    scope ActivateThirdFixedSlot_{name}: {
+        jsr     _Init_MetaSpriteModule
+
+        lda.w   #EntityPool.entity0
+        tcd
+
+        lda.w   #MSFS.{FrameSet1}
+        jsr     _InitEntity0PaletteAndActivate
+        bcc     Fail
+
+        lda.w   #EntityPool.entity1
+        tcd
+
+        lda.w   #MSFS.{FrameSet2}
+        jsr     _InitEntity0PaletteAndActivate
+        bcc     Fail
+
+        // tests that the tiles of the third slot are buffered
+        jsr     Dma.Init
+        ldx.w   Dma.Tile16.tableIndex
+        phx
+            lda.w   #EntityPool.entity2
+            tcd
+
+            lda.w   #MSFS.{FrameSet3}
+            jsr     _InitEntity0PaletteAndActivate
+            bcc     Fail
+        plx
+
+        // Test vramSet set and dynamic clear
+        lda.b   BaseEntity.MetaSprite.status
+        and.w   #MetaSprite.StatusFlags.dynamicTileset | MetaSprite.StatusFlags.vramSet
+        cmp.w   #MetaSprite.StatusFlags.vramSet
+        bne     Fail
+
+        cpx.w   Dma.Tile16.tableIndex
+        beq     Fail
+
+        sec
+        rts
+    Fail:
+        clc
+        rts
+    }
+}
+_ActivateThirdFixedSlot(OneTile, FST_OneTileFixed, FST_OneTileFixed2, FST_OneTileFixed3)
+_ActivateThirdFixedSlot(TwoTiles, FST_TwoTilesFixed, FST_TwoTilesFixed2, FST_TwoTilesFixed3)
+_ActivateThirdFixedSlot(OneRow, FST_OneRowFixed, FST_OneRowFixed2, FST_OneRowFixed3)
+_ActivateThirdFixedSlot(TwoRows, FST_TwoRowsFixed, FST_TwoRowsFixed2, FST_TwoRowsFixed3)
+
+
 
 
 // initializes the metasprite engine and fills all the tile slots.
