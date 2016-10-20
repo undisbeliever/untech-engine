@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF_8"?>
 <!DOCTYPE untech>
 <metasprite id="FST_OneTile" tilesettype="ONE_TILE">
-  <exportorder src="../formats/OneSmallAndLarge.utft"/>
+  <exportorder src="../formats/OneSmallAndLarge.utfseo"/>
   <smalltileset>
     GAA8AGYAwwDDAGYAPAAYAAAAAAAAAAAAAAAAAAAAAAA=
   </smalltileset>
@@ -13,10 +13,10 @@
   <palette>
     4AMjEAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=
   </palette>
-  <frame id="OneLargeObj">
-    <object size="large" x="-8" y="-8" tile="0" order="2"/>
+  <frame id="OneLargeObj" order="2">
+    <object size="large" x="-8" y="-8" tile="0"/>
   </frame>
-  <frame id="OneSmallObj">
-    <object size="small" x="-4" y="-4" tile="0" order="2"/>
+  <frame id="OneSmallObj" order="2">
+    <object size="small" x="-4" y="-4" tile="0"/>
   </frame>
 </metasprite>

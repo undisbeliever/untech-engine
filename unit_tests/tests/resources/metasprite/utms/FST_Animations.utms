@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF_8"?>
 <!DOCTYPE untech>
 <metasprite id="FST_Animations" tilesettype="TWO_TILES_FIXED">
-  <exportorder src="../formats/AnimationTest.utft"/>
+  <exportorder src="../formats/AnimationTest.utfseo"/>
   <smalltileset>
     GAA8AGYAwwDDAGYAPAAYAAAAAAAAAAAAAAAAAAAAAAA=
   </smalltileset>
@@ -13,11 +13,11 @@
   <palette>
     4AMjEAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=
   </palette>
-  <frame id="frame1">
-    <object size="large" x="-8" y="-8" tile="0" order="2"/>
+  <frame id="frame1" order="2">
+    <object size="large" x="-8" y="-8" tile="0"/>
   </frame>
-  <frame id="frame2">
-    <object size="small" x="-4" y="-4" tile="0" order="2"/>
+  <frame id="frame2" order="2">
+    <object size="small" x="-4" y="-4" tile="0"/>
   </frame>
   <animation id="Stop">
     <instruction op="STOP"/>

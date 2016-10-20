@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF_8"?>
 <!DOCTYPE untech>
 <metasprite id="FST_OneRowFixed1" tilesettype="ONE_ROW_FIXED">
-  <exportorder src="../formats/OneFrame.utft"/>
+  <exportorder src="../formats/OneFrame.utfseo"/>
   <largetileset>
     AAAAAB8AEAAQABAAHgAQAAAAAAAAAAAAAAAAAAAAAAAAAAAAPABCAEAAQABAADwA
     AAAAAAAAAAAAAAAAAAAAABAAEAAQABAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
@@ -15,9 +15,9 @@
   <palette>
     4AMjEAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=
   </palette>
-  <frame id="frame">
-    <object size="large" x="-24" y="-8" tile="0" order="2"/>
-    <object size="large" x="-8" y="-8" tile="1" order="2"/>
-    <object size="large" x="8" y="-8" tile="2" order="2"/>
+  <frame id="frame" order="2">
+    <object size="large" x="-24" y="-8" tile="0"/>
+    <object size="large" x="-8" y="-8" tile="1"/>
+    <object size="large" x="8" y="-8" tile="2"/>
   </frame>
 </metasprite>

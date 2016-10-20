@@ -2,7 +2,7 @@
 <!DOCTYPE untech>
 <spriteimporter id="Man" tilesettype="TWO_ROWS_FIXED" image="Man.png" transparent="ed63ff">
   <grid width="16" height="32" xoffset="0" yoffset="0" xpadding="0" ypadding="0" xorigin="8" yorigin="16"/>
-  <exportorder src="../formats/Human.utft"/>
+  <exportorder src="../formats/Human.utfseo"/>
   <frame id="Blink_Right" order="2">
     <gridlocation x="1" y="0"/>
     <tilehitbox x="4" y="10" width="8" height="21"/>

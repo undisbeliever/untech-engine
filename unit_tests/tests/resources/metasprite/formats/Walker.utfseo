@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF_8"?>
 <!DOCTYPE untech>
-<framesettype name="Walker">
+<fsexportorder name="Walker">
   <frame id="Stand_Right">
     <alt name="Stand_Left" hflip="true"/>
   </frame>
@@ -25,4 +25,4 @@
   <animation id="Walk_Left">
     <alt name="Walk_Right" hflip="true"/>
   </animation>
-</framesettype>
+</fsexportorder>

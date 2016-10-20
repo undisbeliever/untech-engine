@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF_8"?>
 <!DOCTYPE untech>
-<framesettype name="AnimationTest">
+<fsexportorder name="AnimationTest">
   <frame id="frame1"/>
   <frame id="frame2"/>
   <animation id="Stop"/>
@@ -10,4 +10,4 @@
   <animation id="SetFrameWaitFrames"/>
   <animation id="SetFrameWaitTime"/>
   <animation id="SetFrameWaitVecl"/>
-</framesettype>
+</fsexportorder>

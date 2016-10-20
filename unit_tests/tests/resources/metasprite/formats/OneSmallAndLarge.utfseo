@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF_8"?>
 <!DOCTYPE untech>
-<framesettype name="OneSmallAndLarge">
+<fsexportorder name="OneSmallAndLarge">
   <frame id="OneSmallObj"/>
   <frame id="OneLargeObj"/>
-</framesettype>
+</fsexportorder>

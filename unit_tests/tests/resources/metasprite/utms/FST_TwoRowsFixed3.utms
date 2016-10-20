@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF_8"?>
 <!DOCTYPE untech>
 <metasprite id="FST_TwoRowsFixed3" tilesettype="TWO_ROWS_FIXED">
-  <exportorder src="../formats/OneFrame.utft"/>
+  <exportorder src="../formats/OneFrame.utfseo"/>
   <largetileset>
     AAAAAB8AEAAQABAAHgAQAAAAAAAAAAAAAAAAAAAAAAAAAAAAPABCAEAAQABAADwA
     AAAAAAAAAAAAAAAAAAAAABAAEAAQABAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
@@ -31,15 +31,15 @@
   <palette>
     4AMjEAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=
   </palette>
-  <frame id="frame">
-    <object size="large" x="-24" y="-24" tile="0" order="2"/>
-    <object size="large" x="-8" y="-24" tile="1" order="2"/>
-    <object size="large" x="8" y="-24" tile="2" order="2"/>
-    <object size="large" x="-24" y="-8" tile="3" order="2"/>
-    <object size="large" x="-8" y="-8" tile="4" order="2"/>
-    <object size="large" x="8" y="-8" tile="5" order="2"/>
-    <object size="large" x="-24" y="8" tile="6" order="2"/>
-    <object size="large" x="-8" y="8" tile="7" order="2"/>
-    <object size="large" x="8" y="8" tile="8" order="2"/>
+  <frame id="frame" order="2">
+    <object size="large" x="-24" y="-24" tile="0"/>
+    <object size="large" x="-8" y="-24" tile="1"/>
+    <object size="large" x="8" y="-24" tile="2"/>
+    <object size="large" x="-24" y="-8" tile="3"/>
+    <object size="large" x="-8" y="-8" tile="4"/>
+    <object size="large" x="8" y="-8" tile="5"/>
+    <object size="large" x="-24" y="8" tile="6"/>
+    <object size="large" x="-8" y="8" tile="7"/>
+    <object size="large" x="8" y="8" tile="8"/>
   </frame>
 </metasprite>

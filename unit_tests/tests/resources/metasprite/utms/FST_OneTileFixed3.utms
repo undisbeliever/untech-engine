@@ -1,14 +1,14 @@
 <?xml version="1.0" encoding="UTF_8"?>
 <!DOCTYPE untech>
 <metasprite id="FST_OneTileFixed3" tilesettype="ONE_TILE_FIXED">
-  <exportorder src="../formats/OneFrame.utft"/>
+  <exportorder src="../formats/OneFrame.utfseo"/>
   <smalltileset>
     GAAYABgA/wD/ABgAGAAYAAAAAAAAAAAAAAAAAAAAAAA=
   </smalltileset>
   <palette>
     4AMjEAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=
   </palette>
-  <frame id="frame">
-    <object size="small" x="-4" y="-4" tile="0" order="2"/>
+  <frame id="frame" order="2">
+    <object size="small" x="-4" y="-4" tile="0"/>
   </frame>
 </metasprite>

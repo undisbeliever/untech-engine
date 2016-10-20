@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF_8"?>
 <!DOCTYPE untech>
-<framesettype name="TwoFrames">
+<fsexportorder name="TwoFrames">
   <frame id="frame1"/>
   <frame id="frame2"/>
-</framesettype>
+</fsexportorder>
