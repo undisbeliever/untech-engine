@@ -1,7 +1,7 @@
 
-include "entity/blank-entity.inc"
-include "entity/changetoparticle-entity.inc"
-include "entity/deleteafterdelay-entity.inc"
+include "entity/entities/blank.inc"
+include "entity/entities/changetoparticle.inc"
+include "entity/entities/deleteafterdelay.inc"
 
 include "entity/_common.inc"
 include "entity/allocation.inc"
