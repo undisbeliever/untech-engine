@@ -15,5 +15,5 @@ scope innerScope {
     allocate(dpVar1, dp, 0x80)
 }
 
-allocate(over, dp, 1)
+allocate(over, dp, 1) // ERROR
 

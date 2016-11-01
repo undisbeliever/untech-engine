@@ -31,12 +31,10 @@ static-tests: $(STATIC_TESTS)
 
 # Have to use a NULL FILE to get bass's pc() function to work
 static-tests/%.success.asm: FORCE
-	bass -strict -create -o $(NULL_FILE) $@ > $(NULL_FILE)
+	bass -strict -create -o $(NULL_FILE) $@
 
-# Have to use a NULL FILE to get bass's pc() function to work
-# ::TODO mark the error line in source and use script to verify error::
 static-tests/%.error.asm: FORCE
-	! bass -strict -create -o $(NULL_FILE) $@ > $(NULL_FILE)
+	python3 static-tests/errortest.py $@
 
 FORCE:
 

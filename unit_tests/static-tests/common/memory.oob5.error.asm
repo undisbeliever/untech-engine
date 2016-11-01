@@ -5,5 +5,5 @@ define ROM_SIZE(32)
 
 include "../../../src/common/memory.inc"
 
-createCodeBlock(code,  0x800000, 0x802000)
+createCodeBlock(code,  0x800000, 0x802000) // ERROR
 

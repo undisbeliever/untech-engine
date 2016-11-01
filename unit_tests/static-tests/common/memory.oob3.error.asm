@@ -5,5 +5,5 @@ define ROM_SIZE(16)
 
 include "../../../src/common/memory.inc"
 
-createDataBlock(data,  0xe00000, 0xe0ffff)
+createDataBlock(data,  0xe00000, 0xe0ffff) // ERROR
 

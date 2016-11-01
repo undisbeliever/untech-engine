@@ -5,5 +5,5 @@ arch snes.cpu
 include "../../../src/common/cpu.inc"
 
 sep($30)
-assert16i()
+assert16i() // ERROR
 

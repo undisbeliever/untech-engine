@@ -11,7 +11,7 @@ scope test {
 
 // Try to re-declare an enum.
 scope test {
-    createEnum()
+    createEnum() // ERROR
 
     enum(D)
     enum(E)

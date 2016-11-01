@@ -6,5 +6,5 @@ include "../../../src/common/cpu.inc"
 
 a16()
 au()
-assert16a()
+assert16a() // ERROR
 

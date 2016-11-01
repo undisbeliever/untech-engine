@@ -11,5 +11,5 @@ createDataBlock(rom1,  0xc00100, 0xc01000)
 rodata(rom0)
     fill 0x101, 0
 
-rodata(rom1)
+rodata(rom1) // ERROR
 

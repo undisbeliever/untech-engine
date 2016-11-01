@@ -18,6 +18,6 @@ scope Child1 {
 scope Child2 {
     childstruct(Base)
         field(b, 10)
-    endstruct()         // fail
+    endstruct() // ERROR
 }
 

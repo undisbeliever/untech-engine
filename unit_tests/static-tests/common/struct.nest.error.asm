@@ -6,7 +6,7 @@ scope test {
     struct()
 
     scope nest {
-        struct()
+        struct() // ERROR
 
         endstruct()
     }

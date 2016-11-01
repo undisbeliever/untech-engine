@@ -7,6 +7,6 @@ scope test {
 
     enum(A)
     enum(B)
-    enum(A)
+    enum(A) // ERROR
 }
 

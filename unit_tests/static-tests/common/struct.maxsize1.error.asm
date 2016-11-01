@@ -10,5 +10,5 @@ scope toolarge {
     field(b, 5)
     field(c, 5)
 
-    endstruct()     // fail
+    endstruct() // ERROR
 }

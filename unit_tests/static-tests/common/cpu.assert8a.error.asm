@@ -6,5 +6,5 @@ include "../../../src/common/cpu.inc"
 
 a8()
 rep($20)
-assert8a()
+assert8a() // ERROR
 

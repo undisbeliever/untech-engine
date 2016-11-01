@@ -1,4 +1,5 @@
 
+include "../../../src/common/assert.inc"
 include "../../../src/common/struct.inc"
 
 // reuse struct should error out
@@ -12,7 +13,7 @@ scope point {
 }
 
 scope point {
-    struct()
+    struct() // ERROR
 
 }
 
