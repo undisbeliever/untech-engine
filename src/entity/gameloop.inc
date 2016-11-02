@@ -319,50 +319,6 @@ macro _ProcessParticleList() {
 }
 
 
-// Process the to Delete list.
-//
-// Entities in this list will be destructed and
-// have their resources freed.
-//
-// REQUIRES: 16 bit A, 16 bit Index, DB = 0x7e
-//
-// MODIFIES: DP
-macro _ProcessToDeleteList() {
-    scope ToDelete: {
-        lda.w   lists.toDelete
-        beq     NoneToDelete
-
-        Loop:
-            tcd
-
-            MetaSprite.EntityDestructor()
-
-            ldx.b   BaseEntity.functionTable
-            jsr     (BaseEntityFunctionTable.Destructor,x)
-
-            lda.b   BaseEntity.next
-            bne     Loop
-
-
-        // Move the toDelete list into the free list
-
-        // toDelete.last->next = lists.free
-        // lists.free = lists.toDelete
-        // lists.toDelete = NULL
-
-        lda.w   lists.free
-        sta.b   BaseEntity.next
-
-        lda.w   lists.toDelete
-        sta.w   lists.free
-
-        stz.w   lists.toDelete
-
-    NoneToDelete:
-    }
-}
-
-
 
 // Processes the tryToActivateAgain entity list
 //
@@ -552,8 +508,7 @@ scope ProcessGameLoop: {
     _ProcessParticleList()
 
 
-
-    _ProcessToDeleteList()
+    _DeleteAllInList(toDelete)
 
     rts
 }
