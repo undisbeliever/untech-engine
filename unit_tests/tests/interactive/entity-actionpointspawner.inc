@@ -219,7 +219,7 @@ scope SpawnerEntity {
         dec
         bpl     SkipSpawn
 
-            assert(N_SPAWN_POINTS & (N_SPAWN_POINTS - 1) == 0)
+            assertPowerOfTwo(N_SPAWN_POINTS)
 
             lda.b   EntityStruct.spawnPoint
             inc

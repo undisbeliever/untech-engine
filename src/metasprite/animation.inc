@@ -160,7 +160,8 @@ scope ResumeTable: {
 constant size(pc() - ResumeTable)
 }
 // Ensure that table contains a power of 2 addresses
-assert(ResumeTable.size & (ResumeTable.size - 1) == 0)
+assertPowerOfTwo(ResumeTable.size)
+assert(ResumeTable.size > 2)
 assert(StartTable.size == ResumeTable.size)
 constant MASK(ResumeTable.size - 2)
 

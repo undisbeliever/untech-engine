@@ -2,9 +2,8 @@
 scope Entity {
     assert(N_ENTITIES >= 10)
 
-    // assert ENTITY_SIZE is a power of 2
     assert(ENTITY_SIZE > 0)
-    assert(ENTITY_SIZE & (ENTITY_SIZE - 1) == 0)
+    assertPowerOfTwo(ENTITY_SIZE)
 
     allocate(entityPool, entityBlock, ENTITY_SIZE * N_ENTITIES)
 
