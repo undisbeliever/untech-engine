@@ -19,7 +19,7 @@ allocateTmpWord(tmp_count)
     // A = entity Id
 
     ldx.w   Entity.lists.enemies
-    beq     EmptyList:
+    beq     EmptyList
 
     stz.w   tmp_count
 
@@ -41,6 +41,8 @@ EmptyList:
     rts
 }
 
+
+
 // Counts the number of enemy entities active
 //
 // REQUIRES: 16 bit A, 16 bit Index, DB = 0x7e
@@ -52,7 +54,7 @@ code()
 scope CountActiveEnemies: {
     lda.w   #0
     ldx.w   lists.enemies
-    beq     EndLoop:
+    beq     EndLoop
 
     Loop:
         inc
