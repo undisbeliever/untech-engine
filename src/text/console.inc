@@ -306,6 +306,21 @@ a8()
     rts
 }
 
+
+// Prints an unsigned 16 bit integer to buffer
+//
+// REQUIRES: 16 bit Index, 16 bit A
+//
+// INPUT: A - uint16 number to print
+a16()
+i16()
+code()
+// DP, DB unknown
+scope PrintU16A: {
+    tay
+FallThrough:
+}
+
 // Prints an unsigned 16 bit integer to buffer
 //
 // REQUIRES: 16 bit Index
@@ -315,6 +330,8 @@ code()
 i16()
 // P, DP, DB unknown
 scope PrintU16Y: {
+    assert(pc() == PrintU16A.FallThrough)
+
     php
     phb
     phd

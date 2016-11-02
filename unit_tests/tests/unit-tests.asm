@@ -100,6 +100,7 @@ include "tests/metasprite.inc"
 include "tests/text.inc"
 
 include "interactive/entity-metasprite.inc"
+include "interactive/entity-actionpointspawner.inc"
 
 Test.finalizeTable()
 

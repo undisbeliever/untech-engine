@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF_8"?>
+<!DOCTYPE untech>
+<metasprite id="ActionPointSpawner" tilesettype="ONE_TILE_FIXED">
+  <exportorder src="../formats/OneFrame.utfseo"/>
+  <largetileset>
+    AAAAAAAAAAADAAQDCAcIBwAAAAAAAAAAAAAAAAAAAAADAAYBBAMEAwQDhANEgyTD
+    AAAAAAAAAAAAAAAAAAAAAAQDAgEBAAAAAAB/AIB/gH8AAAAAAAAAAAAAAAAAAAAA
+    FOMM8wT7gH9AP+AfAP8A/wAAAAAAAAAAAAAAAAAAAAA=
+  </largetileset>
+  <palette>
+    jEJECK5hAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=
+  </palette>
+  <frame id="frame" order="2">
+    <object size="large" x="-16" y="-16" tile="0"/>
+    <object size="large" x="0" y="-16" tile="0" hflip="true"/>
+    <object size="large" x="-16" y="0" tile="0" vflip="true"/>
+    <object size="large" x="0" y="0" tile="0" hflip="true" vflip="true"/>
+    <actionpoint parameter="1" x="0" y="-15"/>
+    <actionpoint parameter="2" x="10" y="-10"/>
+    <actionpoint parameter="3" x="15" y="0"/>
+    <actionpoint parameter="4" x="10" y="10"/>
+    <actionpoint parameter="5" x="0" y="15"/>
+    <actionpoint parameter="6" x="-10" y="10"/>
+    <actionpoint parameter="7" x="-15" y="0"/>
+    <actionpoint parameter="8" x="-10" y="-10"/>
+  </frame>
+</metasprite>

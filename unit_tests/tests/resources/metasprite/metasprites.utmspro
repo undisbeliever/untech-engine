@@ -36,4 +36,8 @@
   <frameset src="utsi/FST_TwoRows.utsi"/>
 
   <frameset src="utms/FST_Animations.utms"/>
+
+  <!-- INTERACTIVE -->
+  <frameset src="utms/Projectile.utms"/>
+  <frameset src="utms/ActionPointSpawner.utms"/>
 </metaspriteproject>
