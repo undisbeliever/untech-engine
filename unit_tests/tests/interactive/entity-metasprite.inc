@@ -6,7 +6,7 @@ scope ShowAllFramesEntity {
     buildFunctionTable(BaseEntityFunctionTable, ShowAllFramesEntity)
     Entity.useDefaultRenderer()
 
-    scope EntityStruct: {
+    scope EntityStruct {
         childstruct(BaseEntity)
             field(frameId, 2)
             field(frameCount, 2)
@@ -156,49 +156,7 @@ Test.add("Entity/MetaSprite Test")
 scope Test: {
 constant tmp_index(Test.tmp)
 
-    // Setup The screen
-    // ----------------
-    pea     (0x7e << 8) | REGISTER_DB
-    plb
-// DB = REGISTER_DB
-
-    sep     #$20
-a8()
-    lda.b   #INIDISP.force
-    sta.w   INIDISP
-
-    assert(VRAM_OBJ_WADDR % OBSEL.base.walign == 0)
-
-    lda.b   #(VRAM_OBJ_WADDR / OBSEL.base.walign) | OBSEL.size.s8_16
-    sta.w   OBSEL
-
-    lda.b   #TM.bg1 | TM.obj
-    sta.w   TM
-
-    jsr     EnableVBlank
-
-    lda.b   #15
-    sta.w   INIDISP
-
-    rep     #$30
-a16()
-    plb
-// DB = 0x7e
-
-
-    // Setup the modules
-    // -----------------
-    jsr     Entity.Init
-
-
-    // Wait for button release
-    // -----------------------
-    WaitButtonRelease:
-        jsr     WaitFrame
-
-        lda.l   JOY1
-        and.w   #JOY.buttons
-        bne     WaitButtonRelease
+    jsr     EntityLoop.Init
 
 
     // Load the entities
@@ -231,31 +189,7 @@ a16()
         bcc     Loop
 
 
-    // Process the entities
-    // --------------------
-    GameLoop:
-        jsr     MetaSprite.Render.InitLoop
-
-        jsr     Entity.ProcessGameLoop
-        jsr     Entity.RenderLoop
-
-        jsr     MetaSprite.Render.EndLoop
-
-        jsr     Dma.TransferOnNextVBlank
-        jsr     WaitFrame
-
-        lda.l   JOY1
-        and.w   #JOY.buttons
-        bne     EndGameLoop
-
-        bra     GameLoop
-
-
-EndGameLoop:
-    jsr     Test.ResetPpuState
-
-    sec
-    rts
+    jmp     EntityLoop.ProcessUntilButtonPress
 
 Fail:
     clc

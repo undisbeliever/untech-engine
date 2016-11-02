@@ -82,6 +82,7 @@ scope EntityPool {
 }
 
 include "includes/test-framework.inc"
+include "includes/entityloop.inc"
 
 // A simple test that always succeeds
 code()
