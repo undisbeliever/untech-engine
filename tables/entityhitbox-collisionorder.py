@@ -24,7 +24,7 @@ def main():
 
     print("scope Tables {")
     print("scope EntityHitbox {")
-    print("constant MAX_INNER_HITBOXES (", MAX_INNER_HITBOXES, ")", sep="")
+    print("constant MAX_INNER_HITBOXES(", MAX_INNER_HITBOXES, ")", sep="")
 
     print("rodata(rom0)")
     print("scope CollisionOrder: {")

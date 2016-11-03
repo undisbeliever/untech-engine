@@ -98,7 +98,7 @@ scope TestBase {
 scope TestBaseWithOffset {
     // test struct inheritance.
     scope Base {
-        basestruct-offset(OffsetBase, 0x100)
+        basestruct_offset(OffsetBase, 0x100)
             field(a, 3)
         endstruct()
     }

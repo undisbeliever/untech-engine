@@ -55,7 +55,7 @@ macro struct() {
     struct(0)
 }
 
-macro basestruct-offset(name, evaluate start) {
+macro basestruct_offset(name, evaluate start) {
     if {defined ::struct.bases.{name}.size} {
         error "basestruct {name} already exists."
     }
@@ -69,7 +69,7 @@ macro basestruct-offset(name, evaluate start) {
     global evaluate ::struct.bases.{name}.size(0)
 }
 macro basestruct(name) {
-    basestruct-offset({name}, 0)
+    basestruct_offset({name}, 0)
 }
 
 macro basestruct(name, parent) {
