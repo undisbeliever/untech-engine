@@ -14,7 +14,7 @@ evaluate ::nTests(0)
 
 scope Test {
 
-constant TESTING_COLOR((22 << Palette.green.shift) | (20 << Palette.red.shift))
+constant TESTING_COLOR(0x7fff)
 constant SUCCESS_COLOR(22 << Palette.green.shift)
 constant FAILURE_COLOR(20 << Palette.red.shift)
 
