@@ -529,6 +529,10 @@ AfterSetBank:
 
 
 // Prints a new line
+//
+// Shifts the cursor to the start of the next line and clears it.
+//
+// REQUIRES: None
 au()
 iu()
 code()
@@ -566,19 +570,20 @@ i16()
         lda.w   #MARGIN_TOP * BUFFER_WIDTH + MARGIN_LEFT
     +
     sta.l   bufferPos
+    tax
 
     clc
     adc.w   #MARGIN_RIGHT - MARGIN_LEFT
     sta.l   bufferEndLinePos
 
 
-    // Empty the next line
+    // Clear the next line
+    // x = bufferPos (start of line)
 
     assert(BUFFER_WIDTH % 2 == 0)
 
     lda.w   #0
     ldy.w   #BUFFER_WIDTH / 2
-    ldx.w   bufferPos
 
     Loop:
         sta.l   buffer,x
