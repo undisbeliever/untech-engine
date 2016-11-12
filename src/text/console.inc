@@ -35,6 +35,39 @@ constant bufferEndLinePos(Text.vars + 2)
 assert(Text.vars.size >= 4)
 
 
+// The ROM data block to store constant strings in
+// SEE: PrintConstString
+if !{defined Text.Console.StringBlock} {
+    define StringBlock(rom0)
+}
+
+// Prints a constant string to the console.
+//
+// The string will be inserted into the ROM Block inside the variable
+// StringBlock.
+//
+// REQUIRES: 16 bit Index
+macro PrintConstString(s) {
+    assert16i()
+
+    pushBlock()
+        rodata({Text.Console.StringBlock})
+        String{#}:
+            db  {s}, 0
+    popBlock()
+
+    ldx.w   #String{#}
+    if ({::cpu.aSize} == 8) {
+        lda.b   #String{#} >> 16
+    } else if {::cpu.aSize} == 16 {
+        lda.w   #String{#} >> 16
+    } else {
+        error "Unknown A size"
+    }
+    jsr     Text.Console.PrintString
+}
+
+
 // Sets the console cursor to a fixed location
 //
 // REQUIRES: 16 bit Index, DB access shadow

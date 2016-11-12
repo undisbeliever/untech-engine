@@ -209,9 +209,7 @@ i16()
     ldy.w   testId
     jsr     Text.Console.PrintU16Y
 
-    ldx.w   #Strings.Passed
-    lda.b   #Strings.Passed >> 16
-    jsr     Text.Console.PrintString
+    Text.Console.PrintConstString(" tests passed")
 
     lda.b   #15
     sta.w   INIDISP
@@ -264,9 +262,7 @@ i16()
     // Print Failed message
     // --------------------
 
-    ldx.w   #Strings.Failed
-    lda.b   #Strings.Failed >> 16
-    jsr     Text.Console.PrintString
+    Text.Console.PrintConstString(" FAILED")
 
     jsr     Text.Console.NewLine
     jsr     Text.Console.NewLine
@@ -367,27 +363,11 @@ i16()
     plb
 // DB = 0x7e
 
-    ldx.w   #Strings.Header
-    lda.b   #Strings.Header >> 16
-    jsr     Text.Console.PrintString
+    Text.Console.PrintConstString("UnTech Unit Tests:")
 
     plp
     sec
     rts
-}
-
-
-rodata(rom0)
-scope Strings {
-
-    Header:
-        db  "UnTech Unit Tests:", 0
-
-    Passed:
-        db  " tests passed", 0
-
-    Failed:
-        db  " FAILED", 0
 }
 
 }

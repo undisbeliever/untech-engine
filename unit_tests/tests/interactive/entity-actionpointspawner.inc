@@ -277,27 +277,21 @@ macro PrintListSizes() {
     Text.Console.SetCursor(0, 20)
     jsr     Text.Console.NewLine
 
-    ldx.w   #PlayerProjectilesString
-    lda.w   #PlayerProjectilesString >> 16
-    jsr     Text.Console.PrintString
+    Text.Console.PrintConstString("Player Projectiles: ")
 
     Entity.CountEntitiesInList(playerProjectiles)
     jsr     Text.Console.PrintU16A
 
     jsr     Text.Console.NewLine
 
-    ldx.w   #EnemyProjectilesString
-    lda.w   #EnemyProjectilesString >> 16
-    jsr     Text.Console.PrintString
+    Text.Console.PrintConstString("Enemy Projectiles:  ")
 
     Entity.CountEntitiesInList(enemyProjectiles)
     jsr     Text.Console.PrintU16A
 
     jsr     Text.Console.NewLine
 
-    ldx.w   #NpcsString
-    lda.w   #NpcsString >> 16
-    jsr     Text.Console.PrintString
+    Text.Console.PrintConstString("NPC Entities:       ")
 
     Entity.CountEntitiesInList(npcs)
     jsr     Text.Console.PrintU16A
@@ -308,7 +302,7 @@ macro PrintListSizes() {
 a16()
 i16()
 code()
-Test.add("Spawn At Action Point Tests")
+Test.add("Spawn At Action Point Test")
 scope Test: {
     jsr     EntityLoop.Init
 
@@ -349,17 +343,6 @@ Fail:
     clc
     rts
 }
-
-
-rodata(rom0)
-PlayerProjectilesString:
-    db "Player Projectiles: ", 0
-
-EnemyProjectilesString:
-    db "Enemy Projectiles:  ", 0
-
-NpcsString:
-    db "NPC Entities:       ", 0
 
 }
 }
