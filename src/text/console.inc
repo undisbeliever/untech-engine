@@ -9,7 +9,7 @@ scope Console {
     constant BUFFER_WIDTH(32)
     constant BUFFER_HEIGHT(28)
 
-    constant MARGIN_LEFT(3)
+    constant MARGIN_LEFT(2)
     constant MARGIN_TOP(2)
 
     constant MARGIN_RIGHT(BUFFER_WIDTH - MARGIN_LEFT)
