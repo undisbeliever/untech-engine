@@ -85,6 +85,8 @@ include "includes/test-framework.inc"
 include "includes/entityloop.inc"
 
 // A simple test that always succeeds
+a16()
+i16()
 code()
 Test.add("Success Test")
 scope SuccessTest: {
@@ -104,6 +106,8 @@ include "interactive/entity-actionpointspawner.inc"
 
 Test.finalizeTable()
 
+au()
+iu()
 code(code)
 CopHandler:
 IrqHandler:

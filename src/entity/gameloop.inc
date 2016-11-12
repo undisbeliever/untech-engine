@@ -328,9 +328,6 @@ macro _ProcessParticleList() {
 // REQUIRES: 16 bit A, 16 bit Index, DB = 0x7e
 //
 // MODIFIES: DP
-a16()
-i16()
-code()
 macro _ProcessTryToActivateAgainList() {
     assert16a()
     assert16i()
@@ -406,10 +403,9 @@ macro _ProcessTryToActivateAgainList() {
 // REQUIRES: 16 bit A, 16 bit Index, DB = 0x7e
 //
 // MODIFIES: DP
-a16()
-i16()
-code()
 macro _ProcessActiveWindow() {
+    assert16a()
+    assert16i()
 
     scope ProcessActiveWindow: {
         lda.w   Camera.xPos

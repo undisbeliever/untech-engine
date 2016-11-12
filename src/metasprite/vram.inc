@@ -147,9 +147,9 @@ macro _Activate() {
 // REQUIRES: 8 bit A, 8 bit Index, DB = 0x7e
 // INPUT: DP = entity
 // INPUT: A = `BaseEntity.MetaSprite.status >> 1`
-code()
 a8()
 i8()
+code()
 scope _DeallocateSlot_A: {
     macro _RemoveSlot(freeSlotPool, oneSlotPool, twoSlotPool) {
         assert8a()
@@ -261,9 +261,9 @@ UpdateStatus:
 //
 // INPUT: DP: Entity
 // OUTPUT: C set if tileset uploads successfully
-code()
 a16()
 i16()
+code()
 scope _UploadDynamicTileset: {
     ldx.b   BaseEntity.MetaSprite.currentFrame
     beq     ReturnTrue
@@ -376,7 +376,7 @@ scope _ActivateFixed {
     macro Process(name, freeSlotPool, usedSlotPool, nSlots, uploadRoutine) {
         a16()
         i16()
-
+        code()
         scope {name}: {
             lda.w   tilesetAddr
 
@@ -586,9 +586,9 @@ scope _ActivateFixed {
     // OUTPUT: C set
     // RETURN: Jump to Return
     // MODIFIES: register size
-    code()
     a8()
     i8()
+    code()
     scope SetState_OneSlot: {
         assert(MetaSprite.StatusFlags.paletteSet == 0x80)
 
@@ -623,9 +623,9 @@ scope _ActivateFixed {
     // OUTPUT: C set
     // RETURN: Jump to Return
     // MODIFIES: register size
-    code()
     a8()
     i8()
+    code()
     scope SetState_TwoSlots: {
         assert(MetaSprite.StatusFlags.paletteSet == 0x80)
 
@@ -723,7 +723,7 @@ scope _AllocateDynamic {
     macro Process_Single(name, freeSlotPool) {
         a16()
         i16()
-
+        code()
         scope {name}: {
             sep     #$10
         i8()
@@ -820,7 +820,7 @@ scope _AllocateDynamic {
     macro Process_Dual(name, freeSlotPool) {
         a16()
         i16()
-
+        code()
         scope {name}: {
             sep     #$10
         i8()
@@ -851,9 +851,9 @@ scope _AllocateDynamic {
     Process_Dual(TwoTiles, freeTiles)
 
 
-    code()
     a8()
     i8()
+    code()
     scope Finalize_Dual: {
         lda.b   #1
         sta.w   slots.count,x

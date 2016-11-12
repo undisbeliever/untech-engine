@@ -248,7 +248,7 @@ scope FunctionTable: {
     macro ProcessTiles(evaluate nTiles) {
         a16()
         i8()
-
+        code()
         scope Transfer{nTiles}: {
             if {nTiles} < 8 {
                 pha
@@ -299,7 +299,7 @@ scope FunctionTable: {
 
 // Buffers one 16x16px tile from a tile list
 //
-// REQUIRES: 8 bit A, 16 bit Index, DB = $7E
+// REQUIRES: DB = $7E
 //
 // ASSUMES: The number of tiles in the list is 1
 //          Will always transfer one tile
@@ -312,6 +312,8 @@ scope FunctionTable: {
 //
 // OUTPUT: C set if successful
 // OUTPUT: Changes register size to 8 bit A, 16 bit Index
+au()
+iu()
 code()
 scope BufferOneTileFromList: {
     rep     #$30
@@ -397,7 +399,7 @@ Fail:
 //
 // NOTE: Will transfer a MAXIMUM of 2 tiles.
 //
-// REQUIRES: 8 bit A, 16 bit Index, DB = $7E
+// REQUIRES: DB = $7E
 //
 // INPUT:
 //      tileListAddr - the address of the tile list (within `TileListBank`)
@@ -406,9 +408,9 @@ Fail:
 //
 // OUTPUT: C set if successful
 // OUTPUT: Changes register size to 8 bit A, 16 bit Index
+au()
+iu()
 code()
-a8()
-i16()
 scope BufferTwoTilesFromList: {
 constant Fail(BufferOneTileFromList.Fail)
     rep     #$30
@@ -517,7 +519,7 @@ a8()
 //
 // NOTE: Will transfer a MAXIMUM of 8 tiles
 //
-// REQUIRES: 8 bit A, 16 bit Index, DB = $7E
+// REQUIRES: DB = $7E
 //
 // INPUT:
 //      tileListAddr - the address of the tile list (within `TileListBank`)
@@ -525,6 +527,8 @@ a8()
 //
 // OUTPUT: C set if successful
 // OUTPUT: Changes register size to 8 bit A, 16 bit Index
+au()
+iu()
 code()
 scope BufferOneRowFromList: {
 constant tmp_nTiles(tmp0)
@@ -634,7 +638,7 @@ Fail:
 //
 // NOTE: Will transfer a MAXIMUM of 16 tiles
 //
-// REQUIRES: 8 bit A, 16 bit Index, DB = $7E
+// REQUITES: DB = $7E
 //
 // INPUT:
 //      tileListAddr - the address of the tile list (within `TileListBank`)
@@ -643,6 +647,8 @@ Fail:
 //
 // OUTPUT: C set if successful
 // OUTPUT: Changes register size to 8 bit A, 16 bit Index
+au()
+iu()
 code()
 scope BufferTwoRowsFromList: {
 constant tmp_nTiles(BufferOneRowFromList.tmp_nTiles)

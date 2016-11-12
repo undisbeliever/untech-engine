@@ -3,9 +3,9 @@ scope DmaTest {
 
 scope Palette {
 
-code()
 a16()
 i16()
+code()
 Test.add("Dma.Palette.MarkDirty(all)")
 scope MarkDirtyTest_all: {
     jsr     Dma.Init
@@ -74,9 +74,9 @@ Fail:
 }
 
 
-code()
 a16()
 i16()
+code()
 Test.add("Dma.Palette.MarkDirty(tiles)")
 scope MarkDirtyTest_tiles: {
     jsr     Dma.Init
@@ -143,9 +143,9 @@ Fail:
 
 
 
-code()
 a16()
 i16()
+code()
 Test.add("Dma.Palette.MarkDirty(objects)")
 scope MarkDirtyTest_objects: {
     jsr     Dma.Init
@@ -220,6 +220,7 @@ Fail:
 // RETURN: Carry set if CGRAM OK
 a8()
 i16()
+code()
 scope _CheckCgram: {
     allocateTmpWord(tmp)
 

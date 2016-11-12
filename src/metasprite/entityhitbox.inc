@@ -60,6 +60,9 @@ Skip{#}:
 // KEEP: X, Y
 // BRANCH: to NoHitbox is there is no metasprite entityhitbox
 macro _SetupOuterAabb(aabb) {
+    assert16a()
+    assert16i()
+
     lda.l   Format.EntityHitbox.Outer.xOffset,x
     and.w   #0xff
     clc
@@ -91,6 +94,9 @@ macro _SetupOuterAabb(aabb) {
 // KEEP: X, Y
 // BRANCH: to `noCollision` if there is no collision
 macro _BranchIfNoOuterCollision(aabb, NoCollision) {
+    assert16a()
+    assert16i()
+
     // x coordinate more likely to miss
 
     scope {#} {
@@ -146,6 +152,9 @@ macro _BranchIfNoOuterCollision(aabb, NoCollision) {
 // KEEP: X, Y
 // BRANCH: to `Collision` if there is a collision
 macro _BranchOnInnerCollision(aabb, Collision) {
+    assert16a()
+    assert16i()
+
     // x coordinate more likely to miss
 
     scope {#} {

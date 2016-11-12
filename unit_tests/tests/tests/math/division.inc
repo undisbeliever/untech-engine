@@ -1,9 +1,9 @@
 
 scope MathTest {
 
-code()
 a16()
 i16()
+code()
 Test.add("Divide.u16y_u8a")
 scope Divide.u16y_u8a: {
     TableLoop(Table, 7)
@@ -48,9 +48,9 @@ End:
 
 
 
-code()
 a16()
 i16()
+code()
 Test.add("Divide.u16y_s16x")
 scope Divide.u16y_s16x: {
     TableLoop(Table, 8)
@@ -98,9 +98,9 @@ End:
 
 
 
-code()
 a16()
 i16()
+code()
 Test.add("Divide.s16y_s16x")
 scope Divide.s16y_s16x: {
     TableLoop(Table, 8)
@@ -150,9 +150,9 @@ End:
 
 
 
-code()
 a16()
 i16()
+code()
 Test.add("Divide.s16y_u16x")
 scope Divide.s16y_u16x: {
     TableLoop(Table, 8)
@@ -201,9 +201,9 @@ End:
 
 
 
-code()
 a16()
 i16()
+code()
 Test.add("Divide.u16y_u16x")
 scope Divide.u16y_u16x: {
     TableLoop(Table, 8)
@@ -244,9 +244,9 @@ End:
 
 
 
-code()
 a16()
 i16()
+code()
 Test.add("Divide.s32_s32")
 scope Divide.s32_s32: {
     TableLoop(Table, 16)
@@ -315,9 +315,9 @@ End:
 
 
 
-code()
 a16()
 i16()
+code()
 Test.add("Divide.u32_u32")
 scope Divide.u32_u32: {
     TableLoop(Table, 16)
@@ -376,9 +376,9 @@ End:
 
 
 
-code()
 a16()
 i16()
+code()
 Test.add("Divide.u32_u8a")
 scope Divide.u32_u8a: {
     TableLoop(Table, 10)

@@ -1,9 +1,9 @@
 
 scope MathTest {
 
-code()
 a16()
 i16()
+code()
 Test.add("Multiply.u8y_u8x_y")
 scope Multiply.u8y_u8x_y: {
     TableLoop(Table, 4)
@@ -37,9 +37,9 @@ End:
 
 
 
-code()
 a16()
 i16()
+code()
 Test.add("Multiply.16y_u8a_16y")
 scope Multiply.16y_u8a_16y: {
     TableLoop(Table, 5)
@@ -89,9 +89,9 @@ End:
 
 
 
-code()
 a16()
 i16()
+code()
 Test.add("Multiply.u16y_u8a_u32xy")
 scope Multiply.u16y_u8a_u32xy: {
     TableLoop(Table, 7)
@@ -142,9 +142,9 @@ End:
 
 
 
-code()
 a16()
 i16()
+code()
 Test.add("Multiply.16y_16x_16y")
 scope Multiply.16y_16x_16y: {
     TableLoop(Table, 6)
@@ -194,9 +194,9 @@ End:
 
 
 
-code()
 a16()
 i16()
+code()
 Test.add("Multiply.u16y_u16x_u32xy")
 scope Multiply.u16y_u16x_u32xy: {
     TableLoop(Table, 8)
@@ -242,9 +242,9 @@ End:
 
 
 
-code()
 a16()
 i16()
+code()
 Test.add("Multiply.s16y_s16x_s32xy")
 scope Multiply.s16y_s16x_s32xy: {
 
@@ -298,9 +298,9 @@ End:
 
 
 
-code()
 a16()
 i16()
+code()
 Test.add("Multiply.u32_32xy_32xy")
 scope Multiply.u32_32xy_32xy: {
 
@@ -368,9 +368,9 @@ End:
 
 
 
-code()
 a16()
 i16()
+code()
 Test.add("Multiply.32xy_u8a_32xy")
 scope Multiply.32_u8a_32xy: {
 

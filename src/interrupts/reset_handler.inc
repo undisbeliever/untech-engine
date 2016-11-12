@@ -13,6 +13,8 @@
 
 arch snes.cpu
 
+au()
+iu()
 code()
 
 // ensure ResetHandler is accessible by interrupt vectors
@@ -99,6 +101,9 @@ a8()
 // Moves all of the OAM sprites offscreen.
 //
 // REQUIRES: none
+au()
+iu()
+code()
 scope ClearVramOamAndCgram: {
     php
     phd
@@ -176,6 +181,9 @@ i8()
 // Reset the registers to a good initial state.
 //
 // REQUIRES: Requires 6 bytes of stack space
+au()
+iu()
+code()
 scope ResetRegisters: {
     php
     phd

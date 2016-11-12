@@ -13,6 +13,8 @@ constant TABLE_MASK(Format.EntityHitboxType._TABLE_MASK)
 // INPUT: DP = first entity
 //         Y = second entity
 // MODIFIES: DP
+a16()
+i16()
 code()
 scope FunctionTable: {
     macro _repeatNull(evaluate n) {

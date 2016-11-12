@@ -5,9 +5,9 @@ scope Animation {
 allocateTmpWord(tmp0)
 allocateTmpWord(tmp1)
 
-code()
 a16()
 i16()
+code()
 Test.add("MetaSprite.Animation.Process (STOP)")
 scope Process_STOP: {
     lda.w   #MSEO.AnimationTest.Animations.Stop
@@ -28,9 +28,9 @@ Fail:
     rts
 }
 
-code()
 a16()
 i16()
+code()
 Test.add("MetaSprite.Animation.Process (GOTO_ANIMATION)")
 scope Process_GOTO_ANIMATION: {
 constant tmp_pc(tmp0)
@@ -65,9 +65,9 @@ Fail:
 }
 
 
-code()
 a16()
 i16()
+code()
 Test.add("MetaSprite.Animation.Process (GOTO_OFFSET)")
 scope Process_GOTO_OFFSET: {
     // The animation data contains many jumps that eventually
@@ -91,9 +91,9 @@ Fail:
 }
 
 
-code()
 a16()
 i16()
+code()
 Test.add("MetaSprite.Animation.Process (SET_FRAME_AND_WAIT_FRAMES)")
 scope Process_SET_FRAME_AND_WAIT_FRAMES: {
 constant tmp_frame(tmp0)
@@ -131,9 +131,9 @@ Fail:
 }
 
 
-code()
 a16()
 i16()
+code()
 Test.add("MetaSprite.Animation.Process (SET_FRAME_AND_WAIT_TIME)")
 scope Process_SET_FRAME_AND_WAIT_TIME: {
 constant tmp_frame(tmp0)
@@ -181,9 +181,9 @@ Fail:
 }
 
 
-code()
 a16()
 i16()
+code()
 Test.add("MetaSprite.Animation.Process (SET_FRAME_AND_WAIT_*VECL)")
 scope Process_SET_FRAME_AND_WAIT_VECL: {
 constant tmp_frame(tmp0)
@@ -260,9 +260,9 @@ Fail:
 // INPUT:  A = Animation Id
 // OUTPUT: DP = Entity address
 // OUTPUT: C set on success
-code()
 a16()
 i16()
+code()
 scope _Init: {
 constant tmp_animation(Test.tmp)
 

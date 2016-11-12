@@ -8,9 +8,9 @@ scope Palette {
 
 allocateTmpWord(tmp0)
 
-code()
 a16()
 i16()
+code()
 Test.add("MetaSprite.Palette.Activate")
 scope Activate: {
 constant tmp_paletteBits(tmp0)
@@ -120,9 +120,9 @@ Fail:
 }
 
 
-code()
 a16()
 i16()
+code()
 Test.add("MetaSprite.Palette.SetPalette")
 scope SetPalette: {
 constant tmp_paletteBits(tmp0)
@@ -214,9 +214,9 @@ Fail:
 }
 
 
-code()
 a16()
 i16()
+code()
 Test.add("MetaSprite.Palette.Deactivate")
 scope Deactivate: {
     jsr     _Init_8Palettes
@@ -281,6 +281,7 @@ scope Deactivate_List_Last: {
     bra     _DeactivateAndTestList_A
 }
 
+
 // IN: A = entity to remove
 a16()
 i16()
@@ -310,9 +311,9 @@ Fail:
 }
 
 
-code()
 a16()
 i16()
+code()
 Test.add("MetaSprite.Palette.Overflow")
 scope Overflow: {
     jsr     _Init_8Palettes
@@ -398,9 +399,9 @@ Fail:
 
 // Initializes the MetaSprite Engine and
 // creates entities 0 - 7, using palettes 0 - 7
-code()
 a16()
 i16()
+code()
 scope _Init_8Palettes: {
     constant tmp_palleteId(tmp0)
 
@@ -438,6 +439,8 @@ Return:
 // Loops through the used palette slot list,
 // verifies the prev/next pointers match.
 // This routine will loop forever if there is a circular reference
+au()
+iu()
 code()
 scope _ValidateUsedSlotList: {
     php

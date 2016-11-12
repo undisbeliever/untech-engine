@@ -20,9 +20,9 @@ allocateTmpWord(tmp0)
 
 
 macro _ActivateFixedTest(FrameSet, nSlots) {
-    code()
     a16()
     i16()
+    code()
     Test.add("MetaSprite.Vram.Activate ({FrameSet})")
     scope Activate_{FrameSet}: {
         jsr     _Init_MetaSpriteModule
@@ -94,9 +94,9 @@ _ActivateFixedTest(FST_TwoRowsFixed, 2)
 
 
 macro _ActivateDynamicTest(FrameSet, nSlots) {
-    code()
     a16()
     i16()
+    code()
     Test.add("MetaSprite.Vram.Activate ({FrameSet})")
     scope Activate_{FrameSet}: {
         jsr     _Init_MetaSpriteModule
@@ -178,9 +178,9 @@ _ActivateDynamicTest(FST_TwoRows, 2)
 
 
 macro _DeallocateTest(type) {
-    code()
     a16()
     i16()
+    code()
     Test.add("MetaSprite.Vram.Deallocate ({type})")
     scope Deallocate_{type}: {
         jsr     _Init_Fill{type}
@@ -308,9 +308,9 @@ _DeallocateTest(Row)
 // and validate linked list is setup correctly
 macro _DeallocateAndTestListTest(type) {
     // IN: A = entity to delete
-    code()
     a16()
     i16()
+    code()
     scope _DeallocateAndTestList_{type}: {
     constant tmp_entityToRemove(tmp0)
 
@@ -356,27 +356,27 @@ macro _DeallocateAndTestListTest(type) {
         rts
     }
 
-    code()
     a16()
     i16()
+    code()
     Test.add("MetaSprite.Vram.DeallocateAndTestList ({type}, First)")
     scope DeallocateAndTestList_{type}_First: {
         lda.w   #EntityPool.entity0
         jmp     _DeallocateAndTestList_{type}
     }
 
-    code()
     a16()
     i16()
+    code()
     Test.add("MetaSprite.Vram.DeallocateAndTestList ({type}, Middle)")
     scope DeallocateAndTestList_{type}_Middle: {
         lda.w   #EntityPool.entity1
         jmp     _DeallocateAndTestList_{type}
     }
 
-    code()
     a16()
     i16()
+    code()
     Test.add("MetaSprite.Vram.DeallocateAndTestList ({type}, Last)")
     scope DeallocateAndTestList_{type}_Last: {
         lda.w   #EntityPool.entity2
@@ -390,9 +390,9 @@ _DeallocateAndTestListTest(TwoRows)
 
 
 macro _ReferenceCountTest(type) {
-    code()
     a16()
     i16()
+    code()
     Test.add("MetaSprite.Vram - ReferenceCount ({type})")
     scope ReferenceCount_{type}: {
         jsr     _Init_Fill{type}
@@ -503,9 +503,9 @@ _ReferenceCountTest(Row)
 // There is a bug that prevents the third fixed VRAM slot from
 // buffering the tiles correctly.
 macro _ActivateThirdFixedSlot(name, FrameSet1, FrameSet2, FrameSet3) {
-    code()
     a16()
     i16()
+    code()
     Test.add("MetaSprite.Vram.ActivateThirdSlot ({name})")
     scope ActivateThirdFixedSlot_{name}: {
         jsr     _Init_MetaSpriteModule
@@ -571,9 +571,9 @@ _ActivateThirdFixedSlot(TwoRows, FST_TwoRowsFixed, FST_TwoRowsFixed2, FST_TwoRow
 // Entity 2 uses a single dynamic slot
 // Entities 3-(8/9) uses two dynamic slots
 macro __Init_Fill(type, nSlots) {
-    code()
     a16()
     i16()
+    code()
     scope _Init_Fill{type}: {
         jsr     _Init_MetaSpriteModule
 
@@ -627,6 +627,8 @@ __Init_Fill(Row, MetaSprite.Vram.VRAM_ROW_SLOTS)
 // Loops through the used vram slots lists,
 // verifies the prev/next pointers match.
 // This routine will loop forever if there is a circular reference
+au()
+iu()
 code()
 scope _ValidateUsedSlotLists: {
     macro Test(list) {

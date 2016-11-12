@@ -6,6 +6,8 @@ scope MetaSprite {
 // This MUST be called before using this module.
 //
 // REQUIRES: 16 bit A, 16 bit Index, DB = $7E
+a16()
+i16()
 code()
 scope Init: {
     MetaSprite.Render._Init()
@@ -33,6 +35,8 @@ i16()
 // INPUT: DP = Entity address
 // INPUT:  A = frameSet Id
 // INPUT:  Y = palette Id
+a16()
+i16()
 code()
 macro _InitEntity() {
     assert16a()
@@ -94,9 +98,9 @@ macro EntityDestructor() {
 //
 // INPUT: DP = Entity
 // OUTPUT: C set if successful
-code()
 a16()
 i16()
+code()
 scope Activate: {
     ldx.b   BaseEntity.MetaSprite.frameSet
     beq     Return
@@ -128,9 +132,9 @@ Return:
 // REQUIRES: 16 bit A, 16 bit Index, DB = $7E
 //
 // INPUT: DP = Entity
-code()
 a16()
 i16()
+code()
 scope Deactivate: {
     sep     #$30
 a8()
@@ -173,9 +177,9 @@ constant SetAnimation(Animation.SetAnimationId)
 // INPUT: DP = Entity
 // INPUT: A = frame Id
 // OUTPUT: C set if successful
-code()
 a16()
 i16()
+code()
 scope SetFrame: {
     ldx.b   BaseEntity.MetaSprite.frameSet
     beq     ReturnFalse
@@ -241,9 +245,9 @@ Return:
 // INPUT: DP = entity
 //        A = frameId
 // OUTPUT: X = frameAddress
-code()
 a16()
 i16()
+code()
 scope GetFrameAddress: {
     and.w   #0x00ff
     asl

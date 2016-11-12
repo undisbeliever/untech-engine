@@ -2,9 +2,9 @@
 scope TextTest {
 scope String {
 
-code()
 a16()
 i16()
+code()
 Test.add("Text.String.U16Y_ToString")
 scope U16Y_ToString: {
     sep     #$20
@@ -46,9 +46,9 @@ Str_812:
 }
 
 
-code()
 a16()
 i16()
+code()
 Test.add("Text.String.U32XY_ToString")
 scope U32XY_ToString: {
     sep     #$20
@@ -93,9 +93,9 @@ Str_Million:
 }
 
 
-code()
 a16()
 i16()
+code()
 Test.add("Text.String.U16Y_ToPaddedString")
 scope U16Y_ToPaddedString: {
     sep     #$20
@@ -147,9 +147,9 @@ Str_111:
 }
 
 
-code()
 a16()
 i16()
+code()
 Test.add("Text.String.U32XY_ToPaddedString")
 scope U32XY_ToPaddedString: {
     sep     #$20
@@ -200,9 +200,9 @@ Str_Million:
 }
 
 
-code()
 a16()
 i16()
+code()
 Test.add("Text.String.CompareEqual")
 scope CompareEqual: {
     sep     #$20
@@ -285,9 +285,9 @@ assert(String_Short1.end - String_Short1 == String_Short2.end - String_Short2)
 // IN: X = string from string function (in bank 0x7e)
 // IN: Y = string to compare against (rom0 bank)
 // OUT: C set if equal
-code()
 a8()
 i16()
+code()
 scope _TestString: {
     stx.b   Text.str1
     lda.b   #0x7e

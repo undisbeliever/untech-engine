@@ -13,6 +13,8 @@ macro FrameCounter.VBlank() {
 }
 
 // REQUIRES: DB access shadow, VBlank Enabled
+au()
+iu()
 code()
 scope WaitFrame: {
     lda.w   frameCounter

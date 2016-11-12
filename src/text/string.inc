@@ -19,9 +19,9 @@ allocateTmpWord(tmp_paddingLength)
 //
 // INPUT: Y = uint16 number
 // OUTPUT: X = address of string (in bank 0x7e)
-code()
 a8()
 i16()
+code()
 scope U16Y_ToString: {
     assert(tmpString.size >= 5)
 
@@ -69,9 +69,9 @@ AfterLoadX:
 //
 // INPUT: XY = uint32 number
 // OUTPUT: X = address of string (in bank 0x7e)
-code()
 a8()
 i16()
+code()
 scope U32XY_ToString: {
     assert(tmpString.size >= 10)
     assert(Font.ZERO == 1)
@@ -123,9 +123,9 @@ scope U32XY_ToString: {
 //        A = padding length
 //        `paddingChar` = padding character
 // OUTPUT: X = address of string (in bank 0x7e)
-code()
 a8()
 i16()
+code()
 scope U16Y_ToPaddedString: {
     cmp.b   #tmpString.size - 2
     bcc     +
@@ -174,9 +174,9 @@ Return:
 //        A = padding length
 //        `paddingChar` = padding character
 // OUTPUT: X = address of string (in bank 0x7e)
-code()
 a8()
 i16()
+code()
 scope U32XY_ToPaddedString: {
     cmp.b   #tmpString.size - 2
     bcc     +
@@ -196,9 +196,9 @@ scope U32XY_ToPaddedString: {
 // INPUT: str1, str2 - far address of strings
 // OUTPUT: c set if both strings are equal
 //         String pointers are unchanged
-code()
 a8()
 i16()
+code()
 scope CompareEqual: {
     ldy.w   #0
 

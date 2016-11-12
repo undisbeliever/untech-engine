@@ -75,7 +75,8 @@ scope ShowAllFramesEntity {
         rts
     }
 
-
+    a16()
+    i16()
     code()
     CalculateAttackValue:
     TakeDamageFromEntity:
@@ -139,19 +140,11 @@ scope EntityTable: {
 constant N_ENTITIES((pc() - EntityTable) / EntityTable.size)
 }
 
-// Initialize the test
-// REQUIRES: 16 bit A, 16 bit Index, DB = 0x7E
-macro Init() {
-    assert16a()
-    assert16i()
-
-}
-
 
 // The Test
-code()
 a16()
 i16()
+code()
 Test.add("Entity/MetaSprite Test")
 scope Test: {
 constant tmp_index(Test.tmp)

@@ -78,9 +78,9 @@ macro _Deallocate() {
 //
 // REQUITES: 8 bit A, 8 bit Index, DB = 0x7e
 // INPUT: X - slot to remove
-code()
 a8()
 i8()
+code()
 scope _RemoveSlot: {
 	// Remove from used list and add to free list
 	//
@@ -158,7 +158,9 @@ ReturnFalse:
 }
 
 
-
+au()
+iu()
+code()
 scope _ProcessSlots {
 ReturnFalse:
     rep     #$31

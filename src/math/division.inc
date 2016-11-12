@@ -19,6 +19,7 @@ code()
 //  X: uint16 remainder
 a8()
 i16()
+code()
 scope Divide.u16y_u8a: {
     phd
     pea     WRDIV & 0xff00
@@ -53,7 +54,9 @@ scope Divide.u16y_u8a: {
 // OUTPUT:
 //  Y: sint16 result
 //  X: uint16 remainder (Always positive, Euclidian division)
+au()
 i16()
+code()
 scope Divide.u16y_s16x: {
     cpx.w   #$8000
     bcc     Divide.u16y_u16x
@@ -91,7 +94,9 @@ a16()
 // OUTPUT:
 //  Y: sint16 result
 //  X: uint16 remainder (Always positive, Euclidian division)
+au()
 i16()
+code()
 scope Divide.s16y_s16x: {
     cpy.w   #$8000
     bcc     YPos
@@ -172,7 +177,9 @@ a16()
 //  X: uint16 remainder (Always positive, Euclidian division)
 
 // This one is here because it is the most common of the signed divisions
+au()
 i16()
+code()
 scope Divide.s16y_u16x: {
     cpy.w   #$8000
     bcc     Divide.u16y_u16x
@@ -212,7 +219,9 @@ a16()
 //  Y: uint16 result
 //  X: uint16 remainder
 
+au()
 i16()
+code()
 scope Divide.u16y_u16x: {
     // Inspiration: http://codebase64.org/doku.php?id=base:16bit_division_16-bit_result
 
@@ -318,6 +327,9 @@ a16()
 //
 // NOTES:
 //  `result32` and `dividend32` share the same memory location
+au()
+iu()
+code()
 scope Divide.s32_s32: {
     php
     rep     #$30
@@ -420,6 +432,9 @@ DividendPositive:
 //
 // NOTES:
 //  `result32` and `dividend32` share the same memory location
+au()
+iu()
+code()
 scope Divide.u32_u32: {
 
     // Inspiration: http://codebase64.org/doku.php?id=base:16bit_division_16-bit_result
@@ -492,6 +507,9 @@ AfterRegisters:
 //
 // NOTES:
 //  `result32` and `dividend32` share the same memory location
+au()
+iu()
+code()
 scope Divide.u32_u8a: {
     php
     phd

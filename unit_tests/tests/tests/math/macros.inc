@@ -1,9 +1,9 @@
 
 scope MathTest {
 
-code()
 a16()
 i16()
+code()
 Test.add("neg.b")
 scope neg.b: {
     sep     #$20
@@ -31,9 +31,9 @@ Fail:
 
 
 
-code()
 a16()
 i16()
+code()
 Test.add("neg.w")
 scope neg.w: {
     lda.w   #0x1337
@@ -58,9 +58,9 @@ Fail:
 
 
 
-code()
 a16()
 i16()
+code()
 Test.add("Negate32xy")
 scope Negate32xy: {
     macro test(evaluate num) {
@@ -89,9 +89,9 @@ Fail:
 
 
 
-code()
 a16()
 i16()
+code()
 Test.add("Negate32.b")
 scope Negate32.b: {
     macro test(evaluate num) {
@@ -127,9 +127,9 @@ Fail:
 
 
 
-code()
 a16()
 i16()
+code()
 Test.add("Negate32.w")
 scope Negate32.w: {
     macro test(evaluate num) {

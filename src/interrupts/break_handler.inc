@@ -9,6 +9,8 @@ arch snes.cpu
 
 constant BSOD_COLOR(13 << Palette.blue.shift)
 
+au()
+iu()
 code()
 scope BreakHandler: {
 

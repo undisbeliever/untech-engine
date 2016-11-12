@@ -7,6 +7,8 @@ include "nmi/framecounter.inc"
 
 arch snes.cpu
 
+au()
+iu()
 code()
 scope NmiHandler: {
     // Store registers
@@ -50,7 +52,11 @@ i8()
 }
 
 
+// Enables NMI (VBlank) Interrupts and autoJoy
+//
 // REQUIRES: DB access shadow
+au()
+iu()
 code()
 scope EnableVBlank: {
     php

@@ -3,6 +3,8 @@ scope Math {
 
 // Negate A (8 bit A)
 macro neg.b() {
+    assert8a()
+
     eor.b   #0xff
     inc
 }
@@ -10,6 +12,8 @@ macro neg.b() {
 
 // Negate A (16 bit A)
 macro neg.w() {
+    assert16a()
+
     eor.w   #0xffff
     inc
 }

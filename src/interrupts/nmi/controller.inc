@@ -62,6 +62,9 @@ macro UpdateControllerState() {
 }
 
 macro _update(joy) {
+    assert16a()
+    assert16i()
+
 	// ensure device connected to JOY1 is a controller
 	assert(JOY.type.controller == 0)
 

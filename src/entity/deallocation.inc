@@ -10,6 +10,9 @@ scope Entity {
 //
 // MODIFIES: DP
 macro _DeleteAllInList(listId) {
+    assert16a()
+    assert16i()
+
     scope DeleteEntities_{listId}: {
         lda.w   lists.{listId}
         beq     NoneToDelete

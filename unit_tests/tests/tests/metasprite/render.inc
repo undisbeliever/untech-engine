@@ -21,9 +21,9 @@ constant SCREEN_WIDTH(256)
 constant SCREEN_HEIGHT(224)
 
 
-code()
 a16()
 i16()
+code()
 Test.add("MetaSprite.RenderEntity (Null)")
 scope RenderEntity_Null: {
     jsr     _Init
@@ -57,9 +57,9 @@ Fail:
 }
 
 
-code()
 a16()
 i16()
+code()
 Test.add("MetaSprite.RenderEntity (One Small)")
 scope RenderEntity_OneSmall: {
     jsr     _Init
@@ -103,9 +103,9 @@ Fail:
 }
 
 
-code()
 a16()
 i16()
+code()
 Test.add("MetaSprite.RenderEntity (One Large)")
 scope RenderEntity_OneLarge: {
     jsr     _Init
@@ -150,9 +150,9 @@ Fail:
 }
 
 
-code()
 a16()
 i16()
+code()
 Test.add("MetaSprite.RenderEntity (Top Left)")
 scope RenderEntity_TopLeft: {
     jsr     _Init
@@ -204,9 +204,9 @@ Fail:
 }
 
 
-code()
 a16()
 i16()
+code()
 Test.add("MetaSprite.RenderEntity (Offscreen)")
 scope RenderEntity_Offscreen: {
     jsr     _Init
@@ -255,9 +255,9 @@ Fail:
 }
 
 
-code()
 a16()
 i16()
+code()
 Test.add("MetaSprite.RenderEntity (Overflow)")
 scope RenderEntity_Overflow: {
     // Test that we don't crash
@@ -293,9 +293,9 @@ Fail:
 }
 
 
-code()
 a16()
 i16()
+code()
 Test.add("MetaSprite.RenderEntity (HiTable)")
 scope RenderEntity_HiTable: {
 
@@ -332,9 +332,9 @@ Fail:
 }
 
 
-code()
 a16()
 i16()
+code()
 Test.add("MetaSprite.RenderEntity (HiTable Size)")
 scope RenderEntity_HiTableSize: {
 
@@ -385,9 +385,9 @@ Fail:
 }
 
 
-code()
 a16()
 i16()
+code()
 Test.add("MetaSprite.EndLoop")
 scope EndLoop: {
 
@@ -468,9 +468,9 @@ Fail:
 // INPUT: DP = Entity address
 // INPUT:  A = frameSet Id
 // OUTPUT: C set on success
-code()
 a16()
 i16()
+code()
 scope _Init: {
     jsr     _Init_MetaSpriteModule
 
@@ -508,12 +508,13 @@ Fail:
     rts
 }
 
+
 // Renders the entity at the center of the screen
 // REQUIRES: 16 bit A, 16 bit Index, DB = 0x7e
 // INPUT: DP = entity
-code()
 a16()
 i16()
+code()
 scope _RenderEntityCenter: {
     lda.w   #SCREEN_WIDTH/2 - INT_MS8_OFFSET
     sta.w   MetaSprite.Render.xPos
@@ -528,9 +529,9 @@ scope _RenderEntityCenter: {
 // REQUIRES: 16 bit A, 16 bit Index, DB = 0x7E
 // INPUT: DP = Entity address
 // OUTPUT: C set if all sprites offscreen
-code()
 a16()
 i16()
+code()
 scope _CheckSpritesOffscreen: {
     asl
     asl

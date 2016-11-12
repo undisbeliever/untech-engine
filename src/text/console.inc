@@ -19,6 +19,7 @@ scope Console {
     constant TEXT_HEIGHT(MARGIN_BOTTOM - MARGIN_TOP)
 
 
+
 // Buffer
 // Each byte in the buffer represents a single character
 constant buffer(Text.buffer)
@@ -61,9 +62,9 @@ macro SetCursor(evaluate x, evaluate y) {
 // DMA: Uses DMA channel 0
 // REQUIRES: 8 bit A, 16 bit Index, DB access registers
 // REQUIRES: screen blank
-code()
 a8()
 i16()
+code()
 scope Init: {
     // Transfer the font to the VRAM
 
@@ -99,6 +100,8 @@ End:
 
 // Clear the Buffer
 // REQUIRES: 8 bit A, 16 bit Index, DB access shadow
+a8()
+i16()
 code()
 // P & DP & DB unknown
 scope ClearBuffer: {
@@ -135,6 +138,8 @@ a8()
 // Prints an 8 bit hex address to the buffer
 //
 // INPUT: A = hex address to print
+au()
+iu()
 code()
 // P & DB unknown
 scope PrintHex8A: {
@@ -150,8 +155,9 @@ a16()
 
 // Prints an 16 bit hex address to the buffer
 //
-// INPUT: A = hex address to print
-// REQUIRES: 16 bit A
+// INPUT: C = hex address to print
+au()
+iu()
 code()
 // P & DB unknown
 scope PrintHex16A: {
@@ -169,6 +175,8 @@ a16()
 // Prints an 16 bit hex address to the buffer
 //
 // INPUT: Y = hex address to print
+au()
+iu()
 code()
 // P & DB unknown
 scope PrintHex16Y: {
@@ -186,7 +194,11 @@ a16()
 
 // Prints an 32 bit hex address to the buffer
 //
+// REQUIRES: 16 bit Index
+//
 // INPUT: XY = hex address to print
+au()
+i16()
 code()
 // P & DB unknown
 scope PrintHex32XY: {
@@ -210,8 +222,8 @@ a16()
 // REQUIRES: 16 bit Index
 //
 // INPUT: A:X = hex address to print
-code()
 i16()
+code()
 // P & DB unknown
 scope PrintFarAddr: {
     php
@@ -235,9 +247,9 @@ a16()
 // REQUIRES: 16 bit Index
 // INPUT: tmpString - the byte string to print
 //        Y number of bytes to print (MUST BE < tmpString.size)
-code()
 a8()
 i16()
+code()
 scope PrintHexString: {
     php
 _AfterPhp:
@@ -326,8 +338,9 @@ FallThrough:
 // REQUIRES: 16 bit Index
 //
 // INPUT: Y - uint16 number to print
-code()
+au()
 i16()
+code()
 // P, DP, DB unknown
 scope PrintU16Y: {
     assert(pc() == PrintU16A.FallThrough)
@@ -353,8 +366,9 @@ a8()
 //
 // INPUT: Y - uint16 number to print
 //        A - number of digits to print
-code()
+au()
 i16()
+code()
 // P, DP, DB unknown
 scope PrintPaddedU16Y: {
     php
@@ -376,8 +390,9 @@ a8()
 // REQUIRES: 32 bit Index
 //
 // INPUT: XY - uint32 number to print
-code()
+au()
 i16()
+code()
 // P, DP, DB unknown
 scope PrintU32XY: {
     php
@@ -401,8 +416,9 @@ a8()
 //
 // INPUT: XY - uint16 number to print
 //        A - number of digits to print
-code()
+au()
 i16()
+code()
 // P, DP, DB unknown
 scope PrintPaddedU32XY: {
     php
@@ -425,8 +441,9 @@ a8()
 // REQUIRES: 16 bit Index
 //
 // INPUT: A:X = string address
-code()
+au()
 i16()
+code()
 // DP & DB unknown
 scope PrintString: {
     php
@@ -479,6 +496,8 @@ AfterSetBank:
 
 
 // Prints a new line
+au()
+iu()
 code()
 // P & DP & DB unknown
 scope NewLine: {

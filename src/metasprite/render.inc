@@ -45,8 +45,9 @@ macro _Init() {
 // Start the render loop
 //
 // REQUITES: 16 bit A, DB = $7e
-code()
 a16()
+iu()
+code()
 scope InitLoop: {
     stz.w   MetaSprite.Render.bufferPos
     Dma.MetaSprite._InitLoop()
@@ -68,9 +69,9 @@ Return:
 // INPUT: DP: Entity
 //        xPos: entity xPos - INT_MS8_OFFSET
 //        yPos: entity yPos - INT_MS8_OFFSET
-code()
 a16()
 i16()
+code()
 scope RenderEntity: {
 constant Return(InitLoop.Return)
 
@@ -94,9 +95,9 @@ End:
 //        X: frame address (NOT NULL)
 //        xPos: entity xPos - INT_MS8_OFFSET
 //        yPos: entity yPos - INT_MS8_OFFSET
-code()
 a16()
 i16()
+code()
 scope RenderEntityFrame: {
     assert(pc() == RenderEntity.End)
 
@@ -205,9 +206,9 @@ constant Return(InitLoop.Return)
 // ensure unused sprites are offscreen
 //
 // REQUIRES: 16 bit A, 16 bit Index, DB = 0x7e
-code()
 a16()
 i16()
+code()
 scope EndLoop: {
     lda.w   bufferPos
     beq     SkipHiTable

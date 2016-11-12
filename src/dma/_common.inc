@@ -62,9 +62,9 @@ macro VBlank() {
 // This MUST be called before using this module.
 //
 // REQUIRES: 16 bit A, 16 bit Index, DB = $7E
-code()
 a16()
 i16()
+code()
 scope Init: {
     Palette._Init()
     Tile16._Init()
@@ -78,9 +78,9 @@ scope Init: {
 // To prevent a glitch no uploads are to be processed until VBlank completed
 //
 // REQUIRES: 16 bit A, 16 bit Index, DB = $7E
-code()
 a16()
 i16()
+code()
 scope TransferOnNextVBlank: {
     Palette._TransferOnNextVBlank()
     Tile16._TransferOnNextVBlank()

@@ -38,6 +38,8 @@ scope Process: {
 }
 
 
+a16()
+i16()
 code()
 CalculateAttackValue:
 TakeDamageFromEntity:

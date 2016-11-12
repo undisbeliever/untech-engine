@@ -92,6 +92,10 @@ macro finalizeTable() {
 // ====
 
 // Process all of the tests in the table one by one
+//
+// REQUIRES: None
+au()
+iu()
 code()
 scope ProcessTests: {
     jsr     ResetPpuState
@@ -222,6 +226,10 @@ i16()
 
 // A test failed.
 // The test can jump to this code at any time
+//
+// REQUIRES: None
+au()
+iu()
 code()
 scope Fail: {
     jsr     ResetPpuState
@@ -299,7 +307,12 @@ a8()
 //
 // All tests that change PPU registers MUST call this routine upon clean-up
 //
-// OUTPUT: Carry always clear
+// REQUIRES: None
+//
+// OUTPUT: Carry always set
+au()
+iu()
+code()
 scope ResetPpuState: {
     php
     rep     #$30

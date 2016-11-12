@@ -69,9 +69,9 @@ macro ToVramH(addr) {
 //
 // INPUT: X - vram address
 // INPUT: Y - size (in bytes)
-code()
 a8()
 i16()
+code()
 scope ClearVram: {
     stx.w   VMADD
     sty.w   DAS0
@@ -100,9 +100,9 @@ scope ClearVram: {
 //
 // INPUT: X - starting color
 // INPUT: Y - nColors
-code()
 a8()
 i16()
+code()
 scope ClearCgram: {
     pha
 
@@ -139,9 +139,9 @@ i8()
 //
 // INPUT: A:X address
 // INPUT: Y   size (in bytes)
-code()
 a8()
 i16()
+code()
 scope TransferToVram: {
     stx.w   A1T0
     sta.w   A1B0
@@ -167,9 +167,9 @@ scope TransferToVram: {
 //
 // INPUT: A:X address
 // INPUT: Y   size (in bytes)
-code()
 a8()
 i16()
+code()
 scope TransferToVramL: {
     stx.w   A1T0
     sta.w   A1B0
@@ -195,9 +195,9 @@ scope TransferToVramL: {
 //
 // INPUT: A:X address
 // INPUT: Y   size (in bytes)
-code()
 a8()
 i16()
+code()
 scope TransferToVramH: {
     stx.w   A1T0
     sta.w   A1B0
@@ -223,9 +223,9 @@ scope TransferToVramH: {
 //
 // INPUT: X = VRAM word address
 // INPUT: Y = tile
-code()
 a8()
 i16()
+code()
 scope FillTilemap: {
 allocateTmpWord(tmp)
 

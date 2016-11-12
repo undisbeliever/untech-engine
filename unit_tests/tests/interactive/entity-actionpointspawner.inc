@@ -305,9 +305,9 @@ macro PrintListSizes() {
 
 
 // The Test
-code()
 a16()
 i16()
+code()
 Test.add("Spawn At Action Point Tests")
 scope Test: {
     jsr     EntityLoop.Init

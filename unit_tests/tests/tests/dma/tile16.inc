@@ -5,9 +5,9 @@ scope Tile16 {
 constant VRAM_BLOCK(0x6000)
 
 
-code()
 a16()
 i16()
+code()
 Test.add("Dma.Tile16.BufferOneTileFromList")
 scope BufferOneTileFromList: {
     constant VRAM_1(VRAM_BLOCK + 32 * 2)
@@ -45,9 +45,9 @@ Fail:
 }
 
 
-code()
 a16()
 i16()
+code()
 Test.add("Dma.Tile16.BufferTwoTilesFromList")
 scope BufferTwoTilesFromList: {
     constant VRAM_1(VRAM_BLOCK + 32 * 7)
@@ -95,10 +95,10 @@ Fail:
 }
 
 
-code()
+//DB=0x7e
 a16()
 i16()
-//DB=0x7e
+code()
 Test.add("Dma.Tile16.BufferOneRowFromList")
 scope BufferOneRowFromList: {
     constant VRAM_1(VRAM_BLOCK)
@@ -145,9 +145,9 @@ Fail:
 }
 
 
-code()
 a16()
 i16()
+code()
 Test.add("Dma.Tile16.BufferTwoRowsFromList (one row)")
 scope BufferTwoRowsFromList_one: {
     constant VRAM_1(VRAM_BLOCK + 32 * 4)
@@ -191,9 +191,9 @@ Fail:
 }
 
 
-code()
 a16()
 i16()
+code()
 //Test.add("Dma.Tile16.BufferTwoRowsFromList (two rows)")
 scope BufferTwoRowsFromList_two: {
     constant VRAM_1(VRAM_BLOCK)
@@ -286,9 +286,9 @@ Fail:
 //
 // INPUT: X = Tile address in rom0
 // INPUT: Y = VRAM address
-code()
 a16()
 i16()
+code()
 scope _CheckTile: {
     allocate(tmp, wram7e, 2)
 

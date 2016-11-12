@@ -23,9 +23,9 @@ ReturnFalse:
 //
 // OUTPUT: Y - address of new entity
 //         C - set if entity created successfully
-code()
 a16()
 i16()
+code()
 scope Spawn: {
 
 allocateTmpWord(xPos)
@@ -279,6 +279,9 @@ Return:
 // INPUT: DP = entity
 //        Y = entityId
 //        A = type to match
+a16()
+i16()
+code()
 scope SpawnEnemyProjectileFromActionPoint: {
     ldx.w   #lists.enemyProjectiles
     bra     _SpawnFromActionPoint
@@ -298,6 +301,9 @@ scope SpawnEnemyProjectileFromActionPoint: {
 // INPUT: DP = entity
 //        Y = entityId
 //        A = type to match
+a16()
+i16()
+code()
 scope SpawnPlayerProjectileFromActionPoint: {
     ldx.w   #lists.playerProjectiles
 _fallthrough:

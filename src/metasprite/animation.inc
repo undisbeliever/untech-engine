@@ -38,9 +38,9 @@ macro _Init() {
 // INPUT: dp = Entity
 // INPUT: A = animation Id
 // OUTPUT: C set on success
-code()
 a16()
 i16()
+code()
 scope SetAnimationId: {
     ldx.b   BaseEntity.MetaSprite.frameSet
     beq     ReturnFalse
@@ -97,9 +97,9 @@ a16()
 // REQUIRES: 16 bit A, 16 bit Index, DB = 0x7e
 //
 // INPUT: dp = Entity
-code()
 a16()
 i16()
+code()
 scope Process: {
     ldx.b   BaseEntity.MetaSprite.Animation.pc
     beq     Return
@@ -134,7 +134,6 @@ scope Bytecode {
 // one finished.
 // By having a start/resume table we save save CPU time not checking
 // if the metaspite frame was set correctly.
-
 scope StartTable: {
     dw  Stop
     dw  GotoStart
@@ -147,6 +146,7 @@ scope StartTable: {
 
 constant size(pc() - StartTable)
 }
+
 scope ResumeTable: {
     dw  Stop
     dw  GotoStart
@@ -183,9 +183,9 @@ constant MASK(ResumeTable.size - 2)
 // INPUT: dp = Entity
 // INPUT:  Y = animation PC
 // RETURN: `RTS`
-code()
 a16()
 i16()
+code()
 scope SetFrameAndWait_Frame_Start: {
     tyx
     lda.l   Data.AnimationBytecodeOffset + 1,x      // frame Id
@@ -215,9 +215,9 @@ Failure:
 // OUTPUT: Y = animation PC
 // RETURN: `_SetFrameAndWait_NextInstruction` if wait is over
 // RETURN: `RTS` if still waiting
-code()
 a16()
 i16()
+code()
 scope SetFrameAndWait_Frame_Continue: {
     lda.b   BaseEntity.MetaSprite.Animation.delay
     bmi     SetFrameAndWait_Frame_Start
@@ -239,9 +239,9 @@ scope SetFrameAndWait_Frame_Continue: {
 // IN: Y = animation.pc
 // OUT: new pc (old PC + 3)
 // RETURN: Process.Continue
-code()
 a16()
 i16()
+code()
 scope _SetFrameAndWait_NextInstruction: {
     tyx
     inx
@@ -264,9 +264,9 @@ scope _SetFrameAndWait_NextInstruction: {
 // INPUT: dp = Entity
 // INPUT:  Y = animation PC
 // RETURN: `RTS`
-code()
 a16()
 i16()
+code()
 scope SetFrameAndWait_Time_Start: {
     tyx
     lda.l   Data.AnimationBytecodeOffset + 1,x      // frame Id
@@ -300,9 +300,9 @@ Failure:
 // OUTPUT: Y = animation PC
 // RETURN: `_SetFrameAndWait_NextInstruction` if wait is over
 // RETURN: `RTS` if still waiting
-code()
 a16()
 i16()
+code()
 scope SetFrameAndWait_Time_Continue: {
     lda.b   BaseEntity.MetaSprite.Animation.delay
     bmi     SetFrameAndWait_Time_Start
@@ -330,9 +330,9 @@ scope SetFrameAndWait_Time_Continue: {
 // INPUT: dp = Entity
 // INPUT:  Y = animation PC
 // RETURN: `RTS`
-code()
 a16()
 i16()
+code()
 scope SetFrameAndWait_Vecl_Start: {
     tyx
     lda.l   Data.AnimationBytecodeOffset + 1,x      // frame Id
@@ -366,9 +366,9 @@ Failure:
 // OUTPUT: Y = animation PC
 // RETURN: `_SetFrameAndWait_NextInstruction` if wait is over
 // RETURN: `RTS` if still waiting
-code()
 a16()
 i16()
+code()
 scope SetFrameAndWait_xVecl_Continue: {
     // if delay & 0x8000
     //     goto SetFrameAndWait_Vecl_Start
@@ -409,9 +409,9 @@ scope SetFrameAndWait_xVecl_Continue: {
 // OUTPUT: Y = animation PC
 // RETURN: `_SetFrameAndWait_NextInstruction` if wait is over
 // RETURN: `RTS` if still waiting
-code()
 a16()
 i16()
+code()
 scope SetFrameAndWait_yVecl_Continue: {
     lda.b   BaseEntity.MetaSprite.Animation.delay
     bmi     SetFrameAndWait_Vecl_Start
@@ -439,9 +439,9 @@ scope SetFrameAndWait_yVecl_Continue: {
 // INPUT: dp = Entity
 // INPUT:  Y = animation PC
 // RETURN: RTS
-code()
 a16()
 i16()
+code()
 scope Stop: {
     stz.b   BaseEntity.MetaSprite.Animation.pc
     rts
@@ -454,9 +454,9 @@ scope Stop: {
 // INPUT: dp = Entity
 // OUTPUT: X = new animation PC
 // RETURN: `Process.Continue`
-code()
 a16()
 i16()
+code()
 scope GotoStart: {
     ldx.b   BaseEntity.MetaSprite.frameSet
 
@@ -483,9 +483,9 @@ scope GotoStart: {
 // INPUT:  Y = animation PC
 // RETURN: `Process.Continue` (X = new animation PC)
 // RETURN: `Bytecode.Stop` if animationId is invalid
-code()
 a16()
 i16()
+code()
 scope GotoAnimation: {
     tyx
     lda.l   Data.AnimationBytecodeOffset + 1,x  // animation id
@@ -528,9 +528,9 @@ a16()
 // INPUT:  Y = animation PC
 // OUTPUT: X = new animation PC
 // RETURN: `Process.Continue`
-code()
 a16()
 i16()
+code()
 scope GotoOffset: {
     tyx
     lda.l   Data.AnimationBytecodeOffset + 1,x

@@ -15,6 +15,9 @@ code()
 //
 // OUTPUT:
 //  Y: result (8 or 16 bits depending on Index size)
+au()
+iu()
+code()
 scope Multiply.u8y_u8x_y: {
     php
     sep     #$20
@@ -48,6 +51,7 @@ a8()
 //  Y: 16 bit product
 a8()
 i16()
+code()
 Multiply.s16y_u8a_s16y:
 scope Multiply.u16y_u8a_u16y: {
     sta.l   WRMPYA
@@ -94,6 +98,7 @@ a8()
 //  product32: 32 bit unsigned product
 a8()
 i16()
+code()
 Multiply.u16y_u8a_u32:
 scope Multiply.u16y_u8a_u32xy: {
     // DP faster than long addressing by 2 cycles
@@ -153,6 +158,7 @@ a8()
 //  Y: 16 bit product
 au()
 iu()
+code()
 Multiply.u16y_s16x_16y:
 Multiply.s16y_u16x_16y:
 Multiply.s16y_s16x_s16y:
@@ -232,6 +238,7 @@ a8()
 //  product32: 32 bit product
 au()
 i16()
+code()
 scope Multiply.u16y_u16x_u32xy: {
     //       Y y
     //   *   X x
@@ -332,7 +339,9 @@ a16()
 // OUTPUT:
 //  XY: 32 bit product
 //  product32: 32 bit product
+au()
 i16()
+code()
 scope Multiply.s16y_s16x_s32xy: {
     cpy.w   #$8000
     bcs     NegY
@@ -387,7 +396,9 @@ FallThrough:
 // OUTPUT:
 //  XY: 32 bit product
 //  product32: 32 bit product
+au()
 i16()
+code()
 Multiply.u32_s32xy_32xy:
 Multiply.s32_u32xy_32xy:
 Multiply.s32_s32xy_s32xy:
@@ -597,6 +608,7 @@ i16()
 //  product32: 32 bit product
 a8()
 i16()
+code()
 Multiply.s32xy_u8a_s32xy:
 scope Multiply.u32xy_u8a_u32xy: {
     //      Xh Xl Yh Yl
