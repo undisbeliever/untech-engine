@@ -6,86 +6,80 @@
 
 arch snes.cpu
 
-evaluate ::cpu.pSet(0)
-evaluate ::cpu.pClear(0)
-
-scope private {
-    macro setPFlags(evaluate v) {
-        global evaluate ::cpu.pSet({::cpu.pSet} | {v})
-        global evaluate ::cpu.pClear({::cpu.pClear} & (~{v}))
-    }
-
-    macro clearPFlags(evaluate v) {
-        global evaluate ::cpu.pSet({::cpu.pSet} & (~{v}))
-        global evaluate ::cpu.pClear({::cpu.pClear} | {v})
-    }
-
-    macro unknownPFlags(evaluate v) {
-        global evaluate ::cpu.pSet({::cpu.pSet} & (~{v}))
-        global evaluate ::cpu.pClear({::cpu.pClear} & (~{v}))
-    }
-}
+evaluate ::cpu.aSize(0)
+evaluate ::cpu.iSize(0)
 
 macro sep(evaluate v) {
-    private.setPFlags({v})
+    if ({v} & 0x20) {
+        global evaluate ::cpu.aSize(8)
+    }
+    if ({v} & 0x10) {
+        global evaluate ::cpu.iSize(8)
+    }
 
     sep #{v}
 }
 
 macro rep(evaluate v) {
-    private.clearPFlags({v})
+    if ({v} & 0x20) {
+        global evaluate ::cpu.aSize(16)
+    }
+    if ({v} & 0x10) {
+        global evaluate ::cpu.iSize(16)
+    }
 
     rep #{v}
 }
 
 macro a8() {
-    private.setPFlags($20)
+    global evaluate ::cpu.aSize(8)
 }
 
 macro a16() {
-    private.clearPFlags($20)
+    global evaluate ::cpu.aSize(16)
 }
 
 macro au() {
-    private.unknownPFlags($20)
+    global evaluate ::cpu.aSize(0)
 }
 
 macro i8() {
-    private.setPFlags($10)
+    global evaluate ::cpu.iSize(8)
 }
 
 macro i16() {
-    private.clearPFlags($10)
+    global evaluate ::cpu.iSize(16)
 }
 
 macro iu() {
-    private.unknownPFlags($10)
+    global evaluate ::cpu.iSize(0)
 }
 
 macro punknown() {
-    private.unknownPFlags($FF)
+    global evaluate ::cpu.aSize(0)
+    global evaluate ::cpu.iSize(0)
 }
 
 macro assert8a() {
-    if !({::cpu.pSet} & $20) || ({::cpu.pClear} & $20) {
+    if {::cpu.aSize} != 8 {
         error "require an 8 bit A"
     }
 }
 
 macro assert16a() {
-    if ({::cpu.pSet} & $20) || !({::cpu.pClear} & $20) {
+    if {::cpu.aSize} != 16 {
         error "require a 16 bit A"
     }
 }
 
 macro assert8i() {
-    if !({::cpu.pSet} & $10) || ({::cpu.pClear} & $10) {
+    if {::cpu.iSize} != 8 {
         error "require an 8 bit Index register"
     }
 }
 
 macro assert16i() {
-    if ({::cpu.pSet} & $10) || !({::cpu.pClear} & $10) {
+    if {::cpu.iSize} != 16 {
         error "require a 16 bit Index register"
     }
 }
