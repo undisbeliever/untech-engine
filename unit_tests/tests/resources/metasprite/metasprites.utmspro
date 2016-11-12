@@ -40,4 +40,6 @@
   <!-- INTERACTIVE -->
   <frameset src="utms/Projectile.utms"/>
   <frameset src="utms/ActionPointSpawner.utms"/>
+  <frameset src="utms/EhCollisionTest_Enemy.utms"/>
+  <frameset src="utms/EhCollisionTest_Player.utms"/>
 </metaspriteproject>

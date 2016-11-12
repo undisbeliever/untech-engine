@@ -86,6 +86,8 @@ i16()
 code()
 scope ProcessUntilButtonPress: {
     Loop:
+        Controller.UpdateControllerState()
+
         jsr     ProcessFrame
 
         jsr     Dma.TransferOnNextVBlank
@@ -109,6 +111,8 @@ a16()
 i16()
 code()
 scope ProcessFrame: {
+    Controller.UpdateControllerState()
+
     jsr     MetaSprite.Render.InitLoop
 
     jsr     Entity.ProcessGameLoop

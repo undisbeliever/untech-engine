@@ -103,6 +103,7 @@ include "tests/text.inc"
 
 include "interactive/entity-metasprite.inc"
 include "interactive/entity-actionpointspawner.inc"
+include "interactive/entityhitbox-collisions.inc"
 
 Test.finalizeTable()
 

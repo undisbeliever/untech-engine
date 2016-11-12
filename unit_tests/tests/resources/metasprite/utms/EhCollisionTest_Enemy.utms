@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF_8"?>
+<!DOCTYPE untech>
+<metasprite id="EhCollisionTest_Enemy" tilesettype="ONE_ROW_FIXED">
+  <exportorder src="../formats/EhCollisionTest_Enemy.utfseo"/>
+  <largetileset>
+    AAAAAAAAfwB/P34/fT99PwAAAAAAAAAAAAAAAAAAAAAAAAAAAAD+AP78fvy+/L78
+    AAAAAAAAAAAAAAAAAAAAAHw/fT99P38/fwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+    Pvy+/L78/vz+AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAB/AEAAQANAAkAD
+    AAAAAAAAAAA/ADwAPQA8AAAAAAAAAP4AAgACgAJAAoAAAAAAAAAAAPwAfAC8AHwA
+    QAJAAkADQAB/AAAAAAAAAD0APQA8AD8AAAAAAAAAAAACQAJAAoACAP4AAAAAAAAA
+    vAC8AHwA/AAAAAAAAAAAAAAAAAAAAH8AfwBjHG0SYxwAAAAAAAAAAD8AIwAtACMA
+    AAAAAAAA/gD+AM4wtki2SAAAAAAAAAAA/ADMALQAtABtEm0SYxx/AH8AAAAAAAAA
+    LQAtACMAPwAAAAAAAAAAAIZ4tki2SP4A/gAAAAAAAACEALQAtAD8AAAAAAAAAAAA
+    AAAAAAAAfwBAP0A/QD9APwAAAAAAAAAAPwAjAC0AIwAAAAAAAAD+AAL8AvwC/AL8
+    AAAAAAAAAAD8AHQAdAB0AEA/QD9AP0A/fwAAAAAAAAAtAC0AIwA/AAAAAAAAAAAA
+    AvwC/AL8Avz+AAAAAAAAAFQAVACsAPwAAAAAAAAAAAAAAAAAAAB/AH8/fj99P34/
+    AAAAAAAAAAA/AD4APQA+AAAAAAAAAP4A/vw+/P78fvwAAAAAAAAAAPwAPAD8AHwA
+    fz9/P3w/fz9/AAAAAAAAAD8APwA8AD8AAAAAAAAAAAC+/L78fvz+/P4AAAAAAAAA
+    vAC8AHwA/AAAAAAAAAAAAAAAAAAAAH8AQABADkAQQAwAAAAAAAAAAAA/ADEALwAz
+    AAAAAAAA/gACAAIwAkgCeAAAAAAAAAAAAPwAzAC0AIRAAkACQBxAAH8AAAAAAAAA
+    AD0APQAjAD8AAAAAAAAAAAJIAkgCSAIA/gAAAAAAAAAAtAC0ALQA/AAAAAAAAAAA
+  </largetileset>
+  <palette>
+    4AMAAP9/GAAAfA9Q733WAlsBAAAAAAAAAAAAAAAAAAA=
+  </palette>
+  <frame id="box" order="2">
+    <object size="large" x="-39" y="-13" tile="3"/>
+    <object size="large" x="-39" y="7" tile="0"/>
+    <object size="large" x="-15" y="-13" tile="5"/>
+    <object size="large" x="-15" y="7" tile="2"/>
+    <entityhitbox type="SHIELD_ATTACK" x="-14" y="-10" width="14" height="10"/>
+    <entityhitbox type="BODY_ATTACK" x="-14" y="10" width="14" height="10"/>
+    <entityhitbox type="ATTACK" x="-38" y="10" width="14" height="10"/>
+    <entityhitbox type="BODY_WEAK" x="-38" y="-10" width="14" height="10"/>
+  </frame>
+  <frame id="row1" order="2">
+    <object size="large" x="-1" y="-13" tile="1"/>
+    <entityhitbox type="BODY" x="0" y="-10" width="14" height="10"/>
+  </frame>
+  <frame id="row2" order="2">
+    <object size="large" x="-1" y="-13" tile="4"/>
+    <object size="large" x="23" y="-13" tile="5"/>
+    <entityhitbox type="SHIELD_ATTACK" x="24" y="-10" width="14" height="10"/>
+    <entityhitbox type="SHIELD" x="0" y="-10" width="14" height="10"/>
+  </frame>
+  <frame id="row3" order="2">
+    <object size="large" x="-1" y="-13" tile="4"/>
+    <object size="large" x="47" y="-13" tile="0"/>
+    <object size="large" x="23" y="-13" tile="1"/>
+    <entityhitbox type="ATTACK" x="48" y="-10" width="14" height="10"/>
+    <entityhitbox type="BODY" x="24" y="-10" width="14" height="10"/>
+    <entityhitbox type="SHIELD" x="0" y="-10" width="14" height="10"/>
+  </frame>
+  <frame id="row4" order="2">
+    <object size="large" x="71" y="-13" tile="0"/>
+    <object size="large" x="23" y="-13" tile="2"/>
+    <object size="large" x="47" y="-13" tile="1"/>
+    <object size="large" x="-1" y="-13" tile="3"/>
+    <entityhitbox type="ATTACK" x="72" y="-10" width="14" height="10"/>
+    <entityhitbox type="BODY" x="48" y="-10" width="14" height="10"/>
+    <entityhitbox type="BODY_ATTACK" x="24" y="-10" width="14" height="10"/>
+    <entityhitbox type="BODY_WEAK" x="0" y="-10" width="14" height="10"/>
+  </frame>
+</metasprite>

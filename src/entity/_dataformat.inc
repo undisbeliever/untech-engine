@@ -106,7 +106,7 @@ scope BaseEntityFunctionTable {
         // REGS: 16 bit A, 16 bit Index, DB = 0x7e
         // INPUT: dp: entity
         //         Y: entity attacking
-        //         C: set if the attacker is a shield
+        //         C: set if the attacker is a ShieldAttack hitbox
         // OUTPUT: A: attack value
         field(CalculateAttackValue, 2)
 

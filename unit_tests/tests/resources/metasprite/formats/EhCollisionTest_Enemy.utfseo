@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF_8"?>
+<!DOCTYPE untech>
+<fsexportorder name="EhCollisionTest_Enemy">
+  <frame id="box"/>
+  <frame id="row1"/>
+  <frame id="row2"/>
+  <frame id="row3"/>
+  <frame id="row4"/>
+</fsexportorder>
