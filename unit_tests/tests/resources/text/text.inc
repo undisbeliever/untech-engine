@@ -11,12 +11,15 @@ scope Font {
     map '{', 0x5b, 4
     map ' ', 0x5f
 
+    map '\n', 0xff
+
     constant ZERO(0x01)
     constant CAPITAL_A(0x0b)
     constant LOWER_A(0x25)
     constant SPACE(0x5f)
     constant MINUS(0x4b)
 
+    constant NEW_LINE(0xff)
 
 rodata(rom0)
     insert FixedTiles, "font-fixed.2bpp"

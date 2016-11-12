@@ -275,23 +275,17 @@ macro PrintListSizes() {
     assert16i()
 
     Text.Console.SetCursor(0, 20)
-    jsr     Text.Console.NewLine
-
-    Text.Console.PrintConstString("Player Projectiles: ")
+    Text.Console.PrintConstString("\nPlayer Projectiles: ")
 
     Entity.CountEntitiesInList(playerProjectiles)
     jsr     Text.Console.PrintU16A
 
-    jsr     Text.Console.NewLine
-
-    Text.Console.PrintConstString("Enemy Projectiles:  ")
+    Text.Console.PrintConstString("\nEnemy Projectiles:  ")
 
     Entity.CountEntitiesInList(enemyProjectiles)
     jsr     Text.Console.PrintU16A
 
-    jsr     Text.Console.NewLine
-
-    Text.Console.PrintConstString("NPC Entities:       ")
+    Text.Console.PrintConstString("\nNPC Entities:       ")
 
     Entity.CountEntitiesInList(npcs)
     jsr     Text.Console.PrintU16A

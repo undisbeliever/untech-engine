@@ -496,17 +496,21 @@ AfterSetBank:
 
     ldx.b   bufferPos
 
+    dey
     Loop:
+        iny
         lda.w   0,y
         beq     EndLoop
 
-        sta.l   buffer,x
+        cmp.b   #Text.Font.NEW_LINE
+        beq     NL
 
-        iny
+        sta.l   buffer,x
 
         inx
         cpx.b   bufferEndLinePos
         bcc     Loop
+        NL:
             phy
             jsr     NewLine
             ldx.b   bufferPos

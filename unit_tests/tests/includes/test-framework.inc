@@ -137,12 +137,9 @@ i16()
 
         rep     #$30
     a16()
-        // Clears the test name
+        // Clears the old test name
         Text.Console.SetCursor(0, 1)
-        jsr     Text.Console.NewLine
-        jsr     Text.Console.NewLine
-        jsr     Text.Console.NewLine
-
+        Text.Console.PrintConstString("\n\n\n")
 
         sep     #$20
     a8()
@@ -262,12 +259,7 @@ i16()
     // Print Failed message
     // --------------------
 
-    Text.Console.PrintConstString(" FAILED")
-
-    jsr     Text.Console.NewLine
-    jsr     Text.Console.NewLine
-    jsr     Text.Console.NewLine
-
+    Text.Console.PrintConstString(" FAILED\n\n\n")
 
     // Print Address of failed test
     rep     #$30
@@ -355,6 +347,7 @@ i16()
     stz.w   CGDATA
 
     jsr     Text.Console.Init
+    Text.Console.PrintConstString("UnTech Unit Tests:")
 
 
     lda.b   #15
@@ -362,8 +355,6 @@ i16()
 
     plb
 // DB = 0x7e
-
-    Text.Console.PrintConstString("UnTech Unit Tests:")
 
     plp
     sec
