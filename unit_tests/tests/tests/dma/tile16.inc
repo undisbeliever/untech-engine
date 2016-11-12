@@ -194,7 +194,7 @@ Fail:
 a16()
 i16()
 code()
-//Test.add("Dma.Tile16.BufferTwoRowsFromList (two rows)")
+Test.add("Dma.Tile16.BufferTwoRowsFromList (two rows)")
 scope BufferTwoRowsFromList_two: {
     constant VRAM_1(VRAM_BLOCK)
     constant VRAM_2(VRAM_BLOCK + 3 * 32 * 16)
@@ -203,6 +203,8 @@ scope BufferTwoRowsFromList_two: {
     jsr     WaitFrame       // Reset Dma.transfersLeft
 
     ldx.w   #TileData.TileList10
+    stx.w   Dma.Tile16.tileListAddr
+
     ldy.w   #VRAM_1
     sty.w   Dma.Tile16.vramWaddr
     ldy.w   #VRAM_2
@@ -224,7 +226,7 @@ i16()
     ldx.w   #TileData.Tile7
     ldy.w   #VRAM_1 + 32 * 0
     jsr     _CheckTile
-    bcs     Fail
+    bcc     Fail
 
     ldx.w   #TileData.Tile6
     ldy.w   #VRAM_1 + 32 * 1
