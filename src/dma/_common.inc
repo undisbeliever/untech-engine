@@ -69,6 +69,8 @@ scope Init: {
     Palette._Init()
     Tile16._Init()
 
+    Dma.ResetTransfersLeft()
+
     rts
 }
 

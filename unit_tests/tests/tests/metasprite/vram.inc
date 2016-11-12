@@ -318,17 +318,11 @@ macro _DeallocateAndTestListTest(type) {
 
         jsr     _Init_MetaSpriteModule
 
-        // needed to prevent DMA buffer overflowing
-        jsr     Dma.Init
-
         lda.w   #EntityPool.entity0
         tcd
         lda.w   #MSFS.FST_{type}Fixed1
         jsr     _InitEntity0PaletteAndActivate
         bcc     Fail
-
-        // needed to prevent DMA buffer overflowing
-        jsr     Dma.Init
 
         lda.w   #EntityPool.entity1
         tcd
