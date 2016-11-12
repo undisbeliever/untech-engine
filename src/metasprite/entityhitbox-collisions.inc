@@ -485,46 +485,47 @@ a16()
 i16()
 code()
 scope BodyAttack_BodyAttack: {
+    // A.CalculateAttackValue (normal)
+    // B.TakeDamageFromEntity (normal)
     // B.CalculateAttackValue (normal)
     // A.TakeDamageFromEntity (normal)
 
-    // A.CalculateAttackValue (normal)
-    // B.TakeDamageFromEntity (normal)
-
-    phd
-    sty.w   tmp
-
-    // swap DP and Y
     tdc
-    tax
-    tya
-    tcd
-    txy
+    sta.w   tmp
+    phy
 
+// DP = A
+// Y = B
     ldx.b   BaseEntity.functionTable
     clc
     jsr     (BaseEntityFunctionTable.CalculateAttackValue,x)
 
 
+// DP = B
+// Y = A
     pld
     ldy.w   tmp
+
     ldx.b   BaseEntity.functionTable
     clc
     jsr     (BaseEntityFunctionTable.TakeDamageFromEntity,x)
 
 
-// DP = A
-// Y = B
+// DP = B
+// Y = A
     phd
-    phy
+    ldy.w   tmp
 
     ldx.b   BaseEntity.functionTable
     clc
     jsr     (BaseEntityFunctionTable.CalculateAttackValue,x)
 
 
-// swap to B
-    pld
+// DP = B
+// Y = A
+    lda.w   tmp
+    tcd
+
     ply
     ldx.b   BaseEntity.functionTable
     clc
