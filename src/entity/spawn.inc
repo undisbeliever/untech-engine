@@ -70,7 +70,8 @@ allocateTmpWord(yPos)
 
         stz.b   BaseEntity.xVecl
         stz.b   BaseEntity.xVecl + 2
-        stz.b   BaseEntity.xVecl + 4
+        stz.b   BaseEntity.yVecl
+        stz.b   BaseEntity.yVecl + 2
 
 
         lda.l   BaseEntityData.defaultPalette,x
@@ -417,7 +418,8 @@ SpawnProjectile:
 
         stz.b   BaseEntity.xVecl
         stz.b   BaseEntity.xVecl + 2
-        stz.b   BaseEntity.xVecl + 4
+        stz.b   BaseEntity.yVecl
+        stz.b   BaseEntity.yVecl + 2
 
         // Get Entity ROM data
         ldx.w   tmp_projectileDataPtr

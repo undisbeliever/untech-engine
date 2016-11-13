@@ -43,13 +43,9 @@ scope BaseEntity {
         field(yPos.px, 2)
 
         // velocity of entity
-        // (2 x 1:7:16 fixed point - pixels/display frame)
-        // to save CPU time velocity comparisons will be preformed
-        // using the upper 16 bits (1:7:8 fixed point)
-        field(xVecl, 1)
-        field(xVecl.hw, 2)
-        field(yVecl, 1)
-        field(yVecl.hw, 2)
+        // (2 x 1:15:16 fixed point - pixels/display frame)
+        field(xVecl, 4)
+        field(yVecl, 4)
     endstruct()
 }
 

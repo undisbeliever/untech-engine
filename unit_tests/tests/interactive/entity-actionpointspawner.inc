@@ -20,7 +20,7 @@ scope ProjectileEntity {
 
     scope EntityStruct {
         childstruct(BaseEntity)
-            field(tmp, 3)
+            field(tmp, 4)
         endstruct()
     }
 
@@ -34,65 +34,68 @@ scope ProjectileEntity {
         ldx.w   MetaSprite.ActionPoint.address
 
         // Determine if projectile is diagonal or orthogonal
-        scope TestIfDiagonal {
-            lda.l   MetaSprite.Format.ActionPoints.xPos,x
-            cmp.b   #INT_MS8_OFFSET
-            beq     Orthogonal
+        lda.l   MetaSprite.Format.ActionPoints.xPos,x
+        cmp.b   #INT_MS8_OFFSET
+        beq     Orthogonal
 
-            lda.l   MetaSprite.Format.ActionPoints.yPos,x
-            cmp.b   #INT_MS8_OFFSET
-            beq     Orthogonal
+        lda.l   MetaSprite.Format.ActionPoints.yPos,x
+        cmp.b   #INT_MS8_OFFSET
+        beq     Orthogonal
 
-                // Projectile is Diagonal
-                ldy.w   #DIAGONAL_VELOCITY
-                lda.b   #DIAGONAL_VELOCITY >> 16
-                bra     EndIf
-
-            Orthogonal:
-                // Projectile is Orthogonal
-                ldy.w   #VELOCITY
-                lda.b   #VELOCITY >> 16
-
-        EndIf:
+            // Projectile is Diagonal
+            ldy.w   #DIAGONAL_VELOCITY
             sty.b   EntityStruct.tmp
-            sta.b   EntityStruct.tmp + 2
-        }
+            ldy.w   #DIAGONAL_VELOCITY >> 16
+            bra     EndIf
+
+        Orthogonal:
+            // Projectile is Orthogonal
+            ldy.w   #VELOCITY
+            sty.b   EntityStruct.tmp
+            ldy.w   #VELOCITY >> 16
+
+    EndIf:
+        sty.b   EntityStruct.tmp + 2
+
+
+        rep     #$30
+    a16()
 
         macro _SetVelocity(c) {
             scope SetVelocity_{c} {
                 // Set Projectile Velocity
                 lda.l   MetaSprite.Format.ActionPoints.{c}Pos,x
-                cmp.b   #INT_MS8_OFFSET
+                and.w   #0xff
+                cmp.w   #INT_MS8_OFFSET
                 beq     Zero
                 bcs     Positive
 
                 Negative:
                     // load negative velocity
-                    rep     #$31
-                a16()
-                    lda.w   #1
-                    // c clear
+                    sec
+                    lda.w   #0
                     sbc.b   EntityStruct.tmp
-                    tay
+                    sta.b   EntityStruct.{c}Vecl
 
-                    sep     #$20
-                a8()
-                    lda.b   #0
+                    lda.w   #0
                     sbc.b   EntityStruct.tmp + 2
+                    sta.b   EntityStruct.{c}Vecl + 2
+
                     bra     EndIf
 
                 Positive:
-                    ldy.b   EntityStruct.tmp
+                    lda.b   EntityStruct.tmp
+                    sta.b   EntityStruct.{c}Vecl
                     lda.b   EntityStruct.tmp + 2
+                    sta.b   EntityStruct.{c}Vecl + 2
+
                     bra     EndIf
 
                 Zero:
-                    ldy.w   #0
-                    lda.b   #0
+                    stz.b   EntityStruct.{c}Vecl
+                    stz.b   EntityStruct.{c}Vecl + 2
 
             EndIf:
-                sty.b   EntityStruct.{c}Vecl
-                sta.b   EntityStruct.{c}Vecl + 2
             }
         }
 
@@ -100,8 +103,6 @@ scope ProjectileEntity {
         _SetVelocity(y)
 
 
-        rep     #$30
-    a16()
         lda.w   #0
         jmp     MetaSprite.SetFrame
     }

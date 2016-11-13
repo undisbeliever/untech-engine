@@ -194,9 +194,9 @@ constant tmp_frame(tmp0)
     bcc     Fail
 
     stz.b   BaseEntity.xVecl
-    stz.b   BaseEntity.xVecl.hw
+    stz.b   BaseEntity.xVecl + 2
     stz.b   BaseEntity.yVecl
-    stz.b   BaseEntity.yVecl.hw
+    stz.b   BaseEntity.yVecl + 2
 
     jsr     MetaSprite.Animation.Process
 
@@ -217,16 +217,16 @@ constant tmp_frame(tmp0)
         cmp.w   tmp_frame
         bne     Fail
 
-        // Increment the velocity and try again
-        lda.w   #0x0080
-        sta.b   BaseEntity.{vecl}.hw
+        // Set velocity to 0.5 pixels/frame
+        lda.w   #0x8000
+        sta.b   BaseEntity.{vecl}
 
         jsr     MetaSprite.Animation.Process
         jsr     MetaSprite.Animation.Process
         jsr     MetaSprite.Animation.Process
         jsr     MetaSprite.Animation.Process
 
-        // travelled 2.0 pixels, frame is the same
+        // travelled 2.0 pixels, frame has not changed
         lda.b   BaseEntity.MetaSprite.currentFrame
         cmp.w   tmp_frame
         bne     Fail

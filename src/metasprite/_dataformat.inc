@@ -344,6 +344,9 @@ scope Format {
             // If the metasprite frame could not be set, then the engine will
             // try again in the next display frame.
             //
+            // NOTE: Internally uses 1:7:8 fixed point math; the animation
+            // will not preform correctly if entity velocity is out of bounds.
+            //
             // param: (uint8) frame Id
             // param: (0:3:5 fixed point) distance to wait
             enum(SET_FRAME_AND_WAIT_XVECL)
@@ -353,6 +356,9 @@ scope Format {
             //
             // If the metasprite frame could not be set, then the engine will
             // try again in the next display frame.
+            //
+            // NOTE: Internally uses 1:7:8 fixed point math; the animation
+            // will not preform correctly if entity velocity is out of bounds.
             //
             // param: (uint8) frame Id
             // param: (0:3:5 fixed point) distance to wait

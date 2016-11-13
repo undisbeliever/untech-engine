@@ -374,7 +374,8 @@ scope SetFrameAndWait_xVecl_Continue: {
     //     goto SetFrameAndWait_Vecl_Start
     //
     // else:
-    //     t = delay - abs(xVecl)
+    //     v = abs((fp1:7:8)xVecl)
+    //     t = delay - v
     //     if t < 0:
     //         goto next instruction
     //     else:
@@ -384,7 +385,8 @@ scope SetFrameAndWait_xVecl_Continue: {
     lda.b   BaseEntity.MetaSprite.Animation.delay
     bmi     SetFrameAndWait_Vecl_Start
 
-    lda.b   BaseEntity.xVecl.hw
+    // convert velocity from 1:15:16 to 1:7:8 fixed point math
+    lda.b   BaseEntity.xVecl + 1
     bmi     +
         // invert if positive
         eor.w   #0xffff
@@ -416,7 +418,7 @@ scope SetFrameAndWait_yVecl_Continue: {
     lda.b   BaseEntity.MetaSprite.Animation.delay
     bmi     SetFrameAndWait_Vecl_Start
 
-    lda.b   BaseEntity.yVecl.hw
+    lda.b   BaseEntity.yVecl + 1
     bmi     +
         eor.w   #0xffff
         inc
