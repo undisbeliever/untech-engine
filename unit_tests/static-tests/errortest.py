@@ -19,7 +19,7 @@ def searchErrorLine(filename):
 
 def doTest(filename):
     process = subprocess.Popen(
-        ("bass", "-strict", "-o", os.devnull, filename), 
+        ("bass-untech", "-strict", "-o", os.devnull, filename),
         stdout=subprocess.PIPE,
         stderr=subprocess.PIPE)
     pout, perr = process.communicate()

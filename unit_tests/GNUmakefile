@@ -31,7 +31,7 @@ static-tests: $(STATIC_TESTS)
 
 # Have to use a NULL FILE to get bass's pc() function to work
 static-tests/%.success.asm: FORCE
-	bass -strict -create -o $(NULL_FILE) $@
+	bass-untech -strict -create -o $(NULL_FILE) $@
 
 static-tests/%.error.asm: FORCE
 	python3 static-tests/errortest.py $@
@@ -44,7 +44,7 @@ FORCE:
 tests: $(TEST_BINARIES)
 
 bin/%.sfc bin/%.sym: tests/%.asm bin/ $(INCLUDES) test-resources
-	bass -strict -create -o $@ -sym $(@:.sfc=.sym) $<
+	bass-untech -strict -create -o $@ -sym $(@:.sfc=.sym) $<
 
 bin/:
 	mkdir -p $@
