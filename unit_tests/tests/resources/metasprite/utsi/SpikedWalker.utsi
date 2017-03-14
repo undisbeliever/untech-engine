@@ -3,6 +3,7 @@
 <spriteimporter id="SpikedWalker" tilesettype="ONE_ROW_FIXED" image="SpikedWalker.png" transparent="d34dfd">
   <grid width="16" height="16" xoffset="0" yoffset="0" xpadding="0" ypadding="0" xorigin="6" yorigin="12"/>
   <exportorder src="../formats/Walker.utfseo"/>
+  <palette npalettes="3" colorsize="4"/>
   <frame id="Fall_Left" order="2">
     <gridlocation x="6" y="0"/>
     <tilehitbox x="2" y="3" width="11" height="11"/>
@@ -60,11 +61,11 @@
     <entityhitbox type="ATTACK" x="5" y="0" width="6" height="5"/>
   </frame>
   <animation id="Walk_Left">
-    <instruction op="SET_FRAME_AND_WAIT_XVECL" frame="Walk_Left_0" parameter="30"/>
-    <instruction op="SET_FRAME_AND_WAIT_XVECL" frame="Walk_Left_1" parameter="30"/>
-    <instruction op="SET_FRAME_AND_WAIT_XVECL" frame="Walk_Left_2" parameter="30"/>
-    <instruction op="SET_FRAME_AND_WAIT_XVECL" frame="Walk_Left_3" parameter="30"/>
-    <instruction op="SET_FRAME_AND_WAIT_XVECL" frame="Walk_Left_4" parameter="30"/>
+    <instruction op="SET_FRAME_AND_WAIT_XVECL" parameter="30" frame="Walk_Left_0"/>
+    <instruction op="SET_FRAME_AND_WAIT_XVECL" parameter="30" frame="Walk_Left_1"/>
+    <instruction op="SET_FRAME_AND_WAIT_XVECL" parameter="30" frame="Walk_Left_2"/>
+    <instruction op="SET_FRAME_AND_WAIT_XVECL" parameter="30" frame="Walk_Left_3"/>
+    <instruction op="SET_FRAME_AND_WAIT_XVECL" parameter="30" frame="Walk_Left_4"/>
     <instruction op="GOTO_START"/>
   </animation>
 </spriteimporter>

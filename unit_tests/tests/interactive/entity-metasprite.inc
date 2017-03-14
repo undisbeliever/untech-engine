@@ -9,6 +9,7 @@ scope ShowAllFramesEntity {
     scope EntityStruct {
         childstruct(BaseEntity)
             field(frameId, 2)
+            field(paletteId, 2)
             field(frameCount, 2)
 
             field(frameDelay, 2)
@@ -26,6 +27,8 @@ scope ShowAllFramesEntity {
         lda.w   #-1
         sta.b   EntityStruct.frameCount
         sta.b   EntityStruct.frameId
+
+        stz.b   EntityStruct.paletteId
 
         rts
     }
@@ -48,25 +51,51 @@ scope ShowAllFramesEntity {
             sep     #$20
         a8()
             ldx.b   EntityStruct.MetaSprite.frameSet
+            ldy.b   EntityStruct.paletteId
 
             lda.b   EntityStruct.frameId
             inc
             cmp.l   MetaSprite.Format.FrameSet.nFrames,x
-            bcc     +
+            bcc     ++
+                // increment palette when resetting to frame 0
+                tya
+                inc
+                cmp.l   MetaSprite.Format.FrameSet.nPalettes,x
+                bcc     +
+                    lda.b   #0
+                +
+                tay
+
                 lda.b   #0
             +
 
-            rep     #$20
+            // A = frame Id
+            // Y = palette Id
+
+            rep     #$30
         a16()
             and.w   #$00ff
             pha
+            phy
                 jsr     MetaSprite.SetFrame
+                bcc     RestoreStack
+
+                sep     #$20
+            a8()
+                lda     1,s
+                jsr     MetaSprite.Palette.SetPalette
+
+                rep     #$30
+            a16()
+        RestoreStack:
+            ply
             pla
             bcc     EndIf
 
                 // frameCount is only reset upon a successful SetFrame
                 // so that cases where we run out of DMA time are handled.
                 sta.b   EntityStruct.frameId
+                sty.b   EntityStruct.paletteId
 
                 lda.b   EntityStruct.frameDelay
                 sta.b   EntityStruct.frameCount
