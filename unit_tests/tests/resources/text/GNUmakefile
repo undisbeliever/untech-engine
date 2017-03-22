@@ -4,9 +4,8 @@
 .PHONY: all
 all: font-fixed.2bpp font-fixed.clr
 
-font-fixed.2bpp font-fixed.clr: font-fixed.pcx
-	pcx2snes -n -s8 -c4 -o2 font-fixed
-	mv font-fixed.pic font-fixed.2bpp
+font-fixed.2bpp font-fixed.clr: font-fixed.png
+	untech-png2tileset -b 2 -o font-fixed.2bpp -p font-fixed.clr font-fixed.png
 
 .PHONY: clean
 clean:

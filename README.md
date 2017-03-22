@@ -13,7 +13,6 @@ Build Requirements
 ===================
  * [my private fork of bass](https://github.com/undisbeliever/bass-untech)
  * [untech-editor](https://github.com/undisbeliever/untech-editor)
- * pcx2snes
  * python3
  * gnu Make
 
