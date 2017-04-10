@@ -51,7 +51,7 @@ bin/:
 
 .PHONY: test-resources
 test-resources:
-	$(foreach d,$(RESOURCE_DIRS), $(MAKE) -C $d;)
+	$(foreach d,$(RESOURCE_DIRS),$(MAKE) -C $d &&) true
 
 
 .PHONY: clean
