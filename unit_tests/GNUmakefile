@@ -1,12 +1,11 @@
 
-TEST_SRC	= $(wildcard src/*.asm)
-TEST_BINARIES	= $(patsubst src/%.asm,bin/%.sfc, $(TEST_SRC))
+BINARY		= bin/unit-tests.sfc
+MAIN		= src/unit-tests.asm
 
-INC_DIR         = ../src/
-INCLUDES	= $(wildcard $(INC_DIR)/*.* $(INC_DIR)/*/*.* $(INC_DIR)/*/*/*.*)
-INCLUDES       += $(wildcard tests/*.* tests/*/*.* tests/*/*/*.*)
+SRC_DIRS       := src ../src
+INCLUDES       := $(foreach d,$(SRC_DIRS),$(wildcard $d/*.* $d/*/*.* $d/*/*/*.* $d/*/*/*/*.*))
 
-STATIC_TESTS    = $(wildcard static-tests/*.success.asm static-tests/*/*.success.asm)
+STATIC_TESTS   := $(wildcard static-tests/*.success.asm static-tests/*/*.success.asm)
 STATIC_TESTS   += $(wildcard static-tests/*.error*.asm static-tests/*/*.error*.asm)
 
 RESOURCE_DIRS   = resources/metasprite resources/text ../tables
@@ -22,7 +21,7 @@ endif
 
 
 .PHONY: all
-all: static-tests tests
+all: static-tests unit-tests
 
 
 
@@ -40,11 +39,11 @@ FORCE:
 
 
 
-.PHONY: tests
-tests: $(TEST_BINARIES)
+.PHONY: unit-tests
+unit-tests: $(BINARY)
 
-bin/%.sfc bin/%.sym: src/%.asm bin/ $(INCLUDES) test-resources
-	bass-untech -strict -create -o $@ -sym $(@:.sfc=.sym) $<
+$(BINARY) $(BINARY:.sfc=.sym): $(MAIN) $(INCLUDES) test-resources bin/
+	bass-untech -strict -create -o $@ -sym $(@:.sfc=.sym) $(MAIN)
 
 bin/:
 	mkdir -p $@
@@ -57,6 +56,6 @@ test-resources:
 
 .PHONY: clean
 clean:
-	$(RM) $(TEST_BINARIES) $(TEST_BINARIES:.sfc=.sym)
+	$(RM) $(BINARY) $(BINARY:.sfc=.sym)
 	$(foreach d,$(RESOURCE_DIRS), $(MAKE) -C $d clean;)
 
