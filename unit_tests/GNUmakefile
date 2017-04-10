@@ -1,6 +1,6 @@
 
-TEST_SRC	= $(wildcard tests/*.asm)
-TEST_BINARIES	= $(patsubst tests/%.asm,bin/%.sfc, $(TEST_SRC))
+TEST_SRC	= $(wildcard src/*.asm)
+TEST_BINARIES	= $(patsubst src/%.asm,bin/%.sfc, $(TEST_SRC))
 
 INC_DIR         = ../src/
 INCLUDES	= $(wildcard $(INC_DIR)/*.* $(INC_DIR)/*/*.* $(INC_DIR)/*/*/*.*)
@@ -9,7 +9,7 @@ INCLUDES       += $(wildcard tests/*.* tests/*/*.* tests/*/*/*.*)
 STATIC_TESTS    = $(wildcard static-tests/*.success.asm static-tests/*/*.success.asm)
 STATIC_TESTS   += $(wildcard static-tests/*.error*.asm static-tests/*/*.error*.asm)
 
-RESOURCE_DIRS   = tests/resources/metasprite tests/resources/text ../tables
+RESOURCE_DIRS   = resources/metasprite resources/text ../tables
 
 
 ifeq ($(OS),Windows_NT)
@@ -43,7 +43,7 @@ FORCE:
 .PHONY: tests
 tests: $(TEST_BINARIES)
 
-bin/%.sfc bin/%.sym: tests/%.asm bin/ $(INCLUDES) test-resources
+bin/%.sfc bin/%.sym: src/%.asm bin/ $(INCLUDES) test-resources
 	bass-untech -strict -create -o $@ -sym $(@:.sfc=.sym) $<
 
 bin/:

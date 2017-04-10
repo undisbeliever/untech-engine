@@ -56,8 +56,8 @@ constant VRAM_OBJ_WADDR(0x6000)
 constant VRAM_CONSOLE_TILES_WADDR(0x1000)
 constant VRAM_CONSOLE_MAP_WADDR(0x0000)
 
-include "resources/metasprite/metasprites.gen.inc"
-include "resources/text/text.inc"
+include "../resources/metasprite/metasprites.gen.inc"
+include "../resources/text/text.inc"
 
 include "../../tables/tables.inc"
 
