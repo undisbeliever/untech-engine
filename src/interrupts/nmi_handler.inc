@@ -33,8 +33,14 @@ i8()
     // Reset NMI Flag.
     ldy.w   RDNMI
 
+    // Disable HDMA
+    ldx.b   #0
+    stx.w   HDMAEN
+
 
     Dma.VBlank()
+    Hdma.VBlank()
+
     ScrollBuffer.VBlank()
     FrameCounter.VBlank()
     Controller.VBlank()

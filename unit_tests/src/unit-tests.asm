@@ -45,6 +45,16 @@ createRamBlock(shadow,      0x7e1100, 0x7e1f7f)
 createRamBlock(stack,       0x7e1f80, 0x7e1fff)
 createRamBlock(wram7e,      0x7e2000, 0x7effff)
 
+
+allocate(dpTmp0, dp, 2)
+allocate(dpTmp1, dp, 2)
+allocate(dpTmp2, dp, 2)
+allocate(dpTmp3, dp, 2)
+allocate(dpTmp4, dp, 2)
+allocate(dpTmp5, dp, 2)
+allocate(dpTmp6, dp, 2)
+allocate(dpTmp7, dp, 2)
+
 scope Entity {
     constant ENTITY_SIZE(64)
     constant N_ENTITIES(64)
@@ -62,6 +72,7 @@ include "../resources/text/text.inc"
 include "../../tables/tables.inc"
 
 include "../../src/dma.inc"
+include "../../src/hdma.inc"
 include "../../src/interrupts.inc"
 include "../../src/math.inc"
 include "../../src/metasprite.inc"
@@ -104,6 +115,8 @@ include "tests/text.inc"
 include "interactive/entity-metasprite.inc"
 include "interactive/entity-actionpointspawner.inc"
 include "interactive/entityhitbox-collisions.inc"
+include "interactive/hdma-circular-window.inc"
+
 
 Test.finalizeTable()
 
