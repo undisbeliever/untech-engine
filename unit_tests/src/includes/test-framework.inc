@@ -121,6 +121,7 @@ i16()
 
         jsr     EnableVBlank
 
+
         lda.w   testId
         asl
         tax
@@ -132,11 +133,21 @@ i16()
         phb
 
         jsr     (AddrTable,x)
-        bcc     Fail
+        bcs     +
+            jmp     Fail
+        +
 
 
         rep     #$30
     a16()
+        WaitForButtonRelease:
+            lda.l   JOY1
+            beq     NoButtonsPressed
+                jsr     WaitFrame
+                bra     WaitForButtonRelease
+        NoButtonsPressed:
+
+
         // Clears the old test name
         Text.Console.SetCursor(0, 1)
         Text.Console.PrintConstString("\n\n\n")

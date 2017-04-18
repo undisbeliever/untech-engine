@@ -11,16 +11,6 @@ i16()
 code()
 scope Init: {
 
-    // Wait for button release
-    // -----------------------
-    WaitButtonRelease:
-        jsr     WaitFrame
-
-        lda.l   JOY1
-        and.w   #JOY.buttons
-        bne     WaitButtonRelease
-
-
     // Setup The screen
     // ----------------
     pea     (0x7e << 8) | REGISTER_DB
