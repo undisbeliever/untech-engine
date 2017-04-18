@@ -866,10 +866,10 @@ scope CGADSUB {
 constant COLDATA(0x2132)
 
 scope COLDATA {
-    scope plabe {
-        constant subtract(%11100000)
+    scope plane {
+        constant all(%11100000)
         constant blue(%10000000)
-        constant greem(%01000000)
+        constant green(%01000000)
         constant red(%00100000)
     }
     scope intensity {
