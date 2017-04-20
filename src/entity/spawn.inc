@@ -1,11 +1,6 @@
 
 scope Entity {
 
-// ::TODO separate projectile ROM data list::
-// ::TODO create a projectile free list::
-// ::DEBUG::
-constant lists.projectileFree(Entity.lists.free)
-
 scope Spawn {
 ReturnFalse:
     clc
@@ -385,15 +380,15 @@ Return:
 SpawnProjectile:
         rep     #$31
     a16()
-        lda.w   lists.projectileFree
+        lda.w   Entity.lists.free
         beq     ReturnDp
 
         stx.w   MetaSprite.ActionPoint.address
 
-        // remove entity from projectileFree list
+        // remove entity from free list
         tcd
         lda.b   BaseEntity.next
-        sta.w   lists.projectileFree
+        sta.w   Entity.lists.free
 
         // calculate entity location
         ldy.w   tmp_entityDoingSpawning

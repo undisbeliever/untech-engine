@@ -182,8 +182,6 @@ scope OBSEL {
     scope name {
         constant mask(%00011000)
         constant shift(3)
-
-        // ::TODO name::
     }
     scope base {
         constant mask(%00000111)

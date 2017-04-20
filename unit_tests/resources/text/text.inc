@@ -22,9 +22,8 @@ scope Font {
     constant NEW_LINE(0xff)
 
 rodata(rom0)
+    // ::TODO convert font-fixed tiles to 1bpp::
     insert FixedTiles, "font-fixed.2bpp"
-
-    // ::TODO change 1bpp tiles::
     constant FixedTiles.bitDepth(2)
 }
 }

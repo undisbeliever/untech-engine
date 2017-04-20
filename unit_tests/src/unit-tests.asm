@@ -60,7 +60,6 @@ scope Entity {
     constant N_ENTITIES(64)
 }
 
-// ::DEBUG::
 // ::TODO move somewhere else::
 constant VRAM_OBJ_WADDR(0x6000)
 constant VRAM_CONSOLE_TILES_WADDR(0x1000)

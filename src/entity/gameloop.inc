@@ -475,8 +475,6 @@ a16()
 i16()
 code()
 scope ProcessGameLoop: {
-    // ::DEBUG::
-    // ::TODO move into Camera Game Loop::
     Camera._UpdateWindows()
 
     _ProcessTryToActivateAgainList()
