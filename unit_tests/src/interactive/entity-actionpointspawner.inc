@@ -155,8 +155,12 @@ scope ProjectileEntity {
         db  0                   // defaultPalette
     }
 
-    rodata(EN_RomDataList)
-    constant ENTITY_ID((pc() - Entity.Data.List) / 2)
+    rodata(EN_ProjectileList)
+    constant PROJECTILE_ID((pc() - Entity.Data.ProjectileList) / 2)
+        dw  RomData
+
+    rodata(EN_EntityList)
+    constant ENTITY_ID((pc() - Entity.Data.EntityList) / 2)
         dw  RomData
 }
 
@@ -176,14 +180,6 @@ scope SpawnerEntity {
             field(spawnRoutine, 2)
         endstruct()
     }
-
-    code()
-    scope SpawnRoutineTable: {
-        dw  Entity.SpawnPlayerProjectileFromActionPoint
-        dw  Entity.SpawnEnemyProjectileFromActionPoint
-        dw  Entity.SpawnAtActionPoint
-    }
-    constant N_SPAWN_ROUTINES((pc() - SpawnRoutineTable) / 2)
 
     a16()
     i16()
@@ -225,8 +221,6 @@ scope SpawnerEntity {
             lda.b   EntityStruct.spawnPoint
             inc
 
-            ldy.w   #ProjectileEntity.ENTITY_ID
-
             ldx.b   EntityStruct.spawnRoutine
             jsr     (SpawnRoutineTable,x)
 
@@ -255,6 +249,43 @@ scope SpawnerEntity {
         rts
     }
 
+
+    // INPUT: A = spawn point
+    //        DP = entity
+    // REQUIRES: 16 bit A, 16 bit Index, DB = 0x7e
+    code()
+    scope SpawnRoutineTable: {
+        dw  SpawnPlayerProjectileAtAp
+        dw  SpawnEnemyProjectileAtAp
+        dw  SpawnEntityAtAp
+    }
+    constant N_SPAWN_ROUTINES((pc() - SpawnRoutineTable) / 2)
+
+    a16()
+    i16()
+    code()
+    scope SpawnPlayerProjectileAtAp: {
+        ldy.w   #ProjectileEntity.PROJECTILE_ID
+        jmp     Entity.SpawnPlayerProjectileFromActionPoint
+    }
+
+    a16()
+    i16()
+    code()
+    scope SpawnEnemyProjectileAtAp: {
+        ldy.w   #ProjectileEntity.PROJECTILE_ID
+        jmp     Entity.SpawnEnemyProjectileFromActionPoint
+    }
+
+    a16()
+    i16()
+    code()
+    scope SpawnEntityAtAp: {
+        ldy.w   #ProjectileEntity.ENTITY_ID
+        jmp     Entity.SpawnAtActionPoint
+    }
+
+
     rodata(EN_RomData)
     scope RomData: {
         dw  FunctionTable
@@ -263,8 +294,8 @@ scope SpawnerEntity {
         db  0                       // defaultPalette
     }
 
-    rodata(EN_RomDataList)
-    constant ENTITY_ID((pc() - Entity.Data.List) / 2)
+    rodata(EN_EntityList)
+    constant ENTITY_ID((pc() - Entity.Data.EntityList) / 2)
         dw  RomData
 }
 

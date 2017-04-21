@@ -124,8 +124,8 @@ scope ShowAllFramesEntity {
             db  0                       // defaultPalette
         }
 
-        rodata(EN_RomDataList)
-        constant {name}_entityId((pc() - Entity.Data.List) / 2)
+        rodata(EN_EntityList)
+        constant {name}_entityId((pc() - Entity.Data.EntityList) / 2)
             dw  RomData_{name}
     }
     BuildEntityData(Man)

@@ -26,7 +26,8 @@ scope Spawn: {
 allocateTmpWord(xPos)
 allocateTmpWord(yPos)
 
-    // ::TODO limit entity Id
+    // ::TODO show error on invalid entity Id ::
+
     asl
     tax
 
@@ -45,7 +46,7 @@ allocateTmpWord(yPos)
 
         // Get Entity ROM Data
 
-        lda.l   Entity.Data.List,x
+        lda.l   Entity.Data.EntityList,x
         tax
         stx.b   BaseEntity.romPtr
 
@@ -195,6 +196,8 @@ scope SpawnAtActionPoint: {
 allocateTmpWord(tmp_compare)
 allocateTmpWord(tmp_entityToSpawn)
 
+    // ::TODO show error on invalid entity Id ::
+
     sta.w   tmp_compare
 
     ldx.b   BaseEntity.MetaSprite.currentFrame
@@ -273,14 +276,14 @@ Return:
 // MUST NOT BE CALLED IN ENTITY CONSTRUCTOR
 //
 // INPUT: DP = entity
-//        Y = entityId
+//        Y = projectileId
 //        A = type to match
 a16()
 i16()
 code()
 scope SpawnEnemyProjectileFromActionPoint: {
     ldx.w   #lists.enemyProjectiles
-    bra     _SpawnFromActionPoint
+    bra     _SpawnProjectileFromActionPoint
 }
 
 // Spawns one or more player projectiles from an ActionPoint type/location
@@ -295,7 +298,7 @@ scope SpawnEnemyProjectileFromActionPoint: {
 // MUST NOT BE CALLED IN ENTITY CONSTRUCTOR
 //
 // INPUT: DP = entity
-//        Y = entityId
+//        Y = projectile Id
 //        A = type to match
 a16()
 i16()
@@ -315,13 +318,15 @@ _fallthrough:
 a16()
 i16()
 code()
-scope _SpawnFromActionPoint: {
+scope _SpawnProjectileFromActionPoint: {
 allocateTmpWord(tmp_listAddr)
 allocateTmpWord(tmp_compare)
 allocateTmpWord(tmp_projectileDataPtr)
 allocateTmpWord(tmp_entityDoingSpawning)
 
     assert(SpawnPlayerProjectileFromActionPoint._fallthrough == pc())
+
+    // ::TODO show error on invalid projectile Id ::
 
     sta.w   tmp_compare
     stx.w   tmp_listAddr
@@ -337,11 +342,9 @@ allocateTmpWord(tmp_entityDoingSpawning)
     tya
     txy
 
-    //::TODO limit projectile Id
-    //::TODO separate projectile data list::
     asl
     tax
-    lda.l   Entity.Data.List,x
+    lda.l   Entity.Data.ProjectileList,x
     sta.w   tmp_projectileDataPtr
 
     tyx

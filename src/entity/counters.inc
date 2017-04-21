@@ -15,8 +15,8 @@ allocateTmpWord(tmp_count)
 
     asl
     tax
-    lda.l   Entity.Data.List,x
-    // A = entity Id
+    lda.l   Entity.Data.EntityList,x
+    // A = entity romPtr
 
     ldx.w   Entity.lists.enemies
     beq     EmptyList

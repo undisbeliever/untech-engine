@@ -67,8 +67,8 @@ macro _repeat(evaluate n) {
             db  0               // defaultPalette
         }
 
-        rodata(EN_RomDataList)
-        constant EntityId_{n}((pc() - Entity.Data.List) / 2)
+        rodata(EN_EntityList)
+        constant EntityId_{n}((pc() - Entity.Data.EntityList) / 2)
             dw  RomData{n}
 
         _repeat({n} + 1)

@@ -2,7 +2,15 @@
 scope Entity {
 
 scope Data {
-    storeBlockStart(List,  EN_RomDataList)
+    // List of entities.
+    // Addresses point to the BaseEntityData struct in the EN_RomData.
+    // (list of addr)
+    storeBlockStart(EntityList,  EN_EntityList)
+
+    // List of projectiles.
+    // Addresses point to the BaseEntityData struct in the EN_RomData.
+    // (list of addr)
+    storeBlockStart(ProjectileList,  EN_ProjectileList)
 
     rodata(EN_RomData)
         constant Offset(pc() & 0xff0000)
