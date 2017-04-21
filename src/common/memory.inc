@@ -36,7 +36,7 @@ scope private {
 
         macro checkBlockIsValid(name, start, end) {
             if (({end} & 0x3f0000) >> 1 | ({end} & 0x7fff)) > ({ROM_SIZE} * 0x20000) {
-                error "ROM block `{name}` is oututside ROM_SIZE"
+                error "ROM block `{name}` is outside ROM_SIZE"
             }
             if ({start} & 0xFFFF) < 0x8000 {
                 error "ROM Block `{name}` is not in ROM area"
@@ -51,7 +51,7 @@ scope private {
 
         macro checkBlockIsValid(name, start, end) {
             if ({end} & 0x3fffff) > ({ROM_SIZE} * 0x20000) {
-                error "ROM block `{name}` is oututside ROM_SIZE"
+                error "ROM block `{name}` is outside ROM_SIZE"
             }
             if (({start} & 0x7fffff) < 0x3f0000) && (({start} & 0xFFFF) < 0x8000) {
                 error "ROM Block `{name}` is not in ROM area"
@@ -61,6 +61,9 @@ scope private {
         error "Unknown memory map `{MEMORY_MAP}`"
     }
 }
+
+
+evaluate ::romBlockNames.count(0)
 
 // Creates a new data block in a given ROM location.
 //
@@ -90,10 +93,14 @@ macro createDataBlock(name, evaluate start, evaluate end) {
         error "ROM Block `{name}` cannot touch the SNES Header"
     }
 
+    global define ::romBlockNames.{::romBlockNames.count}({name})
+    global evaluate ::romBlockNames.count({::romBlockNames.count} + 1)
+
     global evaluate ::romBlocks.{name}.pos({start})
     global evaluate ::romBlocks.{name}.start({start})
     global evaluate ::romBlocks.{name}.end({end})
 }
+
 
 // seeks to the next position in the selected block id
 macro rodata(id) {
@@ -127,6 +134,7 @@ macro code() {
     code(code)
 }
 
+
 // Creates a constant containing the starting address of a block
 macro storeBlockStart(name, blockId) {
     constant {name}({::romBlocks.{blockId}.start})
@@ -154,6 +162,8 @@ macro popBlock() {
 }
 
 
+evaluate ::ramBlockNames.count(0)
+
 // Create a new ram block with a given position and size.
 //
 // RAM blocks can overlap. This is to reuse memory in different contexts.
@@ -174,6 +184,9 @@ macro createRamBlock(id, evaluate start, evaluate end) {
     if {end} < {start} {
         error "RAM Block `{id}` cannot have end before start"
     }
+
+    global define ::ramBlockNames.{::ramBlockNames.count}({id})
+    global evaluate ::ramBlockNames.count({::ramBlockNames.count} + 1)
 
     global evaluate ::blocks.{id}.start({start})
     global evaluate ::blocks.{id}.end({end})
@@ -200,6 +213,82 @@ macro allocate(name, blockId, evaluate size) {
     global evaluate ::blocks.{blockId}.pos({::blocks.{blockId}.pos} + {size})
     global evaluate ::blocks.{blockId}.size({::blocks.{blockId}.size} + {size})
     global evaluate ::blocks.{blockId}.remaining({::blocks.{blockId}.remaining} - {size})
+}
+
+
+// Prints memory usage if `SHOW_MEMORY_USAGE` is defined.
+//
+// This MUST be called at the end of the program, or else the usage
+// table will be invalid.
+macro finalizeMemory() {
+    assert({::romBlock.stackSize} == 0)
+
+    if {defined ::romBlock.current} {
+        // update position of current block
+        global evaluate ::romBlocks.{::romBlock.current}.pos(pc())
+    }
+
+    if {defined SHOW_MEMORY_USAGE} {
+        print "\n"
+        print "MEMORY USAGE:\n"
+        print "\n"
+        print "Address | Size    | Used    | Free    | Block Name\n"
+        print "--------+---------+---------+---------+--------------------------\n"
+        __printDataStats_Loop(0)
+
+        print "--------+---------+---------+---------+--------------------------\n"
+        __printRamStats_Loop(0)
+    }
+}
+
+macro __printDataStats_Loop(evaluate n) {
+    if {n} < {::romBlockNames.count} {
+        define bn({::romBlockNames.{n}})
+
+        // address
+        print " "
+        print_hex(6, {::romBlocks.{bn}.start})
+        print " | "
+
+        // size
+        print_padded(7, {::romBlocks.{bn}.end} - {::romBlocks.{bn}.start} + 1)
+        print " | "
+
+        // used
+        print_padded(7, {::romBlocks.{bn}.pos} - {::romBlocks.{bn}.start})
+        print " | "
+
+        // free
+        print_padded(7, {::romBlocks.{bn}.end} - {::romBlocks.{bn}.pos} + 1)
+        print " | {bn}\n"
+
+        __printDataStats_Loop({n} + 1)
+    }
+}
+
+macro __printRamStats_Loop(evaluate n) {
+    if {n} < {::ramBlockNames.count} {
+        define bn({::ramBlockNames.{n}})
+
+        // address
+        print " "
+        print_hex(6, {::blocks.{bn}.start})
+        print " | "
+
+        // size
+        print_padded(7, {::blocks.{bn}.end} - {::blocks.{bn}.start} + 1)
+        print " | "
+
+        // used
+        print_padded(7, {::blocks.{bn}.size})
+        print " | "
+
+        // free
+        print_padded(7, {::blocks.{bn}.remaining})
+        print " | {bn}\n"
+
+        __printRamStats_Loop({n} + 1)
+    }
 }
 
 // vim: ft=bass-65816 ts=4 sw=4 et:

@@ -45,6 +45,12 @@ unit-tests: $(BINARY)
 $(BINARY) $(BINARY:.sfc=.sym): $(MAIN) $(INCLUDES) test-resources bin/
 	bass-untech -strict -create -o $@ -sym $(@:.sfc=.sym) $(MAIN)
 
+
+.PHONY: memory-usage
+memory-usage: test-resources
+	bass-untech -d SHOW_MEMORY_USAGE -strict -create $(MAIN)
+
+
 bin/:
 	mkdir -p $@
 
