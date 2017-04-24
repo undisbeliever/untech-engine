@@ -7,9 +7,6 @@ assert(({::romBlocks.testTableBlock.start} >> 16) == ({::romBlocks.code.start} >
 // ::TODO display failed test name on breakpoint::
 
 
-// Test.ProcessTests is the main function
-constant Main(Test.ProcessTests)
-
 evaluate ::nTests(0)
 
 scope Test {

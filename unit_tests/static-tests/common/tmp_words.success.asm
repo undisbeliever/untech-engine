@@ -1,5 +1,7 @@
 // Test tmp words
 
+// ::TODO validate binary output::
+
 arch snes.cpu
 
 define MEMORY_MAP(LOROM)
@@ -24,6 +26,7 @@ scope test {
     sta.w   tmp1
 }
 
+
 allocate(dataBlock, shadow, 0x200)
 
 markTmpWord(dataBlock + 0x0e)
@@ -32,8 +35,6 @@ markTmpWord(dataBlock + 0x2e)
 markTmpWord(dataBlock + 0x3e)
 markTmpWord(dataBlock + 0x4e)
 
-assert(test.tmp0 == dataBlock + 0x0e)
-assert(test.tmp1 == dataBlock + 0x1e)
 
 scope test {
     // test requesting a tmp after it's marked

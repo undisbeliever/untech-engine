@@ -51,6 +51,9 @@ include "interactive/entityhitbox-collisions.inc"
 include "interactive/hdma-circular-window.inc"
 
 
+constant Main(Test.ProcessTests)
+
+
 Test.finalizeTable()
 
 

@@ -169,8 +169,7 @@ macro _VBlank() {
             jmp     (Dma.Tile16._ProcessDMA.FunctionTable,x)
 
 
-        constant ::Dma.Tile16.ContinueLoop(Continue)
-        Continue:
+        ::Dma.Tile16.ContinueLoop:
             ply
 
             iny
@@ -180,8 +179,7 @@ macro _VBlank() {
             bne     Loop
             bra     EndLoop
 
-    constant ::Dma.Tile16.EndLoopFunction(EndLoopFunction)
-    EndLoopFunction:
+    ::Dma.Tile16.EndLoopFunction:
         ply
 
     EndLoop:

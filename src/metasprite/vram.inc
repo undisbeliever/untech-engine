@@ -118,10 +118,7 @@ macro _Activate() {
                 jmp     (MetaSprite.Vram._AllocateDynamic.Table,x)
             }
 
-        constant ::MetaSprite.Vram.AllocateDynamic.Return(Return_Dynamic)
-        constant ::MetaSprite.Vram.ActivateFixed.Return(Return_Fixed)
-
-        Return_Dynamic:
+        ::MetaSprite.Vram.AllocateDynamic.Return:
             bcc     ReturnRep
 
             // Upload tiles now that a row is allocated
@@ -130,7 +127,7 @@ macro _Activate() {
         i16()
             jsr     MetaSprite.Vram._UploadDynamicTileset
 
-        Return_Fixed:
+        ::MetaSprite.Vram.ActivateFixed.Return:
             bcc     ReturnRep
     AlreadyActive:
     }
@@ -157,6 +154,8 @@ scope _DeallocateSlot_A: {
 
         // X = current
         scope {freeSlotPool}: {
+            constant Return(UpdateStatus)
+
             assert(StatusFlags.dynamicTileset == 0x40)
 
             // if entity is not dynamic:
@@ -219,8 +218,6 @@ scope _DeallocateSlot_A: {
                 txa
                 sty.w   slotPool.{freeSlotPool}
                 sta.w   slots.next,y
-
-        constant Return(UpdateStatus)
         }
     }
 

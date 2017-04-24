@@ -89,7 +89,7 @@ scope Entity {
         //  - will be deleted when moved outside active window
         allocate(enemyProjectiles, wram7e, 2)
 
-    constant FIRST(players)
+
         // Player entity and allies
         //  - collides with: enemies, bosses, enemyProjectiles
         //  - will never be deactivated
@@ -124,6 +124,8 @@ scope Entity {
         //  - will never be deactivated
         allocate(particles, wram7e, 2)
 
+
+    constant FIRST(players)
     constant LAST(particles)
     constant N_LISTS((LAST - FIRST) / 2 + 1)
     }
