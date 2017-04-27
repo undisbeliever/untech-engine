@@ -229,20 +229,19 @@ macro finalizeMemory() {
     }
 
     if {defined SHOW_MEMORY_USAGE} {
-        print "\n"
-        print "MEMORY USAGE:\n"
-        print "\n"
-        print "Address | Size    | Used    | Free    | Block Name\n"
-        print "--------+---------+---------+---------+--------------------------\n"
-        __printDataStats_Loop(0)
-
-        print "--------+---------+---------+---------+--------------------------\n"
-        __printRamStats_Loop(0)
+        __printMemoryUsage()
     }
 }
 
-macro __printDataStats_Loop(evaluate n) {
-    if {n} < {::romBlockNames.count} {
+macro __printMemoryUsage() {
+    print "\n"
+    print "MEMORY USAGE:\n"
+    print "\n"
+    print "Address | Size    | Used    | Free    | Block Name\n"
+    print "--------+---------+---------+---------+--------------------------\n"
+
+    evaluate n(0)
+    while {n} < {::romBlockNames.count} {
         define bn({::romBlockNames.{n}})
 
         // address
@@ -262,12 +261,13 @@ macro __printDataStats_Loop(evaluate n) {
         print_padded(7, {::romBlocks.{bn}.end} - {::romBlocks.{bn}.pos} + 1)
         print " | {bn}\n"
 
-        __printDataStats_Loop({n} + 1)
+        evaluate n({n} + 1)
     }
-}
 
-macro __printRamStats_Loop(evaluate n) {
-    if {n} < {::ramBlockNames.count} {
+    print "--------+---------+---------+---------+--------------------------\n"
+
+    evaluate n(0)
+    while {n} < {::ramBlockNames.count} {
         define bn({::ramBlockNames.{n}})
 
         // address
@@ -287,7 +287,7 @@ macro __printRamStats_Loop(evaluate n) {
         print_padded(7, {::blocks.{bn}.remaining})
         print " | {bn}\n"
 
-        __printRamStats_Loop({n} + 1)
+        evaluate n({n} + 1)
     }
 }
 

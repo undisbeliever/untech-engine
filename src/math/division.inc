@@ -286,27 +286,25 @@ a16()
     stx.b   divisor
     ldx.w   #0          // Remainder
 
-    macro repeat(evaluate n) {
-        if {n} > 0 {
-            tya         // Dividend / result
-            asl
-            tay
-            txa         // Remainder
-            rol
+    evaluate n(0)
+    while {n} < 16 {
+        tya         // Dividend / result
+        asl
+        tay
+        txa         // Remainder
+        rol
+        tax
+
+        sec
+        sbc.b   divisor
+        bcc     +
+            // C set if positive
             tax
+            iny     // Result
+        +
 
-            sec
-            sbc.b   divisor
-            bcc     +
-                // C set if positive
-                tax
-                iny     // Result
-            +
-
-            repeat({n} - 1)
-        }
+        evaluate n({n} + 1)
     }
-    repeat(16)
 
     plp
     pld

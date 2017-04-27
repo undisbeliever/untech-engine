@@ -60,13 +60,11 @@ scope Entity {
 
 // Allow tests to access entity pool
 scope EntityPool {
-    macro _repeat(evaluate n) {
-        if {n} < Entity.N_ENTITIES {
-            constant entity{n}(Entity.entityPool + {n} * Entity.ENTITY_SIZE)
-            _repeat({n} + 1)
-        }
+    evaluate n(0)
+    while {n} < Entity.N_ENTITIES {
+        constant entity{n}(Entity.entityPool + {n} * Entity.ENTITY_SIZE)
+        evaluate n({n} + 1)
     }
-    _repeat(0)
 }
 
 

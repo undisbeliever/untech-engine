@@ -18,9 +18,9 @@ i16()
 code()
 scope FunctionTable: {
     macro _repeatNull(evaluate n) {
-        if {n} > 0 {
+        while {n} > 0 {
             dw  Null
-            _repeatNull({n} - 1)
+            evaluate n({n} - 1)
         }
     }
 

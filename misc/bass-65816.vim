@@ -68,7 +68,7 @@ syn match   bassScopeLabel /[a-zA-Z0-9._]\+:/ contained display
 
 
 " Conditions
-syn keyword bassConditional if else
+syn keyword bassConditional if else while
 
 
 " bass Keywords

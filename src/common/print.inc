@@ -10,19 +10,23 @@
 //  * width - the printing width
 //  * value - the value to print
 macro print_padded(evaluate width, evaluate value) {
-    __print_padded_spaces_loop({width} - 1, {value})
-    print {value}
-}
+    variable w({width} - 1)
+    variable v({value})
 
-macro __print_padded_spaces_loop(evaluate w, evaluate i) {
-    if {i} < 0 {
-        __print_padded_spaces_loop({w} - 1, 0 - {i})
-    } else if {w} > 0 {
-        if {i} < 10 {
+    if v < 0 {
+        v = 0 - v
+        w = w - 1
+    }
+
+    while w > 0 {
+        if v < 10 {
             print " "
         }
-        __print_padded_spaces_loop({w} - 1, {i} / 10)
+        w = w - 1
+        v = v / 10
     }
+
+    print {value}
 }
 
 // Prints a hexadecimal number with padding

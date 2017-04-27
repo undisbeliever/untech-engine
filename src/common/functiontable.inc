@@ -20,15 +20,13 @@ macro _buildFunctionTable_structs(struct, module) {
     if {defined ::struct.bases.{struct}.parent} {
         _buildFunctionTable_structs({::struct.bases.{struct}.parent}, {module})
     }
-    _buildFunctionTable_field({struct}, {module}, 0)
-}
 
-macro _buildFunctionTable_field(struct, module, evaluate n) {
-    if {n} < {::struct.bases.{struct}.size} {
+    evaluate n(0)
+    while {n} < {::struct.bases.{struct}.size} {
         assert({::struct.bases.{struct}.var{n}size} == 2)
         dw  {module}.{::struct.bases.{struct}.var{n}}
 
-        _buildFunctionTable_field({struct}, {module}, {n} + 1)
+        evaluate n({n} + 1)
     }
 }
 

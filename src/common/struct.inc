@@ -107,14 +107,12 @@ macro _childstruct_parents(parent) {
     if {defined ::struct.bases.{parent}.maxSize} {
         struct_maxsize({::struct.bases.{parent}.maxSize})
     }
-    _childstruct_fields({parent}, 0)
-}
 
-macro _childstruct_fields(parent, evaluate n) {
-    if {n} < {::struct.bases.{parent}.size} {
+    evaluate n(0)
+    while {n} < {::struct.bases.{parent}.size} {
         field({::struct.bases.{parent}.var{n}}, {::struct.bases.{parent}.var{n}size})
 
-        _childstruct_fields({parent}, {n} + 1)
+        evaluate n({n} + 1)
     }
 }
 
