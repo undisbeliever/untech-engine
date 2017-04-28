@@ -28,6 +28,9 @@ allocateTmpWord(yPos)
 
     // ::TODO show error on invalid entity Id ::
 
+    cmp.w   #Entity.Data.EntityListCount
+    bcs     ReturnFalse
+
     asl
     tax
 
@@ -198,6 +201,9 @@ allocateTmpWord(tmp_entityToSpawn)
 
     // ::TODO show error on invalid entity Id ::
 
+    cpy.w   #Entity.Data.EntityListCount
+    bcs     Return
+
     sta.w   tmp_compare
 
     ldx.b   BaseEntity.MetaSprite.currentFrame
@@ -327,6 +333,9 @@ allocateTmpWord(tmp_entityDoingSpawning)
     assert(SpawnPlayerProjectileFromActionPoint._fallthrough == pc())
 
     // ::TODO show error on invalid projectile Id ::
+
+    cpy.w   #Entity.Data.ProjectileListCount
+    bcs     Return
 
     sta.w   tmp_compare
     stx.w   tmp_listAddr
