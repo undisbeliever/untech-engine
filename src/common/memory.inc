@@ -74,6 +74,10 @@ evaluate ::romBlockNames.count(0)
 //  * start - the starting address of the block
 //  * end - the ending address of the block
 macro createDataBlock(name, evaluate start, evaluate end) {
+    if {defined ::MEMORY_FINALIZED} {
+        error "Memory module has been finalized, cannot create Data Block"
+    }
+
     if {defined ::romBlocks.{name}.start} {
         error "ROM Block `{name}` already exists"
     }
@@ -112,6 +116,10 @@ macro createDataBlock(name, evaluate start, evaluate end) {
 
 // seeks to the next position in the selected block id
 macro rodata(id) {
+    if {defined ::MEMORY_FINALIZED} {
+        error "Memory module has been finalized, cannot seek to Data Block"
+    }
+
     if {defined ::romBlock.current} {
         if (pc() - 1) > {::romBlocks.{::romBlock.current}.end} {
             error "Overflow in rom block {::romBlock.current}"
@@ -146,6 +154,32 @@ macro code() {
 // Creates a constant containing the starting address of a block
 macro storeBlockStart(name, blockId) {
     constant {name}({::romBlocks.{blockId}.start})
+}
+
+// Creates a constant containing the total number bytes used by a block.
+//
+// This value is NOT the current number of bytes used. Instead the
+// constant will contain the total number of bytes used by the block
+// when `finalizeMemory` is called.
+macro storeBlockUsed(name, blockId) {
+    constant {name}(::romBlocks.{blockId}.last - {::romBlocks.{blockId}.start})
+}
+
+// Creates a constant containing the final number of elements in a
+// fixed-sized table block
+//
+// {name} will contain the value of (<blockUsed> / <elementSize>)
+//
+// This value is NOT the current block count. Instead the constant will
+// contain the total number of elements in the block when
+// `finalizeMemory` is called.
+// program.
+macro storeBlockCount(name, blockId, evaluate elementSize) {
+    if {elementSize} <= 0 {
+        error "Invalid elementSize"
+    }
+
+    constant {name}((::romBlocks.{blockId}.last - {::romBlocks.{blockId}.start}) / {elementSize})
 }
 
 
@@ -186,6 +220,10 @@ evaluate ::ramBlockNames.count(0)
 //   * `::blocks.{id}.start` - the starting address of the block
 //   * `::blocks.{id}.end` - the last address of the block
 macro createRamBlock(id, evaluate start, evaluate end) {
+    if {defined ::MEMORY_FINALIZED} {
+        error "Memory module has been finalized, cannot create RAM Block"
+    }
+
     if {defined ::blocks.{id}.pos} {
         error "RAM Block `{id}` already exists"
     }
@@ -208,6 +246,10 @@ macro createRamBlock(id, evaluate start, evaluate end) {
 
 // Allocate memory from the RAM block to a given constant name
 macro allocate(name, blockId, evaluate size) {
+    if {defined ::MEMORY_FINALIZED} {
+        error "Memory module has been finalized, cannot allocate memory"
+    }
+
     if !{defined ::blocks.{blockId}.size} {
         error "block {blockId} does not exist"
     }
@@ -224,17 +266,37 @@ macro allocate(name, blockId, evaluate size) {
 }
 
 
+// Finalizes the memory module.
+//
 // Prints memory usage if `SHOW_MEMORY_USAGE` is defined.
 //
-// This MUST be called at the end of the program, or else the usage
-// table will be invalid.
+// This macro MUST BE called ONCE at the end of the program.
 macro finalizeMemory() {
-    assert({::romBlock.stackSize} == 0)
+    if {defined ::MEMORY_FINALIZED} {
+        error "Memory module has already been finalized"
+    }
+    global define ::MEMORY_FINALIZED(1)
+
+    if {::romBlock.stackSize} != 0 {
+        error "Block stack is not empty"
+    }
 
     if {defined ::romBlock.current} {
         // update position of current block
         global evaluate ::romBlocks.{::romBlock.current}.pos(pc())
     }
+
+
+    // build used constants
+    evaluate n(0)
+    while {n} < {::romBlockNames.count} {
+        define bn({::romBlockNames.{n}})
+
+        constant ::romBlocks.{bn}.last({::romBlocks.{bn}.pos})
+
+        evaluate n({n} + 1)
+    }
+
 
     if {defined SHOW_MEMORY_USAGE} {
         __printMemoryUsage()
