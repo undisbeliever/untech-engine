@@ -67,10 +67,7 @@ evaluate ::romBlockNames.count(0)
 
 // Creates a new data block in a given ROM location.
 //
-// There is no checking to ensure the blocks do not overlap, that is your
-// responsibility.
-//
-// The PC can be changed to the data block with the `rodata` macro.
+// The data block is accessed with the `rodata` macro.
 //
 // PARAMS:
 //  * id - the name of the block
@@ -91,6 +88,17 @@ macro createDataBlock(name, evaluate start, evaluate end) {
     }
     if ({start} & 0x3fffff) <= 0x00ffff && ({end} & 0x3fffff) >= 0x00ffb0 {
         error "ROM Block `{name}` cannot touch the SNES Header"
+    }
+
+    evaluate n(0)
+    while {n} < {::romBlockNames.count} {
+        define bn({::romBlockNames.{n}})
+
+        if ({start} & 0x3fffff) <= ({::romBlocks.{bn}.end} & 0x3fffff) && ({end} & 0x3fffff) >= ({::romBlocks.{bn}.start} & 0x3fffff) {
+            error "ROM Block `{name}` overlaps ROM block `{bn}`"
+        }
+
+        evaluate n({n} + 1)
     }
 
     global define ::romBlockNames.{::romBlockNames.count}({name})
@@ -168,7 +176,7 @@ evaluate ::ramBlockNames.count(0)
 //
 // RAM blocks can overlap. This is to reuse memory in different contexts.
 //
-// The RAM block is accessed with the `access` macro.
+// The RAM block is accessed with the `allocate` macro.
 //
 // Information about the block can be accessed by the following defines:
 //
