@@ -305,55 +305,69 @@ macro finalizeMemory() {
 
 macro __printMemoryUsage() {
     print "\n"
-    print "MEMORY USAGE:\n"
+    print "DATA USAGE:\n"
     print "\n"
     print "Address | Size    | Used    | Free    | Block Name\n"
     print "--------+---------+---------+---------+--------------------------\n"
+    print " 00ff80 |      80 |      80 |       0 | SNES Header\n"
+
+    evaluate totalSize(80)
+    evaluate totalUsed(80)
 
     evaluate n(0)
     while {n} < {::romBlockNames.count} {
         define bn({::romBlockNames.{n}})
 
-        // address
+        evaluate size({::romBlocks.{bn}.end} - {::romBlocks.{bn}.start} + 1)
+        evaluate used({::romBlocks.{bn}.pos} - {::romBlocks.{bn}.start})
+
+        evaluate totalSize({totalSize} + {size})
+        evaluate totalUsed({totalUsed} + {used})
+
         print " "
         print_hex(6, {::romBlocks.{bn}.start})
         print " | "
-
-        // size
-        print_padded(7, {::romBlocks.{bn}.end} - {::romBlocks.{bn}.start} + 1)
+        print_padded(7, {size})
         print " | "
-
-        // used
-        print_padded(7, {::romBlocks.{bn}.pos} - {::romBlocks.{bn}.start})
+        print_padded(7, {used})
         print " | "
-
-        // free
-        print_padded(7, {::romBlocks.{bn}.end} - {::romBlocks.{bn}.pos} + 1)
+        print_padded(7, {size} - {used})
         print " | {bn}\n"
 
         evaluate n({n} + 1)
     }
 
+    print "========+=========+=========+=========+==========================\n"
+
+    print " TOTAL  | "
+    print_padded(7, {totalSize})
+    print " | "
+    print_padded(7, {totalUsed})
+    print " | "
+    print_padded(7, {totalSize} - {totalUsed})
+    print "\n"
+
+
+    print "\n"
+    print "\n"
+    print "RAM USAGE:\n"
+    print "\n"
+    print "Address | Size    | Used    | Free    | Block Name\n"
     print "--------+---------+---------+---------+--------------------------\n"
+
+    // Don't print totals for RAM blocks as they may overlap
 
     evaluate n(0)
     while {n} < {::ramBlockNames.count} {
         define bn({::ramBlockNames.{n}})
 
-        // address
         print " "
         print_hex(6, {::blocks.{bn}.start})
         print " | "
-
-        // size
         print_padded(7, {::blocks.{bn}.end} - {::blocks.{bn}.start} + 1)
         print " | "
-
-        // used
         print_padded(7, {::blocks.{bn}.size})
         print " | "
-
-        // free
         print_padded(7, {::blocks.{bn}.remaining})
         print " | {bn}\n"
 
