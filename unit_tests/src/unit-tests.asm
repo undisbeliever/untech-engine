@@ -10,10 +10,10 @@ define VERSION(0)
 include "../../src/common.inc"
 include "memmap.inc"
 
-include "../resources/metasprite/metasprites.gen.inc"
+include "../gen/metasprites.inc"
 include "../resources/text/text.inc"
 
-include "../../tables/tables.inc"
+include "../gen/tables/entityhitbox-collisionorder.inc"
 
 include "../../src/dma.inc"
 include "../../src/hdma.inc"

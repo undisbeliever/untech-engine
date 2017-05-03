@@ -23,7 +23,7 @@ scope Font {
 
 rodata(rom0)
     // ::TODO convert font-fixed tiles to 1bpp::
-    insert FixedTiles, "font-fixed.2bpp"
+    insert FixedTiles, "../../gen/font-fixed.2bpp"
     constant FixedTiles.bitDepth(2)
 }
 }

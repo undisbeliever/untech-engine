@@ -2,35 +2,26 @@
 BINARY		= bin/unit-tests.sfc
 MAIN		= src/unit-tests.asm
 
-SRC_DIRS       := src ../src
-INCLUDES       := $(foreach d,$(SRC_DIRS),$(wildcard $d/*.* $d/*/*.* $d/*/*/*.* $d/*/*/*/*.*))
+SRC_DIRS       := src ../src resources
+INCLUDES       := $(foreach d,$(SRC_DIRS),$(wildcard $d/*.inc $d/*/*.inc $d/*/*/*.inc $d/*/*/*/*.inc))
 
 STATIC_TESTS   := $(wildcard static-tests/*.success.asm static-tests/*/*.success.asm)
 STATIC_TESTS   += $(wildcard static-tests/*.error*.asm static-tests/*/*.error*.asm)
 
-RESOURCE_DIRS   = resources/metasprite resources/text ../tables
-
-
-ifeq ($(OS),Windows_NT)
-  NULL_FILE = nul
-else
-  NULL_FILE = /dev/null
-endif
 
 .DELETE_ON_ERROR:
 
 
 .PHONY: all
-all: static-tests unit-tests
+all: static-tests directories unit-tests
 
 
 
 .PHONY: static-tests
 static-tests: $(STATIC_TESTS)
 
-# Have to use a NULL FILE to get bass's pc() function to work
 static-tests/%.success.asm: FORCE
-	bass-untech -strict -create -o $(NULL_FILE) $@
+	bass-untech -strict $@
 
 static-tests/%.error.asm: FORCE
 	python3 static-tests/errortest.py $@
@@ -39,29 +30,66 @@ FORCE:
 
 
 
-.PHONY: unit-tests
-unit-tests: $(BINARY)
+.PHONY: tables
+TABLE_SCRIPTS  := $(wildcard ../tables/*.py)
+TABLE_INCS     := $(patsubst ../tables/%.py,gen/tables/%.inc,$(TABLE_SCRIPTS))
+tables: $(TABLE_INCS)
 
-$(BINARY) $(BINARY:.sfc=.sym): $(MAIN) $(INCLUDES) test-resources bin/
+gen/tables/%.inc: ../tables/%.py
+	python3 $< >| $@
+
+
+
+.PHONY: resources
+resources: metasprites font
+RESOURCES :=
+
+
+.PHONY: metasprites
+metasprites: gen/metasprites.inc
+gen/metasprites.inc: $(wildcard resources/metasprite/*.*)
+gen/metasprites.inc: $(wildcard resources/metasprite/*/*.*)
+gen/metasprites.inc: $(wildcard resources/metasprite/*/*/*.*)
+gen/metasprites.inc: resources/metasprite/metasprites.utmspro
+	untech-msc -o "$@" "$<"
+
+RESOURCES += gen/metasprites.inc
+
+
+.PHONY: font
+font: gen/font-fixed.2bpp
+gen/font-fixed.2bpp: resources/text/font-fixed.png
+	untech-png2tileset -b 2 -o "$@" "$<"
+
+RESOURCES += gen/font-fixed.2bpp
+
+
+
+
+.PHONY: directories
+DIRS := $(sort $(dir $(BINARY) $(RESOURCES) $(TABLE_INCS)))
+directories: $(DIRS)
+$(DIRS):
+	mkdir -p $@
+
+
+
+.PHONY: unit-tests
+unit-tests: directories $(BINARY)
+
+$(BINARY) $(BINARY:.sfc=.sym): $(MAIN) $(INCLUDES) $(TABLE_INCS) $(RESOURCES)
 	bass-untech -strict -create -o $@ -sym $(@:.sfc=.sym) $(MAIN)
 
 
 .PHONY: memory-usage
-memory-usage: test-resources
-	bass-untech -d SHOW_MEMORY_USAGE -strict -create $(MAIN)
+memory-usage: directories $(BINARY)
+	bass-untech -d SHOW_MEMORY_USAGE -strict $(MAIN)
 
-
-bin/:
-	mkdir -p $@
-
-
-.PHONY: test-resources
-test-resources:
-	$(foreach d,$(RESOURCE_DIRS),$(MAKE) -C $d &&) true
 
 
 .PHONY: clean
 clean:
 	$(RM) $(BINARY) $(BINARY:.sfc=.sym)
-	$(foreach d,$(RESOURCE_DIRS), $(MAKE) -C $d clean;)
+	$(RM) $(sort $(TABLE_INCS))
+	$(RM) $(sort $(RESOURCES))
 

@@ -1,13 +1,6 @@
 *.swp
 *~
 
-bin
-obj
-*.2bpp
-*.4bpp
-*.map
-*.clr
-
-*-gen/
-*.gen.inc
+unit_tests/bin/
+unit_tests/gen/
 
