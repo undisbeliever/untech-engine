@@ -1,7 +1,6 @@
 
 scope Text {
 scope Font {
-
     map '0', 0x01, 10
     map 'A', 0x0b, 26
     map 'a', 0x25, 26
@@ -20,11 +19,6 @@ scope Font {
     constant MINUS(0x4b)
 
     constant NEW_LINE(0xff)
-
-rodata(rom0)
-    // ::TODO convert font-fixed tiles to 1bpp::
-    insert FixedTiles, "../../gen/font-fixed.2bpp"
-    constant FixedTiles.bitDepth(2)
 }
 }
 
