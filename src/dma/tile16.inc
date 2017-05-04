@@ -206,42 +206,19 @@ scope _ProcessDMA {
     constant ContinueLoop(::Dma.Tile16.ContinueLoop)
     constant EndLoopFunction(::Dma.Tile16.EndLoopFunction)
 
-scope FunctionTable: {
-    dw  EndLoopFunction
-    dw  Transfer1
-    dw  Transfer2
-    dw  Transfer3
-    dw  Transfer4
-    dw  Transfer5
-    dw  Transfer6
-    dw  Transfer7
-    dw  Transfer8
-}
+    scope FunctionTable: {
+        dw  EndLoopFunction
+        dw  Transfer1
+        dw  Transfer2
+        dw  Transfer3
+        dw  Transfer4
+        dw  Transfer5
+        dw  Transfer6
+        dw  Transfer7
+        dw  Transfer8
+    }
 
     allocate(bufferIndex, shadow, 2)
-
-    macro _AddrSize(variable n) {
-        if n > 0 {
-            n = n - 1
-
-            lda.w   dmaBuffer.tileAddress + n * 2,y
-            sta.b   A1T0 + n * 16
-            lda.w   dmaBuffer.tileBank + n * 2,y
-            sta.b   A1B0 + n * 16
-
-            _AddrSize(n)
-        }
-    }
-
-    macro _StxDAS0(variable n) {
-        if n > 0 {
-            n = n - 1
-
-            stx.b   DAS0 + n * 16
-
-            _StxDAS0(n)
-        }
-    }
 
     macro ProcessTiles(evaluate nTiles) {
         a16()
@@ -252,7 +229,15 @@ scope FunctionTable: {
                 pha
             }
 
-            _AddrSize({nTiles})
+            variable n({nTiles})
+            while n > 0 {
+                n = n - 1
+
+                lda.w   dmaBuffer.tileAddress + n * 2,y
+                sta.b   A1T0 + n * 16
+                lda.w   dmaBuffer.tileBank + n * 2,y
+                sta.b   A1B0 + n * 16
+            }
 
             if {nTiles} == 1 {
                 iny
@@ -275,7 +260,13 @@ scope FunctionTable: {
             }
 
             ldx.b   #dmaBuffer.TILE_HALF_SIZE
-            _StxDAS0({nTiles})
+
+            variable n({nTiles})
+            while n > 0 {
+                n = n - 1
+
+                stx.b   DAS0 + n * 16
+            }
 
             sty.w   MDMAEN
 
