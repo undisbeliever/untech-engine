@@ -175,8 +175,8 @@ scope TransferToVramL: {
     sta.w   A1B0
     sty.w   DAS0
 
-    lda.b   #VMAIN.increment.by1 | VMAIN.incrementMode.high
-    sta.w   VMAIN
+    assert(VMAIN.incrementMode.low | VMAIN.increment.by1 == 0)
+    stz.w   VMAIN
 
     ldx.w   #DMAP.direction.toPpu | DMAP.transfer.one | (VMDATAL << 8)
     stx.w   DMAP0
