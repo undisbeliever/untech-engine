@@ -57,11 +57,11 @@ RESOURCES += gen/metasprites.inc
 
 
 .PHONY: font
-font: gen/font-fixed.2bpp
-gen/font-fixed.2bpp: resources/text/font-fixed.png
-	untech-png2tileset -b 2 -o "$@" "$<"
+font: gen/font-fixed.1bpp
+gen/font-fixed.1bpp: resources/text/font-fixed.png
+	untech-png2tileset -b 1 -o "$@" "$<"
 
-RESOURCES += gen/font-fixed.2bpp
+RESOURCES += gen/font-fixed.1bpp
 
 
 

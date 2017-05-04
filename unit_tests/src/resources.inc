@@ -5,9 +5,8 @@ include "../resources/text/text.inc"
 scope Text {
     scope Font {
 rodata(rom0)
-        // ::TODO convert font-fixed tiles to 1bpp::
-        insert FixedTiles, "../gen/font-fixed.2bpp"
-        constant FixedTiles.bitDepth(2)
+        insert FixedTiles, "../gen/font-fixed.1bpp"
+        constant FixedTiles.bitDepth(1)
     }
 }
 

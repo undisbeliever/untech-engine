@@ -107,9 +107,17 @@ scope Init: {
 
         Dma.ForceBlank.ToVram(Text.Font.FixedTiles)
 
-    } else {
-        // ::TODO 1bpp bit depth::
+    } else if Text.Font.FixedTiles.bitDepth == 1 {
+        ldx.w   #VRAM_CONSOLE_TILES_WADDR
+        stx.w   VMADD
 
+        Dma.ForceBlank.ToVramL(Text.Font.FixedTiles)
+
+        ldx.w   #VRAM_CONSOLE_TILES_WADDR
+        ldy.w   #Text.Font.FixedTiles.size
+        jsr     Dma.ForceBlank.ClearVramH
+
+    } else {
         error "Invalid Text.Font.FixedTiles bitDepth"
     }
 
