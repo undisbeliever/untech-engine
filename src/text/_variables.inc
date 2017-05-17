@@ -1,3 +1,8 @@
+// text/_variables.inc
+// ===================
+//
+// Variables used by the Text module.
+
 
 scope Text {
 

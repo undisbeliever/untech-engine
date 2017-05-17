@@ -1,3 +1,8 @@
+// entity/_variables.inc
+// =====================
+//
+// Variables used by the Entity module.
+
 
 scope Entity {
     assert(N_ENTITIES >= 10)

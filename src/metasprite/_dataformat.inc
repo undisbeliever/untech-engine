@@ -1,3 +1,8 @@
+// metasprite/_dataformat.inc
+// ==========================
+//
+// MetaSprite Data Format.
+
 
 // Data format may be subject to changes
 if MetaSprite.Data.METASPRITE_FORMAT_VERSION != 24 {

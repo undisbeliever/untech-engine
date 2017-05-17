@@ -1,8 +1,8 @@
-// cpu.inc
-// =======
+// common/cpu.inc
+// ==============
 //
-// Provides a mechanism for managing the processor register sizes
-//
+// Provides a mechanism for managing the processor register sizes.
+
 
 arch snes.cpu
 

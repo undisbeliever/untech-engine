@@ -1,8 +1,8 @@
-// console.inc
-// ===========
+// text/console.inc
+// ================
 //
-// A *simple* text tile console
-//
+// A *simple* text tile console.
+
 
 scope Text {
 scope Console {

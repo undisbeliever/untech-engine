@@ -1,3 +1,8 @@
+// math/multiplication.inc
+// =======================
+//
+// Multiplication Routines.
+
 
 arch snes.cpu
 

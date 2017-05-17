@@ -1,8 +1,11 @@
-// text.inc
-// ========
+// dma/text.inc
+// ============
 //
-// Copies the text buffer to VRAM (if necessary)
+// Manages the text buffer upload during VBlank.
 //
+// The text buffer is only uploaded to the low byte of each VRAM word IF there
+// is enough VBlank time to transfer the entire buffer to VRAM.
+
 
 scope Dma {
 scope Text {

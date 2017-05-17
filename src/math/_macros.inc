@@ -1,3 +1,8 @@
+// math/_macros.inc
+// ================
+//
+// Macros for simple mathematical operations.
+
 
 scope Math {
 

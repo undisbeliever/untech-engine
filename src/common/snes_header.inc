@@ -1,5 +1,5 @@
-// snes_header.inc
-// ===============
+// common/snes_header.inc
+// ======================
 //
 // Builds the SNES ROM header.
 //
@@ -14,6 +14,7 @@
 //
 //  * CART_TYPE  - the type of cart (see CART_TYPE scope, defaults to romOnly)
 //  * ROM_SPEED  - the speed of the ROM (slow (default), fast)
+
 
 // ::TODO Handle SRAM::
 

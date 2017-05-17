@@ -1,8 +1,8 @@
-// metasprite.inc
-// ==============
+// dma/metasprite.inc
+// ==================
 //
-// Copes the MetaSprite buffer to OAM
-//
+// Manages the MetaSprite buffer upload during VBlank.
+
 
 scope Dma {
 scope MetaSprite {

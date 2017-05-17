@@ -1,5 +1,5 @@
-// reset_handler.inc
-// =================
+// interrupts/reset_handler.inc
+// ============================
 //
 // Code to being the SNES into a consistent state upon reset.
 //
@@ -10,6 +10,7 @@
 // This code also requires the following optional defines:
 //
 //  * ROM_SPEED  - the speed of the ROM (slow (default), fast)
+
 
 arch snes.cpu
 

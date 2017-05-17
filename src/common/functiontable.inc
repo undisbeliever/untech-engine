@@ -1,3 +1,8 @@
+// common/functiontable.inc
+// ========================
+//
+// Macros to build a function table from a given struct.
+
 
 // Automatically builds the function table from a given struct
 //

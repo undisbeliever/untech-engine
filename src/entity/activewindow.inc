@@ -1,3 +1,8 @@
+// entity/activewindow.inc
+// =======================
+//
+// Tests if the entity is outside the active window.
+
 
 scope Entity {
 

@@ -1,3 +1,8 @@
+// entity/spawn.inc
+// ================
+//
+// Entity Spawning Routines.
+
 
 scope Entity {
 

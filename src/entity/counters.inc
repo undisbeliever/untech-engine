@@ -1,3 +1,8 @@
+// entity/counters.inc
+// ===================
+//
+// Routines for counting entities.
+
 
 scope Entity {
 

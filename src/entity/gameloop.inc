@@ -1,3 +1,17 @@
+// entity/gameloop.inc
+// ===================
+//
+// Entity Game-Loop.
+//
+// The GameLoop will:
+//   * Process all active entities' Process routine
+//   * Entity Collision detection
+//   * Animate all active entities
+//   * Deactivate entities that are outside the active window
+//   * Activate entities that enter the active window
+//   * Activate entities in the `Entity.tryToActivateAgain` list
+//   * Delete all entities in the `Entity.toDelete` list
+
 
 scope Entity {
 

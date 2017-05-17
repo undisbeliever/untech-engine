@@ -1,3 +1,8 @@
+// entity/allocation.inc
+// =====================
+//
+// Entity pool initialization routines.
+
 
 scope Entity {
 

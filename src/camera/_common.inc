@@ -1,3 +1,8 @@
+// camera/_common.inc
+// ==================
+//
+// Common routines for the Camera Module.
+
 
 scope Camera {
 

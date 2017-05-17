@@ -1,3 +1,8 @@
+// metasprite/_variables.inc
+// =========================
+//
+// Variables used by the MetaSprite module.
+
 
 scope MetaSprite {
 

@@ -1,11 +1,10 @@
-// tile16.inc
-// ==========
+// dma/tile16.inc
+// ==============
 //
 // Manages a transfer queue for uploading 16px tiles to VRAM during VBlank.
 //
 // REQUIRES:
 //    the data block DMA_Tile16Data to be defined.
-//
 
 
 scope Dma {

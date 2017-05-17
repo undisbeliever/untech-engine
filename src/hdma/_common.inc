@@ -1,3 +1,8 @@
+// hdma/_common.inc
+// ================
+//
+// Common HDMA routines.
+
 
 scope Hdma {
 

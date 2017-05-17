@@ -1,3 +1,6 @@
+// common/enum.inc
+// ===============
+//
 // Turns the current scope into an enumeration.
 //
 // Enum constants are declared with the enum macro.
@@ -12,6 +15,9 @@
 //        enum(deletePtr)  // 2
 //        enum(processPtr) // 4
 //    }
+//
+
+
 macro createEnum(start, increment) {
     if {increment} < 1 {
         error "increment is invalid"

@@ -1,4 +1,8 @@
+// common/tmp_words.inc
+// ====================
+//
 // Marks unused words as a temporary variable to be accessed later.
+
 
 evaluate ::tmpWord.nMarks(0)
 evaluate ::tmpWord.nAllocations(0)

@@ -1,4 +1,8 @@
-
+// metasprite/render.inc
+// =====================
+//
+// MetaSprite Renderer.
+//
 // The Renderer assumes:
 //	* The sprites are 8x8 and 16x16
 //	* The screen size is 256x224
@@ -11,6 +15,7 @@
 // without worrying about fragmentation.
 //
 // [1] http://forums.nesdev.com/viewtopic.php?p=92234#p92234
+
 
 scope MetaSprite {
 scope Render {

@@ -1,7 +1,7 @@
-// print.inc
-// =========
+// common/print.inc
+// ================
 //
-// Macros for extended printing to the screen
+// Macros for extended printing to the screen.
 
 
 // Prints a decimal integer number with padding

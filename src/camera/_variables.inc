@@ -1,3 +1,8 @@
+// camera/_variables.inc
+// =====================
+//
+// Variables used by the Camera module.
+
 
 scope Camera {
 

@@ -1,8 +1,9 @@
+// common/registers.inc
+// ====================
 //
 // SNES Register Defines.
 //
 // Names and flags taken from Anomie's SNES Documents
-//
 
 
 // a Data Bank that can access the registers.

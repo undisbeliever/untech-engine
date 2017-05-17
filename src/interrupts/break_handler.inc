@@ -1,8 +1,9 @@
-// break_handler.inc
-// =================
+// interrupts/break_handler.inc
+// ============================
 //
 // The break handler stops CPU execution and displays a blue screen of
 // death containing the contents of the CPU registers and the stack.
+
 
 arch snes.cpu
 

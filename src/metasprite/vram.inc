@@ -1,4 +1,8 @@
-// MetaSprite VRAM allocation code
+// metasprite/vram.inc
+// ===================
+//
+// MetaSprite VRAM slots handler.
+
 
 scope MetaSprite {
 scope Vram {

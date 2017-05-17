@@ -1,3 +1,8 @@
+// metasprite/animation.inc
+// ========================
+//
+// MetaSprite Animation Routines.
+
 
 // ::MAYDO catch infinite loops::
 // ::: not sure if it worth the cost::

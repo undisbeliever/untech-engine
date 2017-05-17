@@ -1,3 +1,8 @@
+// metasprite/entityhitbox-collisions.inc
+// ======================================
+//
+// MetaSprite Entity-Hitbox collision behaviour.
+
 
 scope MetaSprite {
 scope EntityHitbox {

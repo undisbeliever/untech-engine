@@ -1,4 +1,8 @@
-// MetaSprite Palette allocation code
+// metasprite/palette.inc
+// ======================
+//
+// MetaSprite palette slots handler.
+
 
 scope MetaSprite {
 scope Palette {

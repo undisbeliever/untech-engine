@@ -1,3 +1,8 @@
+// metasprite/_common.inc
+// ======================
+//
+// Common routines for the MetaSprite Module.
+
 
 scope MetaSprite {
 

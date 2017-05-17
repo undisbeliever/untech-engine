@@ -1,3 +1,8 @@
+// entity/deallocation.inc
+// =======================
+//
+// Routines for de-allocating entire lists of entities.
+
 
 scope Entity {
 

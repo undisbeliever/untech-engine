@@ -1,3 +1,8 @@
+// interrupts/nmi/scrollbuffer.inc
+// ===============================
+//
+// VBlank buffer for the scroll registers.
+
 
 scope ScrollBuffer {
 scope bg1 {

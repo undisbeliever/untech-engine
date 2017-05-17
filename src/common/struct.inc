@@ -1,4 +1,6 @@
-
+// common/struct.inc
+// =================
+//
 // Turns the current scope into a struct.
 //
 // usage:
@@ -32,7 +34,7 @@
 //    }
 //
 // Child scope will contain `a` and `b` fields.
-//
+
 
 evaluate ::struct(0)
 evaluate ::struct.inBase(0)

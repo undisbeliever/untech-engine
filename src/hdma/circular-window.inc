@@ -1,3 +1,8 @@
+// hdma/circular-window.inc
+// ========================
+//
+// HDMA Table generator for rendering a circle with the screen window.
+
 
 scope Hdma {
 

@@ -1,8 +1,8 @@
-// string.inc
-// ==========
+// text/string.inc
+// ===============
 //
-// String manipulation functions
-//
+// String manipulation routines.
+
 
 scope Text {
 scope String {

@@ -1,3 +1,8 @@
+// common/assert.inc
+// =================
+//
+// Macros that break assembly if a test fails.
+
 
 // Asserts than an expression is true
 // Breaks assembly if expression if false

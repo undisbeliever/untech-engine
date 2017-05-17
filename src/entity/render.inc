@@ -1,3 +1,8 @@
+// entity/render.inc
+// =================
+//
+// Entity Render-Loop.
+
 
 scope Entity {
 

@@ -2,6 +2,11 @@
 # -*- coding: utf-8 -*-
 # vim: set fenc=utf-8 ai ts=4 sw=4 sts=4 et:
 
+"""
+Entity Hithox collision order table generator.
+"""
+
+
 MAX_INNER_HITBOXES = 4
 LIST_SHIFT = 2
 

@@ -1,8 +1,8 @@
-// palette.inc
-// ===========
+// dma/palette.inc
+// ===============
 //
-// Manages the CGRAM buffer
-//
+// Manages the CGRAM buffer upload during VBlank.
+
 
 scope Dma {
 scope Palette {

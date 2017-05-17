@@ -1,3 +1,8 @@
+// entity/_dataformat.inc
+// ======================
+//
+// Entity ROM Data Format.
+
 
 scope Entity {
 

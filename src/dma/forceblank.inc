@@ -1,8 +1,8 @@
 // dma/forceblank.inc
 // ==================
 //
-// DMA transfers to call on force blank.
-//
+// Force Blank DMA Transfers.
+
 
 scope Dma {
 scope ForceBlank {

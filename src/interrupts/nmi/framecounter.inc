@@ -1,3 +1,8 @@
+// interrupts/nmi/framecounter.inc
+// ===============================
+//
+// Frame counter, incremented every VBlank.
+
 
 allocate(frameCounter, shadow, 2)
 

@@ -1,3 +1,8 @@
+// math/_variables.inc
+// ===================
+//
+// Variables used by the Math module.
+
 
 scope Math {
 

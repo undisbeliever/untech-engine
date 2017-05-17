@@ -1,13 +1,13 @@
-// memory.inc
-// ==========
+// common/memory.inc
+// =================
 //
-// Handles ROM and RAM mapping
+// Handles ROM and RAM mapping.
 //
 // The following need to be defined before including this file:
 //
 //  * MEMORY_MAP - set to one of the values in the MEMORY_MAP scope
 //  * ROM_SIZE   - the ROM size in Mbits
-//
+
 
 scope MEMORY_MAP {
     constant LOROM(0x20)

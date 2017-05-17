@@ -1,3 +1,8 @@
+// dma/_common.inc
+// ===============
+//
+// Common Macros for the DMA module.
+
 
 scope Dma {
 

@@ -1,3 +1,8 @@
+// hdma/_variables.inc
+// ===================
+//
+// Variables used by the HDMA module.
+
 
 scope Hdma {
 

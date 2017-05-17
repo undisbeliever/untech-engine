@@ -1,5 +1,8 @@
-// nmi_handler.inc
-// =================
+// interrupts/nmi_handler.inc
+// ==========================
+//
+// VBlank Interrupt Service Routine.
+
 
 arch snes.cpu
 
