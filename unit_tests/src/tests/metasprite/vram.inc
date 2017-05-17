@@ -1,3 +1,7 @@
+// This file is part of the UnTech Game Engine.
+// Copyright (c) 2016 - 2017, Marcus Rowe <undisbeliever@gmail.com>.
+// Distributed under The MIT License: https://opensource.org/licenses/MIT
+
 
 // Don't test that the correct tiles are uploaded into dma buffer
 // That is easily tested by using the engine but hard to code for.

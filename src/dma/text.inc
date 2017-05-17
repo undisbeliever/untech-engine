@@ -5,6 +5,11 @@
 //
 // The text buffer is only uploaded to the low byte of each VRAM word IF there
 // is enough VBlank time to transfer the entire buffer to VRAM.
+//
+//
+// This file is part of the UnTech Game Engine.
+// Copyright (c) 2016 - 2017, Marcus Rowe <undisbeliever@gmail.com>.
+// Distributed under The MIT License: https://opensource.org/licenses/MIT
 
 
 scope Dma {

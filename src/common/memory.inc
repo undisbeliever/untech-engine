@@ -7,6 +7,11 @@
 //
 //  * MEMORY_MAP - set to one of the values in the MEMORY_MAP scope
 //  * ROM_SIZE   - the ROM size in Mbits
+//
+//
+// This file is part of the UnTech Game Engine.
+// Copyright (c) 2016 - 2017, Marcus Rowe <undisbeliever@gmail.com>.
+// Distributed under The MIT License: https://opensource.org/licenses/MIT
 
 
 scope MEMORY_MAP {

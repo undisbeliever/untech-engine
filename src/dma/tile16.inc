@@ -5,6 +5,11 @@
 //
 // REQUIRES:
 //    the data block DMA_Tile16Data to be defined.
+//
+//
+// This file is part of the UnTech Game Engine.
+// Copyright (c) 2016 - 2017, Marcus Rowe <undisbeliever@gmail.com>.
+// Distributed under The MIT License: https://opensource.org/licenses/MIT
 
 
 scope Dma {

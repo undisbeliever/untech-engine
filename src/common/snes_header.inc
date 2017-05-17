@@ -14,6 +14,11 @@
 //
 //  * CART_TYPE  - the type of cart (see CART_TYPE scope, defaults to romOnly)
 //  * ROM_SPEED  - the speed of the ROM (slow (default), fast)
+//
+//
+// This file is part of the UnTech Game Engine.
+// Copyright (c) 2016 - 2017, Marcus Rowe <undisbeliever@gmail.com>.
+// Distributed under The MIT License: https://opensource.org/licenses/MIT
 
 
 // ::TODO Handle SRAM::

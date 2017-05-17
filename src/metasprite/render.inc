@@ -15,6 +15,11 @@
 // without worrying about fragmentation.
 //
 // [1] http://forums.nesdev.com/viewtopic.php?p=92234#p92234
+//
+//
+// This file is part of the UnTech Game Engine.
+// Copyright (c) 2016 - 2017, Marcus Rowe <undisbeliever@gmail.com>.
+// Distributed under The MIT License: https://opensource.org/licenses/MIT
 
 
 scope MetaSprite {

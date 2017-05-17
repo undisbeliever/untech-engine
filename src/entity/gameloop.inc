@@ -11,6 +11,11 @@
 //   * Activate entities that enter the active window
 //   * Activate entities in the `Entity.tryToActivateAgain` list
 //   * Delete all entities in the `Entity.toDelete` list
+//
+//
+// This file is part of the UnTech Game Engine.
+// Copyright (c) 2016 - 2017, Marcus Rowe <undisbeliever@gmail.com>.
+// Distributed under The MIT License: https://opensource.org/licenses/MIT
 
 
 scope Entity {

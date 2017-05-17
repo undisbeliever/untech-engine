@@ -3,6 +3,11 @@
 //
 // The break handler stops CPU execution and displays a blue screen of
 // death containing the contents of the CPU registers and the stack.
+//
+//
+// This file is part of the UnTech Game Engine.
+// Copyright (c) 2016 - 2017, Marcus Rowe <undisbeliever@gmail.com>.
+// Distributed under The MIT License: https://opensource.org/licenses/MIT
 
 
 arch snes.cpu
