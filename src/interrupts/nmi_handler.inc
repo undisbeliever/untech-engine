@@ -1,10 +1,6 @@
 // nmi_handler.inc
 // =================
 
-include "nmi/controller.inc"
-include "nmi/scrollbuffer.inc"
-include "nmi/framecounter.inc"
-
 arch snes.cpu
 
 au()

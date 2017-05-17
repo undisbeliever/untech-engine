@@ -14,15 +14,7 @@ include "resources.inc"
 
 include "../gen/tables/entityhitbox-collisionorder.inc"
 
-include "../../src/dma.inc"
-include "../../src/hdma.inc"
-include "../../src/interrupts.inc"
-include "../../src/math.inc"
-include "../../src/metasprite.inc"
-include "../../src/text.inc"
-
-include "../../src/camera.inc"
-include "../../src/entity.inc"
+include "../../src/untech.inc"
 
 include "includes/test-framework.inc"
 include "includes/entityloop.inc"
@@ -38,11 +30,31 @@ scope SuccessTest: {
     rts
 }
 
-include "tests/dma.inc"
-include "tests/entity.inc"
-include "tests/math.inc"
-include "tests/metasprite.inc"
-include "tests/text.inc"
+
+include "tests/dma/palette.inc"
+include "tests/dma/tile16.inc"
+
+include "tests/entity/entities/blank.inc"
+include "tests/entity/entities/changetoparticle.inc"
+include "tests/entity/entities/deleteafterdelay.inc"
+
+include "tests/entity/_common.inc"
+include "tests/entity/allocation.inc"
+include "tests/entity/gameloop.inc"
+include "tests/entity/spawn.inc"
+
+include "tests/math/_common.inc"
+include "tests/math/division.inc"
+include "tests/math/macros.inc"
+include "tests/math/multiplication.inc"
+
+include "tests/metasprite/_common.inc"
+include "tests/metasprite/palette.inc"
+include "tests/metasprite/vram.inc"
+include "tests/metasprite/render.inc"
+include "tests/metasprite/animation.inc"
+
+include "tests/text/string.inc"
 
 include "interactive/entity-metasprite.inc"
 include "interactive/entity-actionpointspawner.inc"
