@@ -155,6 +155,38 @@ scope Entity {
     allocateTmpWord(changeList)
 
 
+
+
+    // Active window size (beyond camera display)
+    // inactive entities inside this window will become active.
+    constant ACTIVE_WINDOW_EXTEND_HORIZONTAL(96)
+    constant ACTIVE_WINDOW_EXTEND_VERTICAL(96)
+
+    // Inactive window size (beyond camera display)
+    // Active entities that leave the window will deactivate.
+    constant INACTIVE_WINDOW_EXTEND_HORIZONTAL(128)
+    constant INACTIVE_WINDOW_EXTEND_VERTICAL(128)
+
+
+    // Activate window
+    // (4x uint16)
+    scope activeWindow {
+        allocate(top, wram7e, 2)
+        allocate(bottom, wram7e, 2)
+        allocate(left, wram7e, 2)
+        allocate(right, wram7e, 2)
+    }
+
+    // Inactivate window
+    // (4x uint16)
+    scope inactiveWindow {
+        allocate(top, wram7e, 2)
+        allocate(bottom, wram7e, 2)
+        allocate(left, wram7e, 2)
+        allocate(right, wram7e, 2)
+    }
+
+
     // Previous window position mask that the active window was tested
     //
     // Is not reset on Init (doesn't have to be)
@@ -162,6 +194,7 @@ scope Entity {
     // (2x uint16)
     allocate(prevActiveWindowX, wram7e, 2)
     allocate(prevActiveWindowY, wram7e, 2)
+
 
     // The mask which the Camera pos is compared to prevActiveWindow.
     constant TEST_ACTIVE_WINDOW_MASK(~3)

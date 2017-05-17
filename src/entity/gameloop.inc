@@ -136,7 +136,7 @@ scope ProcessEntityList_DeactivateOffscreen: {
         ldy.w   changeList
         bne     ChangeEntityList
 
-        Camera.BranchEntityOutsideInactiveWindow(Deactivate)
+        BranchEntityOutsideInactiveWindow(Deactivate)
         bra     StillActive
 
         Deactivate:
@@ -181,7 +181,7 @@ scope ProcessEntityList_DeleteOffscreen: {
         ldy.w   changeList
         bne     ChangeEntityList
 
-        Camera.BranchEntityOutsideInactiveWindow(Delete)
+        BranchEntityOutsideInactiveWindow(Delete)
         bra     StillActive
 
         Delete:
@@ -228,7 +228,7 @@ macro _ProcessEnemyList(list, doDeactivateTest) {
             bne     SkipCollision
 
             if {doDeactivateTest} == 1 {
-                Camera.BranchEntityOutsideInactiveWindow(Deactivate)
+                BranchEntityOutsideInactiveWindow(Deactivate)
                 bra     StillActive
 
                 Deactivate:
@@ -432,7 +432,7 @@ macro _ProcessActiveWindow() {
 
 
             _LOOP(lists.deactivated)
-                Camera.BranchEntityOutsideActiveWindow(Continue)
+                BranchEntityOutsideActiveWindow(Continue)
 
                     // entity is now inside active window
                     // try to activate if possible
@@ -475,7 +475,7 @@ a16()
 i16()
 code()
 scope ProcessGameLoop: {
-    Camera._UpdateWindows()
+    jsr     _UpdateActiveWindows
 
     _ProcessTryToActivateAgainList()
 

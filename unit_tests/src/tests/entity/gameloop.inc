@@ -309,7 +309,7 @@ constant tmp_listId(Test.tmp + 2)
         spawn(0x1000 + 40, 0x1000 - 40)
         spawn(0x1000 - 40, 0x2000 + 40)
         spawn(0x2000 - 40, 0x1000 + 40)
-        spawn(0x2000 + 40, 0x1000 + Camera.DISPLAY_HEIGHT + Camera.ACTIVE_WINDOW_EXTEND_VERTICAL + 1)
+        spawn(0x2000 + 40, 0x1000 + Camera.DISPLAY_HEIGHT + Entity.ACTIVE_WINDOW_EXTEND_VERTICAL + 1)
 
         lda.w   tmp_listId
         inc

@@ -18,6 +18,7 @@ scope Init: {
     jsr     Dma.Init
     jsr     MetaSprite.Init
     jsr     Camera.Init
+    jsr     _UpdateActiveWindows
 
     // create and chain the free linked list
 

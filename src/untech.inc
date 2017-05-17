@@ -40,10 +40,10 @@ include "metasprite/_common.inc"
 
 include "camera/_variables.inc"
 include "camera/_common.inc"
-include "camera/activewindow.inc"
 
 include "entity/_dataformat.inc"
 include "entity/_variables.inc"
+include "entity/activewindow.inc"
 include "entity/allocation.inc"
 include "entity/counters.inc"
 include "entity/deallocation.inc"

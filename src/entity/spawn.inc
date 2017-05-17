@@ -104,7 +104,7 @@ allocateTmpWord(yPos)
             lda.l   EntityAlwaysActiveList,x
             bne     IsActive
 
-            Camera.BranchEntityOutsideActiveWindow(IsInactive)
+            BranchEntityOutsideActiveWindow(IsInactive)
 
             IsActive:
                 // entity is activate.
