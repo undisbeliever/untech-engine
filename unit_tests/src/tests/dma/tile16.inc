@@ -8,8 +8,8 @@ constant VRAM_BLOCK(0x6000)
 a16()
 i16()
 code()
-Test.add("Dma.Tile16.BufferOneTileFromList")
-scope BufferOneTileFromList: {
+Test.add("Dma.Tile16.QueueOneTileFromList")
+scope QueueOneTileFromList: {
     constant VRAM_1(VRAM_BLOCK + 32 * 2)
 
     jsr     Dma.Init
@@ -21,7 +21,7 @@ scope BufferOneTileFromList: {
     ldy.w   #VRAM_1
     sty.w   Dma.Tile16.vramWaddr
 
-    jsr     Dma.Tile16.BufferOneTileFromList
+    jsr     Dma.Tile16.QueueOneTileFromList
     bcc     Fail
 
 
@@ -48,8 +48,8 @@ Fail:
 a16()
 i16()
 code()
-Test.add("Dma.Tile16.BufferTwoTilesFromList")
-scope BufferTwoTilesFromList: {
+Test.add("Dma.Tile16.QueueTwoTilesFromList")
+scope QueueTwoTilesFromList: {
     constant VRAM_1(VRAM_BLOCK + 32 * 7)
     constant VRAM_2(VRAM_BLOCK + 32 * 6)
 
@@ -65,7 +65,7 @@ scope BufferTwoTilesFromList: {
     ldy.w   #VRAM_2
     sty.w   Dma.Tile16.vramWaddr2
 
-    jsr     Dma.Tile16.BufferTwoTilesFromList
+    jsr     Dma.Tile16.QueueTwoTilesFromList
     bcc     Fail
 
 
@@ -99,8 +99,8 @@ Fail:
 a16()
 i16()
 code()
-Test.add("Dma.Tile16.BufferOneRowFromList")
-scope BufferOneRowFromList: {
+Test.add("Dma.Tile16.QueueOneRowFromList")
+scope QueueOneRowFromList: {
     constant VRAM_1(VRAM_BLOCK)
 
     jsr     Dma.Init
@@ -111,7 +111,7 @@ scope BufferOneRowFromList: {
     ldy.w   #VRAM_1
     sty.w   Dma.Tile16.vramWaddr
 
-    jsr     Dma.Tile16.BufferOneRowFromList
+    jsr     Dma.Tile16.QueueOneRowFromList
     bcc     Fail
 
 
@@ -148,8 +148,8 @@ Fail:
 a16()
 i16()
 code()
-Test.add("Dma.Tile16.BufferTwoRowsFromList (one row)")
-scope BufferTwoRowsFromList_one: {
+Test.add("Dma.Tile16.QueueTwoRowsFromList (one row)")
+scope QueueTwoRowsFromList_one: {
     constant VRAM_1(VRAM_BLOCK + 32 * 4)
 
     jsr     Dma.Init
@@ -162,7 +162,7 @@ scope BufferTwoRowsFromList_one: {
     sty.w   Dma.Tile16.vramWaddr
     sty.w   Dma.Tile16.vramWaddr2
 
-    jsr     Dma.Tile16.BufferTwoRowsFromList
+    jsr     Dma.Tile16.QueueTwoRowsFromList
     bcc     Fail
 
 
@@ -194,8 +194,8 @@ Fail:
 a16()
 i16()
 code()
-Test.add("Dma.Tile16.BufferTwoRowsFromList (two rows)")
-scope BufferTwoRowsFromList_two: {
+Test.add("Dma.Tile16.QueueTwoRowsFromList (two rows)")
+scope QueueTwoRowsFromList_two: {
     constant VRAM_1(VRAM_BLOCK)
     constant VRAM_2(VRAM_BLOCK + 3 * 32 * 16)
 
@@ -210,7 +210,7 @@ scope BufferTwoRowsFromList_two: {
     ldy.w   #VRAM_2
     sty.w   Dma.Tile16.vramWaddr2
 
-    jsr     Dma.Tile16.BufferTwoRowsFromList
+    jsr     Dma.Tile16.QueueTwoRowsFromList
     bcc     Fail
 
 

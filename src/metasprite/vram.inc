@@ -295,9 +295,9 @@ i8()
         // One Slot
         cpx.b   #slots.ROW_SLOTS_MIN_INDEX
         bcs     +
-            jmp     Dma.Tile16.BufferOneTileFromList
+            jmp     Dma.Tile16.QueueOneTileFromList
         +
-            jmp     Dma.Tile16.BufferOneRowFromList
+            jmp     Dma.Tile16.QueueOneRowFromList
 
 
     TwoSlots:
@@ -308,9 +308,9 @@ i8()
         // Two Slots
         cpx.b   #slots.ROW_SLOTS_MIN_INDEX
         bcs     +
-            jmp     Dma.Tile16.BufferTwoTilesFromList
+            jmp     Dma.Tile16.QueueTwoTilesFromList
         +
-            jmp     Dma.Tile16.BufferTwoRowsFromList
+            jmp     Dma.Tile16.QueueTwoRowsFromList
 
 
 ReturnFromUploadRoutine:
@@ -657,10 +657,10 @@ scope _ActivateFixed {
     }
 
 
-    Process(OneTile, freeTiles, oneTile, 1, BufferOneTileFromList)
-    Process(TwoTiles, freeTiles, twoTiles, 2, BufferTwoTilesFromList)
-    Process(OneRow, freeRows, oneRow, 1, BufferOneRowFromList)
-    Process(TwoRows, freeRows, twoRows, 2, BufferTwoRowsFromList)
+    Process(OneTile, freeTiles, oneTile, 1, QueueOneTileFromList)
+    Process(TwoTiles, freeTiles, twoTiles, 2, QueueTwoTilesFromList)
+    Process(OneRow, freeRows, oneRow, 1, QueueOneRowFromList)
+    Process(TwoRows, freeRows, twoRows, 2, QueueTwoRowsFromList)
 
     code()
     scope Table: {

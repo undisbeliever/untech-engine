@@ -1,11 +1,12 @@
 // tile16.inc
 // ==========
 //
-// Manages a buffer to upload 16px tiles to VRAM.
+// Manages a transfer queue for uploading 16px tiles to VRAM during VBlank.
 //
 // REQUIRES:
 //    the data block DMA_Tile16Data to be defined.
 //
+
 
 scope Dma {
 scope Tile16 {
@@ -25,8 +26,54 @@ rodata(DMA_Tile16Data)
     }
 code()
 
-constant BUFFER_SIZE(30)
-constant TABLE_ENTRIES(15)
+
+
+constant TRANSFER_QUEUE_SIZE(15)
+constant TILE_QUEUE_SIZE(30)
+
+// List of transfers to process during VBlank
+//
+// LOCATION: shadow WRAM, accessible by REGISTER_DB during VBlank.
+//
+// The table terminates when vblankFunctionAddr == 0
+scope transferQueue {
+    assert(TRANSFER_QUEUE_SIZE < (256/2))
+
+    // Function to call in the _VBlank
+    // Equal to `nTiles * 2`
+    allocate(vblankFunctionAddr, shadow, TRANSFER_QUEUE_SIZE * 2)
+
+    // This value is always 0. Prevents overruns
+    allocate(forceEndTransfer, shadow, 2)
+
+    // The word VRAM address to send the tiles
+    allocate(wordVramAddress, shadow, TRANSFER_QUEUE_SIZE * 2)
+}
+constant TRANSFER_QUEUE_INDEX_END(TRANSFER_QUEUE_SIZE * 2)
+allocateTmpWord(transferQueueIndex)
+
+
+// List of tiles to upload to VRAM
+//
+// LOCATION: shadow WRAM, accessible by REGISTER_DB during VBlank.
+scope tileQueue {
+    assert(TILE_QUEUE_SIZE < (256/2))
+
+    // tile location in ROM
+    allocate(address, shadow, TILE_QUEUE_SIZE * 2)
+    allocate(bank, shadow, TILE_QUEUE_SIZE * 2)
+
+    // constant variable - speeds up VBlank
+    // always equal to TILE_HALF_SIZE
+    constant tileHalfSize(bank + 1)
+
+    // size of the top half of a 16x16 4bpp tile
+    constant TILE_HALF_SIZE(32 * 2)
+}
+constant TILE_QUEUE_INDEX_END(TILE_QUEUE_SIZE * 2)
+allocateTmpWord(tileQueueIndex)
+
+
 
 // Transfers the tiles during VBlank.
 allocate(processVBlankOnZero, shadow, 2)
@@ -34,72 +81,34 @@ allocate(processVBlankOnZero, shadow, 2)
 
 allocateTmpWord(tmp0)
 
-// Parameter to the upload routines
+// Parameters of the queue transfer routines
 // (word)
 allocateTmpWord(tileListAddr)
 allocateTmpWord(vramWaddr)
 allocateTmpWord(vramWaddr2)
 
 
-// SOA table for handling transfer information.
-// LOCATION: shadow WRAM, accessible by REGISTER_DB during VBlank.
-//
-// The table terminates when dmaBufferSize == 0
-scope table {
-    assert(TABLE_ENTRIES < (256/2))
-
-    // Function to call in the _VBlank
-    // Equal to `nTiles * 2`
-    allocate(vblankFunctionAddr, shadow, TABLE_ENTRIES * 2)
-
-    // This value is always 0. Prevent buffer overruns
-    allocate(forceEndBuffer, shadow, 2)
-
-    // The word VRAM address to send the tiles
-    allocate(wordVramAddress, shadow, TABLE_ENTRIES * 2)
-}
-constant TABLE_INDEX_END(TABLE_ENTRIES * 2)
-allocateTmpWord(tableIndex)
-
-
-// SOA data to load into DMA
-//
-// LOCATION: shadow WRAM, accessible by REGISTER_DB during VBlank.
-scope dmaBuffer {
-    assert(BUFFER_SIZE < (256/2))
-
-    allocate(tileAddress, shadow, BUFFER_SIZE * 2)
-    allocate(tileBank, shadow, BUFFER_SIZE * 2)
-
-    // constant variable - speeds up VBlank
-    // always equal to TILE_HALF_SIZE
-    constant tileHalfSize(tileBank + 1)
-
-    // size of the top half of a 16x16 4bpp tile
-    constant TILE_HALF_SIZE(32 * 2)
-}
-constant DMA_BUFFER_INDEX_END(BUFFER_SIZE * 2)
-allocateTmpWord(dmaBufferIndex)
-
 
 // Initialize the tables/variables
+//
+// REQUIRES: 16 bit A, 16 bit Index, DB = 0x7e
 macro _Init() {
     assert16a()
     assert16i()
 
     scope Tile16: {
-        stz.w   Dma.Tile16.table.forceEndBuffer - 1
-        stz.w   Dma.Tile16.tableIndex
+        stz.w   Dma.Tile16.transferQueue.forceEndTransfer - 1
+        stz.w   Dma.Tile16.transferQueueIndex
 
-        lda.w   #Dma.Tile16.dmaBuffer.TILE_HALF_SIZE << 8
-        ldx.w   #Dma.Tile16.DMA_BUFFER_INDEX_END - 2
+        lda.w   #Dma.Tile16.tileQueue.TILE_HALF_SIZE << 8
+        ldx.w   #Dma.Tile16.TILE_QUEUE_INDEX_END - 2
         -
-            sta.w   Dma.Tile16.dmaBuffer.tileHalfSize - 1,x
+            sta.w   Dma.Tile16.tileQueue.tileHalfSize - 1,x
             dex
             dex
             bpl     -
 
-        stz.w   Dma.Tile16.dmaBufferIndex
+        stz.w   Dma.Tile16.tileQueueIndex
 
         lda.w   #1
         sta.w   Dma.Tile16.processVBlankOnZero
@@ -107,18 +116,23 @@ macro _Init() {
 }
 
 
+
+// Enable transfer queue on next VBlank.
+//
+// REQUIRES: 16 bit A, DB = 0x7e
 macro _TransferOnNextVBlank() {
     assert16a()
 
     scope Tile16: {
-        ldx.w   Dma.Tile16.tableIndex
-        stz.w   Dma.Tile16.table.vblankFunctionAddr,x
+        ldx.w   Dma.Tile16.transferQueueIndex
+        stz.w   Dma.Tile16.transferQueue.vblankFunctionAddr,x
         stz.w   Dma.Tile16.processVBlankOnZero
 
-        stz.w   Dma.Tile16.tableIndex
-        stz.w   Dma.Tile16.dmaBufferIndex
+        stz.w   Dma.Tile16.transferQueueIndex
+        stz.w   Dma.Tile16.tileQueueIndex
     }
 }
+
 
 
 // VBlank code.
@@ -154,17 +168,17 @@ macro _VBlank() {
         sty.b   DAS7H
 
         // Y = 0
-        sty.w   Dma.Tile16._ProcessDMA.bufferIndex
+        sty.w   Dma.Tile16._ProcessDMA.tileQueuePos
 
-        ldx.w   Dma.Tile16.table.vblankFunctionAddr,y
+        ldx.w   Dma.Tile16.transferQueue.vblankFunctionAddr,y
 
         Loop:
             phy
 
-            lda.w   Dma.Tile16.table.wordVramAddress,y
+            lda.w   Dma.Tile16.transferQueue.wordVramAddress,y
             sta.w   VMADD
 
-            ldy.w   Dma.Tile16._ProcessDMA.bufferIndex
+            ldy.w   Dma.Tile16._ProcessDMA.tileQueuePos
 
             jmp     (Dma.Tile16._ProcessDMA.FunctionTable,x)
 
@@ -175,7 +189,7 @@ macro _VBlank() {
             iny
             iny
 
-            ldx.w   Dma.Tile16.table.vblankFunctionAddr,y
+            ldx.w   Dma.Tile16.transferQueue.vblankFunctionAddr,y
             bne     Loop
             bra     EndLoop
 
@@ -190,15 +204,16 @@ macro _VBlank() {
     }
 }
 
-// A Table of functions to process the DMA buffers
+
+// A Table of functions to process the transfer queues
 //
-// Uploads the tiles in the table/buffer to VRAM using DMA
+// Uploads the tiles in the tileQueue to VRAM using DMA
 //
 // REGISTERS: 16 bit A, 16 bit Index, DB = $80, DP = $4300
 // INPUT: DMAPx set to VRAM, VMAIN set
 // INPUT: A - Word address of second half of the tiles
-// INPUT: Y = _ProcessDMA.bufferIndex current location in the DMA buffer
-// OUTPUT: _ProcessDMA.bufferIndex updated to new location
+// INPUT: Y = _ProcessDMA.tileQueuePos = current location in the tile Queue
+// OUTPUT: _ProcessDMA.tileQueuePos updated to new location
 a16()
 i16()
 code()
@@ -218,7 +233,7 @@ scope _ProcessDMA {
         dw  Transfer8
     }
 
-    allocate(bufferIndex, shadow, 2)
+    allocate(tileQueuePos, shadow, 2)
 
     macro ProcessTiles(evaluate nTiles) {
         a16()
@@ -233,21 +248,21 @@ scope _ProcessDMA {
             while n > 0 {
                 n = n - 1
 
-                lda.w   dmaBuffer.tileAddress + n * 2,y
+                lda.w   tileQueue.address + n * 2,y
                 sta.b   A1T0 + n * 16
-                lda.w   dmaBuffer.tileBank + n * 2,y
+                lda.w   tileQueue.bank + n * 2,y
                 sta.b   A1B0 + n * 16
             }
 
             if {nTiles} == 1 {
                 iny
                 iny
-                sty.w   bufferIndex
+                sty.w   tileQueuePos
             } else {
                 tya
                 clc
                 adc.w   #{nTiles} * 2
-                sta.w   bufferIndex
+                sta.w   tileQueuePos
             }
 
             ldy.b   #(1 << {nTiles}) - 1
@@ -259,7 +274,7 @@ scope _ProcessDMA {
                 sta.w   VMADD
             }
 
-            ldx.b   #dmaBuffer.TILE_HALF_SIZE
+            ldx.b   #tileQueue.TILE_HALF_SIZE
 
             variable n({nTiles})
             while n > 0 {
@@ -286,7 +301,7 @@ scope _ProcessDMA {
 
 
 
-// Buffers one 16x16px tile from a tile list
+// Queues one 16x16px tile from a tile list
 //
 // REQUIRES: DB = $7E
 //
@@ -304,7 +319,7 @@ scope _ProcessDMA {
 au()
 iu()
 code()
-scope BufferOneTileFromList: {
+scope QueueOneTileFromList: {
     rep     #$30
     sep     #$20
 a8()
@@ -316,12 +331,12 @@ AfterLoadTileset:
 
     // Check if we can upload 1 tile
 
-    lda.w   dmaBufferIndex
-    cmp.b   #DMA_BUFFER_INDEX_END
+    lda.w   tileQueueIndex
+    cmp.b   #TILE_QUEUE_INDEX_END
     bcs     Fail
 
-    ldy.w   tableIndex
-    cpy.w   #TABLE_INDEX_END
+    ldy.w   transferQueueIndex
+    cpy.w   #TRANSFER_QUEUE_INDEX_END
     bcs     Fail
 
 
@@ -332,30 +347,30 @@ AfterLoadTileset:
     sta.w   Dma.transfersLeft
 
 
-    // Y = tableIndex
+    // Y = transferQueueIndex
 
     lda.b   #1 << 1
-    sta.w   table.vblankFunctionAddr,y
+    sta.w   transferQueue.vblankFunctionAddr,y
 
     rep     #$30
 a16()
     lda.w   vramWaddr
-    sta.w   table.wordVramAddress,y
+    sta.w   transferQueue.wordVramAddress,y
 
     iny
     iny
-    sty.w   tableIndex
+    sty.w   transferQueueIndex
 
 
     sep     #$20
 a8()
-    ldy     dmaBufferIndex
+    ldy     tileQueueIndex
 
-    // tileBank = (tileList.addr << 7) >> 16
-    // tileAddress = word(tileList.addr << 7)
+    // bank = (tileList.addr << 7) >> 16
+    // address = word(tileList.addr << 7)
     lda.l   TileListData.addr.h,x
     lsr
-    sta.w   dmaBuffer.tileBank,y
+    sta.w   tileQueue.bank,y
 
     lda.l   TileListData.addr,x
 
@@ -364,7 +379,7 @@ a16()
     xba
     ror
     and.w   #0xff80
-    sta.w   dmaBuffer.tileAddress,y
+    sta.w   tileQueue.address,y
 
 
 
@@ -372,7 +387,7 @@ a16()
 a8()
     iny
     iny
-    sty.w   dmaBufferIndex
+    sty.w   tileQueueIndex
 
     // carry set (iny does not affect carry)
     rts
@@ -384,9 +399,9 @@ Fail:
 }
 
 
-// Buffers two 16x16px tiles from a tile list to two different vram Addresses
+// Queues two 16x16px tiles from a tile list to two different vram Addresses
 //
-// NOTE: Will transfer a MAXIMUM of 2 tiles.
+// NOTE: Will queue a MAXIMUM of 2 tiles.
 //
 // REQUIRES: DB = $7E
 //
@@ -400,8 +415,8 @@ Fail:
 au()
 iu()
 code()
-scope BufferTwoTilesFromList: {
-constant Fail(BufferOneTileFromList.Fail)
+scope QueueTwoTilesFromList: {
+constant Fail(QueueOneTileFromList.Fail)
     rep     #$30
     sep     #$20
 a8()
@@ -410,16 +425,16 @@ i16()
     ldx.w   tileListAddr
     lda.l   TileListData.count,x
     dec
-    beq     BufferOneTileFromList.AfterLoadTileset
+    beq     QueueOneTileFromList.AfterLoadTileset
 
 
     // Check if we can upload 2 tiles
-    lda.w   dmaBufferIndex
-    cmp.b   #DMA_BUFFER_INDEX_END - 2
+    lda.w   tileQueueIndex
+    cmp.b   #TILE_QUEUE_INDEX_END - 2
     bcs     Fail
 
-    ldy.w   tableIndex
-    cpy.w   #TABLE_INDEX_END - 2
+    ldy.w   transferQueueIndex
+    cpy.w   #TRANSFER_QUEUE_INDEX_END - 2
     bcs     Fail
 
 
@@ -430,37 +445,37 @@ i16()
     sta.w   Dma.transfersLeft
 
 
-    // Y = tableIndex
+    // Y = transferQueueIndex
     // X = tileListAddr
 
     lda.b   #1 << 1
-    sta.w   table.vblankFunctionAddr,y
-    sta.w   table.vblankFunctionAddr + 2,y
+    sta.w   transferQueue.vblankFunctionAddr,y
+    sta.w   transferQueue.vblankFunctionAddr + 2,y
 
     rep     #$31
 a16()
     lda.w   vramWaddr
-    sta.w   table.wordVramAddress,y
+    sta.w   transferQueue.wordVramAddress,y
     lda.w   vramWaddr2
-    sta.w   table.wordVramAddress + 2,y
+    sta.w   transferQueue.wordVramAddress + 2,y
 
     tya
     // carry clear
     adc.w   #4
-    sta.w   tableIndex
+    sta.w   transferQueueIndex
 
     sep     #$20
 a8()
-    ldy     dmaBufferIndex
+    ldy     tileQueueIndex
 
-    // tileBank = (tileList.addr << 7) >> 16
-    // tileAddress = word(tileList.addr << 7)
+    // bank = (tileList.addr << 7) >> 16
+    // address = word(tileList.addr << 7)
 
     // First tile
 
     lda.l   TileListData.addr.h,x
     lsr
-    sta.w   dmaBuffer.tileBank,y
+    sta.w   tileQueue.bank,y
 
     lda.l   TileListData.addr,x
 
@@ -469,7 +484,7 @@ a16()
     xba
     ror
     and.w   #0xff80
-    sta.w   dmaBuffer.tileAddress,y
+    sta.w   tileQueue.address,y
 
 
 
@@ -478,7 +493,7 @@ a16()
 a8()
     lda.l   TileListData.addr + 2 + 1,x
     lsr
-    sta.w   dmaBuffer.tileBank + 2,y
+    sta.w   tileQueue.bank + 2,y
 
     lda.l   TileListData.addr + 2,x
 
@@ -487,14 +502,14 @@ a16()
     xba
     ror
     and.w   #0xff80
-    sta.w   dmaBuffer.tileAddress + 2,y
+    sta.w   tileQueue.address + 2,y
 
 
 
     tya
     clc
     adc.w   #4
-    sta.w   dmaBufferIndex
+    sta.w   tileQueueIndex
 
     sep     #$21
 a8()
@@ -504,9 +519,9 @@ a8()
 
 
 
-// Buffers a single row of 16x16px tiles from a tile list
+// Queues a single row of 16x16px tiles from a tile list
 //
-// NOTE: Will transfer a MAXIMUM of 8 tiles
+// NOTE: Will queue a MAXIMUM of 8 tiles
 //
 // REQUIRES: DB = $7E
 //
@@ -519,7 +534,7 @@ a8()
 au()
 iu()
 code()
-scope BufferOneRowFromList: {
+scope QueueOneRowFromList: {
 constant tmp_nTiles(tmp0)
     rep     #$30
     sep     #$20
@@ -540,13 +555,13 @@ NTilesA:
 
     asl
     // C clear
-    adc.w   dmaBufferIndex
-    cmp.b   #DMA_BUFFER_INDEX_END
+    adc.w   tileQueueIndex
+    cmp.b   #TILE_QUEUE_INDEX_END
     bcs     Fail
 
 
-    ldy.w   tableIndex
-    cpy.w   #TABLE_INDEX_END
+    ldy.w   transferQueueIndex
+    cpy.w   #TRANSFER_QUEUE_INDEX_END
     bcs     Fail
 
 
@@ -559,38 +574,38 @@ NTilesA:
 
 
 
-    // Y = tableIndex
+    // Y = transferQueueIndex
 
     lda.w   tmp_nTiles
     asl
-    sta.w   table.vblankFunctionAddr,y
+    sta.w   transferQueue.vblankFunctionAddr,y
 
 
     rep     #$30
 a16()
     lda.w   vramWaddr
-    sta.w   table.wordVramAddress,y
+    sta.w   transferQueue.wordVramAddress,y
 
     iny
     iny
-    sty.w   tableIndex
+    sty.w   transferQueueIndex
 
 
-BuildDmaBuffer:
+BuildDmaQueue:
     // X = tileListAddr
 
     sep     #$20
 a8()
 
-    ldy     dmaBufferIndex
+    ldy     tileQueueIndex
 
     Loop:
-        // tileBank = (tileList.addr << 7) >> 16
-        // tileAddress = word(tileList.addr << 7)
+        // bank = (tileList.addr << 7) >> 16
+        // address = word(tileList.addr << 7)
 
         lda.l   TileListData.addr.h,x
         lsr
-        sta.w   dmaBuffer.tileBank,y
+        sta.w   tileQueue.bank,y
 
         lda.l   TileListData.addr,x
 
@@ -599,7 +614,7 @@ a16()
         xba
         ror
         and.w   #0xff80
-        sta.w   dmaBuffer.tileAddress,y
+        sta.w   tileQueue.address,y
 
         sep     #$20
 a8()
@@ -613,7 +628,7 @@ a8()
         bne     Loop
 
 
-    sty.w   dmaBufferIndex
+    sty.w   tileQueueIndex
     sec
     rts
 
@@ -623,9 +638,9 @@ Fail:
 }
 
 
-// Buffers two row of 16x16px tiles from a tile list
+// Queues two rows of 16x16px tiles from a tile list
 //
-// NOTE: Will transfer a MAXIMUM of 16 tiles
+// NOTE: Will queue a MAXIMUM of 16 tiles
 //
 // REQUITES: DB = $7E
 //
@@ -639,9 +654,9 @@ Fail:
 au()
 iu()
 code()
-scope BufferTwoRowsFromList: {
-constant tmp_nTiles(BufferOneRowFromList.tmp_nTiles)
-constant Fail(BufferOneRowFromList.Fail)
+scope QueueTwoRowsFromList: {
+constant tmp_nTiles(QueueOneRowFromList.tmp_nTiles)
+constant Fail(QueueOneRowFromList.Fail)
 
     rep     #$30
     sep     #$20
@@ -652,7 +667,7 @@ i16()
 
     lda.l   TileListData.count,x
     cmp.b   #8 + 1
-    bcc     BufferOneRowFromList.NTilesA
+    bcc     QueueOneRowFromList.NTilesA
 
 
     // ensure 8 <= nTiles <= 16
@@ -664,13 +679,13 @@ i16()
 
     asl
     // C clear
-    adc.w   dmaBufferIndex
-    cmp.b   #DMA_BUFFER_INDEX_END
+    adc.w   tileQueueIndex
+    cmp.b   #TILE_QUEUE_INDEX_END
     bcs     Fail
 
 
-    ldy.w   tableIndex
-    cpy.w   #TABLE_INDEX_END - 2
+    ldy.w   transferQueueIndex
+    cpy.w   #TRANSFER_QUEUE_INDEX_END - 2
     bcs     Fail
 
 
@@ -684,31 +699,31 @@ i16()
 
 
 
-    // Y = tableIndex
+    // Y = transferQueueIndex
 
     lda.b   #8 << 1
-    sta.w   table.vblankFunctionAddr,y
+    sta.w   transferQueue.vblankFunctionAddr,y
 
     lda.w   tmp_nTiles
     sec
     sbc.b   #8
     asl
-    sta.w   table.vblankFunctionAddr + 2,y
+    sta.w   transferQueue.vblankFunctionAddr + 2,y
 
 
     rep     #$31
 a16()
     lda.w   vramWaddr
-    sta.w   table.wordVramAddress,y
+    sta.w   transferQueue.wordVramAddress,y
     lda.w   vramWaddr2
-    sta.w   table.wordVramAddress + 2,y
+    sta.w   transferQueue.wordVramAddress + 2,y
 
     tya
     // carry clear
     adc.w   #4
-    sta.w   tableIndex
+    sta.w   transferQueueIndex
 
-    jmp     BufferOneRowFromList.BuildDmaBuffer
+    jmp     QueueOneRowFromList.BuildDmaQueue
 }
 
 }

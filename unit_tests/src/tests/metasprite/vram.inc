@@ -40,7 +40,7 @@ macro _ActivateFixedTest(FrameSet, nSlots) {
         cmp.w   #MetaSprite.StatusFlags.vramSet
         bne     Fail
 
-        ldx.w   Dma.Tile16.tableIndex
+        ldx.w   Dma.Tile16.transferQueueIndex
         cpx.w   #{nSlots} * 2
         bne     Fail
 
@@ -54,7 +54,7 @@ macro _ActivateFixedTest(FrameSet, nSlots) {
         bcc     Fail
 
         // Test that no extra uploads were done
-        ldx.w   Dma.Tile16.tableIndex
+        ldx.w   Dma.Tile16.transferQueueIndex
         cpx.w   #{nSlots} * 2
         bne     Fail
 
@@ -120,7 +120,7 @@ macro _ActivateDynamicTest(FrameSet, nSlots) {
         cmp.w   #MetaSprite.StatusFlags.dynamicTileset | MetaSprite.StatusFlags.vramSet
         bne     Fail
 
-        ldx.w   Dma.Tile16.tableIndex
+        ldx.w   Dma.Tile16.transferQueueIndex
         cpx.w   #{nSlots} * 2
         bne     Fail
 
@@ -137,7 +137,7 @@ macro _ActivateDynamicTest(FrameSet, nSlots) {
         bcc     Fail
 
         // Test that no upload was done (because current frame == NULL)
-        ldx.w   Dma.Tile16.tableIndex
+        ldx.w   Dma.Tile16.transferQueueIndex
         cpx.w   #{nSlots} * 2
         bne     Fail
 
@@ -523,7 +523,7 @@ macro _ActivateThirdFixedSlot(name, FrameSet1, FrameSet2, FrameSet3) {
 
         // tests that the tiles of the third slot are buffered
         jsr     Dma.Init
-        ldx.w   Dma.Tile16.tableIndex
+        ldx.w   Dma.Tile16.transferQueueIndex
         phx
             lda.w   #EntityPool.entity2
             tcd
@@ -539,7 +539,7 @@ macro _ActivateThirdFixedSlot(name, FrameSet1, FrameSet2, FrameSet3) {
         cmp.w   #MetaSprite.StatusFlags.vramSet
         bne     Fail
 
-        cpx.w   Dma.Tile16.tableIndex
+        cpx.w   Dma.Tile16.transferQueueIndex
         beq     Fail
 
         jsr     _ValidateUsedSlotLists
