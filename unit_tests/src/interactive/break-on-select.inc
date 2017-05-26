@@ -24,7 +24,7 @@ scope Test: {
         lda.l   JOY1
         bit.w   #JOY.select
         beq     +
-            brk     #$42
+            break(UNIT_TEST_BRK)
         +
 
         // A = JOY1

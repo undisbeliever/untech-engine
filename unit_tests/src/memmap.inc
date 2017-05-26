@@ -3,7 +3,8 @@
 // Distributed under The MIT License: https://opensource.org/licenses/MIT
 
 createCodeBlock(code,                   0xc08000, 0xc0ffaf)
-createDataBlock(testTableBlock,         0xc00000, 0xc07fff)
+createDataBlock(testTableBlock,         0xc00000, 0xc04fff)
+createDataBlock(breakIdStrings,         0xc05000, 0xc07fff)
 
 createDataBlock(MS_FrameSetList,        0xc10000, 0xc100ff)
 createDataBlock(MS_PaletteList,         0xc10100, 0xc101ff)

@@ -4,6 +4,10 @@
 // The break handler stops CPU execution and displays a blue screen of
 // death containing the contents of the CPU registers and the stack.
 //
+// The blue screen will also contain the identifier string of the brk
+// interrupt (see `break` macro) if the `breakIdStrings` ROM block is
+// defined.
+//
 //
 // This file is part of the UnTech Game Engine.
 // Copyright (c) 2016 - 2017, Marcus Rowe <undisbeliever@gmail.com>.
@@ -115,6 +119,57 @@ macro SetCursor(evaluate xPos, evaluate yPos) {
     assert16i()
     ldy.w   #VRAM_CONSOLE_MAP_WADDR + {yPos} * 32 + {xPos}
     sty.b   VMADD
+}
+
+
+// Prints the breakIdString from a given Id
+//
+// REQUIRES: 8 bit A, 16 bit Index, DP = 0x2100, ForceBlank
+// REQUIRES: VMADD set to cursor position, VMAIN set to increment +1 low
+//
+// INPUT: A - the BRK Id
+macro scope PrintBreakIdString() {
+    assert8a()
+    assert16i()
+
+    // IdStrings - a concatenation of strings
+    storeBlockStart(IdStrings, breakIdStrings)
+    storeBlockUsed(IdSrings.size, breakIdStrings)
+
+    sep     #$30
+i8()
+    ldx.b   #0
+    tay
+    rep     #$10
+i16()
+    beq     PrintLoop
+
+    FindStringLoop:
+        lda.l   IdStrings,x
+        bne     +
+            cpx.w   #IdSrings.size
+            bcs     StringNotFound
+
+            dey
+            beq     StringFound
+        +
+        inx
+        bra     FindStringLoop
+
+StringFound:
+    inx
+
+    PrintLoop:
+        lda.l   IdStrings,x
+        beq     EndLoop
+
+        sta.b   VMDATA
+
+        inx
+        bra     PrintLoop
+
+EndLoop:
+StringNotFound:
 }
 
 
@@ -305,7 +360,17 @@ a8()
     phk
     plb
 
-    jsr     PrintStringAndHex8
+    if {defined ::romBlocks.breakIdStrings.pos} {
+        pha
+        jsr     PrintStringAndHex8
+
+        SetCursor(2, 4)
+
+        pla
+        PrintBreakIdString()
+    } else {
+        jsr     PrintStringAndHex8
+    }
 }
 
 
@@ -320,7 +385,7 @@ macro scope PrintCpuState() {
     assert16i()
 
     // PC
-    SetCursor(2, 5)
+    SetCursor(2, 6)
 
     ldx.w   #PcString
     lda     13,s
@@ -335,7 +400,7 @@ a16()
 
 
     // Stack
-    SetCursor(3, 7)
+    SetCursor(3, 8)
 
     tsa
     clc
@@ -344,16 +409,16 @@ a16()
     jsr     PrintStringAndHex16
 
 
-    Print16BitRegister( 3, 6, AString, 8)
-    Print16BitRegister(13, 6, XString, 6)
-    Print16BitRegister(22, 6, YString, 4)
+    Print16BitRegister( 3, 7, AString, 8)
+    Print16BitRegister(13, 7, XString, 6)
+    Print16BitRegister(22, 7, YString, 4)
 
-    Print16BitRegister(12, 7, DPString, 2)
+    Print16BitRegister(12, 8, DPString, 2)
 
     sep     #$20
 a8()
-    Print8BitRegister(22, 5, PString, 9)
-    Print8BitRegister(21, 7, DBString, 1)
+    Print8BitRegister(22, 6, PString, 9)
+    Print8BitRegister(21, 8, DBString, 1)
 }
 
 
