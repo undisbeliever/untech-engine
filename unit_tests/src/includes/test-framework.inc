@@ -323,6 +323,7 @@ i16()
 // DB = REGISTER_DB
 
     jsr     ResetRegisters
+    jsr     EnableVBlank
 
 
     // Setup Screen

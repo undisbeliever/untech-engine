@@ -107,6 +107,7 @@ a8()
 // Moves all of the OAM sprites offscreen.
 //
 // REQUIRES: none
+// MODIFIES: Disables Interrupts and HDMA, Forces Screen Blank
 au()
 iu()
 code()
@@ -121,19 +122,16 @@ scope ClearVramOamAndCgram: {
 a8()
 i16()
 
-    // Disable All interrupts
-    // Prevent interruptions
-    stz.b   NMITIMEN
+    // Disable interrupts and HDMA
+    stz.w   NMITIMEN
+    stz.w   HDMAEN
 
-    // Disable HDMA
-    stz.b   HDMAEN
-
+    // Force Screen Blank
     lda.b   #INIDISP.force
-    sta.b   INIDISP     // Force Screen Blank
+    sta.w   INIDISP
 
 
     // Fill VRAM with 0 bytes
-
     ldx.w   #0
     ldy.w   #0
     jsr     Dma.ForceBlank.ClearVram
@@ -203,15 +201,14 @@ a16()
 a8()
 i8()
 
-    // Disable All interrupts
-    // Prevent interruptions
-    stz.b   NMITIMEN
+    // Disable Interrupts and HDMA
+    // A = 0
+    sta.l   NMITIMEN
+    sta.l   HDMAEN
 
-    // Disable HDMA
-    stz.b   HDMAEN
-
+    // Force Screen Blank
     lda.b   #INIDISP.force
-    sta.b   INIDISP     // Force Screen Blank
+    sta.b   INIDISP
 
     stz.b   OBSEL
 
