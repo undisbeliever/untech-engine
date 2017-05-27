@@ -3,20 +3,30 @@
 // Distributed under The MIT License: https://opensource.org/licenses/MIT
 
 scope InteractiveTests {
-scope BreakOnSelect {
+scope Errors {
 
 // Tests:
 //  * Break Handler
+//  * break Macro
+//  * Warnings Module
 
+Warnings.Register(UNIT_TEST_WARNING, 8, 20, 31)
 
 a16()
 i16()
 code()
-Test.add("Break on Select")
+Test.add("Errors Test")
 scope Test: {
     Text.Console.SetCursor(0, 4)
     Text.Console.PrintConstString("Press SELECT to trigger BRK\n")
     Text.Console.PrintConstString("Press A/B/X/Y to skip BRK")
+
+    Text.Console.SetCursor(0, 21)
+    Text.Console.PrintConstString("A UNIT_TEST_WARNING warning\n")
+    Text.Console.PrintConstString("has been issued and this\n")
+    Text.Console.PrintConstString("text should be light orange.")
+
+    Warnings.Warn(UNIT_TEST_WARNING)
 
     Loop:
         jsr     WaitFrame

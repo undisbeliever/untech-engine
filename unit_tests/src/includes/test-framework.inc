@@ -119,6 +119,8 @@ i16()
         lda.w   #TestNameList >> 16
         jsr     Text.Console.PrintString
 
+        Warnings.Reset_a16()
+
         jsr     EnableVBlank
 
 
@@ -136,7 +138,6 @@ i16()
         bcs     +
             jmp     Fail
         +
-
 
         rep     #$30
     a16()
@@ -324,6 +325,8 @@ i16()
 
     jsr     ResetRegisters
     jsr     EnableVBlank
+
+    Warnings.Reset()
 
 
     // Setup Screen

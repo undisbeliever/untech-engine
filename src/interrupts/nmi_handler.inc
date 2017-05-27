@@ -45,6 +45,7 @@ i8()
     Dma.VBlank()
     Hdma.VBlank()
 
+    Warnings.VBlank()
     ScrollBuffer.VBlank()
     FrameCounter.VBlank()
     Controller.VBlank()

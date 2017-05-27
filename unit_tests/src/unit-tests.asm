@@ -64,7 +64,7 @@ include "interactive/entity-metasprite.inc"
 include "interactive/entity-actionpointspawner.inc"
 include "interactive/entityhitbox-collisions.inc"
 include "interactive/hdma-circular-window.inc"
-include "interactive/break-on-select.inc"
+include "interactive/errors.inc"
 
 
 constant Main(Test.ProcessTests)

@@ -3,6 +3,7 @@
 // Distributed under The MIT License: https://opensource.org/licenses/MIT
 
 include "errors/break.inc"
+include "errors/warnings.inc"
 
 include "dma/forceblank.inc"
 include "dma/metasprite.inc"
