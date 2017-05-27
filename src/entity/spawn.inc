@@ -36,10 +36,10 @@ scope Spawn: {
 allocateTmpWord(xPos)
 allocateTmpWord(yPos)
 
-    // ::TODO show error on invalid entity Id ::
-
     cmp.w   #Entity.Data.EntityListCount
-    bcs     ReturnFalse
+    bcc     +
+        break(INVALID_ENTITY_ID)
+    +
 
     asl
     tax
@@ -209,10 +209,10 @@ scope SpawnAtActionPoint: {
 allocateTmpWord(tmp_compare)
 allocateTmpWord(tmp_entityToSpawn)
 
-    // ::TODO show error on invalid entity Id ::
-
     cpy.w   #Entity.Data.EntityListCount
-    bcs     Return
+    bcc     +
+        break(INVALID_ENTITY_ID)
+    +
 
     sta.w   tmp_compare
 
@@ -342,10 +342,10 @@ allocateTmpWord(tmp_entityDoingSpawning)
 
     assert(SpawnPlayerProjectileFromActionPoint._fallthrough == pc())
 
-    // ::TODO show error on invalid projectile Id ::
-
     cpy.w   #Entity.Data.ProjectileListCount
-    bcs     Return
+    bcc     +
+        break(INVALID_PROJECTILE_ID)
+    +
 
     sta.w   tmp_compare
     stx.w   tmp_listAddr
