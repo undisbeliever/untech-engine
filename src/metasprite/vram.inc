@@ -12,6 +12,9 @@
 scope MetaSprite {
 scope Vram {
 
+Warnings.Register(NO_MS_VRAM_SLOTS, 31, 24, 0)
+
+
 // Reuse tilesetAddr address with the upload routines
 constant tilesetAddr(Dma.Tile16.tileListAddr)
 
@@ -743,7 +746,8 @@ scope _AllocateDynamic {
             bra     Finalize_Single
 
         NoSlotsFound:
-            // ::TODO handle no slots found
+            Warnings.Warn(NO_MS_VRAM_SLOTS)
+
             clc
             jmp     Return
         }
@@ -848,7 +852,9 @@ scope _AllocateDynamic {
             bra     Finalize_Dual
 
         NoSlotsFound:
-            // ::TODO handle no slots found
+        a16()
+            Warnings.Warn(NO_MS_VRAM_SLOTS)
+
             clc
             jmp     Return
         }

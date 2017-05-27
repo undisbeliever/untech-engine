@@ -12,6 +12,8 @@
 scope MetaSprite {
 scope Palette {
 
+Warnings.Register(NO_MS_PALETTE_SLOTS, 0, 24, 24)
+
 
 // Resets allocation lists
 //
@@ -167,11 +169,14 @@ ReturnFalse:
 }
 
 
-au()
-iu()
 code()
 scope _ProcessSlots {
-ReturnFalse:
+a16()
+i8()
+NoSlotsFound:
+    Warnings.Warn(NO_MS_PALETTE_SLOTS)
+
+    // Return false
     rep     #$31
     sep     #$20
     rts
@@ -262,7 +267,7 @@ i8()
 
 NotFound:
     ldx.w   slotPool.free
-    bmi     ReturnFalse
+    bmi     NoSlotsFound
 
     stx.w   tmp_slotIndex
 

@@ -333,6 +333,12 @@ scope Overflow: {
     jsr     _InitEntityAndActivate
     bcs     Fail
 
+    // Test NO_MS_PALETTE_SLOTS warning was emitted
+    lda.w   Warnings.current
+    cmp.w   #::warningId.ids.NO_MS_PALETTE_SLOTS
+    bne     Fail
+    stz.w   Warnings.current
+
 
     lda.w   #EntityPool.entity9
     tcd
@@ -341,6 +347,13 @@ scope Overflow: {
     lda.w   #MSFS.FST_10Palettes
     jsr     _InitEntityAndActivate
     bcs     Fail
+
+    // Test NO_MS_PALETTE_SLOTS warning was emitted
+    lda.w   Warnings.current
+    cmp.w   #::warningId.ids.NO_MS_PALETTE_SLOTS
+    bne     Fail
+    stz.w   Warnings.current
+
 
     // The overflow should still fail here
     sep     #$20
@@ -366,6 +379,12 @@ a16()
     jsr     MetaSprite.Activate
     bcs     Fail
 
+    // Test NO_MS_PALETTE_SLOTS warning was emitted
+    lda.w   Warnings.current
+    cmp.w   #::warningId.ids.NO_MS_PALETTE_SLOTS
+    bne     Fail
+    stz.w   Warnings.current
+
 
     // Check that activating a duplicate palette works
     sep     #$20
@@ -376,7 +395,11 @@ a8()
     rep     #$20
 a16()
     jsr     MetaSprite.Activate
-    bcc     Fail
+    bcs     _Pass
+    Fail:
+        clc
+        rts
+    _Pass:
 
 
     // Check that activate works after deactivating an existing one
@@ -393,10 +416,6 @@ a16()
     bcc     Fail
 
     sec
-    rts
-
-Fail:
-    clc
     rts
 }
 

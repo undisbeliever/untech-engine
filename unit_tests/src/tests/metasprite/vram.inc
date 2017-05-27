@@ -202,6 +202,12 @@ macro _DeallocateTest(type) {
         jsr     MetaSprite.Activate
         bcs     Fail
 
+        // Test NO_MS_VRAM_SLOTS warning was emitted
+        lda.w   Warnings.current
+        cmp.w   #::warningId.ids.NO_MS_VRAM_SLOTS
+        bne     Fail
+        stz.w   Warnings.current
+
         // Now if I remove the double fixed tile the activate will succeed
         lda.w   #EntityPool.entity1
         tcd
@@ -210,11 +216,7 @@ macro _DeallocateTest(type) {
         lda.w   #EntityPool.entity10
         tcd
         jsr     MetaSprite.Activate
-        bcs     _Pass
-        Fail:
-            clc
-            rts
-        _Pass:
+        bcc     Fail
 
 
         // Now there is only one free slot
@@ -228,6 +230,11 @@ macro _DeallocateTest(type) {
         jsr     MetaSprite.Activate
         bcs     Fail
 
+        // Confirm that NO_MS_VRAM_SLOTS warning has been emitted
+        lda.w   Warnings.current
+        cmp.w   #::warningId.ids.NO_MS_VRAM_SLOTS
+        bne     Fail
+        stz.w   Warnings.current
 
         // Now if I remove a single dynamic tile the activate will succeed
         lda.w   #EntityPool.entity2
@@ -237,7 +244,11 @@ macro _DeallocateTest(type) {
         lda.w   #EntityPool.entity11
         tcd
         jsr     MetaSprite.Activate
-        bcc     Fail
+        bcs     _Pass
+        Fail:
+            clc
+            rts
+        _Pass:
 
 
         // Now there is no free slots
@@ -249,6 +260,12 @@ macro _DeallocateTest(type) {
 
         jsr     MetaSprite.Activate
         bcs     Fail
+
+        // Test NO_MS_VRAM_SLOTS warning was emitted
+        lda.w   Warnings.current
+        cmp.w   #::warningId.ids.NO_MS_VRAM_SLOTS
+        bne     Fail
+        stz.w   Warnings.current
 
 
         // Deactivate single fixed tileset
@@ -264,6 +281,12 @@ macro _DeallocateTest(type) {
         tcd
         jsr     MetaSprite.Activate
         bcs     Fail
+
+        // Test NO_MS_VRAM_SLOTS warning was emitted
+        lda.w   Warnings.current
+        cmp.w   #::warningId.ids.NO_MS_VRAM_SLOTS
+        bne     Fail
+        stz.w   Warnings.current
 
 
         // Finally deactivate a double dynamic
@@ -295,6 +318,12 @@ macro _DeallocateTest(type) {
         lda.w   #MSFS.FST_One{type}
         jsr     _InitEntity0PaletteAndActivate
         bcs     Fail
+
+        // Test NO_MS_VRAM_SLOTS warning was emitted
+        lda.w   Warnings.current
+        cmp.w   #::warningId.ids.NO_MS_VRAM_SLOTS
+        bne     Fail
+        stz.w   Warnings.current
 
         jsr     _ValidateUsedSlotLists
         bcc     Fail
@@ -435,6 +464,13 @@ macro _ReferenceCountTest(type) {
         jsr     _InitEntity0PaletteAndActivate
         bcs     Fail
 
+        // Test NO_MS_VRAM_SLOTS warning was emitted
+        lda.w   Warnings.current
+        cmp.w   #::warningId.ids.NO_MS_VRAM_SLOTS
+        bne     Fail
+        stz.w   Warnings.current
+
+
         lda.w   #EntityPool.entity0
         tcd
         jsr     MetaSprite.Deactivate
@@ -446,7 +482,11 @@ macro _ReferenceCountTest(type) {
         tcd
         lda.w   #MSFS.FST_One{type}
         jsr     _InitEntity0PaletteAndActivate
-        bcc     Fail
+        bcs     _Pass
+        Fail:
+            clc
+            rts
+        _Pass:
 
 
         // entity 1: double fixed, count = 1
@@ -465,6 +505,12 @@ macro _ReferenceCountTest(type) {
         lda.w   #MSFS.FST_One{type}
         jsr     _InitEntity0PaletteAndActivate
         bcs     Fail
+
+        // Test NO_MS_VRAM_SLOTS warning was emitted
+        lda.w   Warnings.current
+        cmp.w   #::warningId.ids.NO_MS_VRAM_SLOTS
+        bne     Fail
+        stz.w   Warnings.current
 
 
         lda.w   #EntityPool.entity10
@@ -490,10 +536,6 @@ macro _ReferenceCountTest(type) {
         bcc     Fail
 
         sec
-        rts
-
-    Fail:
-        clc
         rts
     }
 }
