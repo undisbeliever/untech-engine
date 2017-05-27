@@ -86,6 +86,12 @@ constant tmp(Test.tmp)
     jsr     Entity.Spawn
     bcs     Fail
 
+    // Test ENTITY_POOL_EMPTY warning was emitted
+    lda.w   Warnings.current
+    cmp.w   #::warningId.ids.ENTITY_POOL_EMPTY
+    bne     Fail
+    stz.w   Warnings.current
+
     // Test free list is 0
     jsr     _FreeListLength
     bne     Fail
@@ -106,6 +112,7 @@ Fail:
     clc
     rts
 }
+
 
 a16()
 i16()
@@ -175,7 +182,6 @@ Fail:
     clc
     rts
 }
-
 
 
 a16()

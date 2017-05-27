@@ -12,14 +12,16 @@ scope ActionPointSpawnerTest {
 //  * Entity.SpawnAtActionPoint
 //  * Entity.DeleteOffscreenEntities
 //  * Entity.CountEntitiesInList
+//  * ENTITY_POOL_EMPTY warning
 
 
 scope ProjectileEntity {
     buildFunctionTable(BaseEntityFunctionTable, ProjectileEntity)
     Entity.useDefaultRenderer()
 
-    constant VELOCITY(0x018000)
-    constant DIAGONAL_VELOCITY(0x010f87)  // sqrt(0x018000 ** 2 / 2)
+    // Slow speed to exhaust entity pool.
+    constant VELOCITY(0x8000)
+    constant DIAGONAL_VELOCITY(0x5a82)  // sqrt(0x8000 ** 2 / 2)
 
     scope EntityStruct {
         childstruct(BaseEntity)
@@ -181,6 +183,8 @@ scope SpawnerEntity {
             field(frameDelay, 2)
             field(spawnPoint, 2)
             field(spawnRoutine, 2)
+
+            field(freeListCount, 2)
         endstruct()
     }
 
@@ -211,15 +215,20 @@ scope SpawnerEntity {
 
     // Spawn the projectile using alternating action points and
     // spawn routines.
+    // If no entity was spawned then try again on the next frame.
     a16()
     i16()
     code()
     scope Process: {
+        assertPowerOfTwo(N_SPAWN_POINTS)
+
         lda.b   EntityStruct.frameDelay
         dec
         bpl     SkipSpawn
 
-            assertPowerOfTwo(N_SPAWN_POINTS)
+            Entity.CountEntitiesInList(free)
+            sta.b   EntityStruct.freeListCount
+
 
             lda.b   EntityStruct.spawnPoint
             inc
@@ -228,23 +237,29 @@ scope SpawnerEntity {
             jsr     (SpawnRoutineTable,x)
 
 
-            lda.b   EntityStruct.spawnPoint
-            inc
-            and.w   #N_SPAWN_POINTS - 1
-            sta.b   EntityStruct.spawnPoint
-            bne     SkipChangeSpawner
+            Entity.CountEntitiesInList(free)
+            cmp.b   EntityStruct.freeListCount
+            beq     NoEntitySpawned
 
-                ldx.b   EntityStruct.spawnRoutine
-                inx
-                inx
-                cpx.w   #N_SPAWN_ROUTINES * 2
-                bcc     +
-                    ldx.w   #0
-                +
-                stx.b   EntityStruct.spawnRoutine
+                lda.b   EntityStruct.spawnPoint
+                inc
+                and.w   #N_SPAWN_POINTS - 1
+                sta.b   EntityStruct.spawnPoint
+                bne     SkipChangeSpawner
 
-        SkipChangeSpawner:
-            lda.w   #FRAME_DELAY - 1
+                    ldx.b   EntityStruct.spawnRoutine
+                    inx
+                    inx
+                    cpx.w   #N_SPAWN_ROUTINES * 2
+                    bcc     +
+                        ldx.w   #0
+                    +
+                    stx.b   EntityStruct.spawnRoutine
+
+            SkipChangeSpawner:
+                lda.w   #FRAME_DELAY - 1
+
+        NoEntitySpawned:
 
     SkipSpawn:
         sta.b   EntityStruct.frameDelay

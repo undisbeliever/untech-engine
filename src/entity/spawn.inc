@@ -11,8 +11,16 @@
 
 scope Entity {
 
+Warnings.Register(ENTITY_POOL_EMPTY, 31, 0, 31)
+
+
+code()
 scope Spawn {
-ReturnFalse:
+a16()
+i16()
+EntityPoolEmpty:
+    Warnings.Warn(ENTITY_POOL_EMPTY)
+
     clc
     rts
 }
@@ -45,7 +53,7 @@ allocateTmpWord(yPos)
     tax
 
     lda.w   lists.free
-    beq     ReturnFalse
+    beq     EntityPoolEmpty
 
     phd
         phy
@@ -397,13 +405,18 @@ ReturnDp:
 Return:
     rts
 
+a16()
+EntityPoolEmpty:
+    Warnings.Warn(ENTITY_POOL_EMPTY)
+    bra     ReturnDp
+
 
 // Spawns a projectile then continues the loop
 SpawnProjectile:
         rep     #$31
     a16()
         lda.w   Entity.lists.free
-        beq     ReturnDp
+        beq     EntityPoolEmpty
 
         stx.w   MetaSprite.ActionPoint.address
 
