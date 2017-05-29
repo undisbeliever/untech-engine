@@ -9,9 +9,6 @@
 // Distributed under The MIT License: https://opensource.org/licenses/MIT
 
 
-// ::MAYDO catch infinite loops::
-// ::: not sure if it worth the cost::
-
 scope MetaSprite {
 scope Animation {
 
