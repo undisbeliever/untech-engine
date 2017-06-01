@@ -12,7 +12,19 @@ include "dma/text.inc"
 include "dma/tile16.inc"
 include "dma/_common.inc"
 
+include "math/_macros.inc"
+
+include "metasprite/_dataformat.inc"
+include "entity/_dataformat.inc"
+
 include "hdma/_variables.inc"
+include "math/_variables.inc"
+include "text/_variables.inc"
+include "metasprite/_variables.inc"
+include "entity/_variables.inc"
+include "camera/_variables.inc"
+
+
 include "hdma/circular-window.inc"
 include "hdma/_common.inc"
 
@@ -24,18 +36,15 @@ include "interrupts/nmi/framecounter.inc"
 include "interrupts/nmi_handler.inc"
 
 
-include "math/_variables.inc"
-include "math/_macros.inc"
 include "math/division.inc"
 include "math/multiplication.inc"
 
-include "text/_variables.inc"
 include "text/console.inc"
 include "text/string.inc"
 
 
-include "metasprite/_dataformat.inc"
-include "metasprite/_variables.inc"
+include "camera/_common.inc"
+
 include "metasprite/animation.inc"
 include "metasprite/entityhitbox.inc"
 include "metasprite/entityhitbox-collisions.inc"
@@ -44,11 +53,6 @@ include "metasprite/vram.inc"
 include "metasprite/render.inc"
 include "metasprite/_common.inc"
 
-include "camera/_variables.inc"
-include "camera/_common.inc"
-
-include "entity/_dataformat.inc"
-include "entity/_variables.inc"
 include "entity/activewindow.inc"
 include "entity/allocation.inc"
 include "entity/counters.inc"
