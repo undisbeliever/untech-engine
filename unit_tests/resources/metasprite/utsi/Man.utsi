@@ -90,13 +90,11 @@
     <object size="large" x="0" y="16"/>
     <entityhitbox type="BODY" x="4" y="10" width="10" height="21"/>
   </frame>
-  <animation id="Walk_Right">
-    <instruction op="SET_FRAME_AND_WAIT_XVECL" parameter="20" frame="Walk_Right_0"/>
-    <instruction op="SET_FRAME_AND_WAIT_XVECL" parameter="20" frame="Walk_Right_1"/>
-    <instruction op="SET_FRAME_AND_WAIT_XVECL" parameter="20" frame="Walk_Right_2"/>
-    <instruction op="SET_FRAME_AND_WAIT_XVECL" parameter="20" frame="Walk_Right_3"/>
-    <instruction op="SET_FRAME_AND_WAIT_XVECL" parameter="20" frame="Walk_Right_4"/>
-    <instruction op="SET_FRAME_AND_WAIT_XVECL" parameter="20" frame="Walk_Right_5"/>
-    <instruction op="GOTO_START"/>
+  <animation id="Walk_Right" durationformat="DISTANCE_HORIZONTAL">
+    <aframe frame="Walk_Right_0" duration="20"/>
+    <aframe frame="Walk_Right_1" duration="20"/>
+    <aframe frame="Walk_Right_2" duration="20"/>
+    <aframe frame="Walk_Right_3" duration="20"/>
+    <aframe frame="Walk_Right_4" duration="20"/>
   </animation>
 </spriteimporter>

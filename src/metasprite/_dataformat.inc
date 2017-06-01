@@ -10,7 +10,7 @@
 
 
 // Data format may be subject to changes
-if MetaSprite.Data.METASPRITE_FORMAT_VERSION != 24 {
+if MetaSprite.Data.METASPRITE_FORMAT_VERSION != 25 {
     error "Invalid UnTech MetaSprite Format"
 }
 
@@ -46,7 +46,7 @@ scope Data {
         constant FrameObjectsOffset(pc() & 0xff0000)
 
     rodata(MS_AnimationData)
-        constant AnimationBytecodeOffset(pc() & 0xff0000)
+        constant AnimationOffset(pc() & 0xff0000)
 
     rodata(MS_TileHitboxData)
         constant TileHitboxOffset(pc() & 0xff0000)
@@ -80,6 +80,7 @@ scope Format {
             // Index of the frame table in `Data.FrameList`
             field(frameTable, 2)
             // Number of frames for the frameSet
+            // (1 byte index)
             field(nFrames, 1)
 
             // Index of the animation table in `Data.AnimationList`
@@ -312,68 +313,56 @@ scope Format {
     }
 
 
+    // The animation data
     scope Animation {
-        scope Bytecode {
-            createEnum(0, 2)
+        struct(Data.AnimationOffset)
+            // The format of the `Animation.Frames.duration` field
+            // (DurationFormat uint8 value)
+            field(durationFormat, 1)
 
-            // Stops the animation.
-            enum(STOP)
+            // The animation to execute when all frames have been rendered
+            // If >= FrameSet.nAnimations then the animation stops
+            // (byte)
+            field(nextAnimation, 1)
 
-            // Goto the start of the animation
-            enum(GOTO_START)
+            // The size of the Frames table.
+            // (byte - MUST BE <= 0xfd)
+            field(frameTableSize, 1)
 
-            // Goto a specific animation
-            // param: (uint8) animation Id
-            enum(GOTO_ANIMATION)
+            // Animation frame table, repeated `frameTableSize / 2` times
+            scope Frames {
+                // The frame to display
+                // (byte)
+                field(frameId, 1)
 
-            // Updates the animation PC by a specific offset
-            // param: (int_ms8) byte offset
-            enum(GOTO_OFFSET)
+                // Duration of the frame
+                // (value depends on the `durationFormat` value)
+                field(duration, 1)
+            }
+        endstruct()
+    }
 
-            // Sets the given frame and waits a given amount of frames.
-            //
-            // If the metasprite frame could not be set, then the engine will
-            // try again in the next display frame.
-            //
-            // param: (uint8) frame Id
-            // param: (uint8) number of frames to wait
-            enum(SET_FRAME_AND_WAIT_FRAMES)
+    // The format of `Animation.Frames.duration` field
+    scope AnimationDurationFormat {
+        createEnum(0, 2)
 
-            // Sets the given frame and waits a given amount of time.
-            //
-            // If the metasprite frame could not be set, then the engine will
-            // try again in the next display frame.
-            //
-            // param: (uint8) frame Id
-            // param: (uint8) time to wait (1/75ths of a second)
-            enum(SET_FRAME_AND_WAIT_TIME)
+        // Frame duration = number of display frames to wait
+        enum(FRAME)
 
-            // Sets the given frame and waits until the entity has moved a given
-            // distance horizontally.
-            //
-            // If the metasprite frame could not be set, then the engine will
-            // try again in the next display frame.
-            //
-            // NOTE: Internally uses 1:7:8 fixed point math; the animation
-            // will not preform correctly if entity velocity is out of bounds.
-            //
-            // param: (uint8) frame Id
-            // param: (0:3:5 fixed point) distance to wait
-            enum(SET_FRAME_AND_WAIT_XVECL)
+        // Frame duration = 1/75th of a second
+        enum(TIME)
 
-            // Sets the given frame and waits until the entity has moved a given
-            // distance vertically.
-            //
-            // If the metasprite frame could not be set, then the engine will
-            // try again in the next display frame.
-            //
-            // NOTE: Internally uses 1:7:8 fixed point math; the animation
-            // will not preform correctly if entity velocity is out of bounds.
-            //
-            // param: (uint8) frame Id
-            // param: (0:3:5 fixed point) distance to wait
-            enum(SET_FRAME_AND_WAIT_YVECL)
-        }
+        // Frame duration = distance the entity travels vertically
+        // (0:3:5 fixed point pixels)
+        enum(DISTANCE_VERTICALL)
+
+        // Frame duration = distance the entity to travel horizontally
+        // (0:3:5 fixed point pixels)
+        enum(DISTANCE_HORIZONTAL)
+
+
+        constant _MASK(%110)
+        assert({__enum.current} == _MASK + 2)
     }
 }
 

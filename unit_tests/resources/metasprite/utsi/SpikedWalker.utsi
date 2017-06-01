@@ -60,12 +60,11 @@
     <entityhitbox type="BODY" x="2" y="5" width="11" height="10"/>
     <entityhitbox type="ATTACK" x="5" y="0" width="6" height="5"/>
   </frame>
-  <animation id="Walk_Left">
-    <instruction op="SET_FRAME_AND_WAIT_XVECL" parameter="30" frame="Walk_Left_0"/>
-    <instruction op="SET_FRAME_AND_WAIT_XVECL" parameter="30" frame="Walk_Left_1"/>
-    <instruction op="SET_FRAME_AND_WAIT_XVECL" parameter="30" frame="Walk_Left_2"/>
-    <instruction op="SET_FRAME_AND_WAIT_XVECL" parameter="30" frame="Walk_Left_3"/>
-    <instruction op="SET_FRAME_AND_WAIT_XVECL" parameter="30" frame="Walk_Left_4"/>
-    <instruction op="GOTO_START"/>
+  <animation id="Walk_Left" durationformat="DISTANCE_HORIZONTAL">
+    <aframe frame="Walk_Left_0" duration="30"/>
+    <aframe frame="Walk_Left_1" duration="30"/>
+    <aframe frame="Walk_Left_2" duration="30"/>
+    <aframe frame="Walk_Left_3" duration="30"/>
+    <aframe frame="Walk_Left_4" duration="30"/>
   </animation>
 </spriteimporter>

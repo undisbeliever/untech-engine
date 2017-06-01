@@ -3,11 +3,11 @@
 <fsexportorder name="AnimationTest">
   <frame id="frame1"/>
   <frame id="frame2"/>
-  <animation id="Stop"/>
-  <animation id="GotoStart"/>
-  <animation id="GotoAnimation"/>
-  <animation id="GotoOffset"/>
-  <animation id="SetFrameWaitFrames"/>
-  <animation id="SetFrameWaitTime"/>
-  <animation id="SetFrameWaitVecl"/>
+  <animation id="Frame"/>
+  <animation id="Time"/>
+  <animation id="DistanceVertical"/>
+  <animation id="DistanceHorizontal"/>
+  <animation id="OneShot"/>
+  <animation id="ChangeAnimation"/>
+  <animation id="ChangeAnimation2"/>
 </fsexportorder>

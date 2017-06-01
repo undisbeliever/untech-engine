@@ -39,25 +39,25 @@ scope MetaSprite {
         // Offset between frame object data and the OAM charattr data (second block)
         field(MetaSprite.blockTwoCharAttrOffset, 2)
 
-        // Current animation Id
+        // The AnimationDurationFormat for the current animation frame
+        // (see MetaSprite.Format.AnimationDurationFormat)
+        field(MetaSprite.Animation.durationFormat, 1)
+
+        // Current animation id
+        // If 0xff then the animation is disabled
         field(MetaSprite.Animation.id, 1)
 
-        // The animation bytecode program counter.
-        //
-        // If NULL (0) then there is no animation.
-        //
-        // (word addr)
-        field(MetaSprite.Animation.pc, 2)
+        // The current position within the animation frame table
+        // (one byte index)
+        field(MetaSprite.Animation.pos, 1)
 
-        // Delay state for processing next animation bytecode
+        // Time until the next animation frame is processed.
         //
-        //      fnnnnnnn nnnnnnnn
+        // If negative then the current animation frame has not been processed
+        // and will be loaded on the next `MetaSprite.Animation.Process` call.
         //
-        //  f = If true then MS Frame has not been set.
-        //      Set MS Frame on next animation process.
-        //  n = current delay value.
-        //      Value depends on the animation instruction being processed.
-        field(MetaSprite.Animation.delay, 2)
+        // (sint16)
+        field(MetaSprite.Animation.nextFrameTime, 2)
     }
 
     scope StatusFlags {

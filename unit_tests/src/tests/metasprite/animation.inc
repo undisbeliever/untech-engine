@@ -8,100 +8,15 @@ scope Animation {
 allocateTmpWord(tmp0)
 allocateTmpWord(tmp1)
 
-a16()
-i16()
-code()
-Test.add("MetaSprite.Animation.Process (STOP)")
-scope Process_STOP: {
-    lda.w   #MSEO.AnimationTest.Animations.Stop
-    jsr     _Init
-    bcc     Fail
-
-    jsr     MetaSprite.Animation.Process
-
-    // Test that stop sets the PC to NULL
-    ldx.b   BaseEntity.MetaSprite.Animation.pc
-    bne     Fail
-
-    sec
-    rts
-
-Fail:
-    clc
-    rts
-}
 
 a16()
 i16()
 code()
-Test.add("MetaSprite.Animation.Process (GOTO_ANIMATION)")
-scope Process_GOTO_ANIMATION: {
-constant tmp_pc(tmp0)
-
-    lda.w   #MSEO.AnimationTest.Animations.GotoAnimation
-    jsr     _Init
-    bcc     Fail
-
-    lda.b   BaseEntity.MetaSprite.Animation.pc
-    sta.w   tmp_pc
-
-    jsr     MetaSprite.Animation.Process
-
-    // Tests that the Animation pc has changed
-    lda.w   tmp_pc
-    cmp.b   BaseEntity.MetaSprite.Animation.pc
-    beq     Fail
-
-    // Test the animation id changed
-    sep     #$20
-a8()
-    lda.b   BaseEntity.MetaSprite.Animation.id
-    cmp.b   #MSEO.AnimationTest.Animations.SetFrameWaitFrames
-    bne     Fail
-
-    sec
-    rts
-
-Fail:
-    clc
-    rts
-}
-
-
-a16()
-i16()
-code()
-Test.add("MetaSprite.Animation.Process (GOTO_OFFSET)")
-scope Process_GOTO_OFFSET: {
-    // The animation data contains many jumps that eventually
-    // result in a jump to a STOP instruction
-
-    lda.w   #MSEO.AnimationTest.Animations.GotoOffset
-    jsr     _Init
-    bcc     Fail
-
-    jsr     MetaSprite.Animation.Process
-
-    ldx.b   BaseEntity.MetaSprite.Animation.pc
-    bne     Fail
-
-    sec
-    rts
-
-Fail:
-    clc
-    rts
-}
-
-
-a16()
-i16()
-code()
-Test.add("MetaSprite.Animation.Process (SET_FRAME_AND_WAIT_FRAMES)")
-scope Process_SET_FRAME_AND_WAIT_FRAMES: {
+Test.add("MetaSprite.Animation.Process (Frame)")
+scope Process_Frame: {
 constant tmp_frame(tmp0)
 
-    lda.w   #MSEO.AnimationTest.Animations.SetFrameWaitFrames
+    lda.w   #MSEO.AnimationTest.Animations.Frame
     jsr     _Init
     bcc     Fail
 
@@ -109,12 +24,15 @@ constant tmp_frame(tmp0)
 
     jsr     MetaSprite.Animation.Process
     lda.b   BaseEntity.MetaSprite.currentFrame
+    beq     Fail
     sta.w   tmp_frame
 
     jsr     MetaSprite.Animation.Process
     jsr     MetaSprite.Animation.Process
     jsr     MetaSprite.Animation.Process
     jsr     MetaSprite.Animation.Process
+
+    // Check frame has not changed
     lda.b   BaseEntity.MetaSprite.currentFrame
     cmp.w   tmp_frame
     bne     Fail
@@ -137,11 +55,11 @@ Fail:
 a16()
 i16()
 code()
-Test.add("MetaSprite.Animation.Process (SET_FRAME_AND_WAIT_TIME)")
-scope Process_SET_FRAME_AND_WAIT_TIME: {
+Test.add("MetaSprite.Animation.Process (Time)")
+scope Process_Time: {
 constant tmp_frame(tmp0)
 
-    lda.w   #MSEO.AnimationTest.Animations.SetFrameWaitTime
+    lda.w   #MSEO.AnimationTest.Animations.Time
     jsr     _Init
     bcc     Fail
 
@@ -153,6 +71,7 @@ constant tmp_frame(tmp0)
 
     jsr     MetaSprite.Animation.Process
     lda.b   BaseEntity.MetaSprite.currentFrame
+    beq     Fail
     sta.w   tmp_frame
 
     ldx.w   #25 * 60 / 75
@@ -184,28 +103,29 @@ Fail:
 }
 
 
-a16()
-i16()
-code()
-Test.add("MetaSprite.Animation.Process (SET_FRAME_AND_WAIT_*VECL)")
-scope Process_SET_FRAME_AND_WAIT_VECL: {
-constant tmp_frame(tmp0)
-    // 79 *VECL parameter means >=2.5px travel
+macro DistanceTest(animation, vecl) {
+    a16()
+    i16()
+    code()
+    Test.add("MetaSprite.Animation.Process ({animation})")
+    scope Process_{animation}: {
+    constant tmp_frame(tmp0)
+        // 79 *VECL parameter means >=2.5px travel
 
-    lda.w   #MSEO.AnimationTest.Animations.SetFrameWaitVecl
-    jsr     _Init
-    bcc     Fail
+        lda.w   #MSEO.AnimationTest.Animations.{animation}
+        jsr     _Init
+        bcc     Fail
 
-    stz.b   BaseEntity.xVecl
-    stz.b   BaseEntity.xVecl + 2
-    stz.b   BaseEntity.yVecl
-    stz.b   BaseEntity.yVecl + 2
+        stz.b   BaseEntity.xVecl
+        stz.b   BaseEntity.xVecl + 2
+        stz.b   BaseEntity.yVecl
+        stz.b   BaseEntity.yVecl + 2
 
-    jsr     MetaSprite.Animation.Process
+        jsr     MetaSprite.Animation.Process
 
-    macro test(vecl) {
         // Check that the frame will not advance on a 0 velocity
         lda.b   BaseEntity.MetaSprite.currentFrame
+        beq     Fail
         sta.w   tmp_frame
 
         ldx.w   #30
@@ -240,10 +160,78 @@ constant tmp_frame(tmp0)
         lda.b   BaseEntity.MetaSprite.currentFrame
         cmp.w   tmp_frame
         beq     Fail
-    }
 
-    test(xVecl)
-    test(yVecl)
+        sec
+        rts
+
+    Fail:
+        clc
+        rts
+    }
+}
+DistanceTest(DistanceVertical, yVecl)
+DistanceTest(DistanceHorizontal, xVecl)
+
+
+a16()
+i16()
+code()
+Test.add("MetaSprite.Animation.Process (OneShot)")
+scope Process_OneShot: {
+    lda.w   #MSEO.AnimationTest.Animations.OneShot
+    jsr     _Init
+    bcc     Fail
+
+    jsr     MetaSprite.Animation.Process
+    jsr     MetaSprite.Animation.Process
+
+    // Test that there is no animation
+    sep     #$20
+a8()
+    lda.b   BaseEntity.MetaSprite.Animation.id
+    cmp.b   #0xff
+    bne     Fail
+
+    sec
+    rts
+
+Fail:
+    clc
+    rts
+}
+
+
+a16()
+i16()
+code()
+Test.add("MetaSprite.Animation.Process (Change Animation)")
+scope Process_ChangeAnimation: {
+    // Change animation contains 4 single frames, then changes to
+    // ChangeAnimation2.
+
+    lda.w   #MSEO.AnimationTest.Animations.ChangeAnimation
+    jsr     _Init
+    bcc     Fail
+
+    jsr     MetaSprite.Animation.Process
+    jsr     MetaSprite.Animation.Process
+    jsr     MetaSprite.Animation.Process
+    jsr     MetaSprite.Animation.Process
+
+    // Test that the animation id is still ChangeAnimation
+    lda.b   BaseEntity.MetaSprite.Animation.id
+    and.w   #0xff
+    cmp.w   #MSEO.AnimationTest.Animations.ChangeAnimation
+    bne     Fail
+
+    jsr     MetaSprite.Animation.Process
+
+    // Test the animation id changed
+    sep     #$20
+a8()
+    lda.b   BaseEntity.MetaSprite.Animation.id
+    cmp.b   #MSEO.AnimationTest.Animations.ChangeAnimation2
+    bne     Fail
 
     sec
     rts
