@@ -5,7 +5,7 @@
 code()
 
 // Ensure test table block is in the same bank as the code block
-assert(({::romBlocks.testTableBlock.start} >> 16) == ({::romBlocks.code.start} >> 16))
+assert((__MEMORY__.romBlocks.testTableBlock.start >> 16) == (__MEMORY__.romBlocks.code.start >> 16))
 
 // ::TODO display failed test name on breakpoint::
 

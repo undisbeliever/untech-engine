@@ -360,7 +360,7 @@ a8()
     phk
     plb
 
-    if {defined ::romBlocks.breakIdStrings.pos} {
+    if {defined __MEMORY__.romBlocks.breakIdStrings} {
         pha
         jsr     PrintStringAndHex8
 
@@ -429,7 +429,7 @@ a8()
 //
 // INPUT: CPU Registers pushed to stack
 macro scope PrintStack() {
-    constant STACK_END({::blocks.stack.end})
+    constant STACK_END(__MEMORY__.ramBlocks.stack.end)
 
     constant BYTES_PER_LINE(8)
     constant YPOS(10)

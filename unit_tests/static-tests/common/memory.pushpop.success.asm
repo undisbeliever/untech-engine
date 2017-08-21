@@ -18,13 +18,13 @@ code(code)
 assert(pc() == 0xc08000)
 
 pushBlock()
-assert({::romBlock.stackSize} == 1)
+assert(__MEMORY__.blockStack.size == 1)
 
 rodata(rom1)
 assert(pc() == 0xc18000)
 
 popBlock()
-assert({::romBlock.stackSize} == 0)
+assert(__MEMORY__.blockStack.size == 0)
 assert(pc() == 0xc08000)
 
 
@@ -35,28 +35,28 @@ rodata(rom1)
 pushBlock()
 
 scope innerTest {
-    assert({::romBlock.stackSize} == 2)
+    assert(__MEMORY__.blockStack.size == 2)
 
     rodata(rom2)
 
     popBlock()
-    assert({::romBlock.stackSize} == 1)
+    assert(__MEMORY__.blockStack.size == 1)
     assert(pc() == 0xc18000)
 
     code()
     pushBlock()
-    assert({::romBlock.stackSize} == 2)
+    assert(__MEMORY__.blockStack.size == 2)
     assert(pc() == 0xc08000)
 
     popBlock()
-    assert({::romBlock.stackSize} == 1)
+    assert(__MEMORY__.blockStack.size == 1)
     assert(pc() == 0xc08000)
 
     rodata(rom3)
 }
 
 popBlock()
-assert({::romBlock.stackSize} == 0)
+assert(__MEMORY__.blockStack.size == 0)
 assert(pc() == 0xc08000)
 
 // vim: ft=bass-65816 ts=4 sw=4 et:

@@ -26,8 +26,8 @@ code()
 // ensure ResetHandler is accessible by interrupt vectors
 assert(pc() & 0x3fffff < 0x010000)
 assert(pc() & 0x00ffff >= 0x008000)
-assert(({::blocks.stack.end} & 0xffff) < 0x2000)
-assert(({::blocks.stack.end} >> 16) == 0 || ({::blocks.stack.end} >> 16) == 0x7e)
+assert((__MEMORY__.ramBlocks.stack.end & 0xffff) < 0x2000)
+assert((__MEMORY__.ramBlocks.stack.end >> 16) == 0 || (__MEMORY__.ramBlocks.stack.end >> 16) == 0x7e)
 
 
 // Reset the SNES, initializing the registers and clearing all the memory.
@@ -43,7 +43,7 @@ reset:
     rep     #$38    // 16 bit A, 16 bit Index, Decimal mode off
 a16()
 i16()
-    ldx.w   #{::blocks.stack.end}
+    ldx.w   #__MEMORY__.ramBlocks.stack.end
     txs             // Setup stack
 
     lda.w   #$0000

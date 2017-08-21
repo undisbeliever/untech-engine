@@ -29,7 +29,7 @@ macro break(id) {
         global define ::breakId.ids.{id}({::breakId.pos})
         global evaluate ::breakId.pos({::breakId.pos} + 1)
 
-        if {defined ::romBlocks.breakIdStrings.pos} {
+        if {defined __MEMORY__.romBlocks.breakIdStrings} {
             pushBlock()
             rodata(breakIdStrings)
                 db  "{id}", 0
