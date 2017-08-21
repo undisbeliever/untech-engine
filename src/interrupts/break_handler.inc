@@ -429,8 +429,6 @@ a8()
 //
 // INPUT: CPU Registers pushed to stack
 macro scope PrintStack() {
-    constant STACK_END(__MEMORY__.ramBlocks.stack.end)
-
     constant BYTES_PER_LINE(8)
     constant YPOS(10)
     constant YBOTTOM(3)
@@ -466,7 +464,7 @@ a8()
         sta.w   byteCount
 
         LineLoop:
-            cpx.w   #STACK_END + 1
+            cpx.w   #STACK_BOTTOM + 1
             bcs     Return
 
             lda.w   0,x
