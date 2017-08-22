@@ -62,9 +62,9 @@ macro PrintConstString(s) {
     popBlock()
 
     ldx.w   #String{#}
-    if ({::cpu.aSize} == 8) {
+    if __CPU__.aSize == 8 {
         lda.b   #String{#} >> 16
-    } else if {::cpu.aSize} == 16 {
+    } else if __CPU__.aSize == 16 {
         lda.w   #String{#} >> 16
     } else {
         error "Unknown A size"

@@ -32,11 +32,11 @@ constant CGRAM_POS(1)
 // The identifier needs to have a registered color,
 // colors can be registered with the `Warnings.Register` macro.
 macro Warn(id) {
-    if {::cpu.aSize} == 16 {
+    if __CPU__.aSize == 16 {
         lda.w   #::warningId.ids.{id}
         jsr     Warnings.Warn_a16
 
-    } else if {::cpu.iSize} == 16 {
+    } else if __CPU__.iSize == 16 {
         ldx.w   #::warningId.ids.{id}
         jsr     Warnings.Warn_i16
     } else {
