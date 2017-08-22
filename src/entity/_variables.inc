@@ -23,7 +23,7 @@ scope Entity {
 }
 
 scope BaseEntity {
-    basestruct(BaseEntity)
+    basestruct()
         struct_maxsize(Entity.ENTITY_SIZE)
 
         // address of next entity in current list

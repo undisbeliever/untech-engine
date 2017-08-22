@@ -27,14 +27,12 @@ macro buildFunctionTable(struct, module) {
 }
 
 macro _buildFunctionTable_structs(struct, module) {
-    if {defined ::struct.bases.{struct}.parent} {
-        _buildFunctionTable_structs({::struct.bases.{struct}.parent}, {module})
-    }
+    validateStructIsBase({struct})
 
     evaluate n(0)
-    while {n} < {::struct.bases.{struct}.size} {
-        assert({::struct.bases.{struct}.var{n}size} == 2)
-        dw  {module}.{::struct.bases.{struct}.var{n}}
+    while {n} < {{struct}.__STRUCT__.fields.size} {
+        assert({{struct}.__STRUCT__.fields.{n}.size} == 2)
+        dw  {module}.{{struct}.__STRUCT__.fields.{n}.name}
 
         evaluate n({n} + 1)
     }

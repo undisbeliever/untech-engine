@@ -42,7 +42,7 @@ macro useDefaultRenderer() {
 // These structs are extendible and will be used to store entity
 // parameters.
 scope BaseEntityData {
-    basestruct_offset(BaseEntityData, Entity.Data.Offset)
+    basestruct_offset(Entity.Data.Offset)
         // Location of the entity's `functionPtr` table
         // (word addr - code bank)
         field(functionTable, 2)
@@ -66,7 +66,7 @@ scope BaseEntityData {
 //
 // The data for this must exist in the code data block
 scope BaseEntityFunctionTable {
-    basestruct(BaseEntityFunctionTable)
+    basestruct()
         // Initialise entity variables.
         //
         // When this function is called the following is already set:

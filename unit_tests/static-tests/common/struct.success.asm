@@ -56,12 +56,12 @@ assert(startTest.size == 13)
 // test struct inheritance.
 scope TestBase {
     scope Base {
-        basestruct(Base)
+        basestruct()
             field(a, 3)
         endstruct()
     }
     scope BaseWithParent {
-        basestruct(BaseWithParent, Base)
+        basestruct(Base)
             field(b, 3)
         endstruct()
     }
@@ -98,24 +98,24 @@ scope TestBase {
 scope TestBaseWithOffset {
     // test struct inheritance.
     scope Base {
-        basestruct_offset(OffsetBase, 0x100)
+        basestruct_offset(0x100)
             field(a, 3)
         endstruct()
     }
     scope BaseWithParent {
-        basestruct(OffsetBaseWithParent, OffsetBase)
+        basestruct(Base)
             field(b, 3)
         endstruct()
     }
 
     scope Child1 {
-        childstruct(OffsetBase)
+        childstruct(Base)
             field(c, 2)
         endstruct()
     }
 
     scope Child2 {
-        childstruct(OffsetBaseWithParent)
+        childstruct(BaseWithParent)
             field(d, 2)
         endstruct()
     }

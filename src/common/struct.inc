@@ -22,7 +22,7 @@
 //
 // usage:
 //    scope super {
-//      basestruct(super)
+//      basestruct()
 //        struct_maxsize(16)  // optional
 //        field(a, 2)
 //      endstruct()
@@ -41,137 +41,128 @@
 // Distributed under The MIT License: https://opensource.org/licenses/MIT
 
 
-evaluate ::struct(0)
-evaluate ::struct.inBase(0)
-
 macro struct(evaluate start) {
-    if {defined __struct} {
+    if {defined __STRUCT__} {
         error "scope is already a struct"
     }
-    if {::struct} != 0 {
-        error "Cannot nest structs"
-    }
 
-    global evaluate ::struct(0x1337)
-    global evaluate ::struct.inBase(0)
-    global evaluate ::struct.pos({start})
-    global evaluate ::struct.size(0)
-    global evaluate ::struct.maxSize(0)
+    global define __STRUCT__()
+
+    constant __STRUCT__.start({start})
+    global variable __STRUCT__.inStruct(0x1337)
+    global variable __STRUCT__.isBaseStruct(0)
+    global variable __STRUCT__.pos({start})
+    global variable __STRUCT__.size(0)
+    global variable __STRUCT__.maxSize(0)
 }
 macro struct() {
     struct(0)
 }
 
-macro basestruct_offset(name, evaluate start) {
-    if {defined ::struct.bases.{name}.size} {
-        error "basestruct {name} already exists."
-    }
-
+macro basestruct_offset(evaluate start) {
     struct({start})
 
-    global evaluate ::struct.inBase(1)
-    global define ::struct.currentBase({name})
-
-    global evaluate ::struct.bases.{name}.start({start})
-    global evaluate ::struct.bases.{name}.size(0)
+    __STRUCT__.isBaseStruct = 1
+    global define __STRUCT__.fields.size(0)
 }
-macro basestruct(name) {
-    basestruct_offset({name}, 0)
+macro basestruct() {
+    basestruct_offset(0)
 }
 
-macro basestruct(name, parent) {
-    if {defined ::struct.bases.{name}.size} {
-        error "basestruct `{name}` already exists."
+// raises an error is the struct is no a basestruct
+macro validateStructIsBase(struct) {
+    if !{defined {struct}.__STRUCT__} {
+        error "struct `{struct}` does not exist"
     }
+    if {struct}.__STRUCT__.isBaseStruct == 0 {
+        error "struct `{struct}` is not a basestruct"
+    }
+    if {struct}.__STRUCT__.inStruct {
+        error "basestruct `{struct}` is not closed"
+    }
+}
 
-    childstruct({parent})
+macro basestruct(parent) {
+    validateStructIsBase({parent})
 
-    global evaluate ::struct.inBase(1)
-    global define ::struct.currentBase({name})
-
-    global evaluate ::struct.bases.{name}.size(0)
-    global define ::struct.bases.{name}.parent({parent})
+    basestruct_offset({parent}.__STRUCT__.start)
+    _childstruct_fields({parent})
 }
 
 macro childstruct(parent) {
-    if !{defined ::struct.bases.{parent}.size} {
-        error "basestruct `{parent}` does not exist"
-    }
-    struct()
-    _childstruct_parents({parent})
+    validateStructIsBase({parent})
+
+    struct({parent}.__STRUCT__.start)
+    _childstruct_fields({parent})
 }
 
-macro _childstruct_parents(parent) {
-    if {defined ::struct.bases.{parent}.parent} {
-        _childstruct_parents({::struct.bases.{parent}.parent})
-    } else {
-        if {defined ::struct.bases.{parent}.start} {
-            global evaluate ::struct.pos({::struct.bases.{parent}.start})
-        } else {
-            error "Unknown start of basestruct `{parent}`"
-        }
-    }
-    if {defined ::struct.bases.{parent}.maxSize} {
-        struct_maxsize({::struct.bases.{parent}.maxSize})
-    }
+macro _childstruct_fields(parent) {
+    __STRUCT__.maxSize = {parent}.__STRUCT__.maxSize
 
     evaluate n(0)
-    while {n} < {::struct.bases.{parent}.size} {
-        field({::struct.bases.{parent}.var{n}}, {::struct.bases.{parent}.var{n}size})
+    while {n} < {{parent}.__STRUCT__.fields.size} {
+        field({{parent}.__STRUCT__.fields.{n}.name}, {{parent}.__STRUCT__.fields.{n}.size})
 
         evaluate n({n} + 1)
     }
+
+    assert(__STRUCT__.pos == {parent}.__STRUCT__.pos)
 }
 
 // Creates a field in a struct of a given size.
 macro field(name, evaluate size) {
-    if {::struct} != 0x1337 {
+    if __STRUCT__.inStruct != 0x1337 {
         error "Not in a struct"
     }
-    if {::struct.inBase} {
-        evaluate s({::struct.bases.{::struct.currentBase}.size})
-        global define ::struct.bases.{::struct.currentBase}.var{s}({name})
-        global evaluate ::struct.bases.{::struct.currentBase}.var{s}size({size})
-        global evaluate ::struct.bases.{::struct.currentBase}.size({s} + 1)
+    if __STRUCT__.isBaseStruct {
+        global define __STRUCT__.fields.{__STRUCT__.fields.size}.name({name})
+        global evaluate __STRUCT__.fields.{__STRUCT__.fields.size}.size({size})
+        global evaluate __STRUCT__.fields.size({__STRUCT__.fields.size} + 1)
     }
 
     assert({size} > 0)
 
-    constant {name}({::struct.pos})
-    global evaluate ::struct.pos({::struct.pos} + {size})
-    global evaluate ::struct.size({::struct.size} + {size})
+    constant {name}(__STRUCT__.pos)
+    __STRUCT__.pos = __STRUCT__.pos + {size}
+    __STRUCT__.size = __STRUCT__.size + {size}
+
+    if __STRUCT__.maxSize > 0 && __STRUCT__.size > __STRUCT__.maxSize {
+        evaluate size(__STRUCT__.size)
+        evaluate maxSize(__STRUCT__.maxSize)
+        error "struct is too large, (size {size}, max {maxSize})"
+    }
 }
 
 // Limits the size of the current struct to `maxSize` bytes
 macro struct_maxsize(evaluate maxSize) {
     assert({maxSize} > 0)
 
-    if {::struct} != 0x1337 {
+    if __STRUCT__.inStruct != 0x1337 {
         error "Not in a struct"
     }
-    if {::struct.maxSize} > 0 {
+    if __STRUCT__.maxSize > 0 {
         error "struct is already size limited"
     }
-    if {::struct.inBase} {
-        global evaluate ::struct.bases.{::struct.currentBase}.maxSize({maxSize})
-    }
-    global evaluate ::struct.maxSize({maxSize})
+    __STRUCT__.maxSize = {maxSize}
 }
 
 // Ends the struct, will create the `size` field.
 // Also errors out if the struct is too large
 macro endstruct() {
-    if {::struct} != 0x1337 {
+    if __STRUCT__.inStruct != 0x1337 {
         error "Not in a struct"
     }
 
-    if {::struct.maxSize} > 0 && {::struct.size} > {::struct.maxSize} {
-        error "struct is too large, (size {::struct.size}, max {::struct.maxSize})"
+    if __STRUCT__.maxSize > 0 && __STRUCT__.size > __STRUCT__.maxSize {
+        evaluate size(__STRUCT__.size)
+        evaluate maxSize(__STRUCT__.maxSize)
+        error "struct is too large, (size {size}, max {maxSize})"
     }
 
-    global define __struct(1)
-    global evaluate ::struct(0)
-    constant size({::struct.size})
+    __STRUCT__.inStruct = 0
+    global define __STRUCT__(1)
+
+    constant size(__STRUCT__.size)
 }
 
 // vim: ft=bass-65816 ts=4 sw=4 et:

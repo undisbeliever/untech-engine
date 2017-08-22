@@ -3,21 +3,21 @@ include "../../../src/common/struct.inc"
 include "../../../src/common/assert.inc"
 
 scope Base {
-    basestruct(Base)
+    basestruct()
     struct_maxsize(12)
         field(a, 5)
     endstruct()
 }
 
 scope BaseWithParent {
-    basestruct(BaseWithParent, Base)
+    basestruct(Base)
         field(b, 5)
     endstruct()
 }
 
 scope Child {
     childstruct(BaseWithParent)
-        field(c, 5)
-    endstruct() // ERROR
+        field(c, 5) // ERROR
+    endstruct()
 }
 
