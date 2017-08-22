@@ -11,11 +11,9 @@
 
 RegisterBreakId(INVALID_ENTITY_ID)
 RegisterBreakId(INVALID_PROJECTILE_ID)
-
-scope Entity {
-
 Warnings.Register(ENTITY_POOL_EMPTY, 31, 0, 31)
 
+scope Entity {
 
 code()
 scope Spawn {

@@ -88,7 +88,7 @@ constant tmp(Test.tmp)
 
     // Test ENTITY_POOL_EMPTY warning was emitted
     lda.w   Warnings.current
-    cmp.w   #::warningId.ids.ENTITY_POOL_EMPTY
+    cmp.w   #__WARNINGS__.ids.ENTITY_POOL_EMPTY
     bne     Fail
     stz.w   Warnings.current
 

@@ -335,7 +335,7 @@ scope Overflow: {
 
     // Test NO_MS_PALETTE_SLOTS warning was emitted
     lda.w   Warnings.current
-    cmp.w   #::warningId.ids.NO_MS_PALETTE_SLOTS
+    cmp.w   #__WARNINGS__.ids.NO_MS_PALETTE_SLOTS
     bne     Fail
     stz.w   Warnings.current
 
@@ -350,7 +350,7 @@ scope Overflow: {
 
     // Test NO_MS_PALETTE_SLOTS warning was emitted
     lda.w   Warnings.current
-    cmp.w   #::warningId.ids.NO_MS_PALETTE_SLOTS
+    cmp.w   #__WARNINGS__.ids.NO_MS_PALETTE_SLOTS
     bne     Fail
     stz.w   Warnings.current
 
@@ -381,7 +381,7 @@ a16()
 
     // Test NO_MS_PALETTE_SLOTS warning was emitted
     lda.w   Warnings.current
-    cmp.w   #::warningId.ids.NO_MS_PALETTE_SLOTS
+    cmp.w   #__WARNINGS__.ids.NO_MS_PALETTE_SLOTS
     bne     Fail
     stz.w   Warnings.current
 

@@ -9,11 +9,10 @@
 // Distributed under The MIT License: https://opensource.org/licenses/MIT
 
 
-scope MetaSprite {
-scope Vram {
-
 Warnings.Register(NO_MS_VRAM_SLOTS, 31, 24, 0)
 
+scope MetaSprite {
+scope Vram {
 
 // Reuse tilesetAddr address with the upload routines
 constant tilesetAddr(Dma.Tile16.tileListAddr)

@@ -33,11 +33,11 @@ constant CGRAM_POS(1)
 // colors can be registered with the `Warnings.Register` macro.
 macro Warn(id) {
     if __CPU__.aSize == 16 {
-        lda.w   #::warningId.ids.{id}
+        lda.w   #__WARNINGS__.ids.{id}
         jsr     Warnings.Warn_a16
 
     } else if __CPU__.iSize == 16 {
-        ldx.w   #::warningId.ids.{id}
+        ldx.w   #__WARNINGS__.ids.{id}
         jsr     Warnings.Warn_i16
     } else {
         error "Expected 16 bit A or 16 bit Index"
@@ -49,6 +49,8 @@ macro Warn(id) {
 //
 // Assembly will be aborted if two warnings register similar colors.
 //
+// This macro MUST BE called in the root scope.
+//
 // PARAM: id - warning identifier
 // PARAM: r,g,b - the RGB values of the warning
 macro Register(id, b, g, r) {
@@ -56,7 +58,7 @@ macro Register(id, b, g, r) {
     evaluate g({g} & 31)
     evaluate r({r} & 31)
 
-    constant ::warningId.ids.{id}(({b} << 10) | ({g} << 5) | {r})
+    constant __WARNINGS__.ids.{id}(({b} << 10) | ({g} << 5) | {r})
 
 
     // Detect similar warning colors
@@ -79,10 +81,10 @@ macro Register(id, b, g, r) {
         error "warningId `{id}` cannot be grey"
     }
 
-    if {defined ::warningId.colors.{lc}} {
-        warning "Cannot register warning color {id}: too similar to {::warningId.colors.{lc}}"
+    if {defined __WARNINGS__.colors.{lc}} {
+        warning "Cannot register warning color {id}: too similar to {__WARNINGS__.colors.{lc}}"
     } else {
-        global define ::warningId.colors.{lc}({id})
+        global define __WARNINGS__.colors.{lc}({id})
     }
 }
 

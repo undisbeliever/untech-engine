@@ -3,6 +3,7 @@
 // Distributed under The MIT License: https://opensource.org/licenses/MIT
 
 RegisterBreakId(UNIT_TEST_BRK)
+Warnings.Register(UNIT_TEST_WARNING, 8, 20, 31)
 
 scope InteractiveTests {
 scope Errors {
@@ -11,8 +12,6 @@ scope Errors {
 //  * Break Handler
 //  * break Macro
 //  * Warnings Module
-
-Warnings.Register(UNIT_TEST_WARNING, 8, 20, 31)
 
 a16()
 i16()

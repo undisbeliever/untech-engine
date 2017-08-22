@@ -204,7 +204,7 @@ macro _DeallocateTest(type) {
 
         // Test NO_MS_VRAM_SLOTS warning was emitted
         lda.w   Warnings.current
-        cmp.w   #::warningId.ids.NO_MS_VRAM_SLOTS
+        cmp.w   #__WARNINGS__.ids.NO_MS_VRAM_SLOTS
         bne     Fail
         stz.w   Warnings.current
 
@@ -232,7 +232,7 @@ macro _DeallocateTest(type) {
 
         // Confirm that NO_MS_VRAM_SLOTS warning has been emitted
         lda.w   Warnings.current
-        cmp.w   #::warningId.ids.NO_MS_VRAM_SLOTS
+        cmp.w   #__WARNINGS__.ids.NO_MS_VRAM_SLOTS
         bne     Fail
         stz.w   Warnings.current
 
@@ -263,7 +263,7 @@ macro _DeallocateTest(type) {
 
         // Test NO_MS_VRAM_SLOTS warning was emitted
         lda.w   Warnings.current
-        cmp.w   #::warningId.ids.NO_MS_VRAM_SLOTS
+        cmp.w   #__WARNINGS__.ids.NO_MS_VRAM_SLOTS
         bne     Fail
         stz.w   Warnings.current
 
@@ -284,7 +284,7 @@ macro _DeallocateTest(type) {
 
         // Test NO_MS_VRAM_SLOTS warning was emitted
         lda.w   Warnings.current
-        cmp.w   #::warningId.ids.NO_MS_VRAM_SLOTS
+        cmp.w   #__WARNINGS__.ids.NO_MS_VRAM_SLOTS
         bne     Fail
         stz.w   Warnings.current
 
@@ -321,7 +321,7 @@ macro _DeallocateTest(type) {
 
         // Test NO_MS_VRAM_SLOTS warning was emitted
         lda.w   Warnings.current
-        cmp.w   #::warningId.ids.NO_MS_VRAM_SLOTS
+        cmp.w   #__WARNINGS__.ids.NO_MS_VRAM_SLOTS
         bne     Fail
         stz.w   Warnings.current
 
@@ -466,7 +466,7 @@ macro _ReferenceCountTest(type) {
 
         // Test NO_MS_VRAM_SLOTS warning was emitted
         lda.w   Warnings.current
-        cmp.w   #::warningId.ids.NO_MS_VRAM_SLOTS
+        cmp.w   #__WARNINGS__.ids.NO_MS_VRAM_SLOTS
         bne     Fail
         stz.w   Warnings.current
 
@@ -508,7 +508,7 @@ macro _ReferenceCountTest(type) {
 
         // Test NO_MS_VRAM_SLOTS warning was emitted
         lda.w   Warnings.current
-        cmp.w   #::warningId.ids.NO_MS_VRAM_SLOTS
+        cmp.w   #__WARNINGS__.ids.NO_MS_VRAM_SLOTS
         bne     Fail
         stz.w   Warnings.current
 

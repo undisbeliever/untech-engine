@@ -9,10 +9,10 @@
 // Distributed under The MIT License: https://opensource.org/licenses/MIT
 
 
+Warnings.Register(NO_MS_PALETTE_SLOTS, 0, 24, 24)
+
 scope MetaSprite {
 scope Palette {
-
-Warnings.Register(NO_MS_PALETTE_SLOTS, 0, 24, 24)
 
 
 // Resets allocation lists
