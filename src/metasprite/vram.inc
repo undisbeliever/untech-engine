@@ -129,7 +129,7 @@ macro _Activate() {
                 jmp     (MetaSprite.Vram._AllocateDynamic.Table,x)
             }
 
-        ::MetaSprite.Vram.AllocateDynamic.Return:
+        AllocateDynamicReturn:
             bcc     ReturnRep
 
             // Upload tiles now that a row is allocated
@@ -138,7 +138,7 @@ macro _Activate() {
         i16()
             jsr     MetaSprite.Vram._UploadDynamicTileset
 
-        ::MetaSprite.Vram.ActivateFixed.Return:
+        ActivateFixedReturn:
             bcc     ReturnRep
     AlreadyActive:
     }
@@ -379,7 +379,7 @@ Return:
 //      Jump to Return
 //      Register size unknown
 scope _ActivateFixed {
-    constant Return(::MetaSprite.Vram.ActivateFixed.Return)
+    constant Return(MetaSprite.Activate.Vram.ActivateFixedReturn)
 
     macro Process(name, freeSlotPool, usedSlotPool, nSlots, uploadRoutine) {
         a16()
@@ -701,7 +701,7 @@ scope _ActivateFixed {
 //      Jump to Return on Success
 //      Register size unknown
 scope _AllocateDynamic {
-    constant Return(::MetaSprite.Vram.AllocateDynamic.Return)
+    constant Return(MetaSprite.Activate.Vram.AllocateDynamicReturn)
 
 // ::SHOULDO add dynamic tileset with fixed portion of tiles::
 // ::: ie, tiles 5-7 are fixed through the life of the entity::

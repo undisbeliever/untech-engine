@@ -143,11 +143,10 @@ macro _TransferOnNextVBlank() {
 //
 // REQUIRES: 16 bit A, 8 bit Index, DB = $80, DP = $4300
 // REQUIRES: VMAIN = VMAIN.incrementMode.high
-macro _VBlank() {
+macro scope _VBlank() {
     assert16a()
     assert8i()
 
-    scope Tile16: {
         ldy.w   Dma.Tile16.processVBlankOnZero
         bne     Return
 
@@ -187,7 +186,7 @@ macro _VBlank() {
             jmp     (Dma.Tile16._ProcessDMA.FunctionTable,x)
 
 
-        ::Dma.Tile16.ContinueLoop:
+        ContinueLoop:
             ply
 
             iny
@@ -197,7 +196,7 @@ macro _VBlank() {
             bne     Loop
             bra     EndLoop
 
-    ::Dma.Tile16.EndLoopFunction:
+    EndLoopFunction:
         ply
 
     EndLoop:
@@ -205,7 +204,6 @@ macro _VBlank() {
         stx.w   Dma.Tile16.processVBlankOnZero
 
     Return:
-    }
 }
 
 
@@ -222,8 +220,8 @@ a16()
 i16()
 code()
 scope _ProcessDMA {
-    constant ContinueLoop(::Dma.Tile16.ContinueLoop)
-    constant EndLoopFunction(::Dma.Tile16.EndLoopFunction)
+    constant ContinueLoop(NmiHandler.Dma.Tile16._VBlank.ContinueLoop)
+    constant EndLoopFunction(NmiHandler.Dma.Tile16._VBlank.EndLoopFunction)
 
     scope FunctionTable: {
         dw  EndLoopFunction

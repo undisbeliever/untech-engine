@@ -50,20 +50,18 @@ macro VBlank() {
     assert16a()
     assert8i()
 
-    scope {
-        ldx.b   #VMAIN.incrementMode.high | VMAIN.increment.by1
-        stx.w   VMAIN
+    ldx.b   #VMAIN.incrementMode.high | VMAIN.increment.by1
+    stx.w   VMAIN
 
-        Dma.MetaSprite._VBlank()
-        Dma.Palette._VBlank()
-        Dma.Tile16._VBlank()
+    Dma.MetaSprite._VBlank()
+    Dma.Palette._VBlank()
+    Dma.Tile16._VBlank()
 
-        // Text module is low priority.
-        // Must be done last
-        Dma.Text._VBlank()
+    // Text module is low priority.
+    // Must be done last
+    Dma.Text._VBlank()
 
-        Dma.ResetTransfersLeft()
-    }
+    Dma.ResetTransfersLeft()
 }
 
 
