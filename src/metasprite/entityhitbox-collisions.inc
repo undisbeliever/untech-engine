@@ -52,14 +52,14 @@ scope FunctionTable: {
         _processList(_second)
 
         // padding
-        assert({Format.EntityHitboxType.__enum.current} == 6 * 2)
+        assert({Format.EntityHitboxType.__ENUM__.current} == 6 * 2)
         assert(Format.EntityHitboxType._TABLE_SHIFT == 3)
         _repeatNull(2)
     }
     _processList(_first)
 
     // more padding
-    assert({Format.EntityHitboxType.__enum.current} == 6 * 2)
+    assert({Format.EntityHitboxType.__ENUM__.current} == 6 * 2)
     _repeatNull(2 * 8)
 
     assert((pc() - FunctionTable) == TABLE_MASK + 2)

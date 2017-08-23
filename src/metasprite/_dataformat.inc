@@ -269,7 +269,7 @@ scope Format {
         constant _MASK((1 << (_TABLE_SHIFT + 1)) - 2)
         constant _TABLE_MASK(_MASK << _TABLE_SHIFT | _MASK)
 
-        assert({__enum.current} <= 2 << _TABLE_SHIFT)
+        assert({__ENUM__.current} <= 2 << _TABLE_SHIFT)
     }
 
 
@@ -362,7 +362,7 @@ scope Format {
 
 
         constant _MASK(%110)
-        assert({__enum.current} == _MASK + 2)
+        assert({__ENUM__.current} == _MASK + 2)
     }
 }
 

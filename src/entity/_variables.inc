@@ -150,7 +150,7 @@ scope Entity {
             enum(PLATFORM)
             enum(PARTICLE)
 
-        assert({__enum.current} == lists.N_LISTS * 2)
+        assert({__ENUM__.current} == lists.N_LISTS * 2)
     }
 
 

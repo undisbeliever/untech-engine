@@ -27,9 +27,9 @@ macro createEnum(start, increment) {
         error "increment is invalid"
     }
 
-    constant __enum.first({start})
-    global evaluate __enum.current({start})
-    global evaluate __enum.increment({increment})
+    constant __ENUM__.first({start})
+    global evaluate __ENUM__.current({start})
+    global evaluate __ENUM__.increment({increment})
 }
 macro createEnum(start) {
     createEnum({start}, 1)
@@ -39,9 +39,9 @@ macro createEnum() {
 }
 
 macro enum(id) {
-    if {defined __enum.current} {
-        constant {id}({__enum.current})
-        global evaluate __enum.current({__enum.current} + {__enum.increment})
+    if {defined __ENUM__.current} {
+        constant {id}({__ENUM__.current})
+        global evaluate __ENUM__.current({__ENUM__.current} + {__ENUM__.increment})
 
     } else {
         error "Current scope is not an enum"
