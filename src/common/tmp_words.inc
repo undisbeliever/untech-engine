@@ -9,28 +9,37 @@
 // Distributed under The MIT License: https://opensource.org/licenses/MIT
 
 
-evaluate ::tmpWord.nMarks(0)
-evaluate ::tmpWord.nAllocations(0)
+variable __TMP_WORDS__.nMarks(0)
+variable __TMP_WORDS__.nAllocations(0)
 
 // Mark an unused word as a temporary variable that can be accessed
 // later.
+//
+// This macro MUST BE called in the root scope.
 //
 // var must be in DB 0x7e
 macro markTmpWord(evaluate var) {
     assert(({var} >> 16) == 0x7e)
 
-    constant ::tmpWords.{::tmpWord.nMarks}({var})
+    evaluate n(__TMP_WORDS__.nMarks)
+    constant __TMP_WORDS__.{n}({var})
 
-    global evaluate ::tmpWord.nMarks({::tmpWord.nMarks} + 1)
+    __TMP_WORDS__.nMarks = __TMP_WORDS__.nMarks + 1
 }
 
 // Allocates a tmp Word to a given variable name.
 //
 // The variable will be located somewhere in DB 0x7e
+//
+// If you get a "unrecognized variable: __TMP_WORDS__.*" error
+// then either:
+//   * a `markTmpWord` macro was not called in the root scope, or
+//   * you have run out of tmp words.
 macro allocateTmpWord(name) {
-    constant {name}(::tmpWords.{::tmpWord.nAllocations})
+    evaluate n(__TMP_WORDS__.nAllocations)
+    constant {name}(__TMP_WORDS__.{n})
 
-    global evaluate ::tmpWord.nAllocations({::tmpWord.nAllocations} + 1)
+    __TMP_WORDS__.nAllocations = __TMP_WORDS__.nAllocations + 1
 }
 
 // vim: ft=bass-65816 ts=4 sw=4 et:

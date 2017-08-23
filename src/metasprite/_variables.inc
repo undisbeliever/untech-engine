@@ -80,17 +80,9 @@ scope MetaSprite {
         // Buffer the oam's x8/size bits
         // bits 10-15 of each 4 byte block MUST BE CLEAR
         //
-        // bits 16-31 are unused by the renderer and can be used elsewhere
+        // bits 16-31 are unused by the renderer and can be used elsewhere,
+        // they are marked as unused words at the bottom of this file.
         allocate(oamXposBuffer, wram7e, 128 * 4)
-
-        scope {
-            // Mark the unused word of `oamXposBuffer` as unused.
-            evaluate n(127)
-            while ({n} >= 0) {
-                markTmpWord(oamXposBuffer + {n} * 4 + 2)
-                evaluate n({n} - 1)
-            }
-        }
 
         // The index of the buffer
         // (word index)
@@ -258,6 +250,13 @@ scope MetaSprite {
         // (index, MUST NOT be modified outside ActionPoint routines)
         allocateTmpWord(address)
     }
+}
+
+// Mark the unused word of `MetaSprite.Render.oamXposBuffer` as unused.
+evaluate n(127)
+while ({n} >= 0) {
+    markTmpWord(MetaSprite.Render.oamXposBuffer + {n} * 4 + 2)
+    evaluate n({n} - 1)
 }
 
 // vim: ft=bass-65816 ts=4 sw=4 et:
