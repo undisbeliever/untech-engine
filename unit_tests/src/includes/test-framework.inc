@@ -10,7 +10,8 @@ assert((__MEMORY__.romBlocks.testTableBlock.start >> 16) == (__MEMORY__.romBlock
 // ::TODO display failed test name on breakpoint::
 
 
-evaluate ::nTests(0)
+variable __TESTS__.nTests(0)
+variable __TESTS__.testsFinalized(0)
 
 scope Test {
 
@@ -59,7 +60,7 @@ allocate(currentTestName, shadow, 2)
 //  {name} - the name of the test
 //  pc()   - the address of the test
 macro add(name) {
-    if {defined ::testsFinalized} {
+    if __TESTS__.testsFinalized {
         error "Test table is finalized, cannot add any more tests"
     }
 
@@ -75,15 +76,17 @@ macro add(name) {
 
     popBlock()
 
-    global evaluate ::nTests({::nTests} + 1)
+    __TESTS__.nTests = __TESTS__.nTests + 1
 }
 
 // Finalizes the test table
 //
 // MUST be called
 macro finalizeTable() {
-    constant N_TESTS({::nTests})
-    global define ::testsFinalized(1)
+    assert(__TESTS__.testsFinalized == 0)
+
+    constant N_TESTS(__TESTS__.nTests)
+    __TESTS__.testsFinalized = 1
 }
 
 
