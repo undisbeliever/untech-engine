@@ -53,32 +53,44 @@ macro Warn(id) {
 //
 // PARAM: id - warning identifier
 // PARAM: r,g,b - the RGB values of the warning
-macro Register(id, b, g, r) {
-    evaluate b({b} & 31)
-    evaluate g({g} & 31)
-    evaluate r({r} & 31)
+macro Register(id, variable b, variable g, variable r) {
+    b = b & 31
+    g = g & 31
+    r = r & 31
 
-    constant __WARNINGS__.ids.{id}(({b} << 10) | ({g} << 5) | {r})
-
+    constant __WARNINGS__.ids.{id}((b << 10) | (g << 5) | r)
 
     // Detect similar warning colors
+    Warnings._CheckColorUnique({id}, b, g, r)
+}
 
-    evaluate lb(({b} + %100) >> 3)
-    evaluate lg(({g} + %100) >> 3)
-    evaluate lr(({r} + %100) >> 3)
+// Tests that the warning color is unique.
+// Aborts assembly if the color has been used before.
+// Adds `id` to colors list if color is unique.
+macro _CheckColorUnique(id, variable b, variable g, variable r) {
+    b = (b + %100) >> 3
+    g = (g + %100) >> 3
+    r = (r + %100) >> 3
 
-    evaluate lb({lb} > 3 ? 3 : {lb})
-    evaluate lg({lg} > 3 ? 3 : {lg})
-    evaluate lr({lr} > 3 ? 3 : {lr})
+    b = b > 3 ? 3 : b
+    g = g > 3 ? 3 : g
+    r = r > 3 ? 3 : r
 
-    evaluate lc(({lb} << 4) | ({lg} << 2) | {lr})
+    if b == g && b == r {
+        error "warningId {id} cannot be grey"
+    }
 
+    Warnings._CheckColorUnique({id}, (b << 4) | (g << 2) | r)
+}
+
+// Tests that the warning color is unique.
+// Aborts assembly if the color has been used before.
+// Adds `id` to colors list if color is unique.
+macro _CheckColorUnique(id, evaluate lc) {
     if {lc} == 0 {
-        error "warningId `{id}` cannot be black"
+        error "warningId {id} cannot be black"
     } else if {lc} == %111111 {
-        error "warningId `{id}` cannot be white"
-    } else if {lb} == {lg} && {lb} == {lr} {
-        error "warningId `{id}` cannot be grey"
+        error "warningId {id} cannot be white"
     }
 
     if {defined __WARNINGS__.colors.{lc}} {
