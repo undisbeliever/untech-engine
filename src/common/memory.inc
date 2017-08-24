@@ -65,6 +65,19 @@ scope private {
     } else {
         error "Unknown memory map `{MEMORY_MAP}`"
     }
+
+    macro checkBlockIsUnused(evaluate start, evaluate end) {
+        evaluate n(0)
+        while {n} < {__MEMORY__.romBlockNames.count} {
+            define b(__MEMORY__.romBlocks.{__MEMORY__.romBlockNames.{n}})
+
+            if ({start} & 0x3fffff) <= ({b}.end & 0x3fffff) && ({end} & 0x3fffff) >= ({b}.start & 0x3fffff) {
+                error "ROM Block `{name}` overlaps ROM block `{bn}`"
+            }
+
+            evaluate n({n} + 1)
+        }
+    }
 }
 
 // When set to non-zero then no more memory can be created or allocated.
@@ -107,16 +120,7 @@ macro createDataBlock(name, evaluate start, evaluate end) {
         error "ROM Block `{name}` cannot touch the SNES Header"
     }
 
-    evaluate n(0)
-    while {n} < {__MEMORY__.romBlockNames.count} {
-        define b(__MEMORY__.romBlocks.{__MEMORY__.romBlockNames.{n}})
-
-        if ({start} & 0x3fffff) <= ({b}.end & 0x3fffff) && ({end} & 0x3fffff) >= ({b}.start & 0x3fffff) {
-            error "ROM Block `{name}` overlaps ROM block `{bn}`"
-        }
-
-        evaluate n({n} + 1)
-    }
+    private.checkBlockIsUnused({start}, {end})
 
     global define __MEMORY__.romBlocks.{name}()
     global variable __MEMORY__.romBlocks.{name}.pos({start})
@@ -326,22 +330,21 @@ macro finalizeMemory() {
         error "Block stack is not empty"
     }
 
-
-    // build used constants
-    evaluate n(0)
-    while {n} < {__MEMORY__.romBlockNames.count} {
-        define bn({__MEMORY__.romBlockNames.{n}})
-
-        constant __MEMORY__.romBlocks.{bn}.last(__MEMORY__.romBlocks.{bn}.pos)
-
-        evaluate n({n} + 1)
-    }
-
+    _finalizeMemory_buildUseConstants(0)
 
     if {defined SHOW_MEMORY_USAGE} {
         __printMemoryUsage()
     }
 }
+
+macro _finalizeMemory_buildUseConstants(evaluate n) {
+    // build used constants
+    if {n} < {__MEMORY__.romBlockNames.count} {
+        constant __MEMORY__.romBlocks.{__MEMORY__.romBlockNames.{n}}.last(__MEMORY__.romBlocks.{__MEMORY__.romBlockNames.{n}}.pos)
+        _finalizeMemory_buildUseConstants({n} + 1)
+    }
+}
+
 
 macro __printMemoryUsage() {
     print "\n"
