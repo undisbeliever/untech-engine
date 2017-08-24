@@ -2,13 +2,13 @@
 // Copyright (c) 2016 - 2017, Marcus Rowe <undisbeliever@gmail.com>.
 // Distributed under The MIT License: https://opensource.org/licenses/MIT
 
-scope MetaSpriteTest {
+namespace MetaSpriteTest {
 
 // REQUIRES: 16 bit A, 16 bit Index, DB = 0x7E
 a16()
 i16()
 code()
-scope _Init_MetaSpriteModule: {
+function _Init_MetaSpriteModule {
     jsr     Dma.Init
     jsr     MetaSprite.Init
 
@@ -25,7 +25,7 @@ scope _Init_MetaSpriteModule: {
 a16()
 i16()
 code()
-scope _InitEntity: {
+function _InitEntity {
     MetaSprite._InitEntity()
     rts
 }
@@ -38,7 +38,7 @@ scope _InitEntity: {
 a16()
 i16()
 code()
-scope _InitEntityAndActivate: {
+function _InitEntityAndActivate {
     jsr     _InitEntity
     jmp     MetaSprite.Activate
 }
@@ -50,7 +50,7 @@ scope _InitEntityAndActivate: {
 a16()
 i16()
 code()
-scope _InitEntity0Palette: {
+function _InitEntity0Palette {
     ldy.w   #0
     jmp     _InitEntity
 }
@@ -62,7 +62,7 @@ scope _InitEntity0Palette: {
 a16()
 i16()
 code()
-scope _InitEntity0PaletteAndActivate: {
+function _InitEntity0PaletteAndActivate {
     ldy.w   #0
     jmp     _InitEntityAndActivate
 }
@@ -77,7 +77,7 @@ scope _InitEntity0PaletteAndActivate: {
 a16()
 i16()
 code()
-scope _InitEntityFrameActivate: {
+function _InitEntityFrameActivate {
     phx
         jsr     _InitEntity
     pla

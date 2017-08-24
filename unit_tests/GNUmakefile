@@ -78,7 +78,7 @@ $(DIRS):
 unit-tests: directories $(BINARY)
 
 $(BINARY) $(BINARY:.sfc=.sym): $(MAIN) $(INCLUDES) $(TABLE_INCS) $(RESOURCES)
-	bass-untech -strict -create -o $@ -sym $(@:.sfc=.sym) $(MAIN)
+	bass-untech -strict -o $@ -sym $(@:.sfc=.sym) $(MAIN)
 
 
 .PHONY: memory-usage

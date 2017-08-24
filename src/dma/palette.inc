@@ -9,20 +9,20 @@
 // Distributed under The MIT License: https://opensource.org/licenses/MIT
 
 
-scope Dma {
-scope Palette {
+namespace Dma {
+namespace Palette {
 
 allocate(buffer, wram7e, 256 * 2)
 
 allocateTmpWord(dirty)
-scope dirty {
+namespace dirty {
     // Values match TransferTable Index
-    constant tiles(0x02)
-    constant objects(0x04)
-    constant all(0x06)
+    constant tiles = 0x02
+    constant objects = 0x04
+    constant all = 0x06
 }
 
-scope vblank {
+namespace vblank {
     allocate(cgadd, shadow, 1)
     allocate(buffer, shadow, 2)
     allocate(size, shadow, 2)
@@ -34,7 +34,7 @@ macro _Init() {
     assert16a()
     assert16i()
 
-    scope Palette: {
+    function Palette {
         stz.w   Dma.Palette.vblank.size
     }
 }
@@ -44,7 +44,7 @@ macro _TransferOnNextVBlank() {
     assert16a()
     assert16i()
 
-    scope Palette: {
+    function Palette {
         lda.w   Dma.Palette.dirty
         and.w   #$00FF
         beq     EndIf
@@ -73,7 +73,7 @@ macro _VBlank() {
     assert16a()
     assert8i()
 
-    scope Palette: {
+    function Palette {
         lda.w   Dma.Palette.vblank.size
         beq     EndIf
             sta.b   DAS0
@@ -106,7 +106,7 @@ macro MarkDirty(pattern) {
     assert8a()
 
     // ::ANNOY no anonymous scopes::
-    scope MarkDirty.{#} {
+    namespace MarkDirty.{#} {
         lda.b   #Dma.Palette.dirty.{pattern}
         tsb.w   Dma.Palette.dirty
 
@@ -137,7 +137,7 @@ macro MarkDirty(pattern) {
 
 
 rodata(rom0)
-scope TransferTable: {
+function TransferTable {
     Cgadd:
         dw  0
         dw  0

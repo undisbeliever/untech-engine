@@ -9,13 +9,13 @@
 // Distributed under The MIT License: https://opensource.org/licenses/MIT
 
 
-scope MetaSprite {
-scope EntityHitbox {
-scope CollisionTable {
+namespace MetaSprite {
+namespace EntityHitbox {
+namespace CollisionTable {
 
 allocateTmpWord(tmp)
 
-constant TABLE_MASK(Format.EntityHitboxType._TABLE_MASK)
+constant TABLE_MASK = Format.EntityHitboxType._TABLE_MASK
 
 // Processes the collision
 //
@@ -26,11 +26,11 @@ constant TABLE_MASK(Format.EntityHitboxType._TABLE_MASK)
 a16()
 i16()
 code()
-scope FunctionTable: {
+function FunctionTable {
     macro _repeatNull(evaluate n) {
         while {n} > 0 {
             dw  Null
-            evaluate n({n} - 1)
+            evaluate n = {n} - 1
         }
     }
 
@@ -48,7 +48,7 @@ scope FunctionTable: {
         dw  {__first}_{name}
     }
     macro _first(name) {
-        global define __first({name})
+        define __first = {name}
         _processList(_second)
 
         // padding
@@ -83,7 +83,7 @@ macro _simple(a, b) {
 a16()
 i16()
 code()
-scope Null: {
+function Null {
     rts
 }
 
@@ -94,7 +94,7 @@ code()
 BodyWeak_BodyWeak:
 BodyWeak_Body:
 Body_BodyWeak:
-scope Body_Body: {
+function Body_Body {
     // A.CollideWithBody
     // B.CollideWithBody
 
@@ -107,7 +107,7 @@ i16()
 code()
 Body_BodyAttack:
 BodyAttack_Attack:
-scope Body_Attack: {
+function Body_Attack {
     // B.CalculateAttackValue (normal)
     // A.TakeDamageFromEntity (normal)
 
@@ -137,7 +137,7 @@ scope Body_Attack: {
 a16()
 i16()
 BodyWeak_BodyAttack:
-scope BodyWeak_Attack: {
+function BodyWeak_Attack {
     // B.CalculateAttackValue (normal)
     // A.TakeDamageFromEntity (weak)
 
@@ -168,7 +168,7 @@ a16()
 i16()
 code()
 BodyWeak_Shield:
-scope Body_Shield: {
+function Body_Shield {
     // A.CollideWithShield
     // B.BlockWithShield (body)
 
@@ -191,7 +191,7 @@ a16()
 i16()
 code()
 BodyAttack_ShieldAttack:
-scope Body_ShieldAttack: {
+function Body_ShieldAttack {
     // B.CalculateAttackValue (shield)
     // A.TakeDamageFromEntity (normal)
     // A.CollideWithShield
@@ -227,7 +227,7 @@ scope Body_ShieldAttack: {
 a16()
 i16()
 code()
-scope BodyWeak_ShieldAttack: {
+function BodyWeak_ShieldAttack {
     // B.CalculateAttackValue (shield)
     // A.TakeDamageFromEntity (weak)
     // A.CollideWithShield
@@ -264,7 +264,7 @@ a16()
 i16()
 code()
 Shield_BodyWeak:
-scope Shield_Body: {
+function Shield_Body {
     // A.BlockWithShield (body)
     // B.CollideWithShield
 
@@ -289,7 +289,7 @@ code()
 ShieldAttack_ShieldAttack:
 ShieldAttack_Shield:
 Shield_ShieldAttack:
-scope Shield_Shield: {
+function Shield_Shield {
     // A.BlockWithShield (body)
     // B.BlockWithShield (body)
 
@@ -314,7 +314,7 @@ i16()
 code()
 Shield_BodyAttack:
 ShieldAttack_Attack:
-scope Shield_Attack: {
+function Shield_Attack {
     // A.BlockWithShield (attack)
     // B.CollideWithShield
 
@@ -336,7 +336,7 @@ scope Shield_Attack: {
 a16()
 i16()
 code()
-scope ShieldAttack_Body: {
+function ShieldAttack_Body {
     // A.CalculateAttackValue (shield)
     // B.TakeDamageFromEntity (normal)
     // B.CollideWithShield
@@ -364,7 +364,7 @@ scope ShieldAttack_Body: {
 a16()
 i16()
 code()
-scope ShieldAttack_BodyWeak: {
+function ShieldAttack_BodyWeak {
     // A.CalculateAttackValue (shield)
     // B.TakeDamageFromEntity (weak)
     // B.CollideWithShield
@@ -392,7 +392,7 @@ scope ShieldAttack_BodyWeak: {
 a16()
 i16()
 code()
-scope ShieldAttack_BodyAttack: {
+function ShieldAttack_BodyAttack {
     // A.CalculateAttackValue (shield)
     // B.TakeDamageFromEntity (normal)
     // B.CollideWithShield
@@ -423,7 +423,7 @@ i16()
 code()
 BodyAttack_Body:
 Attack_BodyAttack:
-scope Attack_Body: {
+function Attack_Body {
     // A.CalculateAttackValue (normal)
     // B.TakeDamageFromEntity (normal)
 
@@ -447,7 +447,7 @@ a16()
 i16()
 code()
 BodyAttack_BodyWeak:
-scope Attack_BodyWeak: {
+function Attack_BodyWeak {
     // A.CalculateAttackValue (attack)
     // B.TakeDamageFromEntity (weak)
 
@@ -472,7 +472,7 @@ i16()
 code()
 BodyAttack_Shield:
 Attack_ShieldAttack:
-scope Attack_Shield: {
+function Attack_Shield {
     // A.CollideWithShield
     // B.BlockWithShield (attack)
 
@@ -494,7 +494,7 @@ scope Attack_Shield: {
 a16()
 i16()
 code()
-scope BodyAttack_BodyAttack: {
+function BodyAttack_BodyAttack {
     // A.CalculateAttackValue (normal)
     // B.TakeDamageFromEntity (normal)
     // B.CalculateAttackValue (normal)
@@ -546,7 +546,7 @@ scope BodyAttack_BodyAttack: {
 a16()
 i16()
 code()
-scope Attack_Attack: {
+function Attack_Attack {
     // phase through each other
     rts
 }

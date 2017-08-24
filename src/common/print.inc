@@ -15,8 +15,8 @@
 //  * width - the printing width
 //  * value - the value to print
 macro print_padded(evaluate width, evaluate value) {
-    variable w({width} - 1)
-    variable v({value})
+    variable w = {width} - 1
+    variable v = {value}
 
     if v < 0 {
         v = 0 - v
@@ -45,7 +45,7 @@ macro print_hex(evaluate width, evaluate value) {
     if {width} > 0 || {value} > 0 {
         print_hex({width} - 1, {value} / 16)
 
-        evaluate d({value} % 16)
+        evaluate d = {value} % 16
         if {d} < 10 {
             print {d}
         } else if {d} == 10 {

@@ -14,12 +14,12 @@
 // Distributed under The MIT License: https://opensource.org/licenses/MIT
 
 
-arch snes.cpu
+architecture wdc65816
 
-scope BreakHandler {
+namespace BreakHandler {
 
-constant BSOD_BG_COLOR(13 << Palette.blue.shift)
-constant BSOD_TEXT_COLOR(0x7fff)
+constant BSOD_BG_COLOR = 13 << Palette.blue.shift
+constant BSOD_TEXT_COLOR = 0x7fff
 
 // Code must be in bank 0
 code()
@@ -128,7 +128,7 @@ macro SetCursor(evaluate xPos, evaluate yPos) {
 // REQUIRES: VMADD set to cursor position, VMAIN set to increment +1 low
 //
 // INPUT: A - the BRK Id
-macro scope PrintBreakIdString() {
+macro PrintBreakIdString() {
     assert8a()
     assert16i()
 
@@ -182,7 +182,7 @@ StringNotFound:
 au()
 iu()
 code()
-scope PrintString: {
+function PrintString {
     php
     rep     #$30
     sep     #$20
@@ -214,7 +214,7 @@ EndLoop:
 a8()
 i16()
 code()
-scope PrintStringAndHex8: {
+function PrintStringAndHex8 {
     pha
     jsr     PrintString
     pla
@@ -231,7 +231,7 @@ FallThrough:
 a8()
 i16()
 code()
-scope PrintHex8: {
+function PrintHex8 {
     assert(PrintStringAndHex8.FallThrough == pc())
 
     assert(Text.Font.ZERO == 1)
@@ -265,7 +265,7 @@ scope PrintHex8: {
 a16()
 i16()
 code()
-scope PrintStringAndHex16: {
+function PrintStringAndHex16 {
     pha
     jsr     PrintString
     pla
@@ -281,7 +281,7 @@ FallThrough:
 a16()
 i16()
 code()
-scope PrintHex16: {
+function PrintHex16 {
     assert(PrintStringAndHex16.FallThrough == pc())
 
     tax
@@ -336,7 +336,7 @@ macro Print16BitRegister(evaluate xPos, evaluate yPos, str, evaluate stackOffset
 // REQUIRES: VMAIN set to increment +1 low
 //
 // INPUT: CPU Registers pushed to stack
-macro scope PrintBreakpoint() {
+macro PrintBreakpoint() {
     assert8a()
     assert16i()
 
@@ -380,7 +380,7 @@ a8()
 // REQUIRES: VMAIN set to increment +1 low
 //
 // INPUT: CPU Registers pushed to stack
-macro scope PrintCpuState() {
+macro PrintCpuState() {
     assert8a()
     assert16i()
 
@@ -428,13 +428,13 @@ a8()
 // REQUIRES: VMAIN set to increment +1 low
 //
 // INPUT: CPU Registers pushed to stack
-macro scope PrintStack() {
-    constant BYTES_PER_LINE(8)
-    constant YPOS(10)
-    constant YBOTTOM(3)
+macro PrintStack() {
+    constant BYTES_PER_LINE = 8
+    constant YPOS = 10
+    constant YBOTTOM = 3
 
-    constant N_LINES(28 - YPOS - YBOTTOM)
-    constant PADDING(32 - (BYTES_PER_LINE * 3))
+    constant N_LINES = 28 - YPOS - YBOTTOM
+    constant PADDING = 32 - (BYTES_PER_LINE * 3)
 
     allocate(byteCount, shadow, 1)
     allocate(lineCount, shadow, 1)
@@ -498,7 +498,7 @@ Return:
 au()
 iu()
 code()
-scope ISR: {
+function ISR {
     // Store registers
     rep     #$30
 a16()
@@ -539,7 +539,7 @@ a8()
 }
 
 rodata(rom0)
-constant TextBank(pc() >> 16)
+constant TextBank = pc() >> 16
 
 BreakString:
     db  "BRK ", 0
@@ -569,7 +569,7 @@ DBString:
     db  "DB: ", 0
 }
 
-constant BreakHandler(BreakHandler.ISR)
+constant BreakHandler = BreakHandler.ISR
 
 // vim: ft=bass-65816 ts=4 sw=4 et:
 

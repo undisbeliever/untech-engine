@@ -6,30 +6,30 @@
 // These tests don't check the charattr values.
 // That will be preformed by the interactive tests.
 
-scope MetaSpriteTest {
-scope Render {
+namespace MetaSpriteTest {
+namespace Render {
 
-constant oneSmallObjEntity(EntityPool.entity0)
-constant oneLargeObjEntity(EntityPool.entity1)
-constant manyObjEntity(EntityPool.entity2)
+constant oneSmallObjEntity = EntityPool.entity0
+constant oneLargeObjEntity = EntityPool.entity1
+constant manyObjEntity = EntityPool.entity2
 
-scope manyObjEntity {
-    constant frameSet(MSFS.FST_TwoRows)
-    constant frame(MSEO.TwoFrames.Frames.frame2)
-    constant nLargeObjects(11)
-    constant nSmallObjects(4)
-    constant nObjects(nLargeObjects + nSmallObjects)
+namespace manyObjEntity {
+    constant frameSet = MSFS.FST_TwoRows
+    constant frame = MSEO.TwoFrames.Frames.frame2
+    constant nLargeObjects = 11
+    constant nSmallObjects = 4
+    constant nObjects = nLargeObjects + nSmallObjects
 }
 
-constant SCREEN_WIDTH(256)
-constant SCREEN_HEIGHT(224)
+constant SCREEN_WIDTH = 256
+constant SCREEN_HEIGHT = 224
 
 
 a16()
 i16()
 code()
 Test.add("MetaSprite.RenderEntity (Null)")
-scope RenderEntity_Null: {
+function RenderEntity_Null {
     jsr     _Init
     bcc     Fail
 
@@ -65,7 +65,7 @@ a16()
 i16()
 code()
 Test.add("MetaSprite.RenderEntity (One Small)")
-scope RenderEntity_OneSmall: {
+function RenderEntity_OneSmall {
     jsr     _Init
     bcc     Fail
 
@@ -111,7 +111,7 @@ a16()
 i16()
 code()
 Test.add("MetaSprite.RenderEntity (One Large)")
-scope RenderEntity_OneLarge: {
+function RenderEntity_OneLarge {
     jsr     _Init
     bcc     Fail
 
@@ -158,7 +158,7 @@ a16()
 i16()
 code()
 Test.add("MetaSprite.RenderEntity (Top Left)")
-scope RenderEntity_TopLeft: {
+function RenderEntity_TopLeft {
     jsr     _Init
     bcc     Fail
 
@@ -212,7 +212,7 @@ a16()
 i16()
 code()
 Test.add("MetaSprite.RenderEntity (Offscreen)")
-scope RenderEntity_Offscreen: {
+function RenderEntity_Offscreen {
     jsr     _Init
     bcc     Fail
 
@@ -263,7 +263,7 @@ a16()
 i16()
 code()
 Test.add("MetaSprite.RenderEntity (Overflow)")
-scope RenderEntity_Overflow: {
+function RenderEntity_Overflow {
     // Test that we don't crash
 
     jsr     _Init
@@ -301,7 +301,7 @@ a16()
 i16()
 code()
 Test.add("MetaSprite.RenderEntity (HiTable)")
-scope RenderEntity_HiTable: {
+function RenderEntity_HiTable {
 
     jsr     _Init
     bcc     Fail
@@ -340,7 +340,7 @@ a16()
 i16()
 code()
 Test.add("MetaSprite.RenderEntity (HiTable Size)")
-scope RenderEntity_HiTableSize: {
+function RenderEntity_HiTableSize {
 
 // There was a bug where the size of an object with an
 // xPos < 0 would always be large. This tests for correct
@@ -393,7 +393,7 @@ a16()
 i16()
 code()
 Test.add("MetaSprite.EndLoop")
-scope EndLoop: {
+function EndLoop {
 
     jsr     _Init
     bcc     Fail
@@ -475,7 +475,7 @@ Fail:
 a16()
 i16()
 code()
-scope _Init: {
+function _Init {
     jsr     _Init_MetaSpriteModule
 
     lda.w   #oneSmallObjEntity
@@ -519,7 +519,7 @@ Fail:
 a16()
 i16()
 code()
-scope _RenderEntityCenter: {
+function _RenderEntityCenter {
     lda.w   #SCREEN_WIDTH/2 - INT_MS8_OFFSET
     sta.w   MetaSprite.Render.xPos
     lda.w   #SCREEN_HEIGHT/2 - INT_MS8_OFFSET
@@ -536,7 +536,7 @@ scope _RenderEntityCenter: {
 a16()
 i16()
 code()
-scope _CheckSpritesOffscreen: {
+function _CheckSpritesOffscreen {
     asl
     asl
     tax

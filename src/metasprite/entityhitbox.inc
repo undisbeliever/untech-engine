@@ -9,10 +9,10 @@
 // Distributed under The MIT License: https://opensource.org/licenses/MIT
 
 
-scope MetaSprite {
-scope EntityHitbox {
+namespace MetaSprite {
+namespace EntityHitbox {
 
-scope currentEntity {
+namespace currentEntity {
     // address of the current entity
     allocateTmpWord(entityAddress)
 
@@ -22,7 +22,7 @@ scope currentEntity {
     // Outer hitbox of current entity
     // All values are offset by INT_MS8_OFFSET
     // (int_ms8_word)
-    scope outer {
+    namespace outer {
         allocateTmpWord(xPos)
         allocateTmpWord(yPos)
         allocateTmpWord(width)
@@ -30,11 +30,11 @@ scope currentEntity {
     }
 }
 
-scope toTestEntity {
+namespace toTestEntity {
     allocateTmpWord(entityAddress)
     allocateTmpWord(hitboxAddress)
 
-    scope aabb {
+    namespace aabb {
         allocateTmpWord(xPos)
         allocateTmpWord(yPos)
         allocateTmpWord(width)
@@ -109,7 +109,7 @@ macro _BranchIfNoOuterCollision(aabb, NoCollision) {
 
     // x coordinate more likely to miss
 
-    scope {#} {
+    namespace {#} {
         lda.l   Format.EntityHitbox.Outer.xOffset,x
         and.w   #0xff
         clc
@@ -167,7 +167,7 @@ macro _BranchOnInnerCollision(aabb, Collision) {
 
     // x coordinate more likely to miss
 
-    scope {#} {
+    namespace {#} {
         lda.l   Format.EntityHitbox.Inner.xOffset,x
         and.w   #0xff
         clc
@@ -211,7 +211,7 @@ macro _BranchOnInnerCollision(aabb, Collision) {
 }
 
 
-scope _TestList {
+namespace _TestList {
 NoHitbox:
     rts
 }
@@ -224,7 +224,7 @@ NoHitbox:
 a16()
 i16()
 code()
-scope _TestList: {
+function _TestList {
     ldx.b   BaseEntity.MetaSprite.currentFrame
     beq     NoHitbox
 
@@ -250,7 +250,7 @@ scope _TestList: {
 
 
 
-scope _TestList_CurrentHasSingleHitbox {
+namespace _TestList_CurrentHasSingleHitbox {
     NoEntityOuterCollision:
         // continue loop
 
@@ -274,7 +274,7 @@ scope _TestList_CurrentHasSingleHitbox {
 a16()
 i16()
 code()
-scope _TestList_CurrentHasSingleHitbox: {
+function _TestList_CurrentHasSingleHitbox {
     // Current entity only has a single hitbox
     // y = first entity to test
     tya
@@ -364,7 +364,7 @@ EndEntityLoop:
 a16()
 i16()
 code()
-scope _TestList_CurrentHasMultipleHitboxes: {
+function _TestList_CurrentHasMultipleHitboxes {
     sta.w   tmp_count
 
     // Current entity only has multiple hitbox
@@ -421,7 +421,7 @@ scope _TestList_CurrentHasMultipleHitboxes: {
 a16()
 i16()
 code()
-scope _InnerTest_Multiple_Single: {
+function _InnerTest_Multiple_Single {
     // current entity has mutliple hitboxes
     // entity being tested has a single hitboxes
 
@@ -481,13 +481,13 @@ Return:
 a16()
 i16()
 code()
-scope _InnerTest_Multiple_Multiple: {
+function _InnerTest_Multiple_Multiple {
 allocateTmpWord(toTest_xPos)
 allocateTmpWord(toTest_yPos)
 allocateTmpWord(collisionTableIndex)
 allocateTmpWord(tmp_row)
 
-constant NoCollisions(_InnerTest_Multiple_Single.Return)
+constant NoCollisions = _InnerTest_Multiple_Single.Return
 
     // current entity has mutliple hitboxes
     // entity being tested has multiple hitboxes

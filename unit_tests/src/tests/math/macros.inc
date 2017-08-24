@@ -2,13 +2,13 @@
 // Copyright (c) 2016 - 2017, Marcus Rowe <undisbeliever@gmail.com>.
 // Distributed under The MIT License: https://opensource.org/licenses/MIT
 
-scope MathTest {
+namespace MathTest {
 
 a16()
 i16()
 code()
 Test.add("neg.b")
-scope neg.b: {
+function neg.b {
     sep     #$20
 a8()
 
@@ -38,7 +38,7 @@ a16()
 i16()
 code()
 Test.add("neg.w")
-scope neg.w: {
+function neg.w {
     lda.w   #0x1337
     Math.neg.w()
 
@@ -65,7 +65,7 @@ a16()
 i16()
 code()
 Test.add("Negate32xy")
-scope Negate32xy: {
+function Negate32xy {
     macro test(evaluate num) {
         ldy.w   #{num} & 0xffff
         ldx.w   #{num} >> 16
@@ -96,7 +96,7 @@ a16()
 i16()
 code()
 Test.add("Negate32.b")
-scope Negate32.b: {
+function Negate32.b {
     macro test(evaluate num) {
         lda.w   #{num} & 0xffff
         sta.b   Test.dpTmp
@@ -134,7 +134,7 @@ a16()
 i16()
 code()
 Test.add("Negate32.w")
-scope Negate32.w: {
+function Negate32.w {
     macro test(evaluate num) {
         lda.w   #{num} & 0xffff
         sta.w   Test.tmp

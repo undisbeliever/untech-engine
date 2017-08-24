@@ -9,7 +9,7 @@
 // Distributed under The MIT License: https://opensource.org/licenses/MIT
 
 
-scope Text {
+namespace Text {
 
     // The buffer in which to hold the data to transfer to VRAM
     //
@@ -17,7 +17,7 @@ scope Text {
     // to save space and DMA time
     //
     // (whatever the format)
-    constant buffer.size(32 * 32)
+    constant buffer.size = 32 * 32
     allocate(buffer, wram7e, buffer.size)
 
     // The VRAM word address to store the buffer to
@@ -30,7 +30,7 @@ scope Text {
 
     // Variables used by the different text modes
     // (dp)
-    constant vars.size(4)
+    constant vars.size = 4
     allocate(vars, dp, vars.size)
 
     // string pointer 1
@@ -43,7 +43,7 @@ scope Text {
 
     // A temporary buffer used for string generation
     // (wram7e)
-    constant tmpString.size(12)
+    constant tmpString.size = 12
     allocate(tmpString, wram7e, tmpString.size)
 
     // Padding character

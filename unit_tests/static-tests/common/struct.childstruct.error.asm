@@ -1,7 +1,7 @@
 
 include "../../../src/common/struct.inc"
 
-scope test {
+namespace test {
     childstruct(MissingBase) // ERROR
 
     field(c, 1)

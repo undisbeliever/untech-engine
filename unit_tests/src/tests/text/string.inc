@@ -2,14 +2,14 @@
 // Copyright (c) 2016 - 2017, Marcus Rowe <undisbeliever@gmail.com>.
 // Distributed under The MIT License: https://opensource.org/licenses/MIT
 
-scope TextTest {
-scope String {
+namespace TextTest {
+namespace String {
 
 a16()
 i16()
 code()
 Test.add("Text.String.U16Y_ToString")
-scope U16Y_ToString: {
+function U16Y_ToString {
     sep     #$20
 a8()
     ldy.w   #0
@@ -53,7 +53,7 @@ a16()
 i16()
 code()
 Test.add("Text.String.U32XY_ToString")
-scope U32XY_ToString: {
+function U32XY_ToString {
     sep     #$20
 a8()
     ldy.w   #0
@@ -100,7 +100,7 @@ a16()
 i16()
 code()
 Test.add("Text.String.U16Y_ToPaddedString")
-scope U16Y_ToPaddedString: {
+function U16Y_ToPaddedString {
     sep     #$20
 a8()
     lda.b   #Text.Font.CAPITAL_A
@@ -154,7 +154,7 @@ a16()
 i16()
 code()
 Test.add("Text.String.U32XY_ToPaddedString")
-scope U32XY_ToPaddedString: {
+function U32XY_ToPaddedString {
     sep     #$20
 a8()
     lda.b   #Text.Font.CAPITAL_A + 1
@@ -207,7 +207,7 @@ a16()
 i16()
 code()
 Test.add("Text.String.CompareEqual")
-scope CompareEqual: {
+function CompareEqual {
     sep     #$20
 a8()
     // Test two null strings
@@ -291,7 +291,7 @@ assert(String_Short1.end - String_Short1 == String_Short2.end - String_Short2)
 a8()
 i16()
 code()
-scope _TestString: {
+function _TestString {
     stx.b   Text.str1
     lda.b   #0x7e
     sta.b   Text.str1 + 2
@@ -303,7 +303,7 @@ scope _TestString: {
     jmp     Text.String.CompareEqual
 
 rodata(rom0)
-    constant RomBank(pc() >> 16)
+    constant RomBank = pc() >> 16
 }
 
 }

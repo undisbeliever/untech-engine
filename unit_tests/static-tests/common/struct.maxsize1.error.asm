@@ -2,7 +2,7 @@
 include "../../../src/common/struct.inc"
 include "../../../src/common/assert.inc"
 
-scope toolarge {
+namespace toolarge {
     struct()
     struct_maxsize(12)
 

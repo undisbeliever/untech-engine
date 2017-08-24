@@ -11,11 +11,11 @@
 
 Warnings.Register(NO_MS_VRAM_SLOTS, 31, 24, 0)
 
-scope MetaSprite {
-scope Vram {
+namespace MetaSprite {
+namespace Vram {
 
 // Reuse tilesetAddr address with the upload routines
-constant tilesetAddr(Dma.Tile16.tileListAddr)
+constant tilesetAddr = Dma.Tile16.tileListAddr
 
 
 // Resets allocation lists
@@ -25,10 +25,10 @@ macro _Init() {
     assert8a()
     assert8i()
 
-    scope Vram: {
-        constant ARRAY_INCREMENT(MetaSprite.Vram.slots.ARRAY_INCREMENT)
-        constant ROW_SLOTS_MIN_INDEX(MetaSprite.Vram.slots.ROW_SLOTS_MIN_INDEX)
-        constant N_ELEMENTS(MetaSprite.Vram.slots.N_ELEMENTS)
+    function Vram {
+        constant ARRAY_INCREMENT = MetaSprite.Vram.slots.ARRAY_INCREMENT
+        constant ROW_SLOTS_MIN_INDEX = MetaSprite.Vram.slots.ROW_SLOTS_MIN_INDEX
+        constant N_ELEMENTS = MetaSprite.Vram.slots.N_ELEMENTS
 
         // chain linked list
         ldx.b   #0
@@ -76,7 +76,7 @@ macro _Deallocate() {
 
     assert(MetaSprite.StatusFlags.vramSet == 0x01)
 
-    scope Vram: {
+    function Vram {
         lda.b	BaseEntity.MetaSprite.status
         lsr
 
@@ -99,7 +99,7 @@ macro _Activate() {
 
     assert(MetaSprite.StatusFlags.vramSet == 0x01)
 
-    scope Vram: {
+    function Vram {
         lda.b	BaseEntity.MetaSprite.status
         lsr
         bcs     AlreadyActive
@@ -112,7 +112,7 @@ macro _Activate() {
         a16()
             bpl     Dynamic
 
-            scope Fixed: {
+            function Fixed {
                 tay
 
                 lda.l   MetaSprite.Format.FrameSet.tileset,x
@@ -123,7 +123,7 @@ macro _Activate() {
                 tax
                 jmp     (MetaSprite.Vram._ActivateFixed.Table,x)
             }
-            scope Dynamic: {
+            function Dynamic {
                 and.w   #3 << 1
                 tax
                 jmp     (MetaSprite.Vram._AllocateDynamic.Table,x)
@@ -158,14 +158,14 @@ macro _Activate() {
 a8()
 i8()
 code()
-scope _DeallocateSlot_A: {
+function _DeallocateSlot_A {
     macro _RemoveSlot(freeSlotPool, oneSlotPool, twoSlotPool) {
         assert8a()
         assert8i()
 
         // X = current
-        scope {freeSlotPool}: {
-            constant Return(UpdateStatus)
+        function {freeSlotPool} {
+            constant Return = UpdateStatus
 
             assert(StatusFlags.dynamicTileset == 0x40)
 
@@ -272,7 +272,7 @@ UpdateStatus:
 a16()
 i16()
 code()
-scope _UploadDynamicTileset: {
+function _UploadDynamicTileset {
     ldx.b   BaseEntity.MetaSprite.currentFrame
     beq     ReturnTrue
 
@@ -378,14 +378,14 @@ Return:
 // RETURN:
 //      Jump to Return
 //      Register size unknown
-scope _ActivateFixed {
-    constant Return(MetaSprite.Activate.Vram.ActivateFixedReturn)
+namespace _ActivateFixed {
+    constant Return = MetaSprite.Activate.Vram._Activate.Vram.ActivateFixedReturn
 
-    macro Process(name, freeSlotPool, usedSlotPool, nSlots, uploadRoutine) {
+    inline Process(name, freeSlotPool, usedSlotPool, nSlots, uploadRoutine) {
         a16()
         i16()
         code()
-        scope {name}: {
+        function {name} {
             lda.w   tilesetAddr
 
             sep     #$10
@@ -445,7 +445,7 @@ scope _ActivateFixed {
     // OUTPUT: X = slot
     // BRANCH: to NoSlotsFound if no slots available
     // BRANCH: to NoDmaTime if no slots available
-    macro scope NotFound_Single(freeSlotPool, usedSlotPool, uploadRoutine) {
+    macro NotFound_Single(freeSlotPool, usedSlotPool, uploadRoutine) {
         assert16a()
         assert8i()
 
@@ -512,7 +512,7 @@ scope _ActivateFixed {
     // OUTPUT: X = slot index
     // BRANCH: to NoSlotsFound if no slots available
     // BRANCH: to NoDmaTime if no slots available
-    macro scope NotFound_Dual(freeSlotPool, usedSlotPool, uploadRoutine) {
+    macro NotFound_Dual(freeSlotPool, usedSlotPool, uploadRoutine) {
         assert16a()
         assert8i()
 
@@ -597,7 +597,7 @@ scope _ActivateFixed {
     a8()
     i8()
     code()
-    scope SetState_OneSlot: {
+    function SetState_OneSlot {
         assert(MetaSprite.StatusFlags.paletteSet == 0x80)
 
         lda.b   BaseEntity.MetaSprite.status
@@ -634,7 +634,7 @@ scope _ActivateFixed {
     a8()
     i8()
     code()
-    scope SetState_TwoSlots: {
+    function SetState_TwoSlots {
         assert(MetaSprite.StatusFlags.paletteSet == 0x80)
 
         lda.b   BaseEntity.MetaSprite.status
@@ -674,7 +674,7 @@ scope _ActivateFixed {
     Process(TwoRows, freeRows, twoRows, 2, QueueTwoRowsFromList)
 
     code()
-    scope Table: {
+    function Table {
         dw  OneTile
         dw  TwoTiles
         dw  OneRow
@@ -700,8 +700,8 @@ scope _ActivateFixed {
 // RETURN:
 //      Jump to Return on Success
 //      Register size unknown
-scope _AllocateDynamic {
-    constant Return(MetaSprite.Activate.Vram.AllocateDynamicReturn)
+namespace _AllocateDynamic {
+    constant Return = MetaSprite.Activate.Vram._Activate.Vram.AllocateDynamicReturn
 
 // ::SHOULDO add dynamic tileset with fixed portion of tiles::
 // ::: ie, tiles 5-7 are fixed through the life of the entity::
@@ -728,11 +728,11 @@ scope _AllocateDynamic {
     // MetaSprite.blockOneCharAttrOffset &= ~OamFormat.change.char.mask
     // MetaSprite.blockOneCharAttrOffset |= current->CharAttrOffset
 
-    macro Process_Single(name, freeSlotPool) {
+    inline Process_Single(name, freeSlotPool) {
         a16()
         i16()
         code()
-        scope {name}: {
+        function {name} {
             sep     #$10
         i8()
 
@@ -757,7 +757,7 @@ scope _AllocateDynamic {
     code()
     a16()
     i8()
-    scope Finalize_Single: {
+    function Finalize_Single {
         stz.w   slots.tileset,x
 
         sep     #$20
@@ -826,11 +826,11 @@ scope _AllocateDynamic {
     // MetaSprite.blockTwoCharAttrOffset &= ~OamFormat.change.char.mask
     // MetaSprite.blockTwoCharAttrOffset |= current->CharAttrOffset
 
-    macro Process_Dual(name, freeSlotPool) {
+    inline Process_Dual(name, freeSlotPool) {
         a16()
         i16()
         code()
-        scope {name}: {
+        function {name} {
             sep     #$10
         i8()
 
@@ -865,7 +865,7 @@ scope _AllocateDynamic {
     a8()
     i8()
     code()
-    scope Finalize_Dual: {
+    function Finalize_Dual {
         lda.b   #1
         sta.w   slots.count,x
 
@@ -907,7 +907,7 @@ scope _AllocateDynamic {
 
 
     code()
-    scope Table: {
+    function Table {
         dw  OneTile
         dw  TwoTiles
         dw  OneRow
@@ -918,11 +918,11 @@ scope _AllocateDynamic {
 
 // Read only slot data.
 rodata(rom0)
-scope slots {
-    constant ROW_START(((VRAM_TILE_SLOTS + 7) / 8))
+namespace slots {
+    constant ROW_START = ((VRAM_TILE_SLOTS + 7) / 8)
 
     // The CharAttr offset for each slot
-    scope CharAttrOffset: {
+    function CharAttrOffset {
         macro tiles(variable i) {
             if i < VRAM_TILE_SLOTS {
                 dw  (i / 8) * 32 + (i & 7) * 2
@@ -941,7 +941,7 @@ scope slots {
     }
 
     // The VRAM addresses for each slot
-    scope VramAddress: {
+    function VramAddress {
         macro tiles(variable i) {
             if i < VRAM_TILE_SLOTS {
                 dw  VRAM_OBJ_WADDR + ((i / 8) * 32 + (i & 7) * 2) * 16

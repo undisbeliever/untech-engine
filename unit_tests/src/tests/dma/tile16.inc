@@ -2,18 +2,18 @@
 // Copyright (c) 2016 - 2017, Marcus Rowe <undisbeliever@gmail.com>.
 // Distributed under The MIT License: https://opensource.org/licenses/MIT
 
-scope DmaTest {
-scope Tile16 {
+namespace DmaTest {
+namespace Tile16 {
 
-constant VRAM_BLOCK(0x6000)
+constant VRAM_BLOCK = 0x6000
 
 
 a16()
 i16()
 code()
 Test.add("Dma.Tile16.QueueOneTileFromList")
-scope QueueOneTileFromList: {
-    constant VRAM_1(VRAM_BLOCK + 32 * 2)
+function QueueOneTileFromList {
+    constant VRAM_1 = VRAM_BLOCK + 32 * 2
 
     jsr     Dma.Init
     jsr     WaitFrame       // Reset Dma.transfersLeft
@@ -52,9 +52,9 @@ a16()
 i16()
 code()
 Test.add("Dma.Tile16.QueueTwoTilesFromList")
-scope QueueTwoTilesFromList: {
-    constant VRAM_1(VRAM_BLOCK + 32 * 7)
-    constant VRAM_2(VRAM_BLOCK + 32 * 6)
+function QueueTwoTilesFromList {
+    constant VRAM_1 = VRAM_BLOCK + 32 * 7
+    constant VRAM_2 = VRAM_BLOCK + 32 * 6
 
     jsr     Dma.Init
     jsr     WaitFrame       // Reset Dma.transfersLeft
@@ -103,8 +103,8 @@ a16()
 i16()
 code()
 Test.add("Dma.Tile16.QueueOneRowFromList")
-scope QueueOneRowFromList: {
-    constant VRAM_1(VRAM_BLOCK)
+function QueueOneRowFromList {
+    constant VRAM_1 = VRAM_BLOCK
 
     jsr     Dma.Init
     jsr     WaitFrame       // Reset Dma.transfersLeft
@@ -152,8 +152,8 @@ a16()
 i16()
 code()
 Test.add("Dma.Tile16.QueueTwoRowsFromList (one row)")
-scope QueueTwoRowsFromList_one: {
-    constant VRAM_1(VRAM_BLOCK + 32 * 4)
+function QueueTwoRowsFromList_one {
+    constant VRAM_1 = VRAM_BLOCK + 32 * 4
 
     jsr     Dma.Init
     jsr     WaitFrame       // Reset Dma.transfersLeft
@@ -198,9 +198,9 @@ a16()
 i16()
 code()
 Test.add("Dma.Tile16.QueueTwoRowsFromList (two rows)")
-scope QueueTwoRowsFromList_two: {
-    constant VRAM_1(VRAM_BLOCK)
-    constant VRAM_2(VRAM_BLOCK + 3 * 32 * 16)
+function QueueTwoRowsFromList_two {
+    constant VRAM_1 = VRAM_BLOCK
+    constant VRAM_2 = VRAM_BLOCK + 3 * 32 * 16
 
     jsr     Dma.Init
     jsr     WaitFrame       // Reset Dma.transfersLeft
@@ -294,7 +294,7 @@ Fail:
 a16()
 i16()
 code()
-scope _CheckTile: {
+function _CheckTile {
     allocate(tmp, wram7e, 2)
 
 
@@ -360,7 +360,7 @@ code()
 }
 
 
-scope TileData {
+namespace TileData {
 
 rodata(rom0)
 // padding
@@ -370,7 +370,7 @@ if pc() & 0x7f != 0 {
 assert(pc() & 0x7f == 0)
 
 
-    constant TileBankOffset(pc() & 0xff0000)
+    constant TileBankOffset = pc() & 0xff0000
 
 
 Tile0:

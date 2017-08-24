@@ -9,8 +9,8 @@
 // Distributed under The MIT License: https://opensource.org/licenses/MIT
 
 
-variable __TMP_WORDS__.nMarks(0)
-variable __TMP_WORDS__.nAllocations(0)
+variable __TMP_WORDS__.nMarks = 0
+variable __TMP_WORDS__.nAllocations = 0
 
 // Mark an unused word as a temporary variable that can be accessed
 // later.
@@ -18,11 +18,11 @@ variable __TMP_WORDS__.nAllocations(0)
 // This macro MUST BE called in the root scope.
 //
 // var must be in DB 0x7e
-macro markTmpWord(evaluate var) {
+inline markTmpWord(evaluate var) {
     assert(({var} >> 16) == 0x7e)
 
-    evaluate n(__TMP_WORDS__.nMarks)
-    constant __TMP_WORDS__.{n}({var})
+    evaluate __TMP_WORDS__.n = __TMP_WORDS__.nMarks
+    constant __TMP_WORDS__.{__TMP_WORDS__.n} = {var}
 
     __TMP_WORDS__.nMarks = __TMP_WORDS__.nMarks + 1
 }
@@ -35,9 +35,9 @@ macro markTmpWord(evaluate var) {
 // then either:
 //   * a `markTmpWord` macro was not called in the root scope, or
 //   * you have run out of tmp words.
-macro allocateTmpWord(name) {
-    evaluate n(__TMP_WORDS__.nAllocations)
-    constant {name}(__TMP_WORDS__.{n})
+inline allocateTmpWord(name) {
+    evaluate __TMP_WORDS__.n = __TMP_WORDS__.nAllocations
+    constant {name} = __TMP_WORDS__.{__TMP_WORDS__.n}
 
     __TMP_WORDS__.nAllocations = __TMP_WORDS__.nAllocations + 1
 }

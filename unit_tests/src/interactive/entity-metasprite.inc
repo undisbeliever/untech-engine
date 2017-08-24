@@ -2,14 +2,14 @@
 // Copyright (c) 2016 - 2017, Marcus Rowe <undisbeliever@gmail.com>.
 // Distributed under The MIT License: https://opensource.org/licenses/MIT
 
-scope InteractiveTests {
-scope MetaSpriteInteractiveTest {
+namespace InteractiveTests {
+namespace MetaSpriteInteractiveTest {
 
-scope ShowAllFramesEntity {
+namespace ShowAllFramesEntity {
     buildFunctionTable(BaseEntityFunctionTable, ShowAllFramesEntity)
     Entity.useDefaultRenderer()
 
-    scope EntityStruct {
+    namespace EntityStruct {
         childstruct(BaseEntity)
             field(frameId, 2)
             field(paletteId, 2)
@@ -23,7 +23,7 @@ scope ShowAllFramesEntity {
     a16()
     i16()
     code()
-    scope Init: {
+    function Init {
         sta.b   EntityStruct.frameDelay
         sta.b   EntityStruct.frameCount
 
@@ -39,7 +39,7 @@ scope ShowAllFramesEntity {
     a16()
     i16()
     code()
-    scope Destructor: {
+    function Destructor {
         rts
     }
 
@@ -47,7 +47,7 @@ scope ShowAllFramesEntity {
     a16()
     i16()
     code()
-    scope Process: {
+    function Process {
         dec.b   EntityStruct.frameCount
         bpl     EndIf
 
@@ -118,9 +118,9 @@ scope ShowAllFramesEntity {
         rts
 
 
-    macro BuildEntityData(name) {
+    inline BuildEntityData(name) {
         rodata(EN_RomData)
-        scope RomData_{name}: {
+        function RomData_{name} {
             dw  FunctionTable
             db  Entity.ListId.PLAYER    // initial List
             dw  MSFS.{name}             // frameSetId
@@ -128,7 +128,7 @@ scope ShowAllFramesEntity {
         }
 
         rodata(EN_EntityList)
-        constant {name}_entityId((pc() - Entity.Data.EntityList) / 2)
+        constant {name}_entityId = (pc() - Entity.Data.EntityList) / 2
             dw  RomData_{name}
     }
     BuildEntityData(Man)
@@ -142,7 +142,7 @@ scope ShowAllFramesEntity {
 }
 
 rodata(rom0)
-scope EntityTable: {
+function EntityTable {
     struct(pc())
         field(entityId, 2)
         field(parameter, 2)
@@ -169,7 +169,7 @@ scope EntityTable: {
 
     data(FST_TwoRows, 200, 256 / 2, 45)
 
-constant N_ENTITIES((pc() - EntityTable) / EntityTable.size)
+constant N_ENTITIES = (pc() - EntityTable) / EntityTable.size
 }
 
 
@@ -178,8 +178,8 @@ a16()
 i16()
 code()
 Test.add("Entity/MetaSprite Test")
-scope Test: {
-constant tmp_index(Test.tmp)
+function Test {
+constant tmp_index = Test.tmp
 
     jsr     EntityLoop.Init
 

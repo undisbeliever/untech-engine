@@ -1,6 +1,6 @@
 
-scope Text {
-scope Font {
+namespace Text {
+namespace Font {
     map '0', 0x01, 10
     map 'A', 0x0b, 26
     map 'a', 0x25, 26
@@ -12,13 +12,13 @@ scope Font {
 
     map '\n', 0xff
 
-    constant ZERO(0x01)
-    constant CAPITAL_A(0x0b)
-    constant LOWER_A(0x25)
-    constant SPACE(0x5f)
-    constant MINUS(0x4b)
+    constant ZERO = 0x01
+    constant CAPITAL_A = 0x0b
+    constant LOWER_A = 0x25
+    constant SPACE = 0x5f
+    constant MINUS = 0x4b
 
-    constant NEW_LINE(0xff)
+    constant NEW_LINE = 0xff
 }
 }
 

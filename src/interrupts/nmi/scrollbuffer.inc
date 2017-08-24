@@ -9,12 +9,12 @@
 // Distributed under The MIT License: https://opensource.org/licenses/MIT
 
 
-scope ScrollBuffer {
-scope bg1 {
+namespace ScrollBuffer {
+namespace bg1 {
     allocate(hOffset, shadow, 2)
     allocate(vOffset, shadow, 2)
 }
-scope bg2 {
+namespace bg2 {
     allocate(hOffset, shadow, 2)
     allocate(vOffset, shadow, 2)
 }

@@ -9,10 +9,10 @@
 // Distributed under The MIT License: https://opensource.org/licenses/MIT
 
 
-arch snes.cpu
+architecture wdc65816
 
-variable __CPU__.aSize(0)
-variable __CPU__.iSize(0)
+variable __CPU__.aSize = 0
+variable __CPU__.iSize = 0
 
 macro sep(evaluate v) {
     if ({v} & 0x20) {

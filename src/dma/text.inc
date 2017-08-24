@@ -12,8 +12,8 @@
 // Distributed under The MIT License: https://opensource.org/licenses/MIT
 
 
-scope Dma {
-scope Text {
+namespace Dma {
+namespace Text {
 
 // VBlank code.
 //
@@ -24,7 +24,7 @@ macro _VBlank() {
     assert16a()
     assert8i()
 
-    scope Text: {
+    function Text {
         ldx.w   Text.bufferDirty
         beq     EndIf
 

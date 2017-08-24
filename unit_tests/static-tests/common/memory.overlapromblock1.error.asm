@@ -1,7 +1,7 @@
 // Try and create two Data blocks that overlap each other
 
-define MEMORY_MAP(HIROM)
-define ROM_SIZE(1)
+define MEMORY_MAP = HIROM
+define ROM_SIZE = 1
 
 include "../../../src/common/memory.inc"
 

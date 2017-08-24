@@ -16,25 +16,25 @@
 // PARAM: struct - the struct that contains the function table
 // PARAM: module - the struct that the table is called in (solves visibility problem)
 // PARAM: tableName - the name of the function table (defualt FunctionTable)
-macro buildFunctionTable(struct, module, tableName) {
+inline buildFunctionTable(struct, module, tableName) {
     code()
-    scope {tableName}: {
+    function {tableName} {
         _buildFunctionTable_structs({struct}, {module})
     }
 }
-macro buildFunctionTable(struct, module) {
+inline buildFunctionTable(struct, module) {
     buildFunctionTable({struct}, {module}, FunctionTable)
 }
 
 macro _buildFunctionTable_structs(struct, module) {
     validateStructIsBase({struct})
 
-    evaluate n(0)
+    evaluate n = 0
     while {n} < {{struct}.__STRUCT__.fields.size} {
         assert({{struct}.__STRUCT__.fields.{n}.size} == 2)
         dw  {module}.{{struct}.__STRUCT__.fields.{n}.name}
 
-        evaluate n({n} + 1)
+        evaluate n = {n} + 1
     }
 }
 

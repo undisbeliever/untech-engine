@@ -9,7 +9,7 @@
 // Distributed under The MIT License: https://opensource.org/licenses/MIT
 
 
-scope Camera {
+namespace Camera {
 
 // Initializes the Camera module
 //
@@ -19,7 +19,7 @@ scope Camera {
 a16()
 i16()
 code()
-scope Init: {
+function Init {
     // Reset the camera to origin
 
     lda.w   #ORIGIN

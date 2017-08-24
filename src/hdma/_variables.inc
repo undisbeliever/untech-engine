@@ -9,21 +9,21 @@
 // Distributed under The MIT License: https://opensource.org/licenses/MIT
 
 
-scope Hdma {
+namespace Hdma {
 
 // The current buffer index
 // (byte)
 allocate(currentBuffer, wram7e, 1)
 
 // size of a single HDMA table
-constant BUFFER_SIZE(256 * 6 + 3 + 1)
+constant BUFFER_SIZE = 256 * 6 + 3 + 1
 
 // HDMA Table Buffers
 // (double buffered block of data)
 allocate(buffer1, wram7e, BUFFER_SIZE)
 allocate(buffer2, wram7e, BUFFER_SIZE)
 
-scope ChannelSettings {
+namespace ChannelSettings {
     // Enable HDMA Channel
     //
     // Settings will be copied to HDMA Channel 7 on non-zero during VBlank.

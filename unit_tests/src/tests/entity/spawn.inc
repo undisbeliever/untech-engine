@@ -2,13 +2,13 @@
 // Copyright (c) 2016 - 2017, Marcus Rowe <undisbeliever@gmail.com>.
 // Distributed under The MIT License: https://opensource.org/licenses/MIT
 
-scope EntityTest {
+namespace EntityTest {
 
 a16()
 i16()
 code()
 Test.add("Entity.Spawn")
-scope Spawn: {
+function Spawn {
     jsr     Entity.Init
 
     stz.w   Entities.BlankEntity.parameterSum
@@ -59,8 +59,8 @@ a16()
 i16()
 code()
 Test.add("Entity.Spawn (Overflow)")
-scope Spawn_Overflow: {
-constant tmp(Test.tmp)
+function Spawn_Overflow {
+constant tmp = Test.tmp
 
     jsr     Entity.Init
 
@@ -118,8 +118,8 @@ a16()
 i16()
 code()
 Test.add("Entity.Spawn (Multiple Lists)")
-scope Spawn_MultipleLists: {
-constant tmp(Test.tmp)
+function Spawn_MultipleLists {
+constant tmp = Test.tmp
 
     jsr     Entity.Init
 
@@ -188,10 +188,10 @@ a16()
 i16()
 code()
 Test.add("Entity.Spawn (Offscreen)")
-scope Spawn_Offscreen: {
-constant tmp_listId(Test.tmp)
+function Spawn_Offscreen {
+constant tmp_listId = Test.tmp
 
-constant ONSCREEN(0x1080)
+constant ONSCREEN = 0x1080
 
     jsr     Entity.Init
 
@@ -244,7 +244,7 @@ Fail:
     clc
     rts
 
-scope SpawnEntity_XY: {
+function SpawnEntity_XY {
     stx.w   Entity.Spawn.xPos
     sty.w   Entity.Spawn.yPos
     lda.w   tmp_listId
@@ -252,7 +252,7 @@ scope SpawnEntity_XY: {
 }
 
 rodata(rom0)
-scope ExpectedSizes: {
+function ExpectedSizes {
 // NOTE: projectiles are always spawned, even if offscreen
     dw  6   // player
     dw  6   // boss
@@ -261,11 +261,11 @@ scope ExpectedSizes: {
     dw  2   // platform
     dw  6   // particle
 
-    constant ALIVE(6 * 3 + 2 * 3)
-    constant DEACTIVATED(4 * 3)
-    constant FREE(Entity.N_ENTITIES - ALIVE - DEACTIVATED)
+    constant ALIVE = 6 * 3 + 2 * 3
+    constant DEACTIVATED = 4 * 3
+    constant FREE = Entity.N_ENTITIES - ALIVE - DEACTIVATED
 
-    constant size(pc() - ExpectedSizes)
+    constant size = pc() - ExpectedSizes
     assert(size / 2 == Entity.lists.N_LISTS)
 }
 }

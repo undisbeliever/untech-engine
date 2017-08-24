@@ -9,8 +9,8 @@
 // Distributed under The MIT License: https://opensource.org/licenses/MIT
 
 
-scope MetaSprite {
-scope Animation {
+namespace MetaSprite {
+namespace Animation {
 
 // Initializes the MetaSprite Animation Module
 //
@@ -19,7 +19,7 @@ macro _Init() {
 	assert8a()
 
     // Set animation timer speed
-    scope Animation: {
+    function Animation {
         lda.l   STAT78
         and.b   #STAT78.pal
         beq     +
@@ -50,7 +50,7 @@ macro _Init() {
 a16()
 i16()
 code()
-scope SetAnimationId: {
+function SetAnimationId {
     ldx.b   BaseEntity.MetaSprite.frameSet
     beq     InvalidAnimation
 
@@ -117,7 +117,7 @@ DisableAnimation:
 // REQUIRES: 16 bit A, 16 bit Index
 //
 // INPUT: dp = Entity
-constant DisableAnimation(SetAnimationId.DisableAnimation)
+constant DisableAnimation = SetAnimationId.DisableAnimation
 
 
 
@@ -131,7 +131,7 @@ constant DisableAnimation(SetAnimationId.DisableAnimation)
 a16()
 i16()
 code()
-scope Process: {
+function Process {
     assert(BaseEntity.MetaSprite.Animation.durationFormat + 1 == BaseEntity.MetaSprite.Animation.id)
 
     lda.b   BaseEntity.MetaSprite.Animation.durationFormat
@@ -176,20 +176,20 @@ AnimationDisabled:
     // RETURN: `ProcessNextFrame` animation frame is completed
     a16()
     i16()
-    scope UpdateNextFrameTime {
-        scope Table: {
+    namespace UpdateNextFrameTime {
+        function Table {
             dw  Frame
             dw  Time
             dw  DistanceVertical
             dw  DistanceHorizontal
 
-        constant size(pc() - Table)
+        constant size = pc() - Table
         }
         assertPowerOfTwo(Table.size)
         assert(MetaSprite.Format.AnimationDurationFormat._MASK + 2 == Table.size)
 
         // nextFrameTime = display frames to wait
-        scope Frame: {
+        function Frame {
             dec
             beq     ProcessNextFrame
 
@@ -198,7 +198,7 @@ AnimationDisabled:
         }
 
         // nextFrameTime = 1/300th of a second
-        scope Time: {
+        function Time {
             sec
             sbc.w   timerSpeed
             bcc     ProcessNextFrame
@@ -208,13 +208,13 @@ AnimationDisabled:
         }
 
         // nextFrameTime = distance entity travels vertically (0:7:8 fixed point)
-        scope DistanceVertical: {
+        function DistanceVertical {
             lda.b   BaseEntity.yVecl + 1
             bra     DistanceHorizontal.AfterLoadVecl
         }
 
         // nextFrameTime = distance entity travels horizontally (0:7:8 fixed point)
-        scope DistanceHorizontal: {
+        function DistanceHorizontal {
             lda.b   BaseEntity.xVecl + 1
         AfterLoadVecl:
             bmi     +
@@ -276,11 +276,11 @@ End:
 a8()
 i16()
 code()
-scope _LoadAnimationFrame: {
+function _LoadAnimationFrame {
 assert(Process.End == pc())
 
 // nextFrameTime is invalid - use it as a tmp variable
-constant _tmp(BaseEntity.MetaSprite.Animation.nextFrameTime)
+constant _tmp = BaseEntity.MetaSprite.Animation.nextFrameTime
 
     stx.b   _tmp
 
@@ -320,7 +320,7 @@ a16()
     // A = frame duration value
     jmp     (ConvertDurationTable,x)
 
-scope ConvertDurationTable: {
+function ConvertDurationTable {
     // 1:1
     dw  Frame
 
@@ -365,7 +365,7 @@ UnableToSetFrame:
 a8()
 i16()
 code()
-scope _GotoNextAnimation: {
+function _GotoNextAnimation {
     lda.l   MetaSprite.Format.Animation.nextAnimation,x
 
     ldx.b   BaseEntity.MetaSprite.frameSet

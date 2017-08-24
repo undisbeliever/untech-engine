@@ -9,9 +9,9 @@
 // Distributed under The MIT License: https://opensource.org/licenses/MIT
 
 
-scope Entity {
+namespace Entity {
 
-scope Data {
+namespace Data {
     // List of entities.
     // Addresses point to the BaseEntityData struct in the EN_RomData.
     // (list of addr)
@@ -25,14 +25,14 @@ scope Data {
     storeBlockCount(ProjectileListCount, EN_ProjectileList, 2)
 
     rodata(EN_RomData)
-        constant Offset(pc() & 0xff0000)
+        constant Offset = pc() & 0xff0000
 
     code()
 }
 
 // Uses the default renderer in the function table
-macro useDefaultRenderer() {
-    constant Render(MetaSprite.Render.RenderEntity)
+inline useDefaultRenderer() {
+    constant Render = MetaSprite.Render.RenderEntity
 }
 
 }
@@ -41,7 +41,7 @@ macro useDefaultRenderer() {
 //
 // These structs are extendible and will be used to store entity
 // parameters.
-scope BaseEntityData {
+namespace BaseEntityData {
     basestruct_offset(Entity.Data.Offset)
         // Location of the entity's `functionPtr` table
         // (word addr - code bank)
@@ -65,7 +65,7 @@ scope BaseEntityData {
 // Base Entity Function Table
 //
 // The data for this must exist in the code data block
-scope BaseEntityFunctionTable {
+namespace BaseEntityFunctionTable {
     basestruct()
         // Initialise entity variables.
         //

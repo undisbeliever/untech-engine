@@ -9,7 +9,7 @@
 // Distributed under The MIT License: https://opensource.org/licenses/MIT
 
 
-scope Hdma {
+namespace Hdma {
 
 // Initializes the module
 //
@@ -36,7 +36,7 @@ macro Deactivate() {
 a8()
 i16()
 code()
-scope GetBuffer: {
+function GetBuffer {
     lda.w   currentBuffer
     bne     +
         dec.w   currentBuffer
@@ -58,7 +58,7 @@ macro VBlank() {
     assert16a()
     assert8i()
 
-    scope Hdma {
+    namespace Hdma {
         ldx.w   Hdma.ChannelSettings.enabled
         beq     Skip
             assert(Hdma.ChannelSettings.dmap + 1 == Hdma.ChannelSettings.register)

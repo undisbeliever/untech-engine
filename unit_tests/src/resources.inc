@@ -5,11 +5,11 @@
 include "../gen/metasprites.inc"
 include "../resources/text/text.inc"
 
-scope Text {
-    scope Font {
+namespace Text {
+    namespace Font {
 rodata(rom0)
         insert FixedTiles, "../gen/font-fixed.1bpp"
-        constant FixedTiles.bitDepth(1)
+        constant FixedTiles.bitDepth = 1
     }
 }
 

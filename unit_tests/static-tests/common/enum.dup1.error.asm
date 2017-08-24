@@ -1,7 +1,7 @@
 
 include "../../../src/common/enum.inc"
 
-scope test {
+namespace test {
     createEnum()
 
     enum(A)
@@ -10,7 +10,7 @@ scope test {
 }
 
 // Try to re-declare an enum.
-scope test {
+namespace test {
     createEnum() // ERROR
 
     enum(D)

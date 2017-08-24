@@ -9,8 +9,8 @@
 // Distributed under The MIT License: https://opensource.org/licenses/MIT
 
 
-scope Dma {
-scope ForceBlank {
+namespace Dma {
+namespace ForceBlank {
 
 
 // Transfers a block of memory to VRAM
@@ -77,7 +77,7 @@ macro ToVramH(addr) {
 a8()
 i16()
 code()
-scope ClearVram: {
+function ClearVram {
     stx.w   VMADD
     sty.w   DAS0
 
@@ -108,7 +108,7 @@ scope ClearVram: {
 a8()
 i16()
 code()
-scope ClearVramH: {
+function ClearVramH {
     stx.w   VMADD
     sty.w   DAS0
 
@@ -139,7 +139,7 @@ scope ClearVramH: {
 a8()
 i16()
 code()
-scope ClearCgram: {
+function ClearCgram {
     pha
 
     rep     #$30
@@ -178,7 +178,7 @@ i8()
 a8()
 i16()
 code()
-scope TransferToVram: {
+function TransferToVram {
     stx.w   A1T0
     sta.w   A1B0
     sty.w   DAS0
@@ -206,7 +206,7 @@ scope TransferToVram: {
 a8()
 i16()
 code()
-scope TransferToVramL: {
+function TransferToVramL {
     stx.w   A1T0
     sta.w   A1B0
     sty.w   DAS0
@@ -234,7 +234,7 @@ scope TransferToVramL: {
 a8()
 i16()
 code()
-scope TransferToVramH: {
+function TransferToVramH {
     stx.w   A1T0
     sta.w   A1B0
     sty.w   DAS0
@@ -262,7 +262,7 @@ scope TransferToVramH: {
 a8()
 i16()
 code()
-scope FillTilemap: {
+function FillTilemap {
 allocateTmpWord(tmp)
 
     rep     #$30

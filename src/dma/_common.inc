@@ -9,7 +9,7 @@
 // Distributed under The MIT License: https://opensource.org/licenses/MIT
 
 
-scope Dma {
+namespace Dma {
 
 // Counter to manage the amount of VBlank time I have left.
 //
@@ -18,11 +18,11 @@ scope Dma {
 // SCALE: each value represents transferring 128 bytes during DMA.
 allocate(transfersLeft, shadow, 2)
 
-constant TRANSFER_SCALE(128)
+constant TRANSFER_SCALE = 128
 
 // ::TODO get proper numbers::
-constant TRANSFERS_PER_NTSC_FRAME(4000 / TRANSFER_SCALE)
-constant TRANSFERS_PER_PAL_FRAME(5000 / TRANSFER_SCALE)
+constant TRANSFERS_PER_NTSC_FRAME = 4000 / TRANSFER_SCALE
+constant TRANSFERS_PER_PAL_FRAME = 5000 / TRANSFER_SCALE
 
 
 // Initialize the counters
@@ -73,7 +73,7 @@ macro VBlank() {
 a16()
 i16()
 code()
-scope Init: {
+function Init {
     Palette._Init()
     Tile16._Init()
 
@@ -91,7 +91,7 @@ scope Init: {
 a16()
 i16()
 code()
-scope TransferOnNextVBlank: {
+function TransferOnNextVBlank {
     Palette._TransferOnNextVBlank()
     Tile16._TransferOnNextVBlank()
 

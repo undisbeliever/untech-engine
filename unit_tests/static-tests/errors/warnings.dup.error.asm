@@ -1,7 +1,7 @@
 // Ensure that warnings do register similar colors
 
-define MEMORY_MAP(HIROM)
-define ROM_SIZE(1)
+define MEMORY_MAP = HIROM
+define ROM_SIZE = 1
 
 include "../../../src/common/memory.inc"
 include "../../../src/common/cpu.inc"

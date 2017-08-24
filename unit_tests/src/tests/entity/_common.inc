@@ -2,14 +2,14 @@
 // Copyright (c) 2016 - 2017, Marcus Rowe <undisbeliever@gmail.com>.
 // Distributed under The MIT License: https://opensource.org/licenses/MIT
 
-scope EntityTest {
+namespace EntityTest {
 
 // OUT: A = number of entities in free list
 // MODIFIES: DP
 a16()
 i16()
 code()
-scope _FreeListLength: {
+function _FreeListLength {
     ldx.w   Entity.lists.free
     bra     __ListLength
 }
@@ -19,7 +19,7 @@ scope _FreeListLength: {
 a16()
 i16()
 code()
-scope _DeactivatedListLength: {
+function _DeactivatedListLength {
     ldx.w   Entity.lists.deactivated
     bra     __ListLength
 }
@@ -29,7 +29,7 @@ scope _DeactivatedListLength: {
 a16()
 i16()
 code()
-scope _TryToActivateAgainListLength: {
+function _TryToActivateAgainListLength {
     ldx.w   Entity.lists.tryToActivateAgain
     bra     __ListLength
 }
@@ -39,7 +39,7 @@ scope _TryToActivateAgainListLength: {
 a16()
 i16()
 code()
-scope _FirstListLength: {
+function _FirstListLength {
     ldx.w   Entity.lists.FIRST
     bra     __ListLength
 }
@@ -50,7 +50,7 @@ scope _FirstListLength: {
 a16()
 i16()
 code()
-scope _ListLength_Y: {
+function _ListLength_Y {
     tya
     asl
     tay
@@ -64,7 +64,7 @@ scope _ListLength_Y: {
 a16()
 i16()
 code()
-scope __ListLength: {
+function __ListLength {
     lda.w   #0
 
     cpx.w   #0
@@ -92,7 +92,7 @@ EndLoop:
 a16()
 i16()
 code()
-scope _TestEntityListsValid: {
+function _TestEntityListsValid {
 allocateTmpWord(tmp_index)
 allocateTmpWord(tmp_count)
 
@@ -100,7 +100,7 @@ allocateTmpWord(tmp_count)
 
     // test deactivated entity is not active
     macro _TestDeactivated(list) {
-        scope Test_{list} {
+        namespace Test_{list} {
             lda.w   Entity.lists.{list}
             beq     Skip
 
@@ -125,7 +125,7 @@ allocateTmpWord(tmp_count)
 
 
     // test all other entities are active
-    scope ActiveListTest: {
+    function ActiveListTest {
         ldx.w   #Entity.lists.FIRST
         Loop:
             stx.w   tmp_index
@@ -184,7 +184,7 @@ Fail:
 a16()
 i16()
 code()
-scope _TestListLengthTable: {
+function _TestListLengthTable {
 allocateTmpWord(tmp_index)
 allocateTmpWord(tmp_listId)
 
@@ -215,7 +215,7 @@ Fail:
     rts
 
 rodata(rom0)
-    constant Table(pc() & 0xff0000)
+    constant Table = pc() & 0xff0000
 }
 
 }

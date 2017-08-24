@@ -17,7 +17,7 @@
 // Distributed under The MIT License: https://opensource.org/licenses/MIT
 
 
-arch snes.cpu
+architecture wdc65816
 
 au()
 iu()
@@ -27,8 +27,8 @@ code()
 assert(pc() & 0x3fffff < 0x010000)
 assert(pc() & 0x00ffff >= 0x008000)
 
-constant STACK_SIZE(__MEMORY__.ramBlocks.stack.end - __MEMORY__.ramBlocks.stack.start + 1)
-constant STACK_BOTTOM(__MEMORY__.ramBlocks.stack.end)
+constant STACK_SIZE = __MEMORY__.ramBlocks.stack.end - __MEMORY__.ramBlocks.stack.start + 1
+constant STACK_BOTTOM = __MEMORY__.ramBlocks.stack.end
 assert((STACK_BOTTOM & 0xffff) < 0x2000)
 assert((STACK_BOTTOM >> 16) == 0 || (STACK_BOTTOM >> 16) == 0x7e)
 
@@ -36,7 +36,7 @@ allocate(STACK_TOP, stack, STACK_SIZE)
 
 
 // Reset the SNES, initializing the registers and clearing all the memory.
-scope ResetHandler: {
+function ResetHandler {
 
     jml     reset
 reset:
@@ -116,7 +116,7 @@ a8()
 au()
 iu()
 code()
-scope ClearVramOamAndCgram: {
+function ClearVramOamAndCgram {
     php
     phd
     phb
@@ -193,7 +193,7 @@ i8()
 au()
 iu()
 code()
-scope ResetRegisters: {
+function ResetRegisters {
     php
     phd
 

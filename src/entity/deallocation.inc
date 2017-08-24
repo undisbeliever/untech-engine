@@ -9,7 +9,7 @@
 // Distributed under The MIT License: https://opensource.org/licenses/MIT
 
 
-scope Entity {
+namespace Entity {
 
 // Deletes all of the entities in the given list
 //
@@ -23,7 +23,7 @@ macro _DeleteAllInList(listId) {
     assert16a()
     assert16i()
 
-    scope DeleteEntities_{listId}: {
+    function DeleteEntities_{listId} {
         lda.w   lists.{listId}
         beq     NoneToDelete
 
@@ -66,7 +66,7 @@ macro _DeleteAllInList(listId) {
 a16()
 i16()
 code()
-scope DeleteDeactivatedEntities: {
+function DeleteDeactivatedEntities {
     lda.w   lists.deactivated
     beq     NoneToDelete
 

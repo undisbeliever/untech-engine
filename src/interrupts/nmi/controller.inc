@@ -9,9 +9,9 @@
 // Distributed under The MIT License: https://opensource.org/licenses/MIT
 
 
-scope Controller {
+namespace Controller {
 
-scope Joy1 {
+namespace Joy1 {
 	// The new buttons that were pressed on the current `UpdateControllerState`
 	allocate(pressed, shadow, 2)
 
@@ -23,7 +23,7 @@ scope Joy1 {
 }
 
 if {defined CONTROLLER_USE_JOY2} {
-	scope Joy2 {
+	namespace Joy2 {
 		allocate(pressed, shadow, 2)
 		allocate(current, shadow, 2)
 
@@ -38,7 +38,7 @@ if {defined CONTROLLER_USE_JOY2} {
 macro VBlank() {
 	assert16a()
 
-	scope Controller: {
+	function Controller {
 		-
 			ldx.w	HVJOY			// MUST do 8 bit read on HVJOY
 			txa

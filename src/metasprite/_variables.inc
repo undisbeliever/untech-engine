@@ -9,11 +9,11 @@
 // Distributed under The MIT License: https://opensource.org/licenses/MIT
 
 
-scope MetaSprite {
+namespace MetaSprite {
 
     // The MetaSprite entity data
     // MUST BE called inside the BaseEntity struct
-    macro EntityData() {
+    inline EntityData() {
         // The frameSet that the metasprite belongs to
         field(MetaSprite.frameSet, 2)
 
@@ -60,19 +60,19 @@ scope MetaSprite {
         field(MetaSprite.Animation.nextFrameTime, 2)
     }
 
-    scope StatusFlags {
-        constant paletteSet(0x80)
-        constant dynamicTileset(0x40)
-        constant vramSlotMask(0x3e)
-        constant vramSet(0x01)
+    namespace StatusFlags {
+        constant paletteSet = 0x80
+        constant dynamicTileset = 0x40
+        constant vramSlotMask = 0x3e
+        constant vramSet = 0x01
     }
 
-    scope Render {
+    namespace Render {
         allocate(oamBuffer, wram7e, 128 * 4)
-        scope oamBuffer {
-            constant xPos(oamBuffer + OamFormat.xPos)
-            constant yPos(oamBuffer + OamFormat.yPos)
-            constant charAttr(oamBuffer + OamFormat.charAttr)
+        namespace oamBuffer {
+            constant xPos = oamBuffer + OamFormat.xPos
+            constant yPos = oamBuffer + OamFormat.yPos
+            constant charAttr = oamBuffer + OamFormat.charAttr
         }
 
         allocate(oamHiBuffer, wram7e, 128 / 4)
@@ -103,9 +103,9 @@ scope MetaSprite {
     }
 
 
-    scope Vram {
-        constant VRAM_TILE_SLOTS(16)
-        constant VRAM_ROW_SLOTS(14)
+    namespace Vram {
+        constant VRAM_TILE_SLOTS = 16
+        constant VRAM_ROW_SLOTS = 14
 
         assert(VRAM_TILE_SLOTS + VRAM_ROW_SLOTS * 8 <= 8 * 16)
 
@@ -124,13 +124,13 @@ scope MetaSprite {
         //
         //	    slot index = status & METASPRITE_VRAM_TILE_SLOTS
         //
-        scope slots {
-            constant N_ELEMENTS(VRAM_TILE_SLOTS + VRAM_ROW_SLOTS)
-            constant ARRAY_INCREMENT(2)
-            constant _sectionSize(N_ELEMENTS * ARRAY_INCREMENT)
+        namespace slots {
+            constant N_ELEMENTS = VRAM_TILE_SLOTS + VRAM_ROW_SLOTS
+            constant ARRAY_INCREMENT = 2
+            constant _sectionSize = N_ELEMENTS * ARRAY_INCREMENT
 
             // All indexes at or above this value are Row slots
-            constant ROW_SLOTS_MIN_INDEX(ARRAY_INCREMENT * VRAM_TILE_SLOTS)
+            constant ROW_SLOTS_MIN_INDEX = ARRAY_INCREMENT * VRAM_TILE_SLOTS
 
 
             // This assumption allows the MSB of the index to mean NULL
@@ -144,7 +144,7 @@ scope MetaSprite {
             // Index of the previous slot.
             // This is ONLY set if in a fixed tileset
             // (byte index, if >= 0x80 then NULL)
-            constant prev(next + 1)
+            constant prev = next + 1
 
             // Address of the tileset in the `DMA_Tile16Data` block
             // (word address)
@@ -156,17 +156,17 @@ scope MetaSprite {
 
             // Index of the second slot (if in a two slot type)
             // (byte index, if >= 0x80 then NULL
-            constant pair(count + 1)
+            constant pair = count + 1
         }
 
-        scope slotPool {
+        namespace slotPool {
             // List of slots using one fixed tile
             // (byte index, if >= 0x80 the NULL)
             allocateTmpWord(oneTile)
 
             // List of slots using two fixed tiles
             // (byte index, if >= 0x80 the NULL)
-            constant twoTiles(oneTile + 1)
+            constant twoTiles = oneTile + 1
 
             // List of slots using one fixed row
             // (byte index, if >= 0x80 the NULL)
@@ -174,7 +174,7 @@ scope MetaSprite {
 
             // List of slots using two fixed rows
             // (byte index, if >= 0x80 the NULL)
-            constant twoRows(oneRow + 1)
+            constant twoRows = oneRow + 1
 
             // List of unallocated vram tile slots
             // (byte index, if >= 0x80 the NULL)
@@ -186,8 +186,8 @@ scope MetaSprite {
         }
     }
 
-    scope Palette {
-        constant N_PALETTES(8)
+    namespace Palette {
+        constant N_PALETTES = 8
 
         // Table that contains the address/reference count of each palette
         // used by the MetaSprite engine.
@@ -198,9 +198,9 @@ scope MetaSprite {
         //      Palette Buffer Offset = slot index * 16
         //
         // Double Linked List Array of structures
-        scope slots {
-            constant N_ELEMENTS(N_PALETTES)
-            constant ARRAY_INCREMENT(2)
+        namespace slots {
+            constant N_ELEMENTS = N_PALETTES
+            constant ARRAY_INCREMENT = 2
 
             // This assumption allows the MSB of the index to mean NULL
             assert(N_ELEMENTS * 2 <= 128)
@@ -212,7 +212,7 @@ scope MetaSprite {
             // previous item in the list
             // NOT set when in free list
             // (byte index, >= $80 is NULL)
-            constant prev(next + 1)
+            constant prev = next + 1
 
             // address of the palette in `MS_PaletteData` block
             // (word address)
@@ -223,25 +223,25 @@ scope MetaSprite {
             allocate(count, wram7e, N_ELEMENTS * 2)
         }
 
-        scope slotPool {
+        namespace slotPool {
             // The used list
             // (byte index, >= $80 is null)
             allocateTmpWord(used)
 
             // The freeList
-            constant free(used + 1)
+            constant free = used + 1
         }
     }
 
-    scope Animation {
+    namespace Animation {
         // The speed of the animations in Wait Timer mode
         //
-        // This variable is set to 5 (NTSC) or 6 (PAL)
+        // This variable is set to 5  = NTSC) or 6 (PAL
         // (word)
         allocateTmpWord(timerSpeed)
     }
 
-    scope ActionPoint {
+    namespace ActionPoint {
         // The address of the last action Point that was processed.
         //
         // Exposed so an Entity Init routine can determine location of
@@ -253,10 +253,10 @@ scope MetaSprite {
 }
 
 // Mark the unused word of `MetaSprite.Render.oamXposBuffer` as unused.
-evaluate n(127)
+evaluate n = 127
 while ({n} >= 0) {
     markTmpWord(MetaSprite.Render.oamXposBuffer + {n} * 4 + 2)
-    evaluate n({n} - 1)
+    evaluate n = {n} - 1
 }
 
 // vim: ft=bass-65816 ts=4 sw=4 et:

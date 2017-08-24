@@ -9,7 +9,7 @@
 // Distributed under The MIT License: https://opensource.org/licenses/MIT
 
 
-scope Entity {
+namespace Entity {
 
 // Updates the active and inactive window variables
 //
@@ -17,7 +17,7 @@ scope Entity {
 a16()
 iu()
 code()
-scope _UpdateActiveWindows: {
+function _UpdateActiveWindows {
     assert(INACTIVE_WINDOW_EXTEND_HORIZONTAL > ACTIVE_WINDOW_EXTEND_HORIZONTAL)
     assert(INACTIVE_WINDOW_EXTEND_VERTICAL > ACTIVE_WINDOW_EXTEND_VERTICAL)
 

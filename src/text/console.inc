@@ -9,33 +9,33 @@
 // Distributed under The MIT License: https://opensource.org/licenses/MIT
 
 
-scope Text {
-scope Console {
-    constant BUFFER_WIDTH(32)
-    constant BUFFER_HEIGHT(28)
+namespace Text {
+namespace Console {
+    constant BUFFER_WIDTH = 32
+    constant BUFFER_HEIGHT = 28
 
-    constant MARGIN_LEFT(2)
-    constant MARGIN_TOP(2)
+    constant MARGIN_LEFT = 2
+    constant MARGIN_TOP = 2
 
-    constant MARGIN_RIGHT(BUFFER_WIDTH - MARGIN_LEFT)
-    constant MARGIN_BOTTOM(BUFFER_HEIGHT - MARGIN_TOP)
+    constant MARGIN_RIGHT = BUFFER_WIDTH - MARGIN_LEFT
+    constant MARGIN_BOTTOM = BUFFER_HEIGHT - MARGIN_TOP
 
-    constant TEXT_WIDTH(MARGIN_RIGHT - MARGIN_LEFT)
-    constant TEXT_HEIGHT(MARGIN_BOTTOM - MARGIN_TOP)
+    constant TEXT_WIDTH = MARGIN_RIGHT - MARGIN_LEFT
+    constant TEXT_HEIGHT = MARGIN_BOTTOM - MARGIN_TOP
 
 
 
 // Buffer
 // Each byte in the buffer represents a single character
-constant buffer(Text.buffer)
+constant buffer = Text.buffer
 
 // Location in the buffer
 // (word dp)
-constant bufferPos(Text.vars)
+constant bufferPos = Text.vars
 
 // End position of the buffer for current event
 // (word dp)
-constant bufferEndLinePos(Text.vars + 2)
+constant bufferEndLinePos = Text.vars + 2
 
 assert(Text.vars.size >= 4)
 
@@ -43,7 +43,7 @@ assert(Text.vars.size >= 4)
 // The ROM data block to store constant strings in
 // SEE: PrintConstString
 if !{defined Text.Console.StringBlock} {
-    define StringBlock(rom0)
+    define StringBlock = rom0
 }
 
 // Prints a constant string to the console.
@@ -81,7 +81,7 @@ macro SetCursor(evaluate x, evaluate y) {
     assert({x} >= 0 && {x} < Text.Console.TEXT_WIDTH)
     assert({y} >= 0 && {y} < Text.Console.TEXT_HEIGHT)
 
-    evaluate r((Text.Console.MARGIN_TOP + {y}) * Text.Console.BUFFER_WIDTH)
+    evaluate r = (Text.Console.MARGIN_TOP + {y}) * Text.Console.BUFFER_WIDTH
 
     ldx.w   #{r} + Text.Console.MARGIN_LEFT + {x}
     stx.w   Text.Console.bufferPos
@@ -103,7 +103,7 @@ macro SetCursor(evaluate x, evaluate y) {
 a8()
 i16()
 code()
-scope Init: {
+function Init {
     // Transfer the font to the VRAM
 
     if Text.Font.FixedTiles.bitDepth == 2 {
@@ -150,7 +150,7 @@ a8()
 i16()
 code()
 // P & DP & DB unknown
-scope ClearBuffer: {
+function ClearBuffer {
     assert(pc() == Init.End)
 
     php
@@ -188,7 +188,7 @@ au()
 iu()
 code()
 // P & DB unknown
-scope PrintHex8A: {
+function PrintHex8A {
     php
 
     rep     #$30
@@ -206,7 +206,7 @@ au()
 iu()
 code()
 // P & DB unknown
-scope PrintHex16A: {
+function PrintHex16A {
     php
 
     rep     #$30
@@ -225,7 +225,7 @@ au()
 iu()
 code()
 // P & DB unknown
-scope PrintHex16Y: {
+function PrintHex16Y {
     php
 
     rep     #$30
@@ -247,7 +247,7 @@ au()
 i16()
 code()
 // P & DB unknown
-scope PrintHex32XY: {
+function PrintHex32XY {
     php
 
     rep     #$30
@@ -271,7 +271,7 @@ a16()
 i16()
 code()
 // P & DB unknown
-scope PrintFarAddr: {
+function PrintFarAddr {
     php
 
     sta.l   tmpString + 2
@@ -296,7 +296,7 @@ a16()
 a8()
 i16()
 code()
-scope PrintHexString: {
+function PrintHexString {
     php
 _AfterPhp:
     phb
@@ -374,7 +374,7 @@ a16()
 i16()
 code()
 // DP, DB unknown
-scope PrintU16A: {
+function PrintU16A {
     tay
 FallThrough:
 }
@@ -388,7 +388,7 @@ au()
 i16()
 code()
 // P, DP, DB unknown
-scope PrintU16Y: {
+function PrintU16Y {
     assert(pc() == PrintU16A.FallThrough)
 
     php
@@ -416,7 +416,7 @@ au()
 i16()
 code()
 // P, DP, DB unknown
-scope PrintPaddedU16Y: {
+function PrintPaddedU16Y {
     php
     phb
     phd
@@ -440,7 +440,7 @@ au()
 i16()
 code()
 // P, DP, DB unknown
-scope PrintU32XY: {
+function PrintU32XY {
     php
     phb
     phd
@@ -466,7 +466,7 @@ au()
 i16()
 code()
 // P, DP, DB unknown
-scope PrintPaddedU32XY: {
+function PrintPaddedU32XY {
     php
     phb
     phd
@@ -491,7 +491,7 @@ au()
 i16()
 code()
 // DP & DB unknown
-scope PrintString: {
+function PrintString {
     php
     phb
     phd
@@ -554,7 +554,7 @@ au()
 iu()
 code()
 // P & DP & DB unknown
-scope NewLine: {
+function NewLine {
     php
 
     assert(BUFFER_WIDTH == 32)

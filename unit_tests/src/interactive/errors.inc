@@ -5,8 +5,8 @@
 RegisterBreakId(UNIT_TEST_BRK)
 Warnings.Register(UNIT_TEST_WARNING, 8, 20, 31)
 
-scope InteractiveTests {
-scope Errors {
+namespace InteractiveTests {
+namespace Errors {
 
 // Tests:
 //  * Break Handler
@@ -17,7 +17,7 @@ a16()
 i16()
 code()
 Test.add("Errors Test")
-scope Test: {
+function Test {
     Text.Console.SetCursor(0, 4)
     Text.Console.PrintConstString("Press SELECT to trigger BRK\n")
     Text.Console.PrintConstString("Press A/B/X/Y to skip BRK")

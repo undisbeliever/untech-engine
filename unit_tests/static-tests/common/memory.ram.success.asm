@@ -1,7 +1,7 @@
 // Test RAM blocks
 
-define MEMORY_MAP(LOROM)
-define ROM_SIZE(1)
+define MEMORY_MAP = LOROM
+define ROM_SIZE = 1
 
 include "../../../src/common/assert.inc"
 include "../../../src/common/memory.inc"
@@ -22,11 +22,11 @@ assert(__MEMORY__.ramBlocks.dp.pos == 6)
 assert(__MEMORY__.ramBlocks.dp.size == 6)
 assert(__MEMORY__.ramBlocks.dp.remaining == 0x100 - 6)
 
-constant c(8)
+constant c = 8
 
 allocate(var1, shadow, 0x100)
 
-scope testInScope {
+namespace testInScope {
     allocate(var2, shadow, 0x020 * 2)
     allocate(var3, shadow, c * 4)
 }

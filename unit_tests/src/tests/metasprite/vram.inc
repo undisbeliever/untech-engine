@@ -9,16 +9,16 @@
 // These tests work because a dynamic tileset has vram allocated
 // even if it has no current frame.
 
-scope MSFS {
-    constant FST_OneRow(Woman)
-    constant FST_OneTileFixed(FST_OneTileFixed1)
-    constant FST_OneRowFixed(FST_OneRowFixed1)
-    constant FST_TwoTilesFixed(FST_TwoTilesFixed1)
-    constant FST_TwoRowsFixed(FST_TwoRowsFixed1)
+namespace MSFS {
+    constant FST_OneRow = Woman
+    constant FST_OneTileFixed = FST_OneTileFixed1
+    constant FST_OneRowFixed = FST_OneRowFixed1
+    constant FST_TwoTilesFixed = FST_TwoTilesFixed1
+    constant FST_TwoRowsFixed = FST_TwoRowsFixed1
 }
 
-scope MetaSpriteTest {
-scope Vram {
+namespace MetaSpriteTest {
+namespace Vram {
 
 allocateTmpWord(tmp0)
 
@@ -28,7 +28,7 @@ macro _ActivateFixedTest(FrameSet, nSlots) {
     i16()
     code()
     Test.add("MetaSprite.Vram.Activate ({FrameSet})")
-    scope Activate_{FrameSet}: {
+    function Activate_{FrameSet} {
         jsr     _Init_MetaSpriteModule
 
         lda.w   #EntityPool.entity0
@@ -102,7 +102,7 @@ macro _ActivateDynamicTest(FrameSet, nSlots) {
     i16()
     code()
     Test.add("MetaSprite.Vram.Activate ({FrameSet})")
-    scope Activate_{FrameSet}: {
+    function Activate_{FrameSet} {
         jsr     _Init_MetaSpriteModule
 
         lda.w   #EntityPool.entity0
@@ -186,7 +186,7 @@ macro _DeallocateTest(type) {
     i16()
     code()
     Test.add("MetaSprite.Vram.Deallocate ({type})")
-    scope Deallocate_{type}: {
+    function Deallocate_{type} {
         jsr     _Init_Fill{type}
         bcc     Fail
 
@@ -344,8 +344,8 @@ macro _DeallocateAndTestListTest(type) {
     a16()
     i16()
     code()
-    scope _DeallocateAndTestList_{type}: {
-    constant tmp_entityToRemove(tmp0)
+    function _DeallocateAndTestList_{type} {
+    constant tmp_entityToRemove = tmp0
 
         sta.w   tmp_entityToRemove
 
@@ -390,7 +390,7 @@ macro _DeallocateAndTestListTest(type) {
     i16()
     code()
     Test.add("MetaSprite.Vram.DeallocateAndTestList ({type}, First)")
-    scope DeallocateAndTestList_{type}_First: {
+    function DeallocateAndTestList_{type}_First {
         lda.w   #EntityPool.entity0
         jmp     _DeallocateAndTestList_{type}
     }
@@ -399,7 +399,7 @@ macro _DeallocateAndTestListTest(type) {
     i16()
     code()
     Test.add("MetaSprite.Vram.DeallocateAndTestList ({type}, Middle)")
-    scope DeallocateAndTestList_{type}_Middle: {
+    function DeallocateAndTestList_{type}_Middle {
         lda.w   #EntityPool.entity1
         jmp     _DeallocateAndTestList_{type}
     }
@@ -408,7 +408,7 @@ macro _DeallocateAndTestListTest(type) {
     i16()
     code()
     Test.add("MetaSprite.Vram.DeallocateAndTestList ({type}, Last)")
-    scope DeallocateAndTestList_{type}_Last: {
+    function DeallocateAndTestList_{type}_Last {
         lda.w   #EntityPool.entity2
         jmp     _DeallocateAndTestList_{type}
     }
@@ -424,7 +424,7 @@ macro _ReferenceCountTest(type) {
     i16()
     code()
     Test.add("MetaSprite.Vram - ReferenceCount ({type})")
-    scope ReferenceCount_{type}: {
+    function ReferenceCount_{type} {
         jsr     _Init_Fill{type}
         bcc     Fail
 
@@ -550,7 +550,7 @@ macro _ActivateThirdFixedSlot(name, FrameSet1, FrameSet2, FrameSet3) {
     i16()
     code()
     Test.add("MetaSprite.Vram.ActivateThirdSlot ({name})")
-    scope ActivateThirdFixedSlot_{name}: {
+    function ActivateThirdFixedSlot_{name} {
         jsr     _Init_MetaSpriteModule
 
         lda.w   #EntityPool.entity0
@@ -613,11 +613,11 @@ _ActivateThirdFixedSlot(TwoRows, FST_TwoRowsFixed, FST_TwoRowsFixed2, FST_TwoRow
 // Entity 1 uses two fixed slots
 // Entity 2 uses a single dynamic slot
 // Entities 3-(8/9) uses two dynamic slots
-macro __Init_Fill(type, nSlots) {
+inline __Init_Fill(type, nSlots) {
     a16()
     i16()
     code()
-    scope _Init_Fill{type}: {
+    function _Init_Fill{type} {
         jsr     _Init_MetaSpriteModule
 
         lda.w   #EntityPool.entity0
@@ -673,7 +673,7 @@ __Init_Fill(Row, MetaSprite.Vram.VRAM_ROW_SLOTS)
 au()
 iu()
 code()
-scope _ValidateUsedSlotLists: {
+function _ValidateUsedSlotLists {
     macro Test(list) {
         assert8a()
         assert8i()
@@ -710,7 +710,7 @@ ReturnFalse:
     a8()
     i8()
     code()
-    scope _TestList: {
+    function _TestList {
         ldy.b   #0x80
 
         Loop:

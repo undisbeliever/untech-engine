@@ -2,13 +2,13 @@
 // Copyright (c) 2016 - 2017, Marcus Rowe <undisbeliever@gmail.com>.
 // Distributed under The MIT License: https://opensource.org/licenses/MIT
 
-scope MathTest {
+namespace MathTest {
 
 a16()
 i16()
 code()
 Test.add("Multiply.u8y_u8x_y")
-scope Multiply.u8y_u8x_y: {
+function Multiply.u8y_u8x_y {
     TableLoop(Table, 4)
 
         ldx.w   tableData
@@ -24,7 +24,7 @@ scope Multiply.u8y_u8x_y: {
     rts
 
 rodata(rom0)
-scope Table: {
+function Table {
     macro row(evaluate a, evaluate b) {
         db  {a}, {b}
         dw  {a} * {b}
@@ -44,7 +44,7 @@ a16()
 i16()
 code()
 Test.add("Multiply.16y_u8a_16y")
-scope Multiply.16y_u8a_16y: {
+function Multiply.16y_u8a_16y {
     TableLoop(Table, 5)
 
         sep     #$20
@@ -66,7 +66,7 @@ scope Multiply.16y_u8a_16y: {
     rts
 
 rodata(rom0)
-scope Table: {
+function Table {
     macro row(evaluate a, evaluate b) {
         dw  {a}
         db  {b}
@@ -96,7 +96,7 @@ a16()
 i16()
 code()
 Test.add("Multiply.u16y_u8a_u32xy")
-scope Multiply.u16y_u8a_u32xy: {
+function Multiply.u16y_u8a_u32xy {
     TableLoop(Table, 7)
 
         sep     #$20
@@ -126,7 +126,7 @@ Fail:
     rts
 
 rodata(rom0)
-scope Table: {
+function Table {
     macro row(evaluate a, evaluate b) {
         dw  {a}
         db  {b}
@@ -149,7 +149,7 @@ a16()
 i16()
 code()
 Test.add("Multiply.16y_16x_16y")
-scope Multiply.16y_16x_16y: {
+function Multiply.16y_16x_16y {
     TableLoop(Table, 6)
 
         ldy.w   tableData
@@ -165,7 +165,7 @@ Fail:
     rts
 
 rodata(rom0)
-scope Table: {
+function Table {
     macro row(evaluate a, evaluate b) {
         dw  {a}, {b}, {a} * {b}
     }
@@ -201,7 +201,7 @@ a16()
 i16()
 code()
 Test.add("Multiply.u16y_u16x_u32xy")
-scope Multiply.u16y_u16x_u32xy: {
+function Multiply.u16y_u16x_u32xy {
     TableLoop(Table, 8)
 
         ldy.w   tableData
@@ -226,7 +226,7 @@ Fail:
     rts
 
 rodata(rom0)
-scope Table: {
+function Table {
     macro row(evaluate a, evaluate b) {
         dw  {a}, {b}
         dd  {a} * {b}
@@ -249,7 +249,7 @@ a16()
 i16()
 code()
 Test.add("Multiply.s16y_s16x_s32xy")
-scope Multiply.s16y_s16x_s32xy: {
+function Multiply.s16y_s16x_s32xy {
 
     TableLoop(Table, 8)
 
@@ -275,7 +275,7 @@ Fail:
     rts
 
 rodata(rom0)
-scope Table: {
+function Table {
     macro row(evaluate a, evaluate b) {
         dw  {a}, {b}
         dd  {a} * {b}
@@ -305,7 +305,7 @@ a16()
 i16()
 code()
 Test.add("Multiply.u32_32xy_32xy")
-scope Multiply.u32_32xy_32xy: {
+function Multiply.u32_32xy_32xy {
 
     TableLoop(Table, 12)
 
@@ -336,7 +336,7 @@ Fail:
     rts
 
 rodata(rom0)
-scope Table: {
+function Table {
     macro row(evaluate a, evaluate b) {
         dd  {a}, {b}, {a} * {b}
     }
@@ -375,7 +375,7 @@ a16()
 i16()
 code()
 Test.add("Multiply.32xy_u8a_32xy")
-scope Multiply.32_u8a_32xy: {
+function Multiply.32_u8a_32xy {
 
     TableLoop(Table, 9)
 
@@ -408,7 +408,7 @@ Fail:
     rts
 
 rodata(rom0)
-scope Table: {
+function Table {
     macro row(evaluate a, evaluate b) {
         dd  {a}
         db  {b}

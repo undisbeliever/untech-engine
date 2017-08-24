@@ -8,7 +8,7 @@
 // NOTE: An enum cannot be nested in a scope
 //
 // usage:
-//    scope functionTable {
+//    namespace functionTable {
 //        createEnum(0, 2)
 //
 //        enum(initPtr)    // 0
@@ -22,26 +22,26 @@
 // Distributed under The MIT License: https://opensource.org/licenses/MIT
 
 
-macro createEnum(start, increment) {
+inline createEnum(start, increment) {
     if {increment} < 1 {
         error "increment is invalid"
     }
 
-    constant __ENUM__.first({start})
-    global evaluate __ENUM__.current({start})
-    global evaluate __ENUM__.increment({increment})
+    constant __ENUM__.first = {start}
+    evaluate __ENUM__.current = {start}
+    evaluate __ENUM__.increment = {increment}
 }
-macro createEnum(start) {
+inline createEnum(start) {
     createEnum({start}, 1)
 }
-macro createEnum() {
+inline createEnum() {
     createEnum(0, 1)
 }
 
-macro enum(id) {
+inline enum(id) {
     if {defined __ENUM__.current} {
-        constant {id}({__ENUM__.current})
-        global evaluate __ENUM__.current({__ENUM__.current} + {__ENUM__.increment})
+        constant {id} = {__ENUM__.current}
+        evaluate __ENUM__.current = {__ENUM__.current} + {__ENUM__.increment}
 
     } else {
         error "Current scope is not an enum"

@@ -9,9 +9,9 @@
 // Distributed under The MIT License: https://opensource.org/licenses/MIT
 
 
-arch snes.cpu
+architecture wdc65816
 
-scope Math {
+namespace Math {
 
 code()
 
@@ -28,7 +28,7 @@ code()
 au()
 iu()
 code()
-scope Multiply.u8y_u8x_y: {
+function Multiply.u8y_u8x_y {
     php
     sep     #$20
 a8()
@@ -63,7 +63,7 @@ a8()
 i16()
 code()
 Multiply.s16y_u8a_s16y:
-scope Multiply.u16y_u8a_u16y: {
+function Multiply.u16y_u8a_u16y {
     sta.l   WRMPYA
     tya
     sta.l   WRMPYB
@@ -110,7 +110,7 @@ a8()
 i16()
 code()
 Multiply.u16y_u8a_u32:
-scope Multiply.u16y_u8a_u32xy: {
+function Multiply.u16y_u8a_u32xy {
     // DP faster than long addressing by 2 cycles
 
     phd
@@ -172,7 +172,7 @@ code()
 Multiply.u16y_s16x_16y:
 Multiply.s16y_u16x_16y:
 Multiply.s16y_s16x_s16y:
-scope Multiply.u16y_u16x_u16y: {
+function Multiply.u16y_u16x_u16y {
     //      y y
     // *    x x
     // -----------
@@ -180,8 +180,8 @@ scope Multiply.u16y_u16x_u16y: {
     // +  y*x
     // +  y*x
 
-constant tmpY(tmp1)
-constant tmpX(tmp2)
+constant tmpY = tmp1
+constant tmpX = tmp2
 
     php
     phd
@@ -249,7 +249,7 @@ a8()
 au()
 i16()
 code()
-scope Multiply.u16y_u16x_u32xy: {
+function Multiply.u16y_u16x_u32xy {
     //       Y y
     //   *   X x
     // -----------
@@ -258,8 +258,8 @@ scope Multiply.u16y_u16x_u32xy: {
     // + c y*X
     // + Y*X
 
-constant tmpY(tmp1)
-constant tmpX(tmp2)
+constant tmpY = tmp1
+constant tmpX = tmp2
 
     php
     phd
@@ -352,7 +352,7 @@ a16()
 au()
 i16()
 code()
-scope Multiply.s16y_s16x_s32xy: {
+function Multiply.s16y_s16x_s32xy {
     cpy.w   #$8000
     bcs     NegY
 
@@ -412,7 +412,7 @@ code()
 Multiply.u32_s32xy_32xy:
 Multiply.s32_u32xy_32xy:
 Multiply.s32_s32xy_s32xy:
-scope Multiply.u32_u32xy_u32xy: {
+function Multiply.u32_u32xy_u32xy {
     //      f3 f2 f1 f0
     //  *   Xh Xl Yh Yl
     // ------------------
@@ -429,8 +429,8 @@ scope Multiply.u32_u32xy_u32xy: {
 
     assert(pc() == Multiply.s16y_s16x_s32xy.FallThrough)
 
-constant tmpY(tmp1)
-constant mathTmp(tmp2)
+constant tmpY = tmp1
+constant mathTmp = tmp2
 assert(mathTmp + 2 == tmp3)
 
     php
@@ -620,7 +620,7 @@ a8()
 i16()
 code()
 Multiply.s32xy_u8a_s32xy:
-scope Multiply.u32xy_u8a_u32xy: {
+function Multiply.u32xy_u8a_u32xy {
     //      Xh Xl Yh Yl
     //  *             A
     // ------------------
@@ -629,8 +629,8 @@ scope Multiply.u32xy_u8a_u32xy: {
     // +     A*Xl
     // +  A*Xh
 
-constant tmpY(tmp1)
-constant tmpX(tmp2)
+constant tmpY = tmp1
+constant tmpX = tmp2
 
     phd
 

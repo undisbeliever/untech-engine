@@ -2,8 +2,8 @@
 // Copyright (c) 2016 - 2017, Marcus Rowe <undisbeliever@gmail.com>.
 // Distributed under The MIT License: https://opensource.org/licenses/MIT
 
-scope MetaSpriteTest {
-scope Animation {
+namespace MetaSpriteTest {
+namespace Animation {
 
 allocateTmpWord(tmp0)
 allocateTmpWord(tmp1)
@@ -13,8 +13,8 @@ a16()
 i16()
 code()
 Test.add("MetaSprite.Animation.Process (Frame)")
-scope Process_Frame: {
-constant tmp_frame(tmp0)
+function Process_Frame {
+constant tmp_frame = tmp0
 
     lda.w   #MSEO.AnimationTest.Animations.Frame
     jsr     _Init
@@ -56,8 +56,8 @@ a16()
 i16()
 code()
 Test.add("MetaSprite.Animation.Process (Time)")
-scope Process_Time: {
-constant tmp_frame(tmp0)
+function Process_Time {
+constant tmp_frame = tmp0
 
     lda.w   #MSEO.AnimationTest.Animations.Time
     jsr     _Init
@@ -108,8 +108,8 @@ macro DistanceTest(animation, vecl) {
     i16()
     code()
     Test.add("MetaSprite.Animation.Process ({animation})")
-    scope Process_{animation}: {
-    constant tmp_frame(tmp0)
+    function Process_{animation} {
+    constant tmp_frame = tmp0
         // 79 *VECL parameter means >=2.5px travel
 
         lda.w   #MSEO.AnimationTest.Animations.{animation}
@@ -177,7 +177,7 @@ a16()
 i16()
 code()
 Test.add("MetaSprite.Animation.Process (OneShot)")
-scope Process_OneShot: {
+function Process_OneShot {
     lda.w   #MSEO.AnimationTest.Animations.OneShot
     jsr     _Init
     bcc     Fail
@@ -205,7 +205,7 @@ a16()
 i16()
 code()
 Test.add("MetaSprite.Animation.Process (Change Animation)")
-scope Process_ChangeAnimation: {
+function Process_ChangeAnimation {
     // Change animation contains 4 single frames, then changes to
     // ChangeAnimation2.
 
@@ -254,8 +254,8 @@ Fail:
 a16()
 i16()
 code()
-scope _Init: {
-constant tmp_animation(Test.tmp)
+function _Init {
+constant tmp_animation = Test.tmp
 
     sta.w   tmp_animation
 

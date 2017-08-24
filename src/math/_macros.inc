@@ -9,7 +9,7 @@
 // Distributed under The MIT License: https://opensource.org/licenses/MIT
 
 
-scope Math {
+namespace Math {
 
 // Negate A (8 bit A)
 macro neg.b() {

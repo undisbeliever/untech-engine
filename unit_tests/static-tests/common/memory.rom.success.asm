@@ -1,9 +1,9 @@
 // Test ROM blocks
 
-arch snes.cpu
+architecture wdc65816
 
-define MEMORY_MAP(LOROM)
-define ROM_SIZE(1)
+define MEMORY_MAP = LOROM
+define ROM_SIZE = 1
 
 include "../../../src/common/assert.inc"
 include "../../../src/common/memory.inc"
@@ -23,7 +23,7 @@ assert(pc() == 0xc18000)
 rodata(addrTable)
 assert(pc() == 0xc28000)
 
-scope testInScope {
+namespace testInScope {
     code(code)
     assert(pc() == 0xc08000)
         nop
@@ -46,13 +46,13 @@ rodata(rom1)
 assert(pc() == 0xc18004)
 
 
-scope AddrTableData {
+namespace AddrTableData {
     rodata(addrTable)
 
-    constant N_ITEMS(15)
-    constant ELEMENT_SIZE(5)
+    constant N_ITEMS = 15
+    constant ELEMENT_SIZE = 5
 
-    variable n(0)
+    variable n = 0
     while n < N_ITEMS {
         fill ELEMENT_SIZE, n
         n = n + 1

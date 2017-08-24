@@ -12,8 +12,8 @@
 // Distributed under The MIT License: https://opensource.org/licenses/MIT
 
 
-scope Dma {
-scope Tile16 {
+namespace Dma {
+namespace Tile16 {
 
 rodata(DMA_Tile16Data)
 
@@ -21,26 +21,26 @@ rodata(DMA_Tile16Data)
     //    byte: number of tiles
     //    word: (tileAddress >> 7) * nTiles
 
-    scope TileListData {
+    namespace TileListData {
         struct(pc() & 0xff0000)
             field(count, 1)
             field(addr, 2)
-            constant addr.h(addr + 1)
+            constant addr.h = addr + 1
         endstruct()
     }
 code()
 
 
 
-constant TRANSFER_QUEUE_SIZE(15)
-constant TILE_QUEUE_SIZE(30)
+constant TRANSFER_QUEUE_SIZE = 15
+constant TILE_QUEUE_SIZE = 30
 
 // List of transfers to process during VBlank
 //
 // LOCATION: shadow WRAM, accessible by REGISTER_DB during VBlank.
 //
 // The table terminates when vblankFunctionAddr == 0
-scope transferQueue {
+namespace transferQueue {
     assert(TRANSFER_QUEUE_SIZE < (256/2))
 
     // Function to call in the _VBlank
@@ -53,14 +53,14 @@ scope transferQueue {
     // The word VRAM address to send the tiles
     allocate(wordVramAddress, shadow, TRANSFER_QUEUE_SIZE * 2)
 }
-constant TRANSFER_QUEUE_INDEX_END(TRANSFER_QUEUE_SIZE * 2)
+constant TRANSFER_QUEUE_INDEX_END = TRANSFER_QUEUE_SIZE * 2
 allocateTmpWord(transferQueueIndex)
 
 
 // List of tiles to upload to VRAM
 //
 // LOCATION: shadow WRAM, accessible by REGISTER_DB during VBlank.
-scope tileQueue {
+namespace tileQueue {
     assert(TILE_QUEUE_SIZE < (256/2))
 
     // tile location in ROM
@@ -69,12 +69,12 @@ scope tileQueue {
 
     // constant variable - speeds up VBlank
     // always equal to TILE_HALF_SIZE
-    constant tileHalfSize(bank + 1)
+    constant tileHalfSize = bank + 1
 
     // size of the top half of a 16x16 4bpp tile
-    constant TILE_HALF_SIZE(32 * 2)
+    constant TILE_HALF_SIZE = 32 * 2
 }
-constant TILE_QUEUE_INDEX_END(TILE_QUEUE_SIZE * 2)
+constant TILE_QUEUE_INDEX_END = TILE_QUEUE_SIZE * 2
 allocateTmpWord(tileQueueIndex)
 
 
@@ -100,7 +100,7 @@ macro _Init() {
     assert16a()
     assert16i()
 
-    scope Tile16: {
+    function Tile16 {
         stz.w   Dma.Tile16.transferQueue.forceEndTransfer - 1
         stz.w   Dma.Tile16.transferQueueIndex
 
@@ -127,7 +127,7 @@ macro _Init() {
 macro _TransferOnNextVBlank() {
     assert16a()
 
-    scope Tile16: {
+    function Tile16 {
         ldx.w   Dma.Tile16.transferQueueIndex
         stz.w   Dma.Tile16.transferQueue.vblankFunctionAddr,x
         stz.w   Dma.Tile16.processVBlankOnZero
@@ -143,7 +143,7 @@ macro _TransferOnNextVBlank() {
 //
 // REQUIRES: 16 bit A, 8 bit Index, DB = $80, DP = $4300
 // REQUIRES: VMAIN = VMAIN.incrementMode.high
-macro scope _VBlank() {
+macro _VBlank() {
     assert16a()
     assert8i()
 
@@ -219,11 +219,11 @@ macro scope _VBlank() {
 a16()
 i16()
 code()
-scope _ProcessDMA {
-    constant ContinueLoop(NmiHandler.Dma.Tile16._VBlank.ContinueLoop)
-    constant EndLoopFunction(NmiHandler.Dma.Tile16._VBlank.EndLoopFunction)
+namespace _ProcessDMA {
+    constant ContinueLoop = NmiHandler.Dma.VBlank.Dma.Tile16._VBlank.ContinueLoop
+    constant EndLoopFunction = NmiHandler.Dma.VBlank.Dma.Tile16._VBlank.EndLoopFunction
 
-    scope FunctionTable: {
+    function FunctionTable {
         dw  EndLoopFunction
         dw  Transfer1
         dw  Transfer2
@@ -237,16 +237,16 @@ scope _ProcessDMA {
 
     allocate(tileQueuePos, shadow, 2)
 
-    macro ProcessTiles(evaluate nTiles) {
+    inline ProcessTiles(evaluate nTiles) {
         a16()
         i8()
         code()
-        scope Transfer{nTiles}: {
+        function Transfer{nTiles} {
             if {nTiles} < 8 {
                 pha
             }
 
-            variable n({nTiles})
+            variable n = {nTiles}
             while n > 0 {
                 n = n - 1
 
@@ -278,7 +278,7 @@ scope _ProcessDMA {
 
             ldx.b   #tileQueue.TILE_HALF_SIZE
 
-            variable n({nTiles})
+            variable n = {nTiles}
             while n > 0 {
                 n = n - 1
 
@@ -321,7 +321,7 @@ scope _ProcessDMA {
 au()
 iu()
 code()
-scope QueueOneTileFromList: {
+function QueueOneTileFromList {
     rep     #$30
     sep     #$20
 a8()
@@ -417,8 +417,8 @@ Fail:
 au()
 iu()
 code()
-scope QueueTwoTilesFromList: {
-constant Fail(QueueOneTileFromList.Fail)
+function QueueTwoTilesFromList {
+constant Fail = QueueOneTileFromList.Fail
     rep     #$30
     sep     #$20
 a8()
@@ -536,8 +536,8 @@ a8()
 au()
 iu()
 code()
-scope QueueOneRowFromList: {
-constant tmp_nTiles(tmp0)
+function QueueOneRowFromList {
+constant tmp_nTiles = tmp0
     rep     #$30
     sep     #$20
 a8()
@@ -656,9 +656,9 @@ Fail:
 au()
 iu()
 code()
-scope QueueTwoRowsFromList: {
-constant tmp_nTiles(QueueOneRowFromList.tmp_nTiles)
-constant Fail(QueueOneRowFromList.Fail)
+function QueueTwoRowsFromList {
+constant tmp_nTiles = QueueOneRowFromList.tmp_nTiles
+constant Fail = QueueOneRowFromList.Fail
 
     rep     #$30
     sep     #$20

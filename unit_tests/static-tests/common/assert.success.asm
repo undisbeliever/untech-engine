@@ -1,6 +1,6 @@
 // assert.inc
 
-arch snes.cpu
+architecture wdc65816
 
 include "../../../src/common/assert.inc"
 

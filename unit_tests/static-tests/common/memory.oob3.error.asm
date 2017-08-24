@@ -1,7 +1,7 @@
 // Allocate block outside the ROM_SIZE area
 
-define MEMORY_MAP(HIROM)
-define ROM_SIZE(16)
+define MEMORY_MAP = HIROM
+define ROM_SIZE = 16
 
 include "../../../src/common/memory.inc"
 

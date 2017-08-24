@@ -2,7 +2,7 @@
 include "../../../src/common/enum.inc"
 
 // Create two enums of the same name
-scope test {
+namespace test {
     createEnum()
 
     enum(A)

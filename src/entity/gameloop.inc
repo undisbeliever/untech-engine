@@ -18,7 +18,7 @@
 // Distributed under The MIT License: https://opensource.org/licenses/MIT
 
 
-scope Entity {
+namespace Entity {
 
 // ENTITY ITERATION MACROS
 // =======================
@@ -27,11 +27,11 @@ scope Entity {
 // (word address)
 allocateTmpWord(previousEntity)
 
-macro _LOOP(list) {
+inline _LOOP(list) {
     assert16a()
     assert16i()
 
-    global evaluate _LOOP_LIST({list})
+    evaluate _LOOP_LIST = {list}
 
     // this allows previousEntity variable to work on first item
     assert(BaseEntity.next == 0)
@@ -49,11 +49,11 @@ macro _LOOP(list) {
         tcd
 }
 
-macro _LOOP_Y() {
+inline _LOOP_Y() {
     assert16a()
     assert16i()
 
-    global evaluate _LOOP_LIST(-1)
+    evaluate _LOOP_LIST = -1
 
     // this allows previousEntity variable to work on first item
     assert(BaseEntity.next == 0)
@@ -70,7 +70,7 @@ macro _LOOP_Y() {
         tcd
 }
 
-macro _NEXT() {
+inline _NEXT() {
     assert16a()
     assert16i()
 
@@ -141,7 +141,7 @@ EndLoop:
 a16()
 i16()
 code()
-scope ProcessEntityList_DeactivateOffscreen: {
+function ProcessEntityList_DeactivateOffscreen {
     _LOOP_Y()
         ldx.b   BaseEntity.functionTable
         jsr     (BaseEntityFunctionTable.Process,x)
@@ -186,7 +186,7 @@ scope ProcessEntityList_DeactivateOffscreen: {
 a16()
 i16()
 code()
-scope ProcessEntityList_DeleteOffscreen: {
+function ProcessEntityList_DeleteOffscreen {
     _LOOP_Y()
         ldx.b   BaseEntity.functionTable
         jsr     (BaseEntityFunctionTable.Process,x)
@@ -232,7 +232,7 @@ macro _ProcessEnemyList(list, doDeactivateTest) {
     assert16a()
     assert16i()
 
-    scope {list}: {
+    function {list} {
         _LOOP(lists.{list})
             ldx.b   BaseEntity.functionTable
             jsr     (BaseEntityFunctionTable.Process,x)
@@ -288,7 +288,7 @@ macro _ProcessPlayerList() {
     assert16a()
     assert16i()
 
-    scope players: {
+    function players {
         _LOOP(lists.players)
             ldx.b   BaseEntity.functionTable
             jsr     (BaseEntityFunctionTable.Process,x)
@@ -323,7 +323,7 @@ macro _ProcessParticleList() {
     assert16a()
     assert16i()
 
-    scope particles: {
+    function particles {
         _LOOP(lists.particles)
             ldx.b   BaseEntity.functionTable
             jsr     (BaseEntityFunctionTable.Process,x)
@@ -351,7 +351,7 @@ macro _ProcessTryToActivateAgainList() {
     assert16a()
     assert16i()
 
-    scope TryToActivateAgain: {
+    function TryToActivateAgain {
         lda.w   lists.tryToActivateAgain
         beq     EndLoop
 
@@ -426,7 +426,7 @@ macro _ProcessActiveWindow() {
     assert16a()
     assert16i()
 
-    scope ProcessActiveWindow: {
+    function ProcessActiveWindow {
         lda.w   Camera.xPos
         and.w   #TEST_ACTIVE_WINDOW_MASK
         cmp.w   prevActiveWindowX
@@ -493,7 +493,7 @@ macro _ProcessActiveWindow() {
 a16()
 i16()
 code()
-scope ProcessGameLoop: {
+function ProcessGameLoop {
     jsr     _UpdateActiveWindows
 
     _ProcessTryToActivateAgainList()

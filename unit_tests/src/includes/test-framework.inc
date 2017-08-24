@@ -10,14 +10,14 @@ assert((__MEMORY__.romBlocks.testTableBlock.start >> 16) == (__MEMORY__.romBlock
 // ::TODO display failed test name on breakpoint::
 
 
-variable __TESTS__.nTests(0)
-variable __TESTS__.testsFinalized(0)
+variable __TESTS__.nTests = 0
+variable __TESTS__.testsFinalized = 0
 
-scope Test {
+namespace Test {
 
-constant TESTING_COLOR(0x7fff)
-constant SUCCESS_COLOR(22 << Palette.green.shift)
-constant FAILURE_COLOR(20 << Palette.red.shift)
+constant TESTING_COLOR = 0x7fff
+constant SUCCESS_COLOR = 22 << Palette.green.shift
+constant FAILURE_COLOR = 20 << Palette.red.shift
 
 allocate(dpTmp, dp, 32)
 
@@ -64,7 +64,7 @@ macro add(name) {
         error "Test table is finalized, cannot add any more tests"
     }
 
-    evaluate loc(pc())
+    evaluate loc = pc()
 
     pushBlock()
 
@@ -82,10 +82,10 @@ macro add(name) {
 // Finalizes the test table
 //
 // MUST be called
-macro finalizeTable() {
+inline finalizeTable() {
     assert(__TESTS__.testsFinalized == 0)
 
-    constant N_TESTS(__TESTS__.nTests)
+    constant N_TESTS = __TESTS__.nTests
     __TESTS__.testsFinalized = 1
 }
 
@@ -100,7 +100,7 @@ macro finalizeTable() {
 au()
 iu()
 code()
-scope ProcessTests: {
+function ProcessTests {
     jsr     ResetPpuState
 
     rep     #$30
@@ -113,7 +113,7 @@ i16()
     ldx.w   #TestNameList
     stx.w   currentTestName
 
-    scope Loop: {
+    function Loop {
         // ::TODO print test number
 
         Text.Console.SetCursor(0, 2)
@@ -159,18 +159,16 @@ i16()
         sep     #$20
     a8()
         // Increment currentTestName
-        scope {
-            ldx.w   currentTestName
-            dex
+        ldx.w   currentTestName
+        dex
 
-            Loop:
-                inx
-                lda.l   TestNameList & 0xff0000,x
-                bne     Loop
-
+        -
             inx
-            stx.w   currentTestName
-        }
+            lda.l   TestNameList & 0xff0000,x
+            bne     -
+
+        inx
+        stx.w   currentTestName
 
 
         // restore screen brightness (if necessary)
@@ -241,7 +239,7 @@ i16()
 au()
 iu()
 code()
-scope Fail: {
+function Fail {
     jsr     ResetPpuState
 
     rep     #$30
@@ -316,7 +314,7 @@ a8()
 au()
 iu()
 code()
-scope ResetPpuState: {
+function ResetPpuState {
     php
     rep     #$30
     sep     #$20

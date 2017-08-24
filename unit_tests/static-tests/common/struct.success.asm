@@ -3,7 +3,7 @@
 include "../../../src/common/assert.inc"
 include "../../../src/common/struct.inc"
 
-scope point {
+namespace point {
     struct()
     struct_maxsize(12)
 
@@ -17,11 +17,11 @@ assert(point.xPos == 0)
 assert(point.yPos == 2)
 assert(point.size == 4)
 
-scope test {
+namespace test {
     struct()
 
     field(A, 1)
-    scope nest {
+    namespace nest {
         field(B, 10)
     }
     field(C, 2)
@@ -36,11 +36,11 @@ assert(test.size == 13)
 
 
 // test struct with a given starting value
-scope startTest {
+namespace startTest {
     struct(0x1337)
 
     field(A, 1)
-    scope nest {
+    namespace nest {
         field(B, 10)
     }
     field(C, 2)
@@ -54,25 +54,25 @@ assert(startTest.C == 0x1337 + 11)
 assert(startTest.size == 13)
 
 // test struct inheritance.
-scope TestBase {
-    scope Base {
+namespace TestBase {
+    namespace Base {
         basestruct()
             field(a, 3)
         endstruct()
     }
-    scope BaseWithParent {
+    namespace BaseWithParent {
         basestruct(Base)
             field(b, 3)
         endstruct()
     }
 
-    scope Child1 {
+    namespace Child1 {
         childstruct(Base)
             field(c, 2)
         endstruct()
     }
 
-    scope Child2 {
+    namespace Child2 {
         childstruct(BaseWithParent)
             field(d, 2)
         endstruct()
@@ -95,26 +95,26 @@ scope TestBase {
     assert(Child2.size == 8)
 }
 
-scope TestBaseWithOffset {
+namespace TestBaseWithOffset {
     // test struct inheritance.
-    scope Base {
+    namespace Base {
         basestruct_offset(0x100)
             field(a, 3)
         endstruct()
     }
-    scope BaseWithParent {
+    namespace BaseWithParent {
         basestruct(Base)
             field(b, 3)
         endstruct()
     }
 
-    scope Child1 {
+    namespace Child1 {
         childstruct(Base)
             field(c, 2)
         endstruct()
     }
 
-    scope Child2 {
+    namespace Child2 {
         childstruct(BaseWithParent)
             field(d, 2)
         endstruct()

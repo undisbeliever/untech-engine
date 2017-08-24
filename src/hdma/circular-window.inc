@@ -9,15 +9,15 @@
 // Distributed under The MIT License: https://opensource.org/licenses/MIT
 
 
-scope Hdma {
+namespace Hdma {
 
 // The Hdma.CircularWindow module generates a HDMA table that renders a
 // circle using screen window 1.
-scope CircularWindow {
+namespace CircularWindow {
 
 // ::TODO move memory used by this module into a shared pool::
 
-constant DELTA_TABLE_SIZE(76)
+constant DELTA_TABLE_SIZE = 76
 
 // Delta table calculated in the DrawCircle.BuildDeltaTable scope
 //
@@ -40,7 +40,7 @@ allocateTmpWord(deltaTableRadius)
 // REQUIRES: DB = 0x7e
 au()
 code()
-scope Init: {
+function Init {
     // invalidate deltaTable value
     stz.w   deltaTableRadius
 
@@ -61,27 +61,27 @@ scope Init: {
 a8()
 i16()
 code()
-scope DrawCircle: {
+function DrawCircle {
 
 assert(BUFFER_SIZE >= (255 * 2 + 3) * 3 + 1)
 
-constant _xOrigin(dpTmp0)
-constant _yOrigin(dpTmp1)
-constant _radius(dpTmp2)
+constant _xOrigin = dpTmp0
+constant _yOrigin = dpTmp1
+constant _radius = dpTmp2
 
-constant _hdmaBuffer(dpTmp3)
-constant _hdmaCenterRow(dpTmp4)
+constant _hdmaBuffer = dpTmp3
+constant _hdmaCenterRow = dpTmp4
 
-constant _linesLeft(dpTmp5)
+constant _linesLeft = dpTmp5
 
-constant _j(dpTmp6)
-constant _d(dpTmp7)
+constant _j = dpTmp6
+constant _d = dpTmp7
 
 
 // The HdmaTable is offset by two rows as:
 //   1) The first two rows are reserved for the yOffset
 //   2) It simplifies accessing the previous row of the table
-scope HdmaTable {
+namespace HdmaTable {
     struct()
         field(prev2.count, 1)
         field(prev2.left, 1)
@@ -105,7 +105,7 @@ a16()
     and.w   #0xff
     sta.b   _radius
 
-    scope CheckBounds {
+    namespace CheckBounds {
         // if radius == 0 or
         //    yOrigin + radius < 0 or
         //    yOrigin - radius > DISPLAY_HEIGHT or
@@ -161,7 +161,7 @@ i8()
     beq     DeltaTableAlreadyExists
     sta.w   deltaTableRadius
 
-    scope BuildDeltaTable {
+    namespace BuildDeltaTable {
         // 75 is the size of the delta table when radius = 255
         // +1 if for the 16 bit store.
         assert(DELTA_TABLE_SIZE >= 75 + 1)
@@ -278,7 +278,7 @@ i16()
     // x = hdmaTable
     // y = deltaIndex
 
-    scope FirstScanline {
+    namespace FirstScanline {
         // First scanline of the circle.
 
         //  hdmaTable->count = 1
@@ -331,7 +331,7 @@ i16()
 
     ldy.w   #1
 
-    scope First45 {
+    namespace First45 {
         // First 45 degrees of the circle.
         // Width of circle increased by delta * 2, height increases by 1
         //
@@ -390,7 +390,7 @@ i16()
     SkipLoop:
     }
 
-    scope Second45 {
+    namespace Second45 {
         // Second 45 degrees of the circle.
         // Width of circle increased 2, height unknown, calculated later
         //
@@ -437,7 +437,7 @@ i16()
     //  hdmaCenterRow = hdmaTable
     stx.b   _hdmaCenterRow
 
-    scope Second45Count {
+    namespace Second45Count {
         // Fill in count for second 45 deg of circle.
         //
         // This is preformed in a separate loop as the height delta may
@@ -468,7 +468,7 @@ i16()
     SkipLoop:
     }
 
-    scope Center {
+    namespace Center {
         //  hdmaCenterRow->count = deltaTable[0] * 2 - 1
         //  l = hdmaTable[-1]->left
         //  if (l < 0): l = 0
@@ -500,7 +500,7 @@ i16()
     }
 
 
-    scope CopyBottomHalf {
+    namespace CopyBottomHalf {
         //  if yOrigin + radius <= DISPLAY_HEIGHT
         //      topHalf = hdmaCenterRow - 1         // - 3 bytes
         //      bottomHalf = hdmaCenterRow + 1      // + 3 bytes
@@ -562,7 +562,7 @@ i16()
     End:
     }
 
-    scope LastScanline {
+    namespace LastScanline {
         assert16a()
         assert16i()
         // X = hdmaTable
@@ -573,7 +573,7 @@ i16()
         stz.w   HdmaTable.count + 2,x
     }
 
-    scope ProcessYOffset {
+    namespace ProcessYOffset {
         assert16a()
         assert16i()
 
@@ -688,7 +688,7 @@ i16()
     }
 
 
-    scope SetupChannelSettings: {
+    function SetupChannelSettings {
         sep     #$20
     a8()
         // x = hdmaTable

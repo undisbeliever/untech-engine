@@ -2,8 +2,8 @@
 // Copyright (c) 2016 - 2017, Marcus Rowe <undisbeliever@gmail.com>.
 // Distributed under The MIT License: https://opensource.org/licenses/MIT
 
-scope InteractiveTests {
-scope ActionPointSpawnerTest {
+namespace InteractiveTests {
+namespace ActionPointSpawnerTest {
 
 // Tests:
 //  * EntityLoop
@@ -15,15 +15,15 @@ scope ActionPointSpawnerTest {
 //  * ENTITY_POOL_EMPTY warning
 
 
-scope ProjectileEntity {
+namespace ProjectileEntity {
     buildFunctionTable(BaseEntityFunctionTable, ProjectileEntity)
     Entity.useDefaultRenderer()
 
     // Slow speed to exhaust entity pool.
-    constant VELOCITY(0x8000)
-    constant DIAGONAL_VELOCITY(0x5a82)  // sqrt(0x8000 ** 2 / 2)
+    constant VELOCITY = 0x8000
+    constant DIAGONAL_VELOCITY = 0x5a82 // sqrt(0x8000 ** 2 / 2
 
-    scope EntityStruct {
+    namespace EntityStruct {
         childstruct(BaseEntity)
             field(tmp, 4)
         endstruct()
@@ -32,7 +32,7 @@ scope ProjectileEntity {
     a16()
     i16()
     code()
-    scope Init: {
+    function Init {
         sep     #$20
     a8()
 
@@ -67,7 +67,7 @@ scope ProjectileEntity {
     a16()
 
         macro _SetVelocity(c) {
-            scope SetVelocity_{c} {
+            namespace SetVelocity_{c} {
                 // Set Projectile Velocity
                 lda.l   MetaSprite.Format.ActionPoints.{c}Pos,x
                 and.w   #0xff
@@ -121,7 +121,7 @@ scope ProjectileEntity {
     CollideWithShield:
     BlockWithShield:
     CalculateAttackValue:
-    scope Null: {
+    function Null {
         rts
     }
 
@@ -153,7 +153,7 @@ scope ProjectileEntity {
     }
 
     rodata(EN_RomData)
-    scope RomData: {
+    function RomData {
         dw  FunctionTable
         db  Entity.ListId.NPC   // initial List
         dw  MSFS.Projectile     // frameSetId
@@ -161,24 +161,24 @@ scope ProjectileEntity {
     }
 
     rodata(EN_ProjectileList)
-    constant PROJECTILE_ID((pc() - Entity.Data.ProjectileList) / 2)
+    constant PROJECTILE_ID = (pc() - Entity.Data.ProjectileList) / 2
         dw  RomData
 
     rodata(EN_EntityList)
-    constant ENTITY_ID((pc() - Entity.Data.EntityList) / 2)
+    constant ENTITY_ID = (pc() - Entity.Data.EntityList) / 2
         dw  RomData
 }
 
 
 
-scope SpawnerEntity {
+namespace SpawnerEntity {
     buildFunctionTable(BaseEntityFunctionTable, SpawnerEntity)
     Entity.useDefaultRenderer()
 
-    constant FRAME_DELAY(5)
-    constant N_SPAWN_POINTS(8)
+    constant FRAME_DELAY = 5
+    constant N_SPAWN_POINTS = 8
 
-    scope EntityStruct {
+    namespace EntityStruct {
         childstruct(BaseEntity)
             field(frameDelay, 2)
             field(spawnPoint, 2)
@@ -191,7 +191,7 @@ scope SpawnerEntity {
     a16()
     i16()
     code()
-    scope Init: {
+    function Init {
         stz.b   EntityStruct.frameDelay
         stz.b   EntityStruct.spawnPoint
         stz.b   EntityStruct.spawnRoutine
@@ -209,7 +209,7 @@ scope SpawnerEntity {
     CollideWithShield:
     BlockWithShield:
     CalculateAttackValue:
-    scope Null: {
+    function Null {
         rts
     }
 
@@ -219,7 +219,7 @@ scope SpawnerEntity {
     a16()
     i16()
     code()
-    scope Process: {
+    function Process {
         assertPowerOfTwo(N_SPAWN_POINTS)
 
         lda.b   EntityStruct.frameDelay
@@ -272,17 +272,17 @@ scope SpawnerEntity {
     //        DP = entity
     // REQUIRES: 16 bit A, 16 bit Index, DB = 0x7e
     code()
-    scope SpawnRoutineTable: {
+    function SpawnRoutineTable {
         dw  SpawnPlayerProjectileAtAp
         dw  SpawnEnemyProjectileAtAp
         dw  SpawnEntityAtAp
     }
-    constant N_SPAWN_ROUTINES((pc() - SpawnRoutineTable) / 2)
+    constant N_SPAWN_ROUTINES = (pc() - SpawnRoutineTable) / 2
 
     a16()
     i16()
     code()
-    scope SpawnPlayerProjectileAtAp: {
+    function SpawnPlayerProjectileAtAp {
         ldy.w   #ProjectileEntity.PROJECTILE_ID
         jmp     Entity.SpawnPlayerProjectileFromActionPoint
     }
@@ -290,7 +290,7 @@ scope SpawnerEntity {
     a16()
     i16()
     code()
-    scope SpawnEnemyProjectileAtAp: {
+    function SpawnEnemyProjectileAtAp {
         ldy.w   #ProjectileEntity.PROJECTILE_ID
         jmp     Entity.SpawnEnemyProjectileFromActionPoint
     }
@@ -298,14 +298,14 @@ scope SpawnerEntity {
     a16()
     i16()
     code()
-    scope SpawnEntityAtAp: {
+    function SpawnEntityAtAp {
         ldy.w   #ProjectileEntity.ENTITY_ID
         jmp     Entity.SpawnAtActionPoint
     }
 
 
     rodata(EN_RomData)
-    scope RomData: {
+    function RomData {
         dw  FunctionTable
         db  Entity.ListId.BOSS      // initial List
         dw  MSFS.ActionPointSpawner // frameSetId
@@ -313,7 +313,7 @@ scope SpawnerEntity {
     }
 
     rodata(EN_EntityList)
-    constant ENTITY_ID((pc() - Entity.Data.EntityList) / 2)
+    constant ENTITY_ID = (pc() - Entity.Data.EntityList) / 2
         dw  RomData
 }
 
@@ -347,7 +347,7 @@ a16()
 i16()
 code()
 Test.add("Spawn At Action Point Test")
-scope Test: {
+function Test {
     jsr     EntityLoop.Init
 
     // Load the entity

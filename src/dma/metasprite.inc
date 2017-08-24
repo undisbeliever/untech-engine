@@ -9,8 +9,8 @@
 // Distributed under The MIT License: https://opensource.org/licenses/MIT
 
 
-scope Dma {
-scope MetaSprite {
+namespace Dma {
+namespace MetaSprite {
 
 // Preform DMA transfer if zero
 // (byte)
@@ -25,7 +25,7 @@ allocate(transferOnZero, shadow, 1)
 macro _InitLoop() {
     assert16a()
 
-    scope Dma: {
+    function Dma {
         lda.w   Dma.transfersLeft
         sec
         sbc.w   #(128 * 4 + 128 / 4) / Dma.TRANSFER_SCALE
@@ -41,7 +41,7 @@ macro _InitLoop() {
 macro _EndLoop() {
     assert8a()
 
-    scope Dma: {
+    function Dma {
         stz.w   Dma.MetaSprite.transferOnZero
     EndIf:
     }
@@ -55,7 +55,7 @@ macro _VBlank() {
     assert16a()
     assert8i()
 
-    scope MetaSprite: {
+    function MetaSprite {
         ldx.w   Dma.MetaSprite.transferOnZero
         bne     EndIf
             stz.w   OAMADD

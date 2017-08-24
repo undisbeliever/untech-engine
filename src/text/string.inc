@@ -9,8 +9,8 @@
 // Distributed under The MIT License: https://opensource.org/licenses/MIT
 
 
-scope Text {
-scope String {
+namespace Text {
+namespace String {
 
 allocateTmpWord(tmp_paddingLength)
 
@@ -27,7 +27,7 @@ allocateTmpWord(tmp_paddingLength)
 a8()
 i16()
 code()
-scope U16Y_ToString: {
+function U16Y_ToString {
     assert(tmpString.size >= 5)
 
     ldx.w   #tmpString + tmpString.size - 1
@@ -77,7 +77,7 @@ AfterLoadX:
 a8()
 i16()
 code()
-scope U32XY_ToString: {
+function U32XY_ToString {
     assert(tmpString.size >= 10)
     assert(Font.ZERO == 1)
 
@@ -131,7 +131,7 @@ scope U32XY_ToString: {
 a8()
 i16()
 code()
-scope U16Y_ToPaddedString: {
+function U16Y_ToPaddedString {
     cmp.b   #tmpString.size - 2
     bcc     +
         lda.b   #tmpString.size - 2
@@ -182,7 +182,7 @@ Return:
 a8()
 i16()
 code()
-scope U32XY_ToPaddedString: {
+function U32XY_ToPaddedString {
     cmp.b   #tmpString.size - 2
     bcc     +
         lda.b   #tmpString.size - 2
@@ -204,7 +204,7 @@ scope U32XY_ToPaddedString: {
 a8()
 i16()
 code()
-scope CompareEqual: {
+function CompareEqual {
     ldy.w   #0
 
     lda     [str1],y

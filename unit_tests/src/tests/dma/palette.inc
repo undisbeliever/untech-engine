@@ -2,15 +2,15 @@
 // Copyright (c) 2016 - 2017, Marcus Rowe <undisbeliever@gmail.com>.
 // Distributed under The MIT License: https://opensource.org/licenses/MIT
 
-scope DmaTest {
+namespace DmaTest {
 
-scope Palette {
+namespace Palette {
 
 a16()
 i16()
 code()
 Test.add("Dma.Palette.MarkDirty(all)")
-scope MarkDirtyTest_all: {
+function MarkDirtyTest_all {
     jsr     Dma.Init
 
     lda.w   Dma.transfersLeft
@@ -81,7 +81,7 @@ a16()
 i16()
 code()
 Test.add("Dma.Palette.MarkDirty(tiles)")
-scope MarkDirtyTest_tiles: {
+function MarkDirtyTest_tiles {
     jsr     Dma.Init
 
     lda.w   Dma.transfersLeft
@@ -150,7 +150,7 @@ a16()
 i16()
 code()
 Test.add("Dma.Palette.MarkDirty(objects)")
-scope MarkDirtyTest_objects: {
+function MarkDirtyTest_objects {
     jsr     Dma.Init
 
     lda.w   Dma.transfersLeft
@@ -224,7 +224,7 @@ Fail:
 a8()
 i16()
 code()
-scope _CheckCgram: {
+function _CheckCgram {
     allocateTmpWord(tmp)
 
     sty.w   tmp

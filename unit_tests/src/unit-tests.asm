@@ -2,14 +2,14 @@
 // Copyright (c) 2016 - 2017, Marcus Rowe <undisbeliever@gmail.com>.
 // Distributed under The MIT License: https://opensource.org/licenses/MIT
 
-arch snes.cpu
+architecture wdc65816
 
-define MEMORY_MAP(HIROM)
-define ROM_SIZE(1)
-define ROM_SPEED(slow)
-define REGION(Australia)
-define ROM_NAME("UNTECH UNIT TESTS")
-define VERSION(0)
+define MEMORY_MAP = HIROM
+define ROM_SIZE = 1
+define ROM_SPEED = slow
+define REGION = Australia
+define ROM_NAME = "UNTECH UNIT TESTS"
+define VERSION = 0
 
 include "../../src/common.inc"
 include "memmap.inc"
@@ -29,7 +29,7 @@ a16()
 i16()
 code()
 Test.add("Success Test")
-scope SuccessTest: {
+function SuccessTest {
     sec
     rts
 }
@@ -67,7 +67,7 @@ include "interactive/hdma-circular-window.inc"
 include "interactive/errors.inc"
 
 
-constant Main(Test.ProcessTests)
+constant Main = Test.ProcessTests
 
 
 Test.finalizeTable()

@@ -2,20 +2,20 @@
 include "../../../src/common/struct.inc"
 include "../../../src/common/assert.inc"
 
-scope Base {
+namespace Base {
     basestruct()
     struct_maxsize(12)
         field(a, 5)
     endstruct()
 }
 
-scope BaseWithParent {
+namespace BaseWithParent {
     basestruct(Base)
         field(b, 5)
     endstruct()
 }
 
-scope Child {
+namespace Child {
     childstruct(BaseWithParent)
         field(c, 5) // ERROR
     endstruct()

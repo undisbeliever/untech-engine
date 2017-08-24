@@ -10,7 +10,7 @@
 
 
 // Data format may be subject to changes
-if MetaSprite.Data.METASPRITE_FORMAT_VERSION != 25 {
+if MetaSprite.Data.METASPRITE_FORMAT_VERSION != 26 {
     error "Invalid UnTech MetaSprite Format"
 }
 
@@ -21,49 +21,49 @@ if MetaSprite.Data.METASPRITE_FORMAT_VERSION != 25 {
 //
 //      ROM DATA = (value + INT_MS8_OFFSET)
 //
-constant INT_MS8_OFFSET(128)
+constant INT_MS8_OFFSET = 128
 
 
-scope MetaSprite {
+namespace MetaSprite {
 
-scope Data {
+namespace Data {
     storeBlockStart(FrameSetList, MS_FrameSetList)
     storeBlockStart(PaletteList,  MS_PaletteList)
     storeBlockStart(FrameList,    MS_FrameList)
     storeBlockStart(AnimationList,MS_AnimationList)
 
     rodata(MS_FrameSetData)
-        constant FrameSetOffset(pc() & 0xff0000)
+        constant FrameSetOffset = pc() & 0xff0000
 
     rodata(MS_PaletteData)
-        constant PaletteBank(pc() >> 16)
-        constant PaletteOffset(pc() & 0xff0000)
+        constant PaletteBank = pc() >> 16
+        constant PaletteOffset = pc() & 0xff0000
 
     rodata(MS_FrameData)
-        constant FrameOffset(pc() & 0xff0000)
+        constant FrameOffset = pc() & 0xff0000
 
     rodata(MS_FrameObjectsData)
-        constant FrameObjectsOffset(pc() & 0xff0000)
+        constant FrameObjectsOffset = pc() & 0xff0000
 
     rodata(MS_AnimationData)
-        constant AnimationOffset(pc() & 0xff0000)
+        constant AnimationOffset = pc() & 0xff0000
 
     rodata(MS_TileHitboxData)
-        constant TileHitboxOffset(pc() & 0xff0000)
+        constant TileHitboxOffset = pc() & 0xff0000
 
     rodata(MS_EntityHitboxData)
-        constant EntityHitboxOffset(pc() & 0xff0000)
+        constant EntityHitboxOffset = pc() & 0xff0000
 
     rodata(MS_ActionPointsData)
-        constant ActionPointsOffset(pc() & 0xff0000)
+        constant ActionPointsOffset = pc() & 0xff0000
 
     code()
 }
 
-scope Format {
+namespace Format {
 
     // The root FrameSet data structure
-    scope FrameSet {
+    namespace FrameSet {
         struct(Data.FrameSetOffset)
             // Index of the palette table in `Data.PaletteList`
             field(paletteTable, 2)
@@ -89,16 +89,16 @@ scope Format {
             field(nAnimations, 1)
         endstruct()
 
-        scope tilesetType {
-            scope Size {
-                constant ONE_TILE(0x00)
-                constant TWO_TILES(0x02)
-                constant ONE_ROW(0x04)
-                constant TWO_ROWS(0x08)
+        namespace tilesetType {
+            namespace Size {
+                constant ONE_TILE = 0x00
+                constant TWO_TILES = 0x02
+                constant ONE_ROW = 0x04
+                constant TWO_ROWS = 0x08
             }
-            scope Lifespan {
-                constant FIXED(0x80)
-                constant DYNAMIC(0x00)
+            namespace Lifespan {
+                constant FIXED = 0x80
+                constant DYNAMIC = 0x00
             }
         }
     }
@@ -107,7 +107,7 @@ scope Format {
     //
     // Any of these values can be NULL (0), in which case processing
     // will be aborted
-    scope Frame {
+    namespace Frame {
         struct(Data.FrameOffset)
             // Address of the FrameObjects in the `MS_FrameObjectsData` block
             // May be NULL
@@ -146,16 +146,16 @@ scope Format {
     //      oam.charAttr = (frameObject.charAttr & 0xF01F) + entity.blockOneCharAttrOffset
     //   else:
     //      oam.charAttr = (frameObject.charAttr & 0xF01F) + entity.blockTwoCharAttrOffset
-    scope FrameObjects {
+    namespace FrameObjects {
         struct(Data.FrameObjectsOffset)
             // Determines the number of objects used by the frame
             //
             // Value is `number of objects - 1`.
             // The maximum allowed value is 31 (32 objects).
             field(count, 1)
-            constant COUNT_MASK(0x1f)
+            constant COUNT_MASK = 0x1f
 
-            scope Object {
+            namespace Object {
                 // X offset relative origin
                 // int_ms8 format
                 field(xOffset, 1)
@@ -174,10 +174,10 @@ scope Format {
                 //      b     - block number (0 / 1)
                 //      ccccc - character number within block.
                 field(charAttr, 2)
-                scope charAttr {
-                    constant mask(0xF01F)
-                    constant sizeBit(0x0200)
-                    constant blockBit(0x0020)
+                namespace charAttr {
+                    constant mask = 0xF01F
+                    constant sizeBit = 0x0200
+                    constant blockBit = 0x0020
                 }
             }
         endstruct()
@@ -210,7 +210,7 @@ scope Format {
     //
     // Some hitboxes only involve one AABB. In this case count is 0 and
     // the outer hitbox is checked.
-    scope EntityHitbox {
+    namespace EntityHitbox {
         struct(Data.EntityHitboxOffset)
             // Determines the number of hitboxes used by the entity.
             //
@@ -220,10 +220,10 @@ scope Format {
             // If zero then only the outer hitbox is checked, the inner
             // hitboxes are not processed
             field(count, 1)
-            constant COUNT_MASK(3)
+            constant COUNT_MASK = 3
 
             // Outer hitbox, checked first
-            scope Outer {
+            namespace Outer {
                 field(xOffset, 1) // int_ms8 format
                 field(yOffset, 1) // int_ms8 format
                 field(width, 2) // uint16
@@ -233,7 +233,7 @@ scope Format {
             // The inner hitboxes, repeated `count + 1` times
             //
             // All inner hitboxes MUST be inside the outer hitbox.
-            scope Inner {
+            namespace Inner {
                 // type of hitbox
                 // (EntityHitboxType uint8 value)
                 field(type, 1)
@@ -243,19 +243,19 @@ scope Format {
                 field(width, 2) // uint16
                 field(height, 2) // uint16
 
-                constant size(7)
+                constant size = 7
             }
 
             // The type of a single hitbox
             //
             // Only set if count == 0
-            constant singleHitboxType(Inner.type)
+            constant singleHitboxType = Inner.type
         endstruct()
     }
 
     // The entity hitbox type
     // See entity collision code for collision table
-    scope EntityHitboxType {
+    namespace EntityHitboxType {
         createEnum(0, 2)
 
         enum(BODY)
@@ -265,9 +265,9 @@ scope Format {
         enum(SHIELD_ATTACK)
         enum(ATTACK)        // will phase through other attack hitboxes
 
-        constant _TABLE_SHIFT(3)
-        constant _MASK((1 << (_TABLE_SHIFT + 1)) - 2)
-        constant _TABLE_MASK(_MASK << _TABLE_SHIFT | _MASK)
+        constant _TABLE_SHIFT = 3
+        constant _MASK = (1 << (_TABLE_SHIFT + 1)) - 2
+        constant _TABLE_MASK = _MASK << _TABLE_SHIFT | _MASK
 
         assert({__ENUM__.current} <= 2 << _TABLE_SHIFT)
     }
@@ -277,7 +277,7 @@ scope Format {
     // with the meta-tilemap.
     //
     // For the moment the engine only supports a single AABB hitbox.
-    scope TileHitbox {
+    namespace TileHitbox {
         struct(Data.TileHitboxOffset)
             field(xOffset, 1) // int_ms8 format
             field(yOffset, 1) // int_ms8 format
@@ -299,7 +299,7 @@ scope Format {
     //        of the projectile launched
     //      * Feed touching ground - used for run/walk sounds.
     //
-    scope ActionPoints {
+    namespace ActionPoints {
         struct(Data.ActionPointsOffset)
             // The type of action point
             // Value passed to the entity's ProcessPoint routine
@@ -314,7 +314,7 @@ scope Format {
 
 
     // The animation data
-    scope Animation {
+    namespace Animation {
         struct(Data.AnimationOffset)
             // The format of the `Animation.Frames.duration` field
             // (DurationFormat uint8 value)
@@ -330,7 +330,7 @@ scope Format {
             field(frameTableSize, 1)
 
             // Animation frame table, repeated `frameTableSize / 2` times
-            scope Frames {
+            namespace Frames {
                 // The frame to display
                 // (byte)
                 field(frameId, 1)
@@ -343,7 +343,7 @@ scope Format {
     }
 
     // The format of `Animation.Frames.duration` field
-    scope AnimationDurationFormat {
+    namespace AnimationDurationFormat {
         createEnum(0, 2)
 
         // Frame duration = number of display frames to wait
@@ -361,7 +361,7 @@ scope Format {
         enum(DISTANCE_HORIZONTAL)
 
 
-        constant _MASK(%110)
+        constant _MASK = %110
         assert({__ENUM__.current} == _MASK + 2)
     }
 }

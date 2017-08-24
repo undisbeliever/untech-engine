@@ -9,7 +9,7 @@
 // Distributed under The MIT License: https://opensource.org/licenses/MIT
 
 
-variable __BREAK__.pos(0)
+variable __BREAK__.pos = 0
 
 // Register a break identifier
 //
@@ -19,12 +19,12 @@ variable __BREAK__.pos(0)
 // This macro MUST BE called in the root scope.
 //
 // PARAM: id - warning identifier
-macro RegisterBreakId(id) {
+inline RegisterBreakId(id) {
     if __BREAK__.pos > 255 {
         error "Too many Break IDs"
     }
 
-    constant __BREAK__.ids.{id}(__BREAK__.pos)
+    constant __BREAK__.ids.{id} = __BREAK__.pos
     __BREAK__.pos = __BREAK__.pos + 1
 
     if {defined __MEMORY__.romBlocks.breakIdStrings} {

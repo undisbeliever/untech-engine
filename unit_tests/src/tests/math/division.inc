@@ -2,13 +2,13 @@
 // Copyright (c) 2016 - 2017, Marcus Rowe <undisbeliever@gmail.com>.
 // Distributed under The MIT License: https://opensource.org/licenses/MIT
 
-scope MathTest {
+namespace MathTest {
 
 a16()
 i16()
 code()
 Test.add("Divide.u16y_u8a")
-scope Divide.u16y_u8a: {
+function Divide.u16y_u8a {
     TableLoop(Table, 7)
 
         sep     #$20
@@ -33,7 +33,7 @@ Fail:
     rts
 
 rodata(rom0)
-scope Table: {
+function Table {
     macro row(evaluate a, evaluate b) {
         dw  {a}
         db  {b}
@@ -55,7 +55,7 @@ a16()
 i16()
 code()
 Test.add("Divide.u16y_s16x")
-scope Divide.u16y_s16x: {
+function Divide.u16y_s16x {
     TableLoop(Table, 8)
 
         ldy.w   tableData
@@ -74,11 +74,11 @@ Fail:
     rts
 
 rodata(rom0)
-scope Table: {
+function Table {
     macro row(evaluate a, evaluate b) {
-        evaluate rem({a} % {b})
+        evaluate rem = {a} % {b}
         if ({rem} < 0) {
-            evaluate rem(0-{rem})
+            evaluate rem = 0-{rem}
         }
 
         dw  {a}, {b}
@@ -105,7 +105,7 @@ a16()
 i16()
 code()
 Test.add("Divide.s16y_s16x")
-scope Divide.s16y_s16x: {
+function Divide.s16y_s16x {
     TableLoop(Table, 8)
 
         ldy.w   tableData
@@ -124,11 +124,11 @@ Fail:
     rts
 
 rodata(rom0)
-scope Table: {
+function Table {
     macro row(evaluate a, evaluate b) {
-        evaluate rem({a} % {b})
+        evaluate rem = {a} % {b}
         if ({rem} < 0) {
-            evaluate rem(0-{rem})
+            evaluate rem = 0-{rem}
         }
 
         dw  {a}, {b}
@@ -157,7 +157,7 @@ a16()
 i16()
 code()
 Test.add("Divide.s16y_u16x")
-scope Divide.s16y_u16x: {
+function Divide.s16y_u16x {
     TableLoop(Table, 8)
 
         ldy.w   tableData
@@ -176,11 +176,11 @@ Fail:
     rts
 
 rodata(rom0)
-scope Table: {
+function Table {
     macro row(evaluate a, evaluate b) {
-        evaluate rem({a} % {b})
+        evaluate rem = {a} % {b}
         if ({rem} < 0) {
-            evaluate rem(0-{rem})
+            evaluate rem = 0-{rem}
         }
 
         dw  {a}, {b}
@@ -208,7 +208,7 @@ a16()
 i16()
 code()
 Test.add("Divide.u16y_u16x")
-scope Divide.u16y_u16x: {
+function Divide.u16y_u16x {
     TableLoop(Table, 8)
 
         ldy.w   tableData
@@ -227,7 +227,7 @@ Fail:
     rts
 
 rodata(rom0)
-scope Table: {
+function Table {
     macro row(evaluate a, evaluate b) {
         dw  {a}, {b}
         dw  {a} / {b}
@@ -251,7 +251,7 @@ a16()
 i16()
 code()
 Test.add("Divide.s32_s32")
-scope Divide.s32_s32: {
+function Divide.s32_s32 {
     TableLoop(Table, 16)
 
         ldy.w   tableData
@@ -287,11 +287,11 @@ Fail:
     rts
 
 rodata(rom0)
-scope Table: {
+function Table {
     macro row(evaluate a, evaluate b) {
-        evaluate rem({a} % {b})
+        evaluate rem = {a} % {b}
         if ({rem} < 0) {
-            evaluate rem(0-{rem})
+            evaluate rem = 0-{rem}
         }
 
         dd  {a}, {b}
@@ -322,7 +322,7 @@ a16()
 i16()
 code()
 Test.add("Divide.u32_u32")
-scope Divide.u32_u32: {
+function Divide.u32_u32 {
     TableLoop(Table, 16)
 
         ldy.w   tableData
@@ -358,7 +358,7 @@ Fail:
     rts
 
 rodata(rom0)
-scope Table: {
+function Table {
     macro row(evaluate a, evaluate b) {
         dd  {a}, {b}
         dd  {a} / {b}
@@ -383,7 +383,7 @@ a16()
 i16()
 code()
 Test.add("Divide.u32_u8a")
-scope Divide.u32_u8a: {
+function Divide.u32_u8a {
     TableLoop(Table, 10)
 
         sep     #$20
@@ -419,7 +419,7 @@ Fail:
     rts
 
 rodata(rom0)
-scope Table: {
+function Table {
     macro row(evaluate a, evaluate b) {
         dd  {a}
         db  {b}

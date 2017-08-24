@@ -1,9 +1,9 @@
 // Test push/pop ROM blocks
 
-arch snes.cpu
+architecture wdc65816
 
-define MEMORY_MAP(LOROM)
-define ROM_SIZE(2)
+define MEMORY_MAP = LOROM
+define ROM_SIZE = 2
 
 include "../../../src/common/assert.inc"
 include "../../../src/common/memory.inc"
@@ -34,7 +34,7 @@ pushBlock()
 rodata(rom1)
 pushBlock()
 
-scope innerTest {
+namespace innerTest {
     assert(__MEMORY__.blockStack.size == 2)
 
     rodata(rom2)

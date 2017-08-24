@@ -22,11 +22,11 @@
 // Distributed under The MIT License: https://opensource.org/licenses/MIT
 
 
-scope MetaSprite {
-scope Render {
+namespace MetaSprite {
+namespace Render {
 
-constant SCREEN_WIDTH(256)
-constant SCREEN_HEIGHT(224)
+constant SCREEN_WIDTH = 256
+constant SCREEN_HEIGHT = 224
 
 // Resets the oamXposBuffer, prevent possible bugs
 //
@@ -35,7 +35,7 @@ macro _Init() {
 	assert16a()
 	assert16i()
 
-    scope Render: {
+    function Render {
         ldx.w   #(128 - 1) * 4
 
         Loop:
@@ -58,7 +58,7 @@ macro _Init() {
 a16()
 iu()
 code()
-scope InitLoop: {
+function InitLoop {
     stz.w   MetaSprite.Render.bufferPos
     Dma.MetaSprite._InitLoop()
 
@@ -82,8 +82,8 @@ Return:
 a16()
 i16()
 code()
-scope RenderEntity: {
-constant Return(InitLoop.Return)
+function RenderEntity {
+constant Return = InitLoop.Return
 
     ldx.b   BaseEntity.MetaSprite.currentFrame
     beq     Return
@@ -108,11 +108,11 @@ End:
 a16()
 i16()
 code()
-scope RenderEntityFrame: {
+function RenderEntityFrame {
     assert(pc() == RenderEntity.End)
 
 allocateTmpWord(nObjectsLeft)
-constant Return(InitLoop.Return)
+constant Return = InitLoop.Return
 
     lda.l   MetaSprite.Format.Frame.frameObjects,x
     beq     Return
@@ -219,7 +219,7 @@ constant Return(InitLoop.Return)
 a16()
 i16()
 code()
-scope EndLoop: {
+function EndLoop {
     lda.w   bufferPos
     beq     SkipHiTable
 

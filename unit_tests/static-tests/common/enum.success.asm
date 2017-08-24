@@ -3,7 +3,7 @@
 include "../../../src/common/assert.inc"
 include "../../../src/common/enum.inc"
 
-scope test {
+namespace test {
     createEnum()
 
     enum(ZERO)
@@ -17,7 +17,7 @@ assert(test.ONE == 1)
 assert(test.TWO == 2)
 assert(test.THREE == 3)
 
-scope functionTable {
+namespace functionTable {
     createEnum(0, 2)
 
     enum(initPtr)

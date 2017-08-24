@@ -31,12 +31,12 @@ def main():
         pos += 2
 
 
-    print("scope Tables {")
-    print("scope EntityHitbox {")
-    print("constant MAX_INNER_HITBOXES(", MAX_INNER_HITBOXES, ")", sep="")
+    print("namespace Tables {")
+    print("namespace EntityHitbox {")
+    print("constant MAX_INNER_HITBOXES =", MAX_INNER_HITBOXES)
 
     print("rodata(rom0)")
-    print("scope CollisionOrder: {")
+    print("CollisionOrder:")
 
     # count == 1 is processed by other code
 
@@ -57,10 +57,9 @@ def main():
                 printAddress(c[0], c[1])
             printNull()
 
-    print("}")
-
-    print("scope CollisionOrderTable: {")
-    print("constant SHIFT(", LIST_SHIFT, ")", sep="")
+    print()
+    print("CollisionOrderTable:")
+    print("constant CollisionOrderTable.SHIFT =", LIST_SHIFT)
     print("// NOTE: this table ignores toTest EntityHitbox.count == 0")
     print("// table index = (((toTest.count - 1) << LIST_SHIFT) | current.count) * 2")
 
@@ -74,8 +73,9 @@ def main():
 
         print("\tdw ", ", ".join(l))
 
-    print("}")
-    print("\ncode()")
+    print()
+    print()
+    print("code()")
     print("}")
     print("}")
 

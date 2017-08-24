@@ -13,10 +13,10 @@ RegisterBreakId(INVALID_ENTITY_ID)
 RegisterBreakId(INVALID_PROJECTILE_ID)
 Warnings.Register(ENTITY_POOL_EMPTY, 31, 0, 31)
 
-scope Entity {
+namespace Entity {
 
 code()
-scope Spawn {
+namespace Spawn {
 a16()
 i16()
 EntityPoolEmpty:
@@ -40,7 +40,7 @@ EntityPoolEmpty:
 a16()
 i16()
 code()
-scope Spawn: {
+function Spawn {
 
 allocateTmpWord(xPos)
 allocateTmpWord(yPos)
@@ -107,7 +107,7 @@ allocateTmpWord(yPos)
 
         // Insert entity into the appropriate list
 
-        scope ActiveTest {
+        namespace ActiveTest {
             // entity is active if:
             //   entity list only contains active entities
             //   OR entity is inside active window
@@ -183,7 +183,7 @@ allocateTmpWord(yPos)
 rodata(rom0)
 // one if the entity list is always active
 // zero if entity list can be deactivated
-scope EntityAlwaysActiveList: {
+function EntityAlwaysActiveList {
     dw  1       // players
     dw  1       // bosses
     dw  0       // enemies
@@ -214,7 +214,7 @@ code()
 a16()
 i16()
 code()
-scope SpawnAtActionPoint: {
+function SpawnAtActionPoint {
 allocateTmpWord(tmp_compare)
 allocateTmpWord(tmp_entityToSpawn)
 
@@ -306,7 +306,7 @@ Return:
 a16()
 i16()
 code()
-scope SpawnEnemyProjectileFromActionPoint: {
+function SpawnEnemyProjectileFromActionPoint {
     ldx.w   #lists.enemyProjectiles
     bra     _SpawnProjectileFromActionPoint
 }
@@ -328,7 +328,7 @@ scope SpawnEnemyProjectileFromActionPoint: {
 a16()
 i16()
 code()
-scope SpawnPlayerProjectileFromActionPoint: {
+function SpawnPlayerProjectileFromActionPoint {
     ldx.w   #lists.playerProjectiles
 _fallthrough:
 }
@@ -343,7 +343,7 @@ _fallthrough:
 a16()
 i16()
 code()
-scope _SpawnProjectileFromActionPoint: {
+function _SpawnProjectileFromActionPoint {
 allocateTmpWord(tmp_listAddr)
 allocateTmpWord(tmp_compare)
 allocateTmpWord(tmp_projectileDataPtr)

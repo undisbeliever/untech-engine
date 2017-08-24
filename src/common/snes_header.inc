@@ -23,63 +23,63 @@
 
 // ::TODO Handle SRAM::
 
-scope REGION {
-    constant Japan(0x00)
-    constant US(0x01)
-    constant Europe(0x02)
-    constant Scandinavia(0x03)
-    constant Europe_french(0x06)
-    constant Dutch(0x07)
-    constant Spanish(0x08)
-    constant German(0x09)
-    constant Italian(0x0a)
-    constant Chinese(0x0b)
-    constant Korean(0x0d)
-    constant Common(0x0e)
-    constant Canada(0x0f)
-    constant Brazil(0x10)
-    constant Australia(0x11)
-    constant otherX(0x12)
-    constant otherY(0x13)
-    constant otherZ(0x14)
+namespace REGION {
+    constant Japan = 0x00
+    constant US = 0x01
+    constant Europe = 0x02
+    constant Scandinavia = 0x03
+    constant Europe_french = 0x06
+    constant Dutch = 0x07
+    constant Spanish = 0x08
+    constant German = 0x09
+    constant Italian = 0x0a
+    constant Chinese = 0x0b
+    constant Korean = 0x0d
+    constant Common = 0x0e
+    constant Canada = 0x0f
+    constant Brazil = 0x10
+    constant Australia = 0x11
+    constant otherX = 0x12
+    constant otherY = 0x13
+    constant otherZ = 0x14
 }
 
-scope CART_TYPE {
-    constant romOnly(0)
-    constant romRam(1)
-    constant romSram(2)
+namespace CART_TYPE {
+    constant romOnly = 0
+    constant romRam = 1
+    constant romSram = 2
 }
 if !{defined CART_TYPE} {
-    define CART_TYPE(romOnly)
+    define CART_TYPE = romOnly
 }
 
-scope ROM_SPEED {
-    constant fast(0x10)
-    constant slow(0x00)
+namespace ROM_SPEED {
+    constant fast = 0x10
+    constant slow = 0x00
 }
 if !{defined ROM_SPEED} {
-    define ROM_SPEED(slow)
+    define ROM_SPEED = slow
 }
 
 
-scope SnesHeader {
+namespace SnesHeader {
 
 if {ROM_SIZE} <= 1 {
-    constant _HEADER_ROM_SIZE(0x7)
+    constant _HEADER_ROM_SIZE = 0x7
 } else if {ROM_SIZE} <= 2 {
-    constant _HEADER_ROM_SIZE(0x8)
+    constant _HEADER_ROM_SIZE = 0x8
 } else if {ROM_SIZE} <= 4 {
-    constant _HEADER_ROM_SIZE(0x9)
+    constant _HEADER_ROM_SIZE = 0x9
 } else if {ROM_SIZE} <= 8 {
-    constant _HEADER_ROM_SIZE(0xA)
+    constant _HEADER_ROM_SIZE = 0xA
 } else if {ROM_SIZE} <= 16 {
-    constant _HEADER_ROM_SIZE(0xB)
+    constant _HEADER_ROM_SIZE = 0xB
 } else if {ROM_SIZE} <= 32 {
-    constant _HEADER_ROM_SIZE(0xC)
+    constant _HEADER_ROM_SIZE = 0xC
 } else if {ROM_SIZE} <= 64 {
-    constant _HEADER_ROM_SIZE(0xD)
+    constant _HEADER_ROM_SIZE = 0xD
 }
-constant _HEADER_MAP_MODE(MEMORY_MAP.{MEMORY_MAP}|ROM_SPEED.{ROM_SPEED})
+constant _HEADER_MAP_MODE = MEMORY_MAP.{MEMORY_MAP}|ROM_SPEED.{ROM_SPEED}
 
 private.seek(0x00ffb0)
     db  "FF"                    // $ffbo - 2 Digit marker code

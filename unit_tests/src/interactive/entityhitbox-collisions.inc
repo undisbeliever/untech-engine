@@ -2,21 +2,21 @@
 // Copyright (c) 2016 - 2017, Marcus Rowe <undisbeliever@gmail.com>.
 // Distributed under The MIT License: https://opensource.org/licenses/MIT
 
-scope InteractiveTests {
-scope EntityHitboxCollisionsTest {
+namespace InteractiveTests {
+namespace EntityHitboxCollisionsTest {
 
 // Tests:
 //  * EntityLoop
 //  * MetaSprite EntityHitbox Collisions
 
 
-scope PlayerEntity {
+namespace PlayerEntity {
     buildFunctionTable(BaseEntityFunctionTable, PlayerEntity)
     Entity.useDefaultRenderer()
 
-    constant N_FRAMES(8)
+    constant N_FRAMES = 8
 
-    scope EntityStruct {
+    namespace EntityStruct {
         childstruct(BaseEntity)
             field(selectedFrame, 2)
         endstruct()
@@ -25,7 +25,7 @@ scope PlayerEntity {
     a16()
     i16()
     code()
-    scope Init: {
+    function Init {
         stz.b   EntityStruct.selectedFrame
 
         lda.w   #0
@@ -79,7 +79,7 @@ scope PlayerEntity {
         rts
     }
 
-    scope CalculateAttackValue: {
+    function CalculateAttackValue {
         bcc     +
             Text.Console.PrintConstString("P.CalculateAttackValue (s)\n")
             rts
@@ -91,7 +91,7 @@ scope PlayerEntity {
     a16()
     i16()
     code()
-    scope TakeDamageFromEntity: {
+    function TakeDamageFromEntity {
         bcc     +
             Text.Console.PrintConstString("P.TakeDamageFromEntity (wk)\n")
             rts
@@ -101,7 +101,7 @@ scope PlayerEntity {
         rts
     }
 
-    scope BlockWithShield: {
+    function BlockWithShield {
         bcc     +
             Text.Console.PrintConstString("P.BlockWithShield (attack)\n")
             rts
@@ -110,18 +110,18 @@ scope PlayerEntity {
             rts
     }
 
-    scope CollideWithBody: {
+    function CollideWithBody {
         Text.Console.PrintConstString("P.CollideWithBody\n")
         rts
     }
 
-    scope CollideWithShield: {
+    function CollideWithShield {
         Text.Console.PrintConstString("P.CollideWithShield\n")
         rts
     }
 
     rodata(EN_RomData)
-    scope RomData: {
+    function RomData {
         dw  FunctionTable
         db  Entity.ListId.PLAYER        // initial List
         dw  MSFS.EhCollisionTest_Player // frameSetId
@@ -129,12 +129,12 @@ scope PlayerEntity {
     }
 
     rodata(EN_EntityList)
-    constant ENTITY_ID((pc() - Entity.Data.EntityList) / 2)
+    constant ENTITY_ID = (pc() - Entity.Data.EntityList) / 2
         dw  RomData
 }
 
 
-scope EnemyEntity {
+namespace EnemyEntity {
     buildFunctionTable(BaseEntityFunctionTable, EnemyEntity)
     Entity.useDefaultRenderer()
 
@@ -142,7 +142,7 @@ scope EnemyEntity {
     a16()
     i16()
     code()
-    scope Init: {
+    function Init {
         jmp     MetaSprite.SetFrame
     }
 
@@ -161,7 +161,7 @@ scope EnemyEntity {
         rts
     }
 
-    scope CalculateAttackValue: {
+    function CalculateAttackValue {
         bcc     +
             Text.Console.PrintConstString("E.CalculateAttackValue (s)\n")
             rts
@@ -173,7 +173,7 @@ scope EnemyEntity {
     a16()
     i16()
     code()
-    scope TakeDamageFromEntity: {
+    function TakeDamageFromEntity {
         bcc     +
             Text.Console.PrintConstString("E.TakeDamageFromEntity (wk)\n")
             rts
@@ -183,7 +183,7 @@ scope EnemyEntity {
         rts
     }
 
-    scope BlockWithShield: {
+    function BlockWithShield {
         bcc     +
             Text.Console.PrintConstString("E.BlockWithShield (attack)\n")
             rts
@@ -192,18 +192,18 @@ scope EnemyEntity {
             rts
     }
 
-    scope CollideWithBody: {
+    function CollideWithBody {
         Text.Console.PrintConstString("E.CollideWithBody\n")
         rts
     }
 
-    scope CollideWithShield: {
+    function CollideWithShield {
         Text.Console.PrintConstString("E.CollideWithShield\n")
         rts
     }
 
     rodata(EN_RomData)
-    scope RomData: {
+    function RomData {
         dw  FunctionTable
         db  Entity.ListId.ENEMY         // initial List
         dw  MSFS.EhCollisionTest_Enemy  // frameSetId
@@ -211,18 +211,18 @@ scope EnemyEntity {
     }
 
     rodata(EN_EntityList)
-    constant ENTITY_ID((pc() - Entity.Data.EntityList) / 2)
+    constant ENTITY_ID = (pc() - Entity.Data.EntityList) / 2
         dw  RomData
 }
 
 rodata(rom0)
-scope EnemyTable: {
-constant Y_DELTA(20)
-constant N_COLUMNS(4)
-constant Y_BOTTOM(Camera.ORIGIN + Camera.DISPLAY_HEIGHT - 30)
+function EnemyTable {
+constant Y_DELTA = 20
+constant N_COLUMNS = 4
+constant Y_BOTTOM = Camera.ORIGIN + Camera.DISPLAY_HEIGHT - 30
 
-constant X_LEFT(Camera.ORIGIN + Camera.DISPLAY_WIDTH / 2 - 10)
-constant X_RIGHT(Camera.ORIGIN + Camera.DISPLAY_WIDTH / 2 + 10)
+constant X_LEFT = Camera.ORIGIN + Camera.DISPLAY_WIDTH / 2 - 10
+constant X_RIGHT = Camera.ORIGIN + Camera.DISPLAY_WIDTH / 2 + 10
 
     struct(pc())
         field(xPos, 2)
@@ -237,7 +237,7 @@ constant X_RIGHT(Camera.ORIGIN + Camera.DISPLAY_WIDTH / 2 + 10)
     dw  X_RIGHT,    Y_BOTTOM - Y_DELTA * 1,  MSEO.EhCollisionTest_Enemy.Frames.row3
     dw  X_RIGHT,    Y_BOTTOM - Y_DELTA * 0,  MSEO.EhCollisionTest_Enemy.Frames.row4
 
-    constant N_ENEMIES((pc() - EnemyTable) / size)
+    constant N_ENEMIES = (pc() - EnemyTable) / size
 }
 
 
@@ -246,8 +246,8 @@ a16()
 i16()
 code()
 Test.add("EntityHitbox Collisions Tst")
-scope Test: {
-constant tmp_index(Test.tmp)
+function Test {
+constant tmp_index = Test.tmp
 
     jsr     EntityLoop.Init
 

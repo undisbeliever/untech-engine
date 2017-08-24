@@ -11,7 +11,7 @@
 
 allocate(frameCounter, shadow, 2)
 
-scope NmiHandler {
+namespace NmiHandler {
 // VBlank code, increase frameCounter
 //
 // REQUIRES: 16 bit A, 8 bit Index, DB = $80, DP = $4300
@@ -26,7 +26,7 @@ macro FrameCounter.VBlank() {
 au()
 iu()
 code()
-scope WaitFrame: {
+function WaitFrame {
     lda.w   frameCounter
 
     -

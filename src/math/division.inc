@@ -9,9 +9,9 @@
 // Distributed under The MIT License: https://opensource.org/licenses/MIT
 
 
-arch snes.cpu
+architecture wdc65816
 
-scope Math {
+namespace Math {
 
 code()
 
@@ -30,7 +30,7 @@ code()
 a8()
 i16()
 code()
-scope Divide.u16y_u8a: {
+function Divide.u16y_u8a {
     phd
     pea     WRDIV & 0xff00
     pld
@@ -67,7 +67,7 @@ scope Divide.u16y_u8a: {
 au()
 i16()
 code()
-scope Divide.u16y_s16x: {
+function Divide.u16y_s16x {
     cpx.w   #$8000
     bcc     Divide.u16y_u16x
 
@@ -107,7 +107,7 @@ a16()
 au()
 i16()
 code()
-scope Divide.s16y_s16x: {
+function Divide.s16y_s16x {
     cpy.w   #$8000
     bcc     YPos
 
@@ -190,7 +190,7 @@ a16()
 au()
 i16()
 code()
-scope Divide.s16y_u16x: {
+function Divide.s16y_u16x {
     cpy.w   #$8000
     bcc     Divide.u16y_u16x
 
@@ -232,7 +232,7 @@ a16()
 au()
 i16()
 code()
-scope Divide.u16y_u16x: {
+function Divide.u16y_u16x {
     // Inspiration: http://codebase64.org/doku.php?id=base:16bit_division_16-bit_result
 
     // if divisor < 256
@@ -246,7 +246,7 @@ scope Divide.u16y_u16x: {
     //          remainder -= divisor
     //          result++
 
-constant divisor(tmp1)
+constant divisor = tmp1
 
     phd
     php
@@ -296,7 +296,7 @@ a16()
     stx.b   divisor
     ldx.w   #0          // Remainder
 
-    evaluate n(0)
+    evaluate n = 0
     while {n} < 16 {
         tya         // Dividend / result
         asl
@@ -313,7 +313,7 @@ a16()
             iny     // Result
         +
 
-        evaluate n({n} + 1)
+        evaluate n = {n} + 1
     }
 
     plp
@@ -338,7 +338,7 @@ a16()
 au()
 iu()
 code()
-scope Divide.s32_s32: {
+function Divide.s32_s32 {
     php
     rep     #$30
 a16()
@@ -443,7 +443,7 @@ DividendPositive:
 au()
 iu()
 code()
-scope Divide.u32_u32: {
+function Divide.u32_u32 {
 
     // Inspiration: http://codebase64.org/doku.php?id=base:16bit_division_16-bit_result
 
@@ -518,7 +518,7 @@ AfterRegisters:
 au()
 iu()
 code()
-scope Divide.u32_u8a: {
+function Divide.u32_u8a {
     php
     phd
 

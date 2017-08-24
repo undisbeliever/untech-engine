@@ -2,13 +2,13 @@
 // Copyright (c) 2016 - 2017, Marcus Rowe <undisbeliever@gmail.com>.
 // Distributed under The MIT License: https://opensource.org/licenses/MIT
 
-scope EntityTest {
+namespace EntityTest {
 
 a16()
 i16()
 code()
 Test.add("Entity.Init")
-scope Init: {
+function Init {
     jsr     Entity.Init
 
     jsr     _FreeListLength
@@ -29,8 +29,8 @@ a16()
 i16()
 code()
 Test.add("Entities.ClearTryToActivateAgainList")
-scope ClearTryToActivateAgainList: {
-constant tmp(Test.tmp)
+function ClearTryToActivateAgainList {
+constant tmp = Test.tmp
 
     jsr     Entity.Init
 

@@ -14,9 +14,9 @@
 // Distributed under The MIT License: https://opensource.org/licenses/MIT
 
 
-scope MEMORY_MAP {
-    constant LOROM(0x20)
-    constant HIROM(0x21)
+namespace MEMORY_MAP {
+    constant LOROM = 0x20
+    constant HIROM = 0x21
 }
 
 if !{defined MEMORY_MAP} {
@@ -32,7 +32,7 @@ if {ROM_SIZE} > 32 {
     error "ROM_SIZE is invalid"
 }
 
-scope private {
+namespace private {
     if MEMORY_MAP.{MEMORY_MAP} == MEMORY_MAP.LOROM {
         macro seek(offset) {
             origin (({offset} & 0x3f0000) >> 1) | ({offset} & 0x7fff)
@@ -67,26 +67,26 @@ scope private {
     }
 
     macro checkBlockIsUnused(evaluate start, evaluate end) {
-        evaluate n(0)
+        evaluate n = 0
         while {n} < {__MEMORY__.romBlockNames.count} {
-            define b(__MEMORY__.romBlocks.{__MEMORY__.romBlockNames.{n}})
+            define b = __MEMORY__.romBlocks.{__MEMORY__.romBlockNames.{n}}
 
             if ({start} & 0x3fffff) <= ({b}.end & 0x3fffff) && ({end} & 0x3fffff) >= ({b}.start & 0x3fffff) {
                 error "ROM Block `{name}` overlaps ROM block `{bn}`"
             }
 
-            evaluate n({n} + 1)
+            evaluate n = {n} + 1
         }
     }
 }
 
 // When set to non-zero then no more memory can be created or allocated.
-variable __MEMORY__.finalized(0)
+variable __MEMORY__.finalized = 0
 
 // Number of ROM Blocks defined in the `__MEMORY__.romBlockNames.<n>` defines.
 //
 // It is a define because editing of romBlockNames is only done on the root scope.
-evaluate __MEMORY__.romBlockNames.count(0)
+evaluate __MEMORY__.romBlockNames.count = 0
 
 
 // Creates a new data block in a given ROM location.
@@ -99,7 +99,7 @@ evaluate __MEMORY__.romBlockNames.count(0)
 //  * id - the name of the block
 //  * start - the starting address of the block
 //  * end - the ending address of the block
-macro createDataBlock(name, evaluate start, evaluate end) {
+inline createDataBlock(name, evaluate start, evaluate end) {
     if __MEMORY__.finalized {
         error "Memory module has been finalized, cannot create Data Block"
     }
@@ -122,19 +122,19 @@ macro createDataBlock(name, evaluate start, evaluate end) {
 
     private.checkBlockIsUnused({start}, {end})
 
-    global define __MEMORY__.romBlocks.{name}()
-    global variable __MEMORY__.romBlocks.{name}.pos({start})
-    constant __MEMORY__.romBlocks.{name}.index({__MEMORY__.romBlockNames.count})
-    constant __MEMORY__.romBlocks.{name}.start({start})
-    constant __MEMORY__.romBlocks.{name}.end({end})
+    define __MEMORY__.romBlocks.{name}
+    variable __MEMORY__.romBlocks.{name}.pos = {start}
+    constant __MEMORY__.romBlocks.{name}.index = {__MEMORY__.romBlockNames.count}
+    constant __MEMORY__.romBlocks.{name}.start = {start}
+    constant __MEMORY__.romBlocks.{name}.end = {end}
 
-    global define __MEMORY__.romBlockNames.{__MEMORY__.romBlockNames.count}({name})
-    global evaluate __MEMORY__.romBlockNames.count({__MEMORY__.romBlockNames.count} + 1)
+    define __MEMORY__.romBlockNames.{__MEMORY__.romBlockNames.count} = {name}
+    evaluate __MEMORY__.romBlockNames.count = {__MEMORY__.romBlockNames.count} + 1
 }
 
 
 // Index of the current ROM block.
-variable __MEMORY__.currentRomBlockIndex(-1)
+variable __MEMORY__.currentRomBlockIndex = -1
 
 // seeks to the next position in the selected block id
 macro rodata(id) {
@@ -147,8 +147,8 @@ macro rodata(id) {
     }
 
     if __MEMORY__.currentRomBlockIndex >= 0 {
-        evaluate cbi(__MEMORY__.currentRomBlockIndex)
-        define cb({__MEMORY__.romBlockNames.{cbi}})
+        evaluate cbi = __MEMORY__.currentRomBlockIndex
+        define cb = {__MEMORY__.romBlockNames.{cbi}}
 
         if (pc() - 1) > __MEMORY__.romBlocks.{cb}.end {
             error "Overflow in rom block {cb}"
@@ -165,7 +165,7 @@ macro rodata(id) {
 }
 
 // duplicate of `createDataBlock`, written for clarity.
-macro createCodeBlock(id, start, end) {
+inline createCodeBlock(id, start, end) {
     createDataBlock({id}, {start}, {end})
 }
 
@@ -180,8 +180,8 @@ macro code() {
 
 
 // Creates a constant containing the starting address of a block
-macro storeBlockStart(name, blockId) {
-    constant {name}(__MEMORY__.romBlocks.{blockId}.start)
+inline storeBlockStart(name, blockId) {
+    constant {name} = __MEMORY__.romBlocks.{blockId}.start
 }
 
 // Creates a constant containing the total number bytes used by a block.
@@ -189,8 +189,8 @@ macro storeBlockStart(name, blockId) {
 // This value is NOT the current number of bytes used. Instead the
 // constant will contain the total number of bytes used by the block
 // when `finalizeMemory` is called.
-macro storeBlockUsed(name, blockId) {
-    constant {name}(__MEMORY__.romBlocks.{blockId}.last - __MEMORY__.romBlocks.{blockId}.start)
+inline storeBlockUsed(name, blockId) {
+    constant {name} = __MEMORY__.romBlocks.{blockId}.last - __MEMORY__.romBlocks.{blockId}.start
 }
 
 // Creates a constant containing the final number of elements in a
@@ -202,25 +202,25 @@ macro storeBlockUsed(name, blockId) {
 // contain the total number of elements in the block when
 // `finalizeMemory` is called.
 // program.
-macro storeBlockCount(name, blockId, evaluate elementSize) {
+inline storeBlockCount(name, blockId, evaluate elementSize) {
     if {elementSize} <= 0 {
         error "Invalid elementSize"
     }
 
-    constant {name}((__MEMORY__.romBlocks.{blockId}.last - __MEMORY__.romBlocks.{blockId}.start) / {elementSize})
+    constant {name} = (__MEMORY__.romBlocks.{blockId}.last - __MEMORY__.romBlocks.{blockId}.start) / {elementSize}
 }
 
 
-constant __MEMORY__.blockStack.max(4)
-variable __MEMORY__.blockStack.size(0)
-variable __MEMORY__.blockStack.0(-1)
-variable __MEMORY__.blockStack.1(-1)
-variable __MEMORY__.blockStack.2(-1)
-variable __MEMORY__.blockStack.3(-1)
+constant __MEMORY__.blockStack.max = 4
+variable __MEMORY__.blockStack.size = 0
+variable __MEMORY__.blockStack.0 = -1
+variable __MEMORY__.blockStack.1 = -1
+variable __MEMORY__.blockStack.2 = -1
+variable __MEMORY__.blockStack.3 = -1
 
 // pushes the current code/data block onto the stack
 macro pushBlock() {
-    evaluate stackIndex(__MEMORY__.blockStack.size)
+    evaluate stackIndex = __MEMORY__.blockStack.size
     __MEMORY__.blockStack.{stackIndex} = __MEMORY__.currentRomBlockIndex
 
     __MEMORY__.blockStack.size = __MEMORY__.blockStack.size + 1
@@ -238,8 +238,8 @@ macro popBlock() {
 
     __MEMORY__.blockStack.size = __MEMORY__.blockStack.size - 1
 
-    evaluate stackIndex(__MEMORY__.blockStack.size)
-    evaluate blockIndex(__MEMORY__.blockStack.{stackIndex})
+    evaluate stackIndex = __MEMORY__.blockStack.size
+    evaluate blockIndex = __MEMORY__.blockStack.{stackIndex}
     rodata({__MEMORY__.romBlockNames.{blockIndex}})
 }
 
@@ -248,7 +248,7 @@ macro popBlock() {
 // Number of ROM Blocks defined in the `__MEMORY__.ramBlockNames.<n>` defines.
 //
 // It is a define because editing of ramBlockNames is only done on the root scope.
-evaluate __MEMORY__.ramBlockNames.count(0)
+evaluate __MEMORY__.ramBlockNames.count = 0
 
 // Create a new ram block with a given position and size.
 //
@@ -266,7 +266,7 @@ evaluate __MEMORY__.ramBlockNames.count(0)
 //   * `__MEMORY__.ramBlocks.{id}.remaining` -  the number of bytes remaining in the block
 //   * `__MEMORY__.ramBlocks.{id}.start` - the starting address of the block
 //   * `__MEMORY__.ramBlocks.{id}.end` - the last address of the block
-macro createRamBlock(id, evaluate start, evaluate end) {
+inline createRamBlock(id, evaluate start, evaluate end) {
     if __MEMORY__.finalized {
         error "Memory module has been finalized, cannot create RAM Block"
     }
@@ -278,20 +278,20 @@ macro createRamBlock(id, evaluate start, evaluate end) {
         error "RAM Block `{id}` cannot have end before start"
     }
 
-    global define __MEMORY__.ramBlockNames.{__MEMORY__.ramBlockNames.count}({id})
-    global evaluate __MEMORY__.ramBlockNames.count({__MEMORY__.ramBlockNames.count} + 1)
+    define __MEMORY__.ramBlockNames.{__MEMORY__.ramBlockNames.count} = {id}
+    evaluate __MEMORY__.ramBlockNames.count = {__MEMORY__.ramBlockNames.count} + 1
 
-    global define __MEMORY__.ramBlocks.{id}()
-    constant __MEMORY__.ramBlocks.{id}.start({start})
-    constant __MEMORY__.ramBlocks.{id}.end({end})
+    define __MEMORY__.ramBlocks.{id}
+    constant __MEMORY__.ramBlocks.{id}.start = {start}
+    constant __MEMORY__.ramBlocks.{id}.end = {end}
 
-    global variable __MEMORY__.ramBlocks.{id}.pos({start})
-    global variable __MEMORY__.ramBlocks.{id}.remaining({end} - {start} + 1)
-    global variable __MEMORY__.ramBlocks.{id}.size(0)
+    variable __MEMORY__.ramBlocks.{id}.pos = {start}
+    variable __MEMORY__.ramBlocks.{id}.remaining = {end} - {start} + 1
+    variable __MEMORY__.ramBlocks.{id}.size = 0
 }
 
 // Allocate memory from the RAM block to a given constant name
-macro allocate(name, blockId, evaluate size) {
+inline allocate(name, blockId, evaluate size) {
     if __MEMORY__.finalized {
         error "Memory module has been finalized, cannot allocate memory"
     }
@@ -304,7 +304,7 @@ macro allocate(name, blockId, evaluate size) {
         error "Cannot allocate {size} byte(s) from block {blockId}: Not enough space"
     }
 
-    constant {name}(__MEMORY__.ramBlocks.{blockId}.pos)
+    constant {name} = __MEMORY__.ramBlocks.{blockId}.pos
 
     __MEMORY__.ramBlocks.{blockId}.pos = __MEMORY__.ramBlocks.{blockId}.pos + {size}
     __MEMORY__.ramBlocks.{blockId}.size = __MEMORY__.ramBlocks.{blockId}.size + {size}
@@ -317,7 +317,7 @@ macro allocate(name, blockId, evaluate size) {
 // Prints memory usage if `SHOW_MEMORY_USAGE` is defined.
 //
 // This macro MUST BE called ONCE at the end of the program.
-macro finalizeMemory() {
+inline finalizeMemory() {
     // update position of current block
     rodata(code)
 
@@ -337,10 +337,10 @@ macro finalizeMemory() {
     }
 }
 
-macro _finalizeMemory_buildUseConstants(evaluate n) {
+inline _finalizeMemory_buildUseConstants(evaluate n) {
     // build used constants
     if {n} < {__MEMORY__.romBlockNames.count} {
-        constant __MEMORY__.romBlocks.{__MEMORY__.romBlockNames.{n}}.last(__MEMORY__.romBlocks.{__MEMORY__.romBlockNames.{n}}.pos)
+        constant __MEMORY__.romBlocks.{__MEMORY__.romBlockNames.{n}}.last = __MEMORY__.romBlocks.{__MEMORY__.romBlockNames.{n}}.pos
         _finalizeMemory_buildUseConstants({n} + 1)
     }
 }
@@ -354,19 +354,19 @@ macro __printMemoryUsage() {
     print "--------+---------+---------+---------+--------------------------\n"
     print " 00ff80 |      80 |      80 |       0 | SNES Header\n"
 
-    evaluate totalSize(80)
-    evaluate totalUsed(80)
+    evaluate totalSize = 80
+    evaluate totalUsed = 80
 
-    evaluate n(0)
+    evaluate n = 0
     while {n} < {__MEMORY__.romBlockNames.count} {
-        define blockName({__MEMORY__.romBlockNames.{n}})
-        define block(__MEMORY__.romBlocks.{blockName})
+        define blockName = {__MEMORY__.romBlockNames.{n}}
+        define block = __MEMORY__.romBlocks.{blockName}
 
-        evaluate size({block}.end - {block}.start + 1)
-        evaluate used({block}.pos - {block}.start)
+        evaluate size = {block}.end - {block}.start + 1
+        evaluate used = {block}.pos - {block}.start
 
-        evaluate totalSize({totalSize} + {size})
-        evaluate totalUsed({totalUsed} + {used})
+        evaluate totalSize = {totalSize} + {size}
+        evaluate totalUsed = {totalUsed} + {used}
 
         print " "
         print_hex(6, {block}.start)
@@ -378,7 +378,7 @@ macro __printMemoryUsage() {
         print_padded(7, {size} - {used})
         print " | {blockName}\n"
 
-        evaluate n({n} + 1)
+        evaluate n = {n} + 1
     }
 
     print "========+=========+=========+=========+==========================\n"
@@ -401,10 +401,10 @@ macro __printMemoryUsage() {
 
     // Don't print totals for RAM blocks as they may overlap
 
-    evaluate n(0)
+    evaluate n = 0
     while {n} < {__MEMORY__.ramBlockNames.count} {
-        define blockName({__MEMORY__.ramBlockNames.{n}})
-        define block(__MEMORY__.ramBlocks.{blockName})
+        define blockName = {__MEMORY__.ramBlockNames.{n}}
+        define block = __MEMORY__.ramBlocks.{blockName}
 
         print " "
         print_hex(6, {block}.start)
@@ -416,7 +416,7 @@ macro __printMemoryUsage() {
         print_padded(7, {block}.remaining)
         print " | {blockName}\n"
 
-        evaluate n({n} + 1)
+        evaluate n = {n} + 1
     }
 }
 

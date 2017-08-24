@@ -2,19 +2,19 @@
 // Copyright (c) 2016 - 2017, Marcus Rowe <undisbeliever@gmail.com>.
 // Distributed under The MIT License: https://opensource.org/licenses/MIT
 
-scope MathTest {
+namespace MathTest {
 
 allocate(tableIndex, wram7e, 2)
 allocate(tableData, wram7e, 16)
 
 
-macro TableLoop(Table, evaluate size) {
+inline TableLoop(Table, evaluate size) {
     assert16a()
     assert16i()
 
     assert({size} > 1 && {size} <= 16)
 
-    constant TableBank({Table} >> 16)
+    constant TableBank = {Table} >> 16
 
     ldx.w   #{Table}
     stx.w   tableIndex

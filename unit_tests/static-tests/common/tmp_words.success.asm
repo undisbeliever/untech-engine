@@ -2,10 +2,10 @@
 
 // ::TODO validate binary output::
 
-arch snes.cpu
+architecture wdc65816
 
-define MEMORY_MAP(LOROM)
-define ROM_SIZE(1)
+define MEMORY_MAP = LOROM
+define ROM_SIZE = 1
 
 include "../../../src/common/assert.inc"
 include "../../../src/common/memory.inc"
@@ -16,7 +16,7 @@ createRamBlock(shadow, 0x7e0100, 0x7e1f80)
 createRamBlock(stack,  0x7e1f80, 0x7e1fff)
 
 
-scope test {
+namespace test {
     // test requesting a tmp before it's marked
 
     allocateTmpWord(tmp0)
@@ -36,7 +36,7 @@ markTmpWord(dataBlock + 0x3e)
 markTmpWord(dataBlock + 0x4e)
 
 
-scope test {
+namespace test {
     // test requesting a tmp after it's marked
 
     allocateTmpWord(tmp2)

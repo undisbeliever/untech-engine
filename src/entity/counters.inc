@@ -9,7 +9,7 @@
 // Distributed under The MIT License: https://opensource.org/licenses/MIT
 
 
-scope Entity {
+namespace Entity {
 
 // Counts the number of enemies of a specific Id
 //
@@ -20,7 +20,7 @@ scope Entity {
 a16()
 i16()
 code()
-scope CountEnemiesWithId: {
+function CountEnemiesWithId {
 allocateTmpWord(tmp_count)
 
     asl
@@ -61,7 +61,7 @@ EmptyList:
 a16()
 i16()
 code()
-scope CountActiveEnemies: {
+function CountActiveEnemies {
     lda.w   #0
     ldx.w   lists.enemies
     beq     EndLoop
@@ -103,7 +103,7 @@ macro CountEntitiesInList(listId) {
 a16()
 i16()
 code()
-scope CountEntitiesInList: {
+function CountEntitiesInList {
     lda.w   #0
     ldy.w   0,x
     beq     EndLoop

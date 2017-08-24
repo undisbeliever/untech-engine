@@ -4,7 +4,7 @@
 // Turns the current scope into a struct.
 //
 // usage:
-//    scope point {
+//    namespace point {
 //      struct()
 //        struct_maxsize(4)  // optional
 //
@@ -21,13 +21,13 @@
 // NOTE: Inner scopes will not work with struct inheritance.
 //
 // usage:
-//    scope super {
+//    namespace super {
 //      basestruct()
 //        struct_maxsize(16)  // optional
 //        field(a, 2)
 //      endstruct()
 //    }
-//    scope child {
+//    namespace child {
 //      childstruct(super)
 //        field(b, 2)
 //      endstruct()
@@ -41,31 +41,31 @@
 // Distributed under The MIT License: https://opensource.org/licenses/MIT
 
 
-macro struct(evaluate start) {
+inline struct(evaluate start) {
     if {defined __STRUCT__} {
         error "scope is already a struct"
     }
 
-    global define __STRUCT__()
+    define __STRUCT__
 
-    constant __STRUCT__.start({start})
-    global variable __STRUCT__.inStruct(0x1337)
-    global variable __STRUCT__.isBaseStruct(0)
-    global variable __STRUCT__.pos({start})
-    global variable __STRUCT__.size(0)
-    global variable __STRUCT__.maxSize(0)
+    constant __STRUCT__.start = {start}
+    variable __STRUCT__.inStruct = 0x1337
+    variable __STRUCT__.isBaseStruct = 0
+    variable __STRUCT__.pos = {start}
+    variable __STRUCT__.size = 0
+    variable __STRUCT__.maxSize = 0
 }
-macro struct() {
+inline struct() {
     struct(0)
 }
 
-macro basestruct_offset(evaluate start) {
+inline basestruct_offset(evaluate start) {
     struct({start})
 
     __STRUCT__.isBaseStruct = 1
-    global define __STRUCT__.fields.size(0)
+    define __STRUCT__.fields.size = 0
 }
-macro basestruct() {
+inline basestruct() {
     basestruct_offset(0)
 }
 
@@ -82,59 +82,59 @@ macro validateStructIsBase(struct) {
     }
 }
 
-macro basestruct(parent) {
+inline basestruct(parent) {
     validateStructIsBase({parent})
 
     basestruct_offset({parent}.__STRUCT__.start)
     _childstruct_fields({parent})
 }
 
-macro childstruct(parent) {
+inline childstruct(parent) {
     validateStructIsBase({parent})
 
     struct({parent}.__STRUCT__.start)
     _childstruct_fields({parent})
 }
 
-macro _childstruct_fields(parent) {
+inline _childstruct_fields(parent) {
     __STRUCT__.maxSize = {parent}.__STRUCT__.maxSize
 
-    evaluate n(0)
+    evaluate n = 0
     while {n} < {{parent}.__STRUCT__.fields.size} {
         field({{parent}.__STRUCT__.fields.{n}.name}, {{parent}.__STRUCT__.fields.{n}.size})
 
-        evaluate n({n} + 1)
+        evaluate n = {n} + 1
     }
 
     assert(__STRUCT__.pos == {parent}.__STRUCT__.pos)
 }
 
 // Creates a field in a struct of a given size.
-macro field(name, evaluate size) {
+inline field(name, evaluate size) {
     if __STRUCT__.inStruct != 0x1337 {
         error "Not in a struct"
     }
     if __STRUCT__.isBaseStruct {
-        global define __STRUCT__.fields.{__STRUCT__.fields.size}.name({name})
-        global evaluate __STRUCT__.fields.{__STRUCT__.fields.size}.size({size})
-        global evaluate __STRUCT__.fields.size({__STRUCT__.fields.size} + 1)
+        define __STRUCT__.fields.{__STRUCT__.fields.size}.name = {name}
+        evaluate __STRUCT__.fields.{__STRUCT__.fields.size}.size = {size}
+        evaluate __STRUCT__.fields.size = {__STRUCT__.fields.size} + 1
     }
 
     assert({size} > 0)
 
-    constant {name}(__STRUCT__.pos)
+    constant {name} = __STRUCT__.pos
     __STRUCT__.pos = __STRUCT__.pos + {size}
     __STRUCT__.size = __STRUCT__.size + {size}
 
     if __STRUCT__.maxSize > 0 && __STRUCT__.size > __STRUCT__.maxSize {
-        evaluate size(__STRUCT__.size)
-        evaluate maxSize(__STRUCT__.maxSize)
+        evaluate size = __STRUCT__.size
+        evaluate maxSize = __STRUCT__.maxSize
         error "struct is too large, (size {size}, max {maxSize})"
     }
 }
 
 // Limits the size of the current struct to `maxSize` bytes
-macro struct_maxsize(evaluate maxSize) {
+inline struct_maxsize(evaluate maxSize) {
     assert({maxSize} > 0)
 
     if __STRUCT__.inStruct != 0x1337 {
@@ -148,21 +148,21 @@ macro struct_maxsize(evaluate maxSize) {
 
 // Ends the struct, will create the `size` field.
 // Also errors out if the struct is too large
-macro endstruct() {
+inline endstruct() {
     if __STRUCT__.inStruct != 0x1337 {
         error "Not in a struct"
     }
 
     if __STRUCT__.maxSize > 0 && __STRUCT__.size > __STRUCT__.maxSize {
-        evaluate size(__STRUCT__.size)
-        evaluate maxSize(__STRUCT__.maxSize)
+        evaluate size = __STRUCT__.size
+        evaluate maxSize = __STRUCT__.maxSize
         error "struct is too large, (size {size}, max {maxSize})"
     }
 
     __STRUCT__.inStruct = 0
-    global define __STRUCT__(1)
+    define __STRUCT__ = 1
 
-    constant size(__STRUCT__.size)
+    constant size = __STRUCT__.size
 }
 
 // vim: ft=bass-65816 ts=4 sw=4 et:

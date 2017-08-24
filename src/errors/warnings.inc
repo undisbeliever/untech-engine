@@ -10,7 +10,7 @@
 // Distributed under The MIT License: https://opensource.org/licenses/MIT
 
 
-scope Warnings {
+namespace Warnings {
 
 // The current value of the warning buffer.
 // Will be uploaded to CGRAM if MSB is clear.
@@ -20,7 +20,7 @@ scope Warnings {
 allocate(current, shadow, 2)
 
 // The CGRAM color position to use for notifying the user.
-constant CGRAM_POS(1)
+constant CGRAM_POS = 1
 
 
 // Issue a warning.
@@ -53,12 +53,12 @@ macro Warn(id) {
 //
 // PARAM: id - warning identifier
 // PARAM: r,g,b - the RGB values of the warning
-macro Register(id, variable b, variable g, variable r) {
+inline Register(id, variable b, variable g, variable r) {
     b = b & 31
     g = g & 31
     r = r & 31
 
-    constant __WARNINGS__.ids.{id}((b << 10) | (g << 5) | r)
+    constant __WARNINGS__.ids.{id} = (b << 10) | (g << 5) | r
 
     // Detect similar warning colors
     Warnings._CheckColorUnique({id}, b, g, r)
@@ -67,7 +67,7 @@ macro Register(id, variable b, variable g, variable r) {
 // Tests that the warning color is unique.
 // Aborts assembly if the color has been used before.
 // Adds `id` to colors list if color is unique.
-macro _CheckColorUnique(id, variable b, variable g, variable r) {
+inline _CheckColorUnique(id, variable b, variable g, variable r) {
     b = (b + %100) >> 3
     g = (g + %100) >> 3
     r = (r + %100) >> 3
@@ -86,7 +86,7 @@ macro _CheckColorUnique(id, variable b, variable g, variable r) {
 // Tests that the warning color is unique.
 // Aborts assembly if the color has been used before.
 // Adds `id` to colors list if color is unique.
-macro _CheckColorUnique(id, evaluate lc) {
+inline _CheckColorUnique(id, evaluate lc) {
     if {lc} == 0 {
         error "warningId {id} cannot be black"
     } else if {lc} == %111111 {
@@ -96,7 +96,7 @@ macro _CheckColorUnique(id, evaluate lc) {
     if {defined __WARNINGS__.colors.{lc}} {
         warning "Cannot register warning color {id}: too similar to {__WARNINGS__.colors.{lc}}"
     } else {
-        global define __WARNINGS__.colors.{lc}({id})
+        define __WARNINGS__.colors.{lc} = {id}
     }
 }
 
@@ -137,7 +137,7 @@ macro Reset_a16() {
 au()
 iu()
 code()
-scope Warn_i16: {
+function Warn_i16 {
     php
     rep #$30
 a16()
@@ -155,7 +155,7 @@ i16()
 au()
 iu()
 code()
-scope Warn_a16: {
+function Warn_a16 {
     php
 
     rep #$30
@@ -185,7 +185,7 @@ macro VBlank() {
     assert16a()
     assert8i()
 
-    scope Warnings: {
+    function Warnings {
         ldy.w   Warnings.current + 1
         bmi     Skip
             ldx.b   #Warnings.CGRAM_POS

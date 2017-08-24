@@ -9,7 +9,7 @@
 // Distributed under The MIT License: https://opensource.org/licenses/MIT
 
 
-scope Entity {
+namespace Entity {
 
 // Processes the render loop
 //
@@ -20,7 +20,7 @@ scope Entity {
 a16()
 i16()
 code()
-scope RenderLoop: {
+function RenderLoop {
     macro _jsr_RenderList(name) {
         lda.w   lists.{name}
         jsr     RenderList
@@ -49,7 +49,7 @@ End:
 a16()
 i16()
 code()
-scope RenderList: {
+function RenderList {
 assert(pc() == RenderLoop.End)
 
     beq     Skip

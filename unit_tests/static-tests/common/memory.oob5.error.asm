@@ -1,7 +1,7 @@
 // Allocate block inside shadow RAM
 
-define MEMORY_MAP(HIROM)
-define ROM_SIZE(32)
+define MEMORY_MAP = HIROM
+define ROM_SIZE = 32
 
 include "../../../src/common/memory.inc"
 

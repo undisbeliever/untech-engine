@@ -1,6 +1,6 @@
 // Test cpu.inc
 
-arch snes.cpu
+architecture wdc65816
 
 include "../../../src/common/assert.inc"
 include "../../../src/common/cpu.inc"
@@ -19,7 +19,7 @@ assert8i()
 
 punknown()
 
-evaluate oldPc(pc())
+evaluate oldPc = pc()
 
 rep($20)
 assert16a()

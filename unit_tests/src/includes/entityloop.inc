@@ -2,8 +2,8 @@
 // Copyright (c) 2016 - 2017, Marcus Rowe <undisbeliever@gmail.com>.
 // Distributed under The MIT License: https://opensource.org/licenses/MIT
 
-scope InteractiveTests {
-scope EntityLoop {
+namespace InteractiveTests {
+namespace EntityLoop {
 
 // Initialize the Entity Loop
 //
@@ -12,7 +12,7 @@ scope EntityLoop {
 a16()
 i16()
 code()
-scope Init: {
+function Init {
 
     // Setup The screen
     // ----------------
@@ -60,7 +60,7 @@ a16()
 a16()
 i16()
 code()
-scope Cleanup: {
+function Cleanup {
     jsr     Test.ResetPpuState
 
     sec
@@ -77,7 +77,7 @@ scope Cleanup: {
 a16()
 i16()
 code()
-scope ProcessUntilButtonPress: {
+function ProcessUntilButtonPress {
     Loop:
         Controller.UpdateControllerState()
 
@@ -103,7 +103,7 @@ scope ProcessUntilButtonPress: {
 a16()
 i16()
 code()
-scope ProcessFrame: {
+function ProcessFrame {
     Controller.UpdateControllerState()
 
     jsr     MetaSprite.Render.InitLoop

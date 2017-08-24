@@ -2,16 +2,16 @@
 // Copyright (c) 2016 - 2017, Marcus Rowe <undisbeliever@gmail.com>.
 // Distributed under The MIT License: https://opensource.org/licenses/MIT
 
-scope InteractiveTests {
-scope HdmaCircularWindowTest {
+namespace InteractiveTests {
+namespace HdmaCircularWindowTest {
 
 // Tests:
 //  * Hdma
 //  * Hdma.CircularWindow
 
-constant xPos(Test.dpTmp)
-constant yPos(Test.dpTmp + 2)
-constant radius(Test.dpTmp + 4)
+constant xPos = Test.dpTmp
+constant yPos = Test.dpTmp + 2
+constant radius = Test.dpTmp + 4
 
 
 // Prints the positions on the screen
@@ -19,8 +19,8 @@ macro PrintWindowInput() {
     assert8a()
     assert16i()
 
-    constant textXPos((Text.Console.TEXT_WIDTH - 12) / 2)
-    constant textYPos((Text.Console.TEXT_HEIGHT -  6) / 2)
+    constant textXPos = (Text.Console.TEXT_WIDTH - 12) / 2
+    constant textYPos = (Text.Console.TEXT_HEIGHT -  6) / 2
 
 
     Text.Console.SetCursor(textXPos, textYPos)
@@ -48,7 +48,7 @@ a16()
 i16()
 code()
 Test.add("HDMA Circular Window Test")
-scope Test: {
+function Test {
     lda.w   #Camera.DISPLAY_WIDTH / 2
     sta.b   xPos
 

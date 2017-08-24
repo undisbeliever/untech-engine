@@ -9,7 +9,7 @@
 // Distributed under The MIT License: https://opensource.org/licenses/MIT
 
 
-scope MetaSprite {
+namespace MetaSprite {
 
 // Initializes the MetaSprite Engine
 //
@@ -19,7 +19,7 @@ scope MetaSprite {
 a16()
 i16()
 code()
-scope Init: {
+function Init {
     MetaSprite.Render._Init()
 
     sep     #$30
@@ -52,7 +52,7 @@ macro _InitEntity() {
     assert16a()
     assert16i()
 
-    scope InitEntity: {
+    function InitEntity {
         stz.b   BaseEntity.MetaSprite.status
         stz.b   BaseEntity.MetaSprite.currentFrame
 
@@ -92,7 +92,7 @@ macro EntityDestructor() {
     assert16a()
     assert16i()
 
-    scope EntityDestructor: {
+    function EntityDestructor {
         jsr     MetaSprite.Deactivate
         stz.b   BaseEntity.MetaSprite.frameSet
         stz.b   BaseEntity.MetaSprite.currentFrame
@@ -114,7 +114,7 @@ macro EntityDestructor() {
 a16()
 i16()
 code()
-scope Activate: {
+function Activate {
     ldx.b   BaseEntity.MetaSprite.frameSet
     beq     Return
 
@@ -148,7 +148,7 @@ Return:
 a16()
 i16()
 code()
-scope Deactivate: {
+function Deactivate {
     sep     #$30
 a8()
 i8()
@@ -171,7 +171,7 @@ a16()
 // INPUT: dp = Entity
 // INPUT: A = animation Id
 // OUTPUT: C set on success
-constant SetAnimation(Animation.SetAnimationId)
+constant SetAnimation = Animation.SetAnimationId
 
 
 // Disables the entity's animation.
@@ -179,7 +179,7 @@ constant SetAnimation(Animation.SetAnimationId)
 // REQUIRES: 16 bit A, 16 bit Index
 //
 // INPUT: dp = Entity
-constant DisableAnimation(Animation.DisableAnimation)
+constant DisableAnimation = Animation.DisableAnimation
 
 
 // Sets the entity's metasprite frame.
@@ -201,7 +201,7 @@ constant DisableAnimation(Animation.DisableAnimation)
 a16()
 i16()
 code()
-scope SetFrame: {
+function SetFrame {
     ldx.b   BaseEntity.MetaSprite.frameSet
     beq     ReturnFalse
 
@@ -269,7 +269,7 @@ Return:
 a16()
 i16()
 code()
-scope GetFrameAddress: {
+function GetFrameAddress {
     and.w   #0x00ff
     asl
     adc.l   MetaSprite.Format.FrameSet.frameTable,x

@@ -9,12 +9,12 @@
 // Distributed under The MIT License: https://opensource.org/licenses/MIT
 
 
-arch snes.cpu
+architecture wdc65816
 
 au()
 iu()
 code()
-scope NmiHandler: {
+function NmiHandler {
     // Store registers
     rep     #$30
 a16()
@@ -69,7 +69,7 @@ i8()
 au()
 iu()
 code()
-scope EnableVBlank: {
+function EnableVBlank {
     php
 
     sep     #$20

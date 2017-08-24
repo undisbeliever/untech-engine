@@ -9,7 +9,7 @@
 // Distributed under The MIT License: https://opensource.org/licenses/MIT
 
 
-scope Math {
+namespace Math {
 
 allocate(product32, shadow, 4)
 allocate(factor32, shadow, 4)
@@ -17,7 +17,7 @@ allocate(factor32, shadow, 4)
 allocate(dividend32, dp, 4)
 allocate(divisor32, dp, 4)
 allocate(remainder32, dp, 4)
-constant result32(dividend32)
+constant result32 = dividend32
 
 allocate(tmp1, shadow, 2)
 allocate(tmp2, shadow, 2)

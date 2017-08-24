@@ -57,17 +57,17 @@ allocate(dpTmp7, dp, 2)
 
 // Entity Layout
 // =============
-scope Entity {
-    constant ENTITY_SIZE(64)
-    constant N_ENTITIES(64)
+namespace Entity {
+    constant ENTITY_SIZE = 64
+    constant N_ENTITIES = 64
 }
 
 // Allow tests to access entity pool
-scope EntityPool {
-    evaluate n(0)
+namespace EntityPool {
+    evaluate n = 0
     while {n} < Entity.N_ENTITIES {
-        constant entity{n}(Entity.entityPool + {n} * Entity.ENTITY_SIZE)
-        evaluate n({n} + 1)
+        constant entity{n} = Entity.entityPool + {n} * Entity.ENTITY_SIZE
+        evaluate n = {n} + 1
     }
 }
 
@@ -75,9 +75,9 @@ scope EntityPool {
 
 // VRAM Layout
 // ===========
-constant VRAM_OBJ_WADDR(0x6000)
-constant VRAM_CONSOLE_TILES_WADDR(0x1000)
-constant VRAM_CONSOLE_MAP_WADDR(0x0000)
+constant VRAM_OBJ_WADDR = 0x6000
+constant VRAM_CONSOLE_TILES_WADDR = 0x1000
+constant VRAM_CONSOLE_MAP_WADDR = 0x0000
 
 
 // vim: ft=bass-65816 ts=4 sw=4 et:

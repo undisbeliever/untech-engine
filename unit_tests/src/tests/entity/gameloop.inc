@@ -2,15 +2,15 @@
 // Copyright (c) 2016 - 2017, Marcus Rowe <undisbeliever@gmail.com>.
 // Distributed under The MIT License: https://opensource.org/licenses/MIT
 
-scope EntityTest {
+namespace EntityTest {
 
 a16()
 i16()
 code()
 Test.add("Entity.GameLoop (ChangeList)")
-scope GameLoop_ChangeList: {
-constant tmp_index(Test.tmp)
-constant tmp_test(Test.tmp + 2)
+function GameLoop_ChangeList {
+constant tmp_index = Test.tmp
+constant tmp_test = Test.tmp + 2
 
     // Spawns many entities that will just change their
     // list to the particle list, processes one Entity
@@ -61,9 +61,9 @@ Fail:
     rts
 
 rodata(rom0)
-scope SpawnList: {
-    define C(Entities.ChangeToParticleEntity.EntityId_)
-    define B(Entities.BlankEntity.EntityId_)
+function SpawnList {
+    define C = Entities.ChangeToParticleEntity.EntityId_
+    define B = Entities.BlankEntity.EntityId_
 
     dw  {C}0, {C}0, {B}0, {B}0, {B}0    // player
     dw  {B}1, {C}1, {C}1, {B}1, {B}1    // boss
@@ -72,11 +72,11 @@ scope SpawnList: {
     dw  {C}4, {C}4, {C}4, {C}4, {C}4    // playform
     dw  {B}5, {B}5, {B}5, {B}5, {B}5    // particle
 
-    constant size(pc() - SpawnList)
+    constant size = pc() - SpawnList
     assert(size/2 <= Entity.N_ENTITIES)
 }
 
-scope ExpectedSizes: {
+function ExpectedSizes {
     dw  3                   // player
     dw  3                   // boss
     dw  3                   // enemy
@@ -84,7 +84,7 @@ scope ExpectedSizes: {
     dw  0                   // platform
     dw  (6 * 5) - (3 * 4)   // particle
 
-    constant size(pc() - ExpectedSizes)
+    constant size = pc() - ExpectedSizes
     assert(size / 2 == Entity.lists.N_LISTS)
 }
 }
@@ -95,8 +95,8 @@ a16()
 i16()
 code()
 Test.add("Entity.GameLoop (Delete)")
-scope GameLoop_Delete: {
-constant tmp(Test.tmp)
+function GameLoop_Delete {
+constant tmp = Test.tmp
 
     jsr     Entity.Init
 
@@ -185,8 +185,8 @@ a16()
 i16()
 code()
 Test.add("Entity.GameLoop.TryToActivateAgain")
-scope GameLoop_TryToActivateAgain: {
-constant tmp(Test.tmp)
+function GameLoop_TryToActivateAgain {
+constant tmp = Test.tmp
 
     jsr     Entity.Init
 
@@ -194,7 +194,7 @@ constant tmp(Test.tmp)
     jsr     WaitFrame
     stz.w   Dma.transfersLeft
 
-    scope CreateEntities: {
+    function CreateEntities {
         lda.w   #0x1000
         sta.w   Entity.Spawn.xPos
         sta.w   Entity.Spawn.yPos
@@ -238,7 +238,7 @@ constant tmp(Test.tmp)
     }
 
     // Test that entities are allocated in the next frame
-    scope TestActivateNextFrame: {
+    function TestActivateNextFrame {
         jsr     Dma.Init
         jsr     WaitFrame
 
@@ -268,7 +268,7 @@ constant tmp(Test.tmp)
 
     // After the second frame the entities should be deleted
     // Tests that they were actually processed
-    scope TestNextFrame: {
+    function TestNextFrame {
         jsr     Entity.ProcessGameLoop
 
         jsr     _FreeListLength
@@ -289,9 +289,9 @@ a16()
 i16()
 code()
 Test.add("GameLoop (Move Camera)")
-scope GameLoop_MoveCamera: {
-constant tmp_index(Test.tmp)
-constant tmp_listId(Test.tmp + 2)
+function GameLoop_MoveCamera {
+constant tmp_index = Test.tmp
+constant tmp_listId = Test.tmp + 2
 
     jsr     Entity.Init
 
@@ -334,7 +334,7 @@ constant tmp_listId(Test.tmp + 2)
     // Test move camera
     // Only test NPCs and Entities
     // (as they are the ones that deactivate)
-    scope TestMoveCamera: {
+    function TestMoveCamera {
         ldx.w   #0
         Loop:
             stx.w   tmp_index
@@ -375,7 +375,7 @@ Fail:
     clc
     rts
 
-scope SpawnEntity_XY: {
+function SpawnEntity_XY {
     stx.w   Entity.Spawn.xPos
     sty.w   Entity.Spawn.yPos
     lda.w   tmp_listId
@@ -383,7 +383,7 @@ scope SpawnEntity_XY: {
 }
 
 rodata(rom0)
-scope InitialExpectedSizes: {
+function InitialExpectedSizes {
     dw  4   // player
     dw  4   // boss
     dw  1   // enemy
@@ -391,12 +391,12 @@ scope InitialExpectedSizes: {
     dw  1   // platform
     dw  4   // particle
 
-    constant size(pc() - InitialExpectedSizes)
+    constant size = pc() - InitialExpectedSizes
     assert(size / 2 == Entity.lists.N_LISTS)
 }
 
 rodata(rom0)
-scope MoveCameraTable: {
+function MoveCameraTable {
     macro _row(xPos, yPos, e) {
         dw  {xPos}, {yPos}
         dw  4   // player
@@ -414,8 +414,8 @@ scope MoveCameraTable: {
     _row(0x2000, 0x1000, 2) // Still inside inactive window
     _row(0x3000, 0x3000, 0)
 
-    constant rowSize((2 + Entity.lists.N_LISTS) * 2)
-    constant size(pc() - MoveCameraTable)
+    constant rowSize = (2 + Entity.lists.N_LISTS) * 2
+    constant size = pc() - MoveCameraTable
 }
 }
 

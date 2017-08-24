@@ -11,8 +11,8 @@
 
 Warnings.Register(NO_MS_PALETTE_SLOTS, 0, 24, 24)
 
-scope MetaSprite {
-scope Palette {
+namespace MetaSprite {
+namespace Palette {
 
 
 // Resets allocation lists
@@ -22,9 +22,9 @@ macro _Init() {
     assert8a()
     assert8i()
 
-    scope Palette: {
-        constant ARRAY_INCREMENT(MetaSprite.Palette.slots.ARRAY_INCREMENT)
-        constant N_ELEMENTS(MetaSprite.Palette.slots.N_ELEMENTS)
+    function Palette {
+        constant ARRAY_INCREMENT = MetaSprite.Palette.slots.ARRAY_INCREMENT
+        constant N_ELEMENTS = MetaSprite.Palette.slots.N_ELEMENTS
 
         // chain linked list
 
@@ -63,7 +63,7 @@ macro _Deallocate() {
 
     assert(MetaSprite.StatusFlags.paletteSet == 0x80)
 
-    scope Palette: {
+    function Palette {
         lda.b   #MetaSprite.StatusFlags.paletteSet
         trb.b	BaseEntity.MetaSprite.status
 
@@ -92,7 +92,7 @@ macro _Deallocate() {
 a8()
 i8()
 code()
-scope _RemoveSlot: {
+function _RemoveSlot {
 	// Remove from used list and add to free list
 	//
 	// if current.prev is NULL:
@@ -141,7 +141,7 @@ scope _RemoveSlot: {
 a8()
 i16()
 code()
-scope SetPalette: {
+function SetPalette {
     ldx.b   BaseEntity.MetaSprite.frameSet
     beq     ReturnFalse
 
@@ -170,7 +170,7 @@ ReturnFalse:
 
 
 code()
-scope _ProcessSlots {
+namespace _ProcessSlots {
 a16()
 i8()
 NoSlotsFound:
@@ -193,7 +193,7 @@ NoSlotsFound:
 a8()
 i16()
 code()
-scope _ProcessSlots: {
+function _ProcessSlots {
 allocateTmpWord(tmp_paletteAddr)
 allocateTmpWord(tmp_slotIndex)
 

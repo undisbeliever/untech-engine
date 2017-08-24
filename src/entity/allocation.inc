@@ -9,7 +9,7 @@
 // Distributed under The MIT License: https://opensource.org/licenses/MIT
 
 
-scope Entity {
+namespace Entity {
 
 // Initializes the entity pool
 //
@@ -24,7 +24,7 @@ scope Entity {
 a16()
 i16()
 code()
-scope Init: {
+function Init {
     jsr     Dma.Init
     jsr     MetaSprite.Init
     jsr     Camera.Init
@@ -75,7 +75,7 @@ scope Init: {
 a16()
 i16()
 code()
-scope ClearTryToActivateAgainList: {
+function ClearTryToActivateAgainList {
     lda.w   lists.tryToActivateAgain
     beq     Return
 

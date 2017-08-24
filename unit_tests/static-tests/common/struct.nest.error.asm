@@ -2,10 +2,10 @@
 include "../../../src/common/struct.inc"
 
 // should error on nested fields
-scope test {
+namespace test {
     struct()
 
-    scope nest {
+    namespace nest {
         struct() // ERROR
 
         endstruct()

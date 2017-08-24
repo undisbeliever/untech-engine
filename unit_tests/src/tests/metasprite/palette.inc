@@ -7,8 +7,8 @@
 // That is easily tested by using the engine
 // but hard to code for.
 
-scope MetaSpriteTest {
-scope Palette {
+namespace MetaSpriteTest {
+namespace Palette {
 
 allocateTmpWord(tmp0)
 
@@ -16,8 +16,8 @@ a16()
 i16()
 code()
 Test.add("MetaSprite.Palette.Activate")
-scope Activate: {
-constant tmp_paletteBits(tmp0)
+function Activate {
+constant tmp_paletteBits = tmp0
     assert(MetaSprite.StatusFlags.paletteSet == 0x80)
 
     jsr     _Init_MetaSpriteModule
@@ -128,8 +128,8 @@ a16()
 i16()
 code()
 Test.add("MetaSprite.Palette.SetPalette")
-scope SetPalette: {
-constant tmp_paletteBits(tmp0)
+function SetPalette {
+constant tmp_paletteBits = tmp0
     jsr     _Init_8Palettes
     bcc     Fail
 
@@ -222,7 +222,7 @@ a16()
 i16()
 code()
 Test.add("MetaSprite.Palette.Deactivate")
-scope Deactivate: {
+function Deactivate {
     jsr     _Init_8Palettes
     bcc     Fail
 
@@ -260,7 +260,7 @@ a16()
 i16()
 code()
 Test.add("MetaSprite.Palette.DeactivateAndTestList (First)")
-scope Deactivate_List_First: {
+function Deactivate_List_First {
     lda.w   #EntityPool.entity0
     bra     _DeactivateAndTestList_A
 }
@@ -270,7 +270,7 @@ a16()
 i16()
 code()
 Test.add("MetaSprite.Palette.DeactivateAndTestList (Middle)")
-scope Deactivate_List_Middle: {
+function Deactivate_List_Middle {
     lda.w   #EntityPool.entity4
     bra     _DeactivateAndTestList_A
 }
@@ -280,7 +280,7 @@ a16()
 i16()
 code()
 Test.add("MetaSprite.Palette.DeactivateAndTestList (Last)")
-scope Deactivate_List_Last: {
+function Deactivate_List_Last {
     lda.w   #EntityPool.entity7
     bra     _DeactivateAndTestList_A
 }
@@ -290,7 +290,7 @@ scope Deactivate_List_Last: {
 a16()
 i16()
 code()
-scope _DeactivateAndTestList_A: {
+function _DeactivateAndTestList_A {
 allocateTmpWord(tmp_entityToRemove)
 
     sta.w   tmp_entityToRemove
@@ -319,7 +319,7 @@ a16()
 i16()
 code()
 Test.add("MetaSprite.Palette.Overflow")
-scope Overflow: {
+function Overflow {
     jsr     _Init_8Palettes
     bcc     Fail
 
@@ -425,8 +425,8 @@ a16()
 a16()
 i16()
 code()
-scope _Init_8Palettes: {
-    constant tmp_palleteId(tmp0)
+function _Init_8Palettes {
+    constant tmp_palleteId = tmp0
 
     jsr     _Init_MetaSpriteModule
 
@@ -465,7 +465,7 @@ Return:
 au()
 iu()
 code()
-scope _ValidateUsedSlotList: {
+function _ValidateUsedSlotList {
     php
 
     sep     #$30

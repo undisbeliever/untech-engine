@@ -9,7 +9,7 @@
 // Distributed under The MIT License: https://opensource.org/licenses/MIT
 
 
-scope Entity {
+namespace Entity {
     assert(N_ENTITIES >= 10)
 
     assert(ENTITY_SIZE > 0)
@@ -22,7 +22,7 @@ scope Entity {
     assert(entityPool & (ENTITY_SIZE - 1) == 0)
 }
 
-scope BaseEntity {
+namespace BaseEntity {
     basestruct()
         struct_maxsize(Entity.ENTITY_SIZE)
 
@@ -37,7 +37,7 @@ scope BaseEntity {
         // If entity is in deactivated list, `functionTable` is reused as the
         // address of the entity list to move into when reactivated.
         // (word addr - union with functionTable)
-        constant _ft_currentList(functionTable)
+        constant _ft_currentList = functionTable
 
         // pointer to the ROM data used by the entity code
         // (word addr)
@@ -59,10 +59,10 @@ scope BaseEntity {
     endstruct()
 }
 
-scope Entity {
+namespace Entity {
     // A linked list of entity types
     // (word addr)
-    scope lists {
+    namespace lists {
         // Unallocated Entities
         allocate(free, wram7e, 2)
 
@@ -135,13 +135,13 @@ scope Entity {
         allocate(particles, wram7e, 2)
 
 
-    constant FIRST(players)
-    constant LAST(particles)
-    constant N_LISTS((LAST - FIRST) / 2 + 1)
+    constant FIRST = players
+    constant LAST = particles
+    constant N_LISTS = (LAST - FIRST) / 2 + 1
     }
 
     // Entity list Id used for the BaseEntityData struct
-    scope ListId {
+    namespace ListId {
         createEnum(0, 2)
             enum(PLAYER)
             enum(BOSS)
@@ -169,18 +169,18 @@ scope Entity {
 
     // Active window size (beyond camera display)
     // inactive entities inside this window will become active.
-    constant ACTIVE_WINDOW_EXTEND_HORIZONTAL(96)
-    constant ACTIVE_WINDOW_EXTEND_VERTICAL(96)
+    constant ACTIVE_WINDOW_EXTEND_HORIZONTAL = 96
+    constant ACTIVE_WINDOW_EXTEND_VERTICAL = 96
 
     // Inactive window size (beyond camera display)
     // Active entities that leave the window will deactivate.
-    constant INACTIVE_WINDOW_EXTEND_HORIZONTAL(128)
-    constant INACTIVE_WINDOW_EXTEND_VERTICAL(128)
+    constant INACTIVE_WINDOW_EXTEND_HORIZONTAL = 128
+    constant INACTIVE_WINDOW_EXTEND_VERTICAL = 128
 
 
     // Activate window
     // (4x uint16)
-    scope activeWindow {
+    namespace activeWindow {
         allocate(top, wram7e, 2)
         allocate(bottom, wram7e, 2)
         allocate(left, wram7e, 2)
@@ -189,7 +189,7 @@ scope Entity {
 
     // Inactivate window
     // (4x uint16)
-    scope inactiveWindow {
+    namespace inactiveWindow {
         allocate(top, wram7e, 2)
         allocate(bottom, wram7e, 2)
         allocate(left, wram7e, 2)
@@ -207,7 +207,7 @@ scope Entity {
 
 
     // The mask which the Camera pos is compared to prevActiveWindow.
-    constant TEST_ACTIVE_WINDOW_MASK(~3)
+    constant TEST_ACTIVE_WINDOW_MASK = ~3
 }
 
 // vim: ft=bass-65816 ts=4 sw=4 et:

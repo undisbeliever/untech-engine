@@ -3,7 +3,7 @@ include "../../../src/common/assert.inc"
 include "../../../src/common/struct.inc"
 
 // reuse struct should error out
-scope point {
+namespace point {
     struct()
 
     field(xPos, 2)
@@ -12,7 +12,7 @@ scope point {
     endstruct()
 }
 
-scope point {
+namespace point {
     struct() // ERROR
 
 }
