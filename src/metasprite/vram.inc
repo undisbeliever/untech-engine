@@ -25,44 +25,43 @@ macro _Init() {
     assert8a()
     assert8i()
 
-    function Vram {
-        constant ARRAY_INCREMENT = MetaSprite.Vram.slots.ARRAY_INCREMENT
-        constant ROW_SLOTS_MIN_INDEX = MetaSprite.Vram.slots.ROW_SLOTS_MIN_INDEX
-        constant N_ELEMENTS = MetaSprite.Vram.slots.N_ELEMENTS
+    constant ARRAY_INCREMENT = MetaSprite.Vram.slots.ARRAY_INCREMENT
+    constant ROW_SLOTS_MIN_INDEX = MetaSprite.Vram.slots.ROW_SLOTS_MIN_INDEX
+    constant N_ELEMENTS = MetaSprite.Vram.slots.N_ELEMENTS
 
-        // chain linked list
-        ldx.b   #0
-        lda.b   #ARRAY_INCREMENT
+    // chain linked list
+    ldx.b   #0
+    lda.b   #ARRAY_INCREMENT
 
-        clc
+    clc
+
     Loop:
-            sta.w   MetaSprite.Vram.slots.next,x
-            tax
+        sta.w   MetaSprite.Vram.slots.next,x
+        tax
 
-            // c clear from branch
-            adc.b   #ARRAY_INCREMENT
-            cmp.b   #ARRAY_INCREMENT * N_ELEMENTS
-            bcc     Loop
+        // c clear from branch
+        adc.b   #ARRAY_INCREMENT
+        cmp.b   #ARRAY_INCREMENT * N_ELEMENTS
+        bcc     Loop
 
 
-        // Separate the slots into two lists
+    // Separate the slots into two lists
 
-        lda.b   #0x80
-        sta.w   MetaSprite.Vram.slots.next + ROW_SLOTS_MIN_INDEX - ARRAY_INCREMENT
-        sta.w   MetaSprite.Vram.slots.next + ARRAY_INCREMENT * (N_ELEMENTS - 1)
+    lda.b   #0x80
+    sta.w   MetaSprite.Vram.slots.next + ROW_SLOTS_MIN_INDEX - ARRAY_INCREMENT
+    sta.w   MetaSprite.Vram.slots.next + ARRAY_INCREMENT * (N_ELEMENTS - 1)
 
-        // Reset the slot pool
+    // Reset the slot pool
 
-        sta.w   MetaSprite.Vram.slotPool.oneTile
-        sta.w   MetaSprite.Vram.slotPool.twoTiles
-        sta.w   MetaSprite.Vram.slotPool.oneRow
-        sta.w   MetaSprite.Vram.slotPool.twoRows
+    sta.w   MetaSprite.Vram.slotPool.oneTile
+    sta.w   MetaSprite.Vram.slotPool.twoTiles
+    sta.w   MetaSprite.Vram.slotPool.oneRow
+    sta.w   MetaSprite.Vram.slotPool.twoRows
 
-        lda.b   #MetaSprite.Vram.slots.ROW_SLOTS_MIN_INDEX
-        sta.w   MetaSprite.Vram.slotPool.freeRows
+    lda.b   #MetaSprite.Vram.slots.ROW_SLOTS_MIN_INDEX
+    sta.w   MetaSprite.Vram.slotPool.freeRows
 
-        stz.w   MetaSprite.Vram.slotPool.freeTiles
-    }
+    stz.w   MetaSprite.Vram.slotPool.freeTiles
 }
 
 
@@ -76,14 +75,12 @@ macro _Deallocate() {
 
     assert(MetaSprite.StatusFlags.vramSet == 0x01)
 
-    function Vram {
-        lda.b	BaseEntity.MetaSprite.status
-        lsr
+    lda.b	BaseEntity.MetaSprite.status
+    lsr
 
-        bcc     Skip
-            jsr     MetaSprite.Vram._DeallocateSlot_A
+    bcc     Skip
+        jsr     MetaSprite.Vram._DeallocateSlot_A
     Skip:
-    }
 }
 
 
@@ -99,49 +96,47 @@ macro _Activate() {
 
     assert(MetaSprite.StatusFlags.vramSet == 0x01)
 
-    function Vram {
-        lda.b	BaseEntity.MetaSprite.status
-        lsr
-        bcs     AlreadyActive
-            assert(MetaSprite.Format.FrameSet.tilesetType.Lifespan.FIXED == 0x80)
+    lda.b	BaseEntity.MetaSprite.status
+    lsr
+    bcs     AlreadyActive
+        assert(MetaSprite.Format.FrameSet.tilesetType.Lifespan.FIXED == 0x80)
 
-            // X = frameset
-            lda.l   MetaSprite.Format.FrameSet.tilesetType,x
+        // X = frameset
+        lda.l   MetaSprite.Format.FrameSet.tilesetType,x
 
-            rep     #$30
-        a16()
-            bpl     Dynamic
+        rep     #$30
+    a16()
+        bpl     Dynamic
 
-            function Fixed {
-                tay
+        function Fixed {
+            tay
 
-                lda.l   MetaSprite.Format.FrameSet.tileset,x
-                sta.w   MetaSprite.Vram.tilesetAddr
+            lda.l   MetaSprite.Format.FrameSet.tileset,x
+            sta.w   MetaSprite.Vram.tilesetAddr
 
-                tya
-                and.w   #3 << 1
-                tax
-                jmp     (MetaSprite.Vram._ActivateFixed.Table,x)
-            }
-            function Dynamic {
-                and.w   #3 << 1
-                tax
-                jmp     (MetaSprite.Vram._AllocateDynamic.Table,x)
-            }
+            tya
+            and.w   #3 << 1
+            tax
+            jmp     (MetaSprite.Vram._ActivateFixed.Table,x)
+        }
+        function Dynamic {
+            and.w   #3 << 1
+            tax
+            jmp     (MetaSprite.Vram._AllocateDynamic.Table,x)
+        }
 
-        AllocateDynamicReturn:
-            bcc     ReturnRep
+    AllocateDynamicReturn:
+        bcc     ReturnRep
 
-            // Upload tiles now that a row is allocated
-            rep     #$30
-        a16()
-        i16()
-            jsr     MetaSprite.Vram._UploadDynamicTileset
+        // Upload tiles now that a row is allocated
+        rep     #$30
+    a16()
+    i16()
+        jsr     MetaSprite.Vram._UploadDynamicTileset
 
-        ActivateFixedReturn:
-            bcc     ReturnRep
-    AlreadyActive:
-    }
+    ActivateFixedReturn:
+        bcc     ReturnRep
+AlreadyActive:
 }
 
 
@@ -379,7 +374,7 @@ Return:
 //      Jump to Return
 //      Register size unknown
 namespace _ActivateFixed {
-    constant Return = MetaSprite.Activate.Vram._Activate.Vram.ActivateFixedReturn
+    constant Return = MetaSprite.Activate.Vram._Activate.ActivateFixedReturn
 
     inline Process(name, freeSlotPool, usedSlotPool, nSlots, uploadRoutine) {
         a16()
@@ -701,7 +696,7 @@ namespace _ActivateFixed {
 //      Jump to Return on Success
 //      Register size unknown
 namespace _AllocateDynamic {
-    constant Return = MetaSprite.Activate.Vram._Activate.Vram.AllocateDynamicReturn
+    constant Return = MetaSprite.Activate.Vram._Activate.AllocateDynamicReturn
 
 // ::SHOULDO add dynamic tileset with fixed portion of tiles::
 // ::: ie, tiles 5-7 are fixed through the life of the entity::

@@ -56,9 +56,9 @@ macro ProcessList(list) {
     assert16i()
 
     ldy.w   Entity.lists.{list}
-    beq     Skip{#}
+    beq     Skip_{list}
         jsr     MetaSprite.EntityHitbox._TestList
-Skip{#}:
+Skip_{list}:
 }
 
 

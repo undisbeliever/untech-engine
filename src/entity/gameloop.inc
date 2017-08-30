@@ -228,7 +228,7 @@ function ProcessEntityList_DeleteOffscreen {
 //
 // REQUIRES: 16 bit A, 16 bit Index, DB = 0x7e
 // MODIFIES: DP
-macro _ProcessEnemyList(list, doDeactivateTest) {
+inline _ProcessEnemyList(list, doDeactivateTest) {
     assert16a()
     assert16i()
 

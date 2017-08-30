@@ -67,7 +67,7 @@ namespace ProjectileEntity {
     a16()
 
         macro _SetVelocity(c) {
-            namespace SetVelocity_{c} {
+            namespace {c} {
                 // Set Projectile Velocity
                 lda.l   MetaSprite.Format.ActionPoints.{c}Pos,x
                 and.w   #0xff

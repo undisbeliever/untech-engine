@@ -100,23 +100,21 @@ macro _Init() {
     assert16a()
     assert16i()
 
-    function Tile16 {
-        stz.w   Dma.Tile16.transferQueue.forceEndTransfer - 1
-        stz.w   Dma.Tile16.transferQueueIndex
+    stz.w   Dma.Tile16.transferQueue.forceEndTransfer - 1
+    stz.w   Dma.Tile16.transferQueueIndex
 
-        lda.w   #Dma.Tile16.tileQueue.TILE_HALF_SIZE << 8
-        ldx.w   #Dma.Tile16.TILE_QUEUE_INDEX_END - 2
-        -
-            sta.w   Dma.Tile16.tileQueue.tileHalfSize - 1,x
-            dex
-            dex
-            bpl     -
+    lda.w   #Dma.Tile16.tileQueue.TILE_HALF_SIZE << 8
+    ldx.w   #Dma.Tile16.TILE_QUEUE_INDEX_END - 2
+    -
+        sta.w   Dma.Tile16.tileQueue.tileHalfSize - 1,x
+        dex
+        dex
+        bpl     -
 
-        stz.w   Dma.Tile16.tileQueueIndex
+    stz.w   Dma.Tile16.tileQueueIndex
 
-        lda.w   #1
-        sta.w   Dma.Tile16.processVBlankOnZero
-    }
+    lda.w   #1
+    sta.w   Dma.Tile16.processVBlankOnZero
 }
 
 
@@ -127,14 +125,12 @@ macro _Init() {
 macro _TransferOnNextVBlank() {
     assert16a()
 
-    function Tile16 {
-        ldx.w   Dma.Tile16.transferQueueIndex
-        stz.w   Dma.Tile16.transferQueue.vblankFunctionAddr,x
-        stz.w   Dma.Tile16.processVBlankOnZero
+    ldx.w   Dma.Tile16.transferQueueIndex
+    stz.w   Dma.Tile16.transferQueue.vblankFunctionAddr,x
+    stz.w   Dma.Tile16.processVBlankOnZero
 
-        stz.w   Dma.Tile16.transferQueueIndex
-        stz.w   Dma.Tile16.tileQueueIndex
-    }
+    stz.w   Dma.Tile16.transferQueueIndex
+    stz.w   Dma.Tile16.tileQueueIndex
 }
 
 

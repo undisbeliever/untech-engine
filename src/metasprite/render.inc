@@ -35,20 +35,18 @@ macro _Init() {
 	assert16a()
 	assert16i()
 
-    function Render {
-        ldx.w   #(128 - 1) * 4
+    ldx.w   #(128 - 1) * 4
 
-        Loop:
-            stz.w   MetaSprite.Render.oamXposBuffer,x
-            dex
-            dex
-            dex
-            dex
-            bpl     Loop
+    Loop:
+        stz.w   MetaSprite.Render.oamXposBuffer,x
+        dex
+        dex
+        dex
+        dex
+        bpl     Loop
 
-        ldy.w   #128 * 4
-        sty.w   MetaSprite.Render.previousBufferPos
-    }
+    ldy.w   #128 * 4
+    sty.w   MetaSprite.Render.previousBufferPos
 }
 
 

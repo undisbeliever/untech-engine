@@ -23,7 +23,7 @@ namespace Vram {
 allocateTmpWord(tmp0)
 
 
-macro _ActivateFixedTest(FrameSet, nSlots) {
+inline _ActivateFixedTest(FrameSet, nSlots) {
     a16()
     i16()
     code()
@@ -97,7 +97,7 @@ _ActivateFixedTest(FST_OneRowFixed, 1)
 _ActivateFixedTest(FST_TwoRowsFixed, 2)
 
 
-macro _ActivateDynamicTest(FrameSet, nSlots) {
+inline _ActivateDynamicTest(FrameSet, nSlots) {
     a16()
     i16()
     code()
@@ -181,7 +181,7 @@ _ActivateDynamicTest(FST_TwoRows, 2)
 
 
 
-macro _DeallocateTest(type) {
+inline _DeallocateTest(type) {
     a16()
     i16()
     code()
@@ -339,7 +339,7 @@ _DeallocateTest(Row)
 
 // Delete an entities start/middle/end of the list
 // and validate linked list is setup correctly
-macro _DeallocateAndTestListTest(type) {
+inline _DeallocateAndTestListTest(type) {
     // IN: A = entity to delete
     a16()
     i16()
@@ -419,7 +419,7 @@ _DeallocateAndTestListTest(TwoTiles)
 _DeallocateAndTestListTest(TwoRows)
 
 
-macro _ReferenceCountTest(type) {
+inline _ReferenceCountTest(type) {
     a16()
     i16()
     code()
@@ -545,7 +545,7 @@ _ReferenceCountTest(Row)
 
 // There is a bug that prevents the third fixed VRAM slot from
 // buffering the tiles correctly.
-macro _ActivateThirdFixedSlot(name, FrameSet1, FrameSet2, FrameSet3) {
+inline _ActivateThirdFixedSlot(name, FrameSet1, FrameSet2, FrameSet3) {
     a16()
     i16()
     code()

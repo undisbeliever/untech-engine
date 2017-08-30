@@ -19,7 +19,7 @@ namespace Entity {
 // REQUIRES: 16 bit A, 16 bit Index, DB = 0x7e
 //
 // MODIFIES: DP
-macro _DeleteAllInList(listId) {
+inline _DeleteAllInList(listId) {
     assert16a()
     assert16i()
 

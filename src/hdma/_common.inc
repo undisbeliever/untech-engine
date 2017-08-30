@@ -58,24 +58,22 @@ macro VBlank() {
     assert16a()
     assert8i()
 
-    namespace Hdma {
-        ldx.w   Hdma.ChannelSettings.enabled
-        beq     Skip
-            assert(Hdma.ChannelSettings.dmap + 1 == Hdma.ChannelSettings.register)
+    ldx.w   Hdma.ChannelSettings.enabled
+    beq     Skip
+        assert(Hdma.ChannelSettings.dmap + 1 == Hdma.ChannelSettings.register)
 
-            lda.w   Hdma.ChannelSettings.dmap
-            sta.b   DMAP7
+        lda.w   Hdma.ChannelSettings.dmap
+        sta.b   DMAP7
 
-            lda.w   Hdma.ChannelSettings.tableAddr
-            sta.b   A1T7
+        lda.w   Hdma.ChannelSettings.tableAddr
+        sta.b   A1T7
 
-            ldx.b   #Hdma.buffer1 >> 16
-            stx.b   A1B7
+        ldx.b   #Hdma.buffer1 >> 16
+        stx.b   A1B7
 
-            ldx.b   #HDMAEN.dma7
-            stx.w   HDMAEN
+        ldx.b   #HDMAEN.dma7
+        stx.w   HDMAEN
     Skip:
-    }
 }
 
 }

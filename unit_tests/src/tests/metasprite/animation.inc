@@ -103,7 +103,7 @@ Fail:
 }
 
 
-macro DistanceTest(animation, vecl) {
+inline DistanceTest(animation, vecl) {
     a16()
     i16()
     code()

@@ -100,7 +100,7 @@ allocateTmpWord(tmp_count)
 
     // test deactivated entity is not active
     macro _TestDeactivated(list) {
-        namespace Test_{list} {
+        namespace {list} {
             lda.w   Entity.lists.{list}
             beq     Skip
 

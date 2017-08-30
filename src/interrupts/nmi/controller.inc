@@ -38,20 +38,18 @@ if {defined CONTROLLER_USE_JOY2} {
 macro VBlank() {
 	assert16a()
 
-	function Controller {
-		-
-			ldx.w	HVJOY			// MUST do 8 bit read on HVJOY
-			txa
-			lsr
-			bcs		-
+    -
+        ldx.w	HVJOY			// MUST do 8 bit read on HVJOY
+        txa
+        lsr
+        bcs		-
 
-		lda.w   JOY1
-		tsb.w   Controller.Joy1._buffer
+    lda.w   JOY1
+    tsb.w   Controller.Joy1._buffer
 
-		if {defined CONTROLLER_USE_JOY2} {
-			lda.w   JOY2
-			tsb.w   Controller.Joy2._buffer
-		}
+    if {defined CONTROLLER_USE_JOY2} {
+        lda.w   JOY2
+        tsb.w   Controller.Joy2._buffer
 	}
 }
 

@@ -185,17 +185,15 @@ macro VBlank() {
     assert16a()
     assert8i()
 
-    function Warnings {
-        ldy.w   Warnings.current + 1
-        bmi     Skip
-            ldx.b   #Warnings.CGRAM_POS
-            stx.w   CGADD
+    ldy.w   Warnings.current + 1
+    bmi     Skip
+        ldx.b   #Warnings.CGRAM_POS
+        stx.w   CGADD
 
-            ldx.w   Warnings.current
-            stx.w   CGDATA
-            sty.w   CGDATA
-    Skip:
-    }
+        ldx.w   Warnings.current
+        stx.w   CGDATA
+        sty.w   CGDATA
+Skip:
 }
 }
 

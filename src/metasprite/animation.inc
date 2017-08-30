@@ -19,21 +19,19 @@ macro _Init() {
 	assert8a()
 
     // Set animation timer speed
-    function Animation {
-        lda.l   STAT78
-        and.b   #STAT78.pal
-        beq     +
-            // pal
-            lda.b   #6
-            bra     ++
-        +
-            // ntsc
-            lda.b   #5
-        +
+    lda.l   STAT78
+    and.b   #STAT78.pal
+    beq     +
+        // pal
+        lda.b   #6
+        bra     ++
+    +
+        // ntsc
+        lda.b   #5
+    +
 
-        sta.w   MetaSprite.Animation.timerSpeed
-        stz.w   MetaSprite.Animation.timerSpeed + 1
-    }
+    sta.w   MetaSprite.Animation.timerSpeed
+    stz.w   MetaSprite.Animation.timerSpeed + 1
 }
 
 

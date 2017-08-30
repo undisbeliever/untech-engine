@@ -52,34 +52,32 @@ macro _InitEntity() {
     assert16a()
     assert16i()
 
-    function InitEntity {
-        stz.b   BaseEntity.MetaSprite.status
-        stz.b   BaseEntity.MetaSprite.currentFrame
+    stz.b   BaseEntity.MetaSprite.status
+    stz.b   BaseEntity.MetaSprite.currentFrame
 
-        // Determine FrameSet address
-        cmp.w   #MetaSprite.Data.FrameSetListCount
-        bcc     +
-            lda.w   #0
-        +
+    // Determine FrameSet address
+    cmp.w   #MetaSprite.Data.FrameSetListCount
+    bcc     +
+        lda.w   #0
+    +
 
-        asl
-        tax
-        lda.l   MetaSprite.Data.FrameSetList,x
-        sta.b   BaseEntity.MetaSprite.frameSet
-        tax
+    asl
+    tax
+    lda.l   MetaSprite.Data.FrameSetList,x
+    sta.b   BaseEntity.MetaSprite.frameSet
+    tax
 
-        sep     #$10
-    i8()
-        sty.b   BaseEntity.MetaSprite.palette
+    sep     #$10
+i8()
+    sty.b   BaseEntity.MetaSprite.palette
 
-        // Disable animation
-        ldx.b   #0xff
-        stx.b   BaseEntity.MetaSprite.Animation.id
+    // Disable animation
+    ldx.b   #0xff
+    stx.b   BaseEntity.MetaSprite.Animation.id
 
-        rep     #$30
-    a16()
-    i16()
-    }
+    rep     #$30
+a16()
+i16()
 }
 
 
@@ -92,15 +90,13 @@ macro EntityDestructor() {
     assert16a()
     assert16i()
 
-    function EntityDestructor {
-        jsr     MetaSprite.Deactivate
-        stz.b   BaseEntity.MetaSprite.frameSet
-        stz.b   BaseEntity.MetaSprite.currentFrame
+    jsr     MetaSprite.Deactivate
+    stz.b   BaseEntity.MetaSprite.frameSet
+    stz.b   BaseEntity.MetaSprite.currentFrame
 
-        // Disable animation
-        ldx.w   #0xffff
-        stx.b   BaseEntity.MetaSprite.Animation.id
-    }
+    // Disable animation
+    ldx.w   #0xffff
+    stx.b   BaseEntity.MetaSprite.Animation.id
 }
 
 

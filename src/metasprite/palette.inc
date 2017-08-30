@@ -22,34 +22,33 @@ macro _Init() {
     assert8a()
     assert8i()
 
-    function Palette {
-        constant ARRAY_INCREMENT = MetaSprite.Palette.slots.ARRAY_INCREMENT
-        constant N_ELEMENTS = MetaSprite.Palette.slots.N_ELEMENTS
+    constant ARRAY_INCREMENT = MetaSprite.Palette.slots.ARRAY_INCREMENT
+    constant N_ELEMENTS = MetaSprite.Palette.slots.N_ELEMENTS
 
-        // chain linked list
+    // chain linked list
 
-        ldx.b   #0
-        lda.b   #ARRAY_INCREMENT
+    ldx.b   #0
+    lda.b   #ARRAY_INCREMENT
 
-        clc
+    clc
+
     Loop:
-            sta.w   MetaSprite.Palette.slots.next,x
-            stz.w   MetaSprite.Palette.slots.count,x
-            tax
+        sta.w   MetaSprite.Palette.slots.next,x
+        stz.w   MetaSprite.Palette.slots.count,x
+        tax
 
-            // c clear from branch
-            adc.b   #ARRAY_INCREMENT
-            cmp.b   #ARRAY_INCREMENT * N_ELEMENTS
-            bcc     Loop
+        // c clear from branch
+        adc.b   #ARRAY_INCREMENT
+        cmp.b   #ARRAY_INCREMENT * N_ELEMENTS
+        bcc     Loop
 
-        lda.b   #0x80
-        sta.w   MetaSprite.Palette.slots.next + ARRAY_INCREMENT * (N_ELEMENTS - 1)
-        stz.w   MetaSprite.Palette.slots.count + ARRAY_INCREMENT * (N_ELEMENTS - 1)
+    lda.b   #0x80
+    sta.w   MetaSprite.Palette.slots.next + ARRAY_INCREMENT * (N_ELEMENTS - 1)
+    stz.w   MetaSprite.Palette.slots.count + ARRAY_INCREMENT * (N_ELEMENTS - 1)
 
-        // reset list pointers
-        sta.w   MetaSprite.Palette.slotPool.used
-        stz.w   MetaSprite.Palette.slotPool.free
-    }
+    // reset list pointers
+    sta.w   MetaSprite.Palette.slotPool.used
+    stz.w   MetaSprite.Palette.slotPool.free
 }
 
 
@@ -63,23 +62,21 @@ macro _Deallocate() {
 
     assert(MetaSprite.StatusFlags.paletteSet == 0x80)
 
-    function Palette {
-        lda.b   #MetaSprite.StatusFlags.paletteSet
-        trb.b	BaseEntity.MetaSprite.status
+    lda.b   #MetaSprite.StatusFlags.paletteSet
+    trb.b	BaseEntity.MetaSprite.status
 
-        beq     Skip
-            // Entity has a palette, decrease the slot counter
-            // Remove Slot if counter is 0
+    beq     Skip
+        // Entity has a palette, decrease the slot counter
+        // Remove Slot if counter is 0
 
-            lda.b   BaseEntity.MetaSprite.blockOneCharAttrOffset + 1
-            and.b	#OamFormat.attr.palette.mask
-            tax
+        lda.b   BaseEntity.MetaSprite.blockOneCharAttrOffset + 1
+        and.b	#OamFormat.attr.palette.mask
+        tax
 
-            dec.w   MetaSprite.Palette.slots.count,x
-            bne     Skip
-                jsr     MetaSprite.Palette._RemoveSlot
+        dec.w   MetaSprite.Palette.slots.count,x
+        bne     Skip
+            jsr     MetaSprite.Palette._RemoveSlot
     Skip:
-    }
 }
 
 
