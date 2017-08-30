@@ -120,12 +120,11 @@ namespace ShowAllFramesEntity {
 
     inline BuildEntityData(name) {
         rodata(EN_RomData)
-        function RomData_{name} {
+        RomData_{name}:
             dw  FunctionTable
             db  Entity.ListId.PLAYER    // initial List
             dw  MSFS.{name}             // frameSetId
             db  0                       // defaultPalette
-        }
 
         rodata(EN_EntityList)
         constant {name}_entityId = (pc() - Entity.Data.EntityList) / 2
@@ -142,7 +141,7 @@ namespace ShowAllFramesEntity {
 }
 
 rodata(rom0)
-function EntityTable {
+namespace EntityTable {
     struct(pc())
         field(entityId, 2)
         field(parameter, 2)
@@ -157,6 +156,7 @@ function EntityTable {
         dw  {yPos} + Camera.ORIGIN
     }
 
+Data:
     data(Man, 10, 50, 200)
     data(SpikedWalker, 10, 128, 200)
     data(Woman, 10, 256 - 50, 200)
@@ -169,7 +169,7 @@ function EntityTable {
 
     data(FST_TwoRows, 200, 256 / 2, 45)
 
-constant N_ENTITIES = (pc() - EntityTable) / EntityTable.size
+    constant N_ENTITIES = (pc() - Data) / EntityTable.size
 }
 
 

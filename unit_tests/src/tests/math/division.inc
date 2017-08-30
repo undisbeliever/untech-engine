@@ -33,7 +33,7 @@ Fail:
     rts
 
 rodata(rom0)
-function Table {
+Table:
     macro row(evaluate a, evaluate b) {
         dw  {a}
         db  {b}
@@ -45,8 +45,7 @@ function Table {
     row(10000, 100)
     row(0x1337, 5)
     row(0xffff, 0xff)
-End:
-}
+Table.End:
 }
 
 
@@ -74,7 +73,7 @@ Fail:
     rts
 
 rodata(rom0)
-function Table {
+Table:
     macro row(evaluate a, evaluate b) {
         evaluate rem = {a} % {b}
         if ({rem} < 0) {
@@ -95,8 +94,7 @@ function Table {
     manyRows(10000, 1000)
     manyRows(0xdead, 0x1337)
     manyRows(0x1337, 0x7777)
-End:
-}
+Table.End:
 }
 
 
@@ -124,7 +122,7 @@ Fail:
     rts
 
 rodata(rom0)
-function Table {
+Table:
     macro row(evaluate a, evaluate b) {
         evaluate rem = {a} % {b}
         if ({rem} < 0) {
@@ -147,8 +145,7 @@ function Table {
     manyRows(10000, 1000)
     manyRows(0x7777, 0x1337)
     manyRows(0x1337, 0x7777)
-End:
-}
+Table.End:
 }
 
 
@@ -176,7 +173,7 @@ Fail:
     rts
 
 rodata(rom0)
-function Table {
+Table:
     macro row(evaluate a, evaluate b) {
         evaluate rem = {a} % {b}
         if ({rem} < 0) {
@@ -198,8 +195,7 @@ function Table {
     manyRows(0x1337, 0xdead)
     manyRows(0x7777, 0x1337)
     manyRows(0x1337, 0x7777)
-End:
-}
+Table.End:
 }
 
 
@@ -227,7 +223,7 @@ Fail:
     rts
 
 rodata(rom0)
-function Table {
+Table:
     macro row(evaluate a, evaluate b) {
         dw  {a}, {b}
         dw  {a} / {b}
@@ -241,8 +237,7 @@ function Table {
     row(0x7777, 0x1337)
     row(0xffff, 0xff)
     row(0xff, 0xffff)
-End:
-}
+Table.End:
 }
 
 
@@ -287,7 +282,7 @@ Fail:
     rts
 
 rodata(rom0)
-function Table {
+Table:
     macro row(evaluate a, evaluate b) {
         evaluate rem = {a} % {b}
         if ({rem} < 0) {
@@ -312,8 +307,7 @@ function Table {
     manyRows(0x1337, 0x7777)
     manyRows(0x77777777, 0x13371337)
     manyRows(0x13371337, 0x77777777)
-End:
-}
+Table.End:
 }
 
 
@@ -358,7 +352,7 @@ Fail:
     rts
 
 rodata(rom0)
-function Table {
+Table:
     macro row(evaluate a, evaluate b) {
         dd  {a}, {b}
         dd  {a} / {b}
@@ -373,8 +367,7 @@ function Table {
     row(0x77777777, 0x13371337)
     row(0x13371337, 0x77777777)
     row(0xffffffff, 0xffff)
-End:
-}
+Table.End:
 }
 
 
@@ -419,7 +412,7 @@ Fail:
     rts
 
 rodata(rom0)
-function Table {
+Table:
     macro row(evaluate a, evaluate b) {
         dd  {a}
         db  {b}
@@ -436,8 +429,7 @@ function Table {
     row(0x13371337, 56)
     row(0x77777777, 42)
     row(0xffffffff, 0xff)
-End:
-}
+Table.End:
 }
 
 }

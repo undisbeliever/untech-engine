@@ -56,12 +56,11 @@ CollideWithShield:
 evaluate n = 0
 while {n} < Entity.lists.N_LISTS {
     rodata(EN_RomData)
-    function RomData{n} {
+    RomData{n}:
         dw  FunctionTable
         db  {n} * 2         // initial List
         dw  0               // frameSetId
         db  0               // defaultPalette
-    }
 
     rodata(EN_EntityList)
     constant EntityId_{n} = (pc() - Entity.Data.EntityList) / 2

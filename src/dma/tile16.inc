@@ -219,7 +219,7 @@ namespace _ProcessDMA {
     constant ContinueLoop = NmiHandler.Dma.VBlank.Dma.Tile16._VBlank.ContinueLoop
     constant EndLoopFunction = NmiHandler.Dma.VBlank.Dma.Tile16._VBlank.EndLoopFunction
 
-    function FunctionTable {
+    FunctionTable: {
         dw  EndLoopFunction
         dw  Transfer1
         dw  Transfer2

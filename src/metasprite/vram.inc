@@ -108,7 +108,7 @@ macro _Activate() {
     a16()
         bpl     Dynamic
 
-        function Fixed {
+        Fixed:
             tay
 
             lda.l   MetaSprite.Format.FrameSet.tileset,x
@@ -118,12 +118,11 @@ macro _Activate() {
             and.w   #3 << 1
             tax
             jmp     (MetaSprite.Vram._ActivateFixed.Table,x)
-        }
-        function Dynamic {
+
+        Dynamic:
             and.w   #3 << 1
             tax
             jmp     (MetaSprite.Vram._AllocateDynamic.Table,x)
-        }
 
     AllocateDynamicReturn:
         bcc     ReturnRep
@@ -159,7 +158,7 @@ function _DeallocateSlot_A {
         assert8i()
 
         // X = current
-        function {freeSlotPool} {
+        namespace {freeSlotPool} {
             constant Return = UpdateStatus
 
             assert(StatusFlags.dynamicTileset == 0x40)
@@ -669,12 +668,11 @@ namespace _ActivateFixed {
     Process(TwoRows, freeRows, twoRows, 2, QueueTwoRowsFromList)
 
     code()
-    function Table {
+    Table:
         dw  OneTile
         dw  TwoTiles
         dw  OneRow
         dw  TwoRows
-    }
 }
 
 
@@ -902,12 +900,11 @@ namespace _AllocateDynamic {
 
 
     code()
-    function Table {
+    Table:
         dw  OneTile
         dw  TwoTiles
         dw  OneRow
         dw  TwoRows
-    }
 }
 
 

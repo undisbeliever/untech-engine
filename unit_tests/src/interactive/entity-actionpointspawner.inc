@@ -153,12 +153,11 @@ namespace ProjectileEntity {
     }
 
     rodata(EN_RomData)
-    function RomData {
+    RomData:
         dw  FunctionTable
         db  Entity.ListId.NPC   // initial List
         dw  MSFS.Projectile     // frameSetId
         db  0                   // defaultPalette
-    }
 
     rodata(EN_ProjectileList)
     constant PROJECTILE_ID = (pc() - Entity.Data.ProjectileList) / 2
@@ -272,11 +271,10 @@ namespace SpawnerEntity {
     //        DP = entity
     // REQUIRES: 16 bit A, 16 bit Index, DB = 0x7e
     code()
-    function SpawnRoutineTable {
+    SpawnRoutineTable:
         dw  SpawnPlayerProjectileAtAp
         dw  SpawnEnemyProjectileAtAp
         dw  SpawnEntityAtAp
-    }
     constant N_SPAWN_ROUTINES = (pc() - SpawnRoutineTable) / 2
 
     a16()
@@ -305,12 +303,11 @@ namespace SpawnerEntity {
 
 
     rodata(EN_RomData)
-    function RomData {
+    RomData:
         dw  FunctionTable
         db  Entity.ListId.BOSS      // initial List
         dw  MSFS.ActionPointSpawner // frameSetId
         db  0                       // defaultPalette
-    }
 
     rodata(EN_EntityList)
     constant ENTITY_ID = (pc() - Entity.Data.EntityList) / 2

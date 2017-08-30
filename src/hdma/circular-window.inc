@@ -688,22 +688,21 @@ i16()
     }
 
 
-    function SetupChannelSettings {
-        sep     #$20
-    a8()
-        // x = hdmaTable
-        stx.w   ChannelSettings.tableAddr
+SetupChannelSettings:
+    sep     #$20
+a8()
+    // x = hdmaTable
+    stx.w   ChannelSettings.tableAddr
 
 
-        assert(ChannelSettings.dmap + 1 == ChannelSettings.register)
+    assert(ChannelSettings.dmap + 1 == ChannelSettings.register)
 
-        ldx.w   #DMAP.direction.toPpu | DMAP.addressing.absolute | DMAP.transfer.two | (WH0 << 8)
-        stx.w   ChannelSettings.dmap
+    ldx.w   #DMAP.direction.toPpu | DMAP.addressing.absolute | DMAP.transfer.two | (WH0 << 8)
+    stx.w   ChannelSettings.dmap
 
 
-        lda.b   #1
-        sta.w   ChannelSettings.enabled
-    }
+    lda.b   #1
+    sta.w   ChannelSettings.enabled
 
     rts
 }

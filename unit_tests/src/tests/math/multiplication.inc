@@ -24,7 +24,7 @@ function Multiply.u8y_u8x_y {
     rts
 
 rodata(rom0)
-function Table {
+Table:
     macro row(evaluate a, evaluate b) {
         db  {a}, {b}
         dw  {a} * {b}
@@ -34,8 +34,7 @@ function Table {
     row(0xff, 0xff)
     row(10, 10)
     row(100, 100)
-End:
-}
+Table.End:
 }
 
 
@@ -66,7 +65,7 @@ function Multiply.16y_u8a_16y {
     rts
 
 rodata(rom0)
-function Table {
+Table:
     macro row(evaluate a, evaluate b) {
         dw  {a}
         db  {b}
@@ -86,8 +85,7 @@ assert(Math.Multiply.s16y_u8a_s16y == Math.Multiply.u16y_u8a_u16y)
     manyRows(0x7777, 0x77)
     manyRows(128, 33)
     manyRows(666, 128)  // overflow test
-End:
-}
+Table.End:
 }
 
 
@@ -126,7 +124,7 @@ Fail:
     rts
 
 rodata(rom0)
-function Table {
+Table:
     macro row(evaluate a, evaluate b) {
         dw  {a}
         db  {b}
@@ -139,8 +137,7 @@ function Table {
     row(100, 56)
     row(1000, 56)
     row(10000, 56)
-End:
-}
+Table.End:
 }
 
 
@@ -165,7 +162,7 @@ Fail:
     rts
 
 rodata(rom0)
-function Table {
+Table:
     macro row(evaluate a, evaluate b) {
         dw  {a}, {b}, {a} * {b}
     }
@@ -190,8 +187,7 @@ assert(Math.Multiply.s16y_s16x_s16y == Math.Multiply.u16y_u16x_u16y)
     manyRows(1024, 1024)
     manyRows(42, 42)
     manyRows(0x1337, 0x1337)
-End:
-}
+Table.End:
 }
 
 
@@ -226,7 +222,7 @@ Fail:
     rts
 
 rodata(rom0)
-function Table {
+Table:
     macro row(evaluate a, evaluate b) {
         dw  {a}, {b}
         dd  {a} * {b}
@@ -238,8 +234,7 @@ function Table {
     row(1000, 1000)
     row(10000, 10000)
     row(0xffff, 0xffff)
-End:
-}
+Table.End:
 }
 
 
@@ -275,7 +270,7 @@ Fail:
     rts
 
 rodata(rom0)
-function Table {
+Table:
     macro row(evaluate a, evaluate b) {
         dw  {a}, {b}
         dd  {a} * {b}
@@ -294,8 +289,7 @@ function Table {
     manyRows(1000, 1000)
     manyRows(1024, 1024)
     manyRows(0x1337, 0x1337)
-End:
-}
+Table.End:
 }
 
 
@@ -336,7 +330,7 @@ Fail:
     rts
 
 rodata(rom0)
-function Table {
+Table:
     macro row(evaluate a, evaluate b) {
         dd  {a}, {b}, {a} * {b}
     }
@@ -364,8 +358,7 @@ assert(Math.Multiply.s32_s32xy_s32xy == Math.Multiply.u32_u32xy_u32xy)
     manyRows(1000000, 1000000)
     manyRows(0xffffff, 0xffffff)
     manyRows(0x1337, 0x1337)
-End:
-}
+Table.End:
 }
 
 
@@ -408,7 +401,7 @@ Fail:
     rts
 
 rodata(rom0)
-function Table {
+Table:
     macro row(evaluate a, evaluate b) {
         dd  {a}
         db  {b}
@@ -436,8 +429,7 @@ assert(Math.Multiply.s32xy_u8a_s32xy == Math.Multiply.u32xy_u8a_u32xy)
     manyRows(0x1337, 0x80)
     manyRows(0x1337, 0x25)
     manyRows(0x13371337, 64)
-End:
-}
+Table.End:
 }
 
 }

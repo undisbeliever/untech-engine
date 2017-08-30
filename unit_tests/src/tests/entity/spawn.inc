@@ -252,7 +252,8 @@ function SpawnEntity_XY {
 }
 
 rodata(rom0)
-function ExpectedSizes {
+ExpectedSizes:
+namespace ExpectedSizes {
 // NOTE: projectiles are always spawned, even if offscreen
     dw  6   // player
     dw  6   // boss

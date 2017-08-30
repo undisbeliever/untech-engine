@@ -127,7 +127,7 @@ macro MarkDirty(pattern) {
 
 
 rodata(rom0)
-function TransferTable {
+namespace TransferTable {
     Cgadd:
         dw  0
         dw  0

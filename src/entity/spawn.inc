@@ -183,7 +183,7 @@ allocateTmpWord(yPos)
 rodata(rom0)
 // one if the entity list is always active
 // zero if entity list can be deactivated
-function EntityAlwaysActiveList {
+EntityAlwaysActiveList: {
     dw  1       // players
     dw  1       // bosses
     dw  0       // enemies

@@ -175,14 +175,13 @@ AnimationDisabled:
     a16()
     i16()
     namespace UpdateNextFrameTime {
-        function Table {
+        Table:
             dw  Frame
             dw  Time
             dw  DistanceVertical
             dw  DistanceHorizontal
+        constant Table.size = pc() - Table
 
-        constant size = pc() - Table
-        }
         assertPowerOfTwo(Table.size)
         assert(MetaSprite.Format.AnimationDurationFormat._MASK + 2 == Table.size)
 

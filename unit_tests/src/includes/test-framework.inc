@@ -113,7 +113,7 @@ i16()
     ldx.w   #TestNameList
     stx.w   currentTestName
 
-    function Loop {
+    Loop:
         // ::TODO print test number
 
         Text.Console.SetCursor(0, 2)
@@ -186,7 +186,6 @@ i16()
 
         cmp.w   #N_TESTS
         bcc     Loop
-    }
 
 
 AllTestsPassed:

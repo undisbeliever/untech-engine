@@ -121,12 +121,11 @@ namespace PlayerEntity {
     }
 
     rodata(EN_RomData)
-    function RomData {
+    RomData:
         dw  FunctionTable
         db  Entity.ListId.PLAYER        // initial List
         dw  MSFS.EhCollisionTest_Player // frameSetId
         db  0                           // defaultPalette
-    }
 
     rodata(EN_EntityList)
     constant ENTITY_ID = (pc() - Entity.Data.EntityList) / 2
@@ -149,7 +148,7 @@ namespace EnemyEntity {
     a16()
     i16()
     code()
-    Destructor: {
+    function Destructor {
         Text.Console.PrintConstString("E.Destructor\n")
         rts
     }
@@ -157,7 +156,7 @@ namespace EnemyEntity {
     a16()
     i16()
     code()
-    Process: {
+    function Process {
         rts
     }
 
@@ -203,12 +202,11 @@ namespace EnemyEntity {
     }
 
     rodata(EN_RomData)
-    function RomData {
+    RomData:
         dw  FunctionTable
         db  Entity.ListId.ENEMY         // initial List
         dw  MSFS.EhCollisionTest_Enemy  // frameSetId
         db  0                           // defaultPalette
-    }
 
     rodata(EN_EntityList)
     constant ENTITY_ID = (pc() - Entity.Data.EntityList) / 2
@@ -216,7 +214,7 @@ namespace EnemyEntity {
 }
 
 rodata(rom0)
-function EnemyTable {
+namespace EnemyTable {
 constant Y_DELTA = 20
 constant N_COLUMNS = 4
 constant Y_BOTTOM = Camera.ORIGIN + Camera.DISPLAY_HEIGHT - 30
@@ -230,6 +228,7 @@ constant X_RIGHT = Camera.ORIGIN + Camera.DISPLAY_WIDTH / 2 + 10
         field(parameter, 2)
     endstruct()
 
+Data:
     //  xPos,       yPos,                   frameId
     dw  X_LEFT,     Y_BOTTOM - Y_DELTA * 2,  MSEO.EhCollisionTest_Enemy.Frames.box
     dw  X_RIGHT,    Y_BOTTOM - Y_DELTA * 3,  MSEO.EhCollisionTest_Enemy.Frames.row1
@@ -237,7 +236,7 @@ constant X_RIGHT = Camera.ORIGIN + Camera.DISPLAY_WIDTH / 2 + 10
     dw  X_RIGHT,    Y_BOTTOM - Y_DELTA * 1,  MSEO.EhCollisionTest_Enemy.Frames.row3
     dw  X_RIGHT,    Y_BOTTOM - Y_DELTA * 0,  MSEO.EhCollisionTest_Enemy.Frames.row4
 
-    constant N_ENEMIES = (pc() - EnemyTable) / size
+    constant N_ENEMIES = (pc() - Data) / size
 }
 
 

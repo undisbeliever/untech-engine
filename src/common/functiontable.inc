@@ -18,7 +18,7 @@
 // PARAM: tableName - the name of the function table (defualt FunctionTable)
 inline buildFunctionTable(struct, module, tableName) {
     code()
-    function {tableName} {
+    {tableName}: {
         _buildFunctionTable_structs({struct}, {module})
     }
 }

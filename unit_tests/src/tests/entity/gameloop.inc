@@ -61,7 +61,7 @@ Fail:
     rts
 
 rodata(rom0)
-function SpawnList {
+SpawnList: {
     define C = Entities.ChangeToParticleEntity.EntityId_
     define B = Entities.BlankEntity.EntityId_
 
@@ -72,11 +72,11 @@ function SpawnList {
     dw  {C}4, {C}4, {C}4, {C}4, {C}4    // playform
     dw  {B}5, {B}5, {B}5, {B}5, {B}5    // particle
 
-    constant size = pc() - SpawnList
-    assert(size/2 <= Entity.N_ENTITIES)
+    constant SpawnList.size = pc() - SpawnList
+    assert(SpawnList.size/2 <= Entity.N_ENTITIES)
 }
 
-function ExpectedSizes {
+ExpectedSizes: {
     dw  3                   // player
     dw  3                   // boss
     dw  3                   // enemy
@@ -84,8 +84,8 @@ function ExpectedSizes {
     dw  0                   // platform
     dw  (6 * 5) - (3 * 4)   // particle
 
-    constant size = pc() - ExpectedSizes
-    assert(size / 2 == Entity.lists.N_LISTS)
+    constant ExpectedSizes.size = pc() - ExpectedSizes
+    assert(ExpectedSizes.size / 2 == Entity.lists.N_LISTS)
 }
 }
 
@@ -383,7 +383,7 @@ function SpawnEntity_XY {
 }
 
 rodata(rom0)
-function InitialExpectedSizes {
+InitialExpectedSizes: {
     dw  4   // player
     dw  4   // boss
     dw  1   // enemy
@@ -391,12 +391,11 @@ function InitialExpectedSizes {
     dw  1   // platform
     dw  4   // particle
 
-    constant size = pc() - InitialExpectedSizes
-    assert(size / 2 == Entity.lists.N_LISTS)
+    assert((pc() - InitialExpectedSizes) / 2 == Entity.lists.N_LISTS)
 }
 
 rodata(rom0)
-function MoveCameraTable {
+MoveCameraTable: {
     macro _row(xPos, yPos, e) {
         dw  {xPos}, {yPos}
         dw  4   // player
@@ -414,8 +413,8 @@ function MoveCameraTable {
     _row(0x2000, 0x1000, 2) // Still inside inactive window
     _row(0x3000, 0x3000, 0)
 
-    constant rowSize = (2 + Entity.lists.N_LISTS) * 2
-    constant size = pc() - MoveCameraTable
+    constant MoveCameraTable.rowSize = (2 + Entity.lists.N_LISTS) * 2
+    constant MoveCameraTable.size = pc() - MoveCameraTable
 }
 }
 
