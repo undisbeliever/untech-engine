@@ -86,9 +86,9 @@ macro _Deallocate() {
 
 
 // Activates the given entity's vram table
-// REQUIRES: 8 bit A, 16 bit Index
+// REQUIRES: 8 bit A, 16 bit Index, DB = 0x7e
 // INPUT: X = frameSet
-// BRANCH: ReturnRep on failure (with carry clear)
+// BRANCH: ReturnFailure on failure
 // MODIFIES: Register size
 macro _Activate() {
     assert8a()
@@ -112,18 +112,7 @@ macro _Activate() {
         tyx
         jmp     (MetaSprite.Vram._ActivateTable,x)
 
-
-    AllocateDynamicReturn:
-        bcc     ReturnRep
-
-        // Upload tiles now that a row is allocated
-        rep     #$30
-    a16()
-    i16()
-        jsr     MetaSprite.Vram._UploadDynamicTileset
-
-    ActivateFixedReturn:
-        bcc     ReturnRep
+    Success:
     AlreadyActive:
 }
 
@@ -368,14 +357,13 @@ Return:
 //      DP: Entity
 //       A: Tileset Address
 //
-// OUTPUT:
-//      Carry set on success
-//
 // RETURN:
-//      Jump to Return
+//      Jump to ReturnSuccess on Success
+//      Jump to ReturnFailure on Failure
 //      Register size unknown
 namespace _ActivateFixed {
-    constant Return = MetaSprite.Activate.Vram._Activate.ActivateFixedReturn
+    constant ReturnSuccess = MetaSprite.Activate.Vram._Activate.Success
+    constant ReturnFailure = MetaSprite.Activate.ReturnFailure
 
     inline Process(name, freeSlotPool, usedSlotPool, nSlots, uploadRoutine) {
         a16()
@@ -429,8 +417,7 @@ namespace _ActivateFixed {
 
         NoDmaTime:
         NoSlotsFound:
-            clc
-            jmp     Return
+            jmp     ReturnFailure
         }
     }
 
@@ -615,8 +602,7 @@ namespace _ActivateFixed {
         ora.l   slots.CharAttrOffset,x
         sta.b   BaseEntity.MetaSprite.blockOneCharAttrOffset
 
-        sec
-        jmp     Return
+        jmp     ReturnSuccess
     }
 
 
@@ -659,8 +645,7 @@ namespace _ActivateFixed {
         ora.l   slots.CharAttrOffset,x
         sta.b   BaseEntity.MetaSprite.blockTwoCharAttrOffset
 
-        sec
-        jmp     Return
+        jmp     ReturnSuccess
     }
 
 
@@ -672,7 +657,8 @@ namespace _ActivateFixed {
 
 
 
-// Allocates VRAM slot(s) to a dynamic metasprite
+// Allocates the VRAM slot(s) of a dynamic tileset MetaSprite, uploading
+// the MetaSprite frame's tiles (if necessary).
 //
 // ASSUMES: Entity has a frameSet with a dynamic tileset.
 //          Entity does not have a slot attached to it.
@@ -683,14 +669,13 @@ namespace _ActivateFixed {
 //      DP: Entity
 //       A: Tileset Address
 //
-// OUTPUT:
-//      Carry set on success
-//
 // RETURN:
-//      Jump to Return on Success
+//      Jump to ReturnSuccess on Success
+//      Jump to ReturnFailure on Failure
 //      Register size unknown
 namespace _ActivateDynamic {
-    constant Return = MetaSprite.Activate.Vram._Activate.AllocateDynamicReturn
+    constant ReturnSuccess = MetaSprite.Activate.Vram._Activate.Success
+    constant ReturnFailure = MetaSprite.Activate.ReturnFailure
 
 // ::SHOULDO add dynamic tileset with fixed portion of tiles::
 // ::: ie, tiles 5-7 are fixed through the life of the entity::
@@ -716,6 +701,8 @@ namespace _ActivateDynamic {
     //
     // MetaSprite.blockOneCharAttrOffset &= ~OamFormat.change.char.mask
     // MetaSprite.blockOneCharAttrOffset |= current->CharAttrOffset
+    //
+    // return _UploadDynamicTileset()
 
     inline Process_Single(name, freeSlotPool) {
         a16()
@@ -736,8 +723,7 @@ namespace _ActivateDynamic {
         NoSlotsFound:
             Warnings.Warn(NO_MS_VRAM_SLOTS)
 
-            clc
-            jmp     Return
+            jmp     ReturnFailure
         }
     }
     Process_Single(OneTile, freeTiles)
@@ -774,15 +760,19 @@ namespace _ActivateDynamic {
 
         sta.b   BaseEntity.MetaSprite.status
 
-        rep     #$20
+        rep     #$30
     a16()
+    i16()
         lda.b   BaseEntity.MetaSprite.blockOneCharAttrOffset
         and.w   #~OamFormat.charAttr.char.mask
         ora.l   slots.CharAttrOffset,x
         sta.b   BaseEntity.MetaSprite.blockOneCharAttrOffset
 
-        sec
-        jmp     Return
+        jsr     MetaSprite.Vram._UploadDynamicTileset
+        bcc     Fail
+            jmp     ReturnSuccess
+        Fail:
+            jmp     ReturnFailure
     }
 
 
@@ -814,6 +804,8 @@ namespace _ActivateDynamic {
     // MetaSprite.blockOneCharAttrOffset |= current->CharAttrOffset
     // MetaSprite.blockTwoCharAttrOffset &= ~OamFormat.change.char.mask
     // MetaSprite.blockTwoCharAttrOffset |= current->CharAttrOffset
+    //
+    // return _UploadDynamicTileset()
 
     inline Process_Dual(name, freeSlotPool) {
         a16()
@@ -843,8 +835,7 @@ namespace _ActivateDynamic {
         a16()
             Warnings.Warn(NO_MS_VRAM_SLOTS)
 
-            clc
-            jmp     Return
+            jmp     ReturnFailure
         }
     }
     Process_Dual(TwoRows, freeRows)
@@ -878,8 +869,9 @@ namespace _ActivateDynamic {
 
         sta.b   BaseEntity.MetaSprite.status
 
-        rep     #$20
+        rep     #$30
     a16()
+    i16()
         lda.b   BaseEntity.MetaSprite.blockOneCharAttrOffset
         and.w   #~OamFormat.charAttr.char.mask
         ora.l   slots.CharAttrOffset,x
@@ -890,8 +882,11 @@ namespace _ActivateDynamic {
         ora.l   slots.CharAttrOffset,x
         sta.b   BaseEntity.MetaSprite.blockTwoCharAttrOffset
 
-        sec
-        jmp     Return
+        jsr     MetaSprite.Vram._UploadDynamicTileset
+        bcc     Fail
+            jmp     ReturnSuccess
+        Fail:
+            jmp     ReturnFailure
     }
 }
 

@@ -117,6 +117,8 @@ function Activate {
     sep     #$20
 a8()
     Vram._Activate()
+au()
+iu()
 
     sep     #$20
     rep     #$10
@@ -127,11 +129,19 @@ i16()
     jsr     MetaSprite.Palette._ProcessSlots
     // c = return
 
-ReturnRep:
     rep     #$30
 a16()
 i16()
 Return:
+    rts
+
+ReturnFailure:
+au()
+iu()
+    rep     #$31
+a16()
+i16()
+    // carry clear
     rts
 }
 
