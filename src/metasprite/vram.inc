@@ -714,7 +714,7 @@ namespace _ActivateDynamic {
     //
     // return _UploadDynamicTileset()
 
-    inline Process_Single(name, freeSlotPool) {
+    inline Process_Single(name, freeSlotPool, fallThrough) {
         a16()
         i16()
         code()
@@ -728,21 +728,23 @@ namespace _ActivateDynamic {
             ldy.w   slots.next,x
             sty.w   slotPool.{freeSlotPool}
 
-            bra     Finalize_Single
-
-        NoSlotsFound:
-            Warnings.Warn(NO_MS_VRAM_SLOTS)
-
-            jmp     ReturnFailure
+            if {fallThrough} {
+                _FallThrough:
+            } else {
+                bra     Finalize_Single
+            }
         }
     }
-    Process_Single(OneTile, freeTiles)
-    Process_Single(OneRow, freeRows)
+    Process_Single(OneTile, freeTiles, 0)
+    Process_Single(OneRow, freeRows, 1)
+
 
     code()
     a16()
     i8()
     function Finalize_Single {
+        assert(pc() == OneRow._FallThrough)
+
         stz.w   slots.tileset,x
 
         assert(slots.next + 1 == slots.prev)
@@ -779,11 +781,17 @@ namespace _ActivateDynamic {
 
         jsr     MetaSprite.Vram._UploadDynamicTileset
         bcc     Fail
-            jmp     ReturnSuccess
-        Fail:
-            jmp     ReturnFailure
+        jmp     ReturnSuccess
     }
 
+
+    a16()
+    i8()
+    code()
+    NoSlotsFound:
+        Warnings.Warn(NO_MS_VRAM_SLOTS)
+    Fail:
+        jmp     ReturnFailure
 
 
     // Dual code: (split into two halfs)
@@ -816,7 +824,7 @@ namespace _ActivateDynamic {
     //
     // return _UploadDynamicTileset()
 
-    inline Process_Dual(name, freeSlotPool) {
+    inline Process_Dual(name, freeSlotPool, fallThrough) {
         a16()
         i16()
         code()
@@ -842,23 +850,23 @@ namespace _ActivateDynamic {
             lda.w   slots.next,y
             sta.w   slotPool.{freeSlotPool}
 
-            bra     Finalize_Dual
-
-        NoSlotsFound:
-        a16()
-            Warnings.Warn(NO_MS_VRAM_SLOTS)
-
-            jmp     ReturnFailure
+            if {fallThrough} {
+                _FallThrough:
+            } else {
+                bra     Finalize_Dual
+            }
         }
     }
-    Process_Dual(TwoRows, freeRows)
-    Process_Dual(TwoTiles, freeTiles)
+    Process_Dual(TwoRows, freeRows, 0)
+    Process_Dual(TwoTiles, freeTiles, 1)
 
 
     a8()
     i8()
     code()
     function Finalize_Dual {
+        assert(pc() == TwoTiles._FallThrough)
+
         lda.b   #1
         sta.w   slots.count,x
 
@@ -893,9 +901,7 @@ namespace _ActivateDynamic {
 
         jsr     MetaSprite.Vram._UploadDynamicTileset
         bcc     Fail
-            jmp     ReturnSuccess
-        Fail:
-            jmp     ReturnFailure
+        jmp     ReturnSuccess
     }
 }
 
