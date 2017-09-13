@@ -162,27 +162,27 @@ namespace MetaSprite {
         namespace slotPool {
             // List of slots using one fixed tile
             // (byte index, if >= 0x80 the NULL)
-            allocateTmpWord(oneTile)
+            allocate(oneTile, wram7e, 1)
 
             // List of slots using two fixed tiles
             // (byte index, if >= 0x80 the NULL)
-            constant twoTiles = oneTile + 1
+            allocate(twoTiles, wram7e, 1)
 
             // List of slots using one fixed row
             // (byte index, if >= 0x80 the NULL)
-            allocateTmpWord(oneRow)
+            allocate(oneRow, wram7e, 1)
 
             // List of slots using two fixed rows
             // (byte index, if >= 0x80 the NULL)
-            constant twoRows = oneRow + 1
+            allocate(twoRows, wram7e, 1)
 
             // List of unallocated vram tile slots
             // (byte index, if >= 0x80 the NULL)
-            allocateTmpWord(freeTiles)
+            allocate(freeTiles, wram7e, 1)
 
             // List of unallocated vram row slots
             // (byte index, if >= 0x80 the NULL)
-            allocateTmpWord(freeRows)
+            allocate(freeRows, wram7e, 1)
         }
     }
 

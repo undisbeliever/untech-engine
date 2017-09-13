@@ -51,17 +51,27 @@ macro _Init() {
     sta.w   MetaSprite.Vram.slots.next + ROW_SLOTS_MIN_INDEX - ARRAY_INCREMENT
     sta.w   MetaSprite.Vram.slots.next + ARRAY_INCREMENT * (N_ELEMENTS - 1)
 
-    // Reset the slot pool
 
+    // Clear the slot pools
+
+    rep     #$20
+a16()
+    assert(MetaSprite.Vram.slotPool.oneTile + 1 == MetaSprite.Vram.slotPool.twoTiles)
+    assert(MetaSprite.Vram.slotPool.oneRow + 1 == MetaSprite.Vram.slotPool.twoRows)
+
+    lda.w   #0x8080
     sta.w   MetaSprite.Vram.slotPool.oneTile
-    sta.w   MetaSprite.Vram.slotPool.twoTiles
     sta.w   MetaSprite.Vram.slotPool.oneRow
-    sta.w   MetaSprite.Vram.slotPool.twoRows
 
-    lda.b   #MetaSprite.Vram.slots.ROW_SLOTS_MIN_INDEX
-    sta.w   MetaSprite.Vram.slotPool.freeRows
 
-    stz.w   MetaSprite.Vram.slotPool.freeTiles
+    // Initialize the first free slot lists
+
+    assert(MetaSprite.Vram.slotPool.freeTiles + 1 == MetaSprite.Vram.slotPool.freeRows)
+    lda.w   #MetaSprite.Vram.slots.ROW_SLOTS_MIN_INDEX << 8
+    sta.w   MetaSprite.Vram.slotPool.freeTiles
+
+    sep     #$20
+a8()
 }
 
 
@@ -735,17 +745,16 @@ namespace _ActivateDynamic {
     function Finalize_Single {
         stz.w   slots.tileset,x
 
-        sep     #$20
-    a8()
+        assert(slots.next + 1 == slots.prev)
+        lda.w   #0x8080
+        sta.w   slots.next,x
 
-        lda.b   #1
+        assert(slots.count + 1 == slots.pair)
+        lda.w   #0x8001
         sta.w   slots.count,x
 
-        lda.b   #0x80
-        sta.w   slots.prev,x
-        sta.w   slots.next,x
-        sta.w   slots.pair,x
-
+        sep     #$20
+    a8()
         assert(MetaSprite.StatusFlags.paletteSet == 0x80)
 
         lda.b   BaseEntity.MetaSprite.status
@@ -824,6 +833,10 @@ namespace _ActivateDynamic {
 
             stz.w   slots.tileset,x
 
+            assert(slots.next + 1 == slots.prev)
+            lda.w   #0x8080
+            sta.w   slots.next,x
+
             sep     #$20
         a8()
             lda.w   slots.next,y
@@ -848,10 +861,6 @@ namespace _ActivateDynamic {
     function Finalize_Dual {
         lda.b   #1
         sta.w   slots.count,x
-
-        lda.b   #0x80
-        sta.w   slots.prev,x
-        sta.w   slots.next,x
 
         tya
         sta.w   slots.pair,x
