@@ -10,7 +10,7 @@
 
 
 // Data format may be subject to changes
-if MetaSprite.Data.METASPRITE_FORMAT_VERSION != 26 {
+if MetaSprite.Data.METASPRITE_FORMAT_VERSION != 27 {
     error "Invalid UnTech MetaSprite Format"
 }
 
@@ -94,11 +94,11 @@ namespace Format {
                 constant ONE_TILE = 0x00
                 constant TWO_TILES = 0x02
                 constant ONE_ROW = 0x04
-                constant TWO_ROWS = 0x08
+                constant TWO_ROWS = 0x06
             }
             namespace Lifespan {
-                constant FIXED = 0x80
-                constant DYNAMIC = 0x00
+                constant FIXED = 0x00
+                constant DYNAMIC = 0x08
             }
         }
     }

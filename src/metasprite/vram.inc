@@ -99,30 +99,19 @@ macro _Activate() {
     lda.b	BaseEntity.MetaSprite.status
     lsr
     bcs     AlreadyActive
-        assert(MetaSprite.Format.FrameSet.tilesetType.Lifespan.FIXED == 0x80)
-
         // X = frameset
         lda.l   MetaSprite.Format.FrameSet.tilesetType,x
 
         rep     #$30
     a16()
-        bpl     Dynamic
+        and.w   #MetaSprite.Vram._ActivateTable.mask
+        tay
 
-        Fixed:
-            tay
+        lda.l   MetaSprite.Format.FrameSet.tileset,x
 
-            lda.l   MetaSprite.Format.FrameSet.tileset,x
-            sta.w   MetaSprite.Vram.tilesetAddr
+        tyx
+        jmp     (MetaSprite.Vram._ActivateTable,x)
 
-            tya
-            and.w   #3 << 1
-            tax
-            jmp     (MetaSprite.Vram._ActivateFixed.Table,x)
-
-        Dynamic:
-            and.w   #3 << 1
-            tax
-            jmp     (MetaSprite.Vram._AllocateDynamic.Table,x)
 
     AllocateDynamicReturn:
         bcc     ReturnRep
@@ -135,9 +124,22 @@ macro _Activate() {
 
     ActivateFixedReturn:
         bcc     ReturnRep
-AlreadyActive:
+    AlreadyActive:
 }
 
+code()
+_ActivateTable:
+    dw  _ActivateFixed.OneTile
+    dw  _ActivateFixed.TwoTiles
+    dw  _ActivateFixed.OneRow
+    dw  _ActivateFixed.TwoRows
+    dw  _ActivateDynamic.OneTile
+    dw  _ActivateDynamic.TwoTiles
+    dw  _ActivateDynamic.OneRow
+    dw  _ActivateDynamic.TwoRows
+
+assertPowerOfTwo(pc() - _ActivateTable)
+constant _ActivateTable.mask = pc() - _ActivateTable - 2
 
 
 // Deallocates the vram slot from the entity.
@@ -364,7 +366,7 @@ Return:
 //
 // INPUT:
 //      DP: Entity
-//      tilesetAddr = Tileset Address
+//       A: Tileset Address
 //
 // OUTPUT:
 //      Carry set on success
@@ -380,7 +382,7 @@ namespace _ActivateFixed {
         i16()
         code()
         function {name} {
-            lda.w   tilesetAddr
+            sta.w   tilesetAddr
 
             sep     #$10
         i8()
@@ -666,13 +668,6 @@ namespace _ActivateFixed {
     Process(TwoTiles, freeTiles, twoTiles, 2, QueueTwoTilesFromList)
     Process(OneRow, freeRows, oneRow, 1, QueueOneRowFromList)
     Process(TwoRows, freeRows, twoRows, 2, QueueTwoRowsFromList)
-
-    code()
-    Table:
-        dw  OneTile
-        dw  TwoTiles
-        dw  OneRow
-        dw  TwoRows
 }
 
 
@@ -686,6 +681,7 @@ namespace _ActivateFixed {
 //
 // INPUT:
 //      DP: Entity
+//       A: Tileset Address
 //
 // OUTPUT:
 //      Carry set on success
@@ -693,7 +689,7 @@ namespace _ActivateFixed {
 // RETURN:
 //      Jump to Return on Success
 //      Register size unknown
-namespace _AllocateDynamic {
+namespace _ActivateDynamic {
     constant Return = MetaSprite.Activate.Vram._Activate.AllocateDynamicReturn
 
 // ::SHOULDO add dynamic tileset with fixed portion of tiles::
@@ -897,14 +893,6 @@ namespace _AllocateDynamic {
         sec
         jmp     Return
     }
-
-
-    code()
-    Table:
-        dw  OneTile
-        dw  TwoTiles
-        dw  OneRow
-        dw  TwoRows
 }
 
 
