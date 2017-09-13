@@ -62,6 +62,9 @@ Test.add("Entity.Spawn (Overflow)")
 function Spawn_Overflow {
 constant tmp = Test.tmp
 
+    // Disable VBlank - prevent Warnings from corrupting CGRAM
+    jsr     DisableVBlank
+
     jsr     Entity.Init
 
     stz.w   Entities.BlankEntity.parameterSum

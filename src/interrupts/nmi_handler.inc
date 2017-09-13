@@ -85,5 +85,24 @@ a16()
     rts
 }
 
+
+// Disable NMI (VBlank) Interrupts and Disable autoJoy
+//
+// REQUIRES: DB access shadow
+au()
+iu()
+code()
+function DisableVBlank {
+    php
+
+    sep     #$20
+a8()
+    lda.b   #0
+    sta.l   NMITIMEN
+
+    plp
+    rts
+}
+
 // vim: ft=bass-65816 ts=4 sw=4 et:
 
