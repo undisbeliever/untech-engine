@@ -516,6 +516,55 @@ a8()
 }
 
 
+// Queues a list of 16x16px tiles at the end of a vram row.
+//
+// NOTE: Will queue a MAXIMUM of 8 tiles
+//
+// REQUIRES: DB = $7e
+//
+// INPUT:
+//      tileListAddr - the address of the tile list (within `TileListBank`)
+//      vramWaddr - the VRAM word address (MUST on an even VRAM tile row)
+//
+// OUTPUT: C set if successful
+// OUTPUT: Changes register size to 8 bit A, 16 bit Index
+au()
+iu()
+code()
+function QueueListAtEndOfRow {
+    rep     #$30
+    sep     #$20
+a8()
+i16()
+
+    ldx.w   tileListAddr
+
+    // ensure 1 <= nTiles <= 8
+    lda.l   TileListData.count,x
+    dec
+    and.b   #7
+    inc
+
+NTilesA:
+    tay
+
+    // vramWaddr |= (8 - nTiles) * 32
+
+    eor.b   #7
+    inc
+
+    asl
+    asl
+    asl
+    asl
+    asl
+    ora.w   vramWaddr
+    sta.w   vramWaddr
+
+    tya
+    bra     QueueOneRowFromList.NTilesA
+}
+
 
 // Queues a single row of 16x16px tiles from a tile list
 //
@@ -722,6 +771,113 @@ a16()
     sta.w   transferQueueIndex
 
     jmp     QueueOneRowFromList.BuildDmaQueue
+}
+
+
+// Queues a list of 16x16px tiles at the end of two vram rows.
+//
+// NOTE: Will queue a MAXIMUM of 8 tiles
+//
+// REQUIRES: DB = $7e
+//
+// INPUT:
+//      tileListAddr - the address of the tile list (within `TileListBank`)
+//      vramWaddr - the VRAM word address (MUST on an even VRAM tile row)
+//      vramWaddr2 - the VRAM word address of the second row (MUST on an even VRAM tile row)
+//
+// OUTPUT: C set if successful
+// OUTPUT: Changes register size to 8 bit A, 16 bit Index
+au()
+iu()
+code()
+function QueueListAtEndOfTwoRows {
+constant tmp_nTiles = QueueOneRowFromList.tmp_nTiles
+
+    rep     #$30
+    sep     #$20
+a8()
+i16()
+
+    ldx.w   tileListAddr
+
+    lda.l   TileListData.count,x
+    cmp.b   #8 + 1
+    bcs     +
+        // nTiles <= 8, load tiles at end of the second row
+        ldy.w   vramWaddr2
+        sty.w   vramWaddr
+        jmp     QueueListAtEndOfRow.NTilesA
+    +
+
+    // ensure 1 <= nTiles <= 15
+    dec
+    and.b   #15
+    inc
+    sta.w   tmp_nTiles
+
+    asl
+    // C clear
+    adc.w   tileQueueIndex
+    cmp.b   #TILE_QUEUE_INDEX_END
+    bcs     Fail
+
+
+    ldy.w   transferQueueIndex
+    cpy.w   #TRANSFER_QUEUE_INDEX_END - 2
+    bcs     Fail
+
+
+    lda.w   Dma.transfersLeft
+    dec
+    clc                 // -2 code overhead
+    sbc.w   tmp_nTiles
+    bcc     Fail
+
+    sta.w   Dma.transfersLeft
+
+
+    // Y = transferQueueIndex
+
+    lda.w   tmp_nTiles
+    sec
+    sbc.b   #8
+    asl
+    sta.w   transferQueue.vblankFunctionAddr,y
+
+    lda.b   #8 << 1
+    sta.w   transferQueue.vblankFunctionAddr + 2,y
+
+
+    // transferQueue.wordAddress[Y] = vramWaddr | (16 - nTiles) * 32
+    // transferQueue.wordAddress[Y + 1] = vramWaddr2
+
+    lda.w   tmp_nTiles
+    eor.b   #15
+
+    rep     #$31
+a16()
+    and.w   #7
+    inc
+    xba
+    lsr
+    lsr
+    lsr
+    ora.w   vramWaddr
+    sta.w   transferQueue.wordVramAddress,y
+
+    lda.w   vramWaddr2
+    sta.w   transferQueue.wordVramAddress + 2,y
+
+    tya
+    // carry clear
+    adc.w   #4
+    sta.w   transferQueueIndex
+
+    jmp     QueueOneRowFromList.BuildDmaQueue
+
+Fail:
+    clc
+    rts
 }
 
 }

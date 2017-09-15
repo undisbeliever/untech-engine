@@ -163,6 +163,7 @@ function QueueTwoRowsFromList_one {
 
     ldy.w   #VRAM_1
     sty.w   Dma.Tile16.vramWaddr
+    ldy.w   #VRAM_1 + 32 * 16
     sty.w   Dma.Tile16.vramWaddr2
 
     jsr     Dma.Tile16.QueueTwoRowsFromList
@@ -275,6 +276,209 @@ i16()
 
     ldx.w   #TileData.Tile2
     ldy.w   #VRAM_2 + 32 * 1
+    jsr     _CheckTile
+    bcc     Fail
+
+    sec
+    rts
+
+Fail:
+    clc
+    rts
+}
+
+
+//DB=0x7e
+a16()
+i16()
+code()
+Test.add("Dma.Tile16.QueueListAtEndOfRow")
+function QueueListAtEndOfRow {
+    constant VRAM_1 = VRAM_BLOCK + 10 * 32 * 16
+
+    jsr     Dma.Init
+    jsr     WaitFrame       // Reset Dma.transfersLeft
+
+    ldx.w   #TileData.TileList5
+    stx.w   Dma.Tile16.tileListAddr
+    ldy.w   #VRAM_1
+    sty.w   Dma.Tile16.vramWaddr
+
+    jsr     Dma.Tile16.QueueListAtEndOfRow
+    bcc     Fail
+
+
+    rep     #$30
+a16()
+    jsr     Dma.TransferOnNextVBlank
+
+    jsr     WaitFrame
+
+    ldx.w   #TileData.Tile4
+    ldy.w   #VRAM_1 + 32 * 7
+    jsr     _CheckTile
+    bcc     Fail
+
+    ldx.w   #TileData.Tile3
+    ldy.w   #VRAM_1 + 32 * 6
+    jsr     _CheckTile
+    bcc     Fail
+
+    ldx.w   #TileData.Tile2
+    ldy.w   #VRAM_1 + 32 * 5
+    jsr     _CheckTile
+    bcc     Fail
+
+    ldx.w   #TileData.Tile1
+    ldy.w   #VRAM_1 + 32 * 4
+    jsr     _CheckTile
+    bcc     Fail
+
+    ldx.w   #TileData.Tile0
+    ldy.w   #VRAM_1 + 32 * 3
+    jsr     _CheckTile
+    bcc     Fail
+
+    sec
+    rts
+
+Fail:
+    clc
+    rts
+}
+
+
+
+
+a16()
+i16()
+code()
+Test.add("Dma.Tile16.QueueListAtEndOfTwoRows (one row)")
+function QueueListAtEndOfTwoRows_one {
+    constant VRAM_1 = VRAM_BLOCK +  8 * 32 * 16
+    constant VRAM_2 = VRAM_BLOCK + 14 * 32 * 16
+
+    jsr     Dma.Init
+    jsr     WaitFrame       // Reset Dma.transfersLeft
+
+    ldx.w   #TileData.TileList2
+    stx.w   Dma.Tile16.tileListAddr
+
+    ldy.w   #VRAM_1
+    sty.w   Dma.Tile16.vramWaddr
+    ldy.w   #VRAM_2
+    sty.w   Dma.Tile16.vramWaddr2
+
+    jsr     Dma.Tile16.QueueListAtEndOfTwoRows
+    bcc     Fail
+
+
+    rep     #$30
+a16()
+    jsr     Dma.TransferOnNextVBlank
+
+    jsr     WaitFrame
+
+    ldx.w   #TileData.Tile2
+    ldy.w   #VRAM_2 + 32 * 6
+    jsr     _CheckTile
+    bcc     Fail
+
+    ldx.w   #TileData.Tile3
+    ldy.w   #VRAM_2 + 32 * 7
+    jsr     _CheckTile
+    bcc     Fail
+
+    sec
+    rts
+
+Fail:
+    clc
+    rts
+}
+
+
+a16()
+i16()
+code()
+Test.add("Dma.Tile16.QueueListAtEndOfTwoRows (two rows)")
+function QueueListAtEndOfTwoRows_two {
+    constant VRAM_1 = VRAM_BLOCK + 12 * 32 * 16
+    constant VRAM_2 = VRAM_BLOCK +  6 * 32 * 16
+
+    jsr     Dma.Init
+    jsr     WaitFrame       // Reset Dma.transfersLeft
+
+    ldx.w   #TileData.TileList10
+    stx.w   Dma.Tile16.tileListAddr
+
+    ldy.w   #VRAM_1
+    sty.w   Dma.Tile16.vramWaddr
+    ldy.w   #VRAM_2
+    sty.w   Dma.Tile16.vramWaddr2
+
+    jsr     Dma.Tile16.QueueListAtEndOfTwoRows
+    bcc     Fail
+
+
+    rep     #$30
+a16()
+    jsr     Dma.TransferOnNextVBlank
+
+    jsr     WaitFrame
+
+    rep     #$30
+a16()
+i16()
+    ldx.w   #TileData.Tile7
+    ldy.w   #VRAM_1 + 32 * 6
+    jsr     _CheckTile
+    bcc     Fail
+
+    ldx.w   #TileData.Tile6
+    ldy.w   #VRAM_1 + 32 * 7
+    jsr     _CheckTile
+    bcc     Fail
+
+    // Check Second Row
+
+    ldx.w   #TileData.Tile5
+    ldy.w   #VRAM_2 + 32 * 0
+    jsr     _CheckTile
+    bcc     Fail
+
+    ldx.w   #TileData.Tile4
+    ldy.w   #VRAM_2 + 32 * 1
+    jsr     _CheckTile
+    bcc     Fail
+
+    ldx.w   #TileData.Tile3
+    ldy.w   #VRAM_2 + 32 * 2
+    jsr     _CheckTile
+    bcc     Fail
+
+    ldx.w   #TileData.Tile2
+    ldy.w   #VRAM_2 + 32 * 3
+    jsr     _CheckTile
+    bcc     Fail
+
+    ldx.w   #TileData.Tile1
+    ldy.w   #VRAM_2 + 32 * 4
+    jsr     _CheckTile
+    bcc     Fail
+
+    ldx.w   #TileData.Tile0
+    ldy.w   #VRAM_2 + 32 * 5
+    jsr     _CheckTile
+    bcc     Fail
+
+    ldx.w   #TileData.Tile1
+    ldy.w   #VRAM_2 + 32 * 6
+    jsr     _CheckTile
+    bcc     Fail
+
+    ldx.w   #TileData.Tile2
+    ldy.w   #VRAM_2 + 32 * 7
     jsr     _CheckTile
     bcc     Fail
 
@@ -435,6 +639,17 @@ TileList3:
     dw  Tile4 >> 7
     dw  Tile5 >> 7
     dw  Tile6 >> 7
+
+
+rodata(DMA_Tile16Data)
+TileList5:
+    db  5
+    dw  Tile0 >> 7
+    dw  Tile1 >> 7
+    dw  Tile2 >> 7
+    dw  Tile3 >> 7
+    dw  Tile4 >> 7
+
 
 rodata(DMA_Tile16Data)
 TileList10:
