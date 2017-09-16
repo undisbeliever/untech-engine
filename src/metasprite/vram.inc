@@ -687,15 +687,15 @@ namespace _ActivateDynamic {
     constant ReturnSuccess = MetaSprite.Activate.Vram._Activate.Success
     constant ReturnFailure = MetaSprite.Activate.ReturnFailure
 
-// ::SHOULDO add dynamic tileset with fixed portion of tiles::
-// ::: ie, tiles 5-7 are fixed through the life of the entity::
-// ::: this could be enabled by setting FrameSet.tileset to non-zero::
-
-
-    // Single code: (split into two halfs)
+    // Single code:
     //
     // if freeSlotPool == NULL:
     //    return false
+    //
+    // if pool is rows and tilesetAddr is not NULL:
+    //    Tile16.QueueListAtEndOfRow(tilesetAddr, freeSlotPool->VramAddress)
+    //    if load tiles failed:
+    //      return false
     //
     // current = freeSlotPool
     // freeSlotPool = current->next
@@ -714,34 +714,64 @@ namespace _ActivateDynamic {
     //
     // return _UploadDynamicTileset()
 
-    inline Process_Single(name, freeSlotPool, fallThrough) {
-        a16()
-        i16()
-        code()
-        function {name} {
+
+    a16()
+    i16()
+    code()
+    function OneTile {
+        sep     #$10
+    i8()
+
+        ldx.w   slotPool.freeTiles
+        bmi     NoSlotsFound
+
+        ldy.w   slots.next,x
+        sty.w   slotPool.freeTiles
+
+        bra     Finalize_Single
+    }
+
+
+    a16()
+    i16()
+    code()
+    function OneRow {
+        tay
+        beq     SkipLoadTileset
+
+            // FrameSet has static tileset
             sep     #$10
         i8()
-
-            ldx.w   slotPool.{freeSlotPool}
+            ldx.w   slotPool.freeRows
             bmi     NoSlotsFound
 
-            ldy.w   slots.next,x
-            sty.w   slotPool.{freeSlotPool}
+            sta.w   Dma.Tile16.tileListAddr
 
-            if {fallThrough} {
-                _FallThrough:
-            } else {
-                bra     Finalize_Single
-            }
-        }
+            lda.l   slots.VramAddress,x
+            sta.w   Dma.Tile16.vramWaddr
+
+            jsr     Dma.Tile16.QueueListAtEndOfRow
+            bcc     Fail
+
+            rep     #$20
+        a16()
+
+    SkipLoadTileset:
+        sep     #$10
+    i8()
+        ldx.w   slotPool.freeRows
+        bmi     NoSlotsFound
+
+        ldy.w   slots.next,x
+        sty.w   slotPool.freeRows
+
+    _FallThrough:
     }
-    Process_Single(OneTile, freeTiles, 0)
-    Process_Single(OneRow, freeRows, 1)
 
 
-    code()
     a16()
     i8()
+    code()
     function Finalize_Single {
         assert(pc() == OneRow._FallThrough)
 
@@ -790,6 +820,8 @@ namespace _ActivateDynamic {
     code()
     NoSlotsFound:
         Warnings.Warn(NO_MS_VRAM_SLOTS)
+    au()
+    iu()
     Fail:
         jmp     ReturnFailure
 
@@ -801,6 +833,18 @@ namespace _ActivateDynamic {
     //
     // if freeSlotPool->next == NULL:
     //    return false
+    //
+    // if tilesetAddr is not NULL:
+    //    if pool is rows:
+    //      Tile16.QueueListAtEndOfTwoRows(TilesetAddr,
+    //                                     freeSlotPool->VramAddress,
+    //                                     freeSlotPool->next->VramAddress,
+    //    else:
+    //      Tile16.QueueOneTileFromList(tilesetAddr, freeSlotPool->next->VramAddress)
+    //
+    //    if load tiles failed:
+    //       return false
+    //
     //
     // first = freeSlotPool
     // second = first->next
@@ -829,6 +873,43 @@ namespace _ActivateDynamic {
         i16()
         code()
         function {name} {
+            tay
+            beq     SkipLoadTileset
+
+                // FrameSet has static tileset
+                sep     #$10
+            i8()
+                ldx.w   slotPool.{freeSlotPool}
+                bmi     NoSlotsFound
+
+                ldy.w   slots.next,x
+                bmi     NoSlotsFound
+
+                sta.w   Dma.Tile16.tileListAddr
+
+                if slotPool.{freeSlotPool} == slotPool.freeRows {
+                    lda.l   slots.VramAddress,x
+                    sta.w   Dma.Tile16.vramWaddr
+                    tyx
+                    lda.l   slots.VramAddress,x
+                    sta.w   Dma.Tile16.vramWaddr2
+
+                    jsr     Dma.Tile16.QueueListAtEndOfTwoRows
+                    bcc     Fail
+
+                } else {
+                    tyx
+                    lda.l   slots.VramAddress,x
+                    sta.w   Dma.Tile16.vramWaddr
+
+                    jsr     Dma.Tile16.QueueOneTileFromList
+                    bcc     Fail
+                }
+
+                rep     #$20
+            a16()
+
+        SkipLoadTileset:
             sep     #$10
         i8()
 
@@ -837,7 +918,6 @@ namespace _ActivateDynamic {
 
             ldy.w   slots.next,x
             bmi     NoSlotsFound
-
 
             stz.w   slots.tileset,x
 
@@ -900,8 +980,10 @@ namespace _ActivateDynamic {
         sta.b   BaseEntity.MetaSprite.blockTwoCharAttrOffset
 
         jsr     MetaSprite.Vram._UploadDynamicTileset
-        bcc     Fail
-        jmp     ReturnSuccess
+        bcc     +
+            jmp     ReturnSuccess
+        +
+            jmp     ReturnFailure
     }
 }
 

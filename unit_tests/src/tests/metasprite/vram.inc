@@ -97,7 +97,7 @@ _ActivateFixedTest(FST_OneRowFixed, 1)
 _ActivateFixedTest(FST_TwoRowsFixed, 2)
 
 
-inline _ActivateDynamicTest(FrameSet, nSlots) {
+inline _ActivateDynamicTest(FrameSet, nSlots, staticUploads) {
     a16()
     i16()
     code()
@@ -125,7 +125,7 @@ inline _ActivateDynamicTest(FrameSet, nSlots) {
         bne     Fail
 
         ldx.w   Dma.Tile16.transferQueueIndex
-        cpx.w   #{nSlots} * 2
+        cpx.w   #({nSlots} + {staticUploads}) * 2
         bne     Fail
 
 
@@ -140,9 +140,9 @@ inline _ActivateDynamicTest(FrameSet, nSlots) {
         jsr     MetaSprite.Activate
         bcc     Fail
 
-        // Test that no upload was done (because current frame == NULL)
+        // Test that static tiles were uploaded (if exist)
         ldx.w   Dma.Tile16.transferQueueIndex
-        cpx.w   #{nSlots} * 2
+        cpx.w   #({nSlots} + {staticUploads} * 2) * 2
         bne     Fail
 
         // Test vramSet and dynamic set
@@ -174,10 +174,10 @@ inline _ActivateDynamicTest(FrameSet, nSlots) {
     }
 }
 
-_ActivateDynamicTest(FST_OneTile, 1)
-_ActivateDynamicTest(FST_TwoTiles, 2)
-_ActivateDynamicTest(FST_OneRow, 1)
-_ActivateDynamicTest(FST_TwoRows, 2)
+_ActivateDynamicTest(FST_OneTile, 1, 0)
+_ActivateDynamicTest(FST_TwoTiles, 1, 1)
+_ActivateDynamicTest(FST_OneRow, 0, 1)  // frame 0 has no dynamic tiles
+_ActivateDynamicTest(FST_TwoRows, 2, 1)
 
 
 
@@ -500,6 +500,9 @@ inline _ReferenceCountTest(type) {
         jsr     _InitEntity0PaletteAndActivate
         bcc     Fail
 
+        // Prevent dma buffer from overflowing
+        jsr     WaitFrame
+
         // entity 0: single fixed, count = 2
 
         // Try and fail to create a dynamic entity (we're full)
@@ -648,6 +651,8 @@ inline __Init_Fill(type, nSlots) {
             lda.w   #MSFS.FST_Two{type}s
             jsr     _InitEntity0PaletteAndActivate
             bcc     Fail
+
+            jsr     Dma.Init
 
             tdc
             clc

@@ -10,7 +10,7 @@
 
 
 // Data format may be subject to changes
-if MetaSprite.Data.METASPRITE_FORMAT_VERSION != 27 {
+if MetaSprite.Data.METASPRITE_FORMAT_VERSION != 28 {
     error "Invalid UnTech MetaSprite Format"
 }
 
@@ -72,6 +72,10 @@ namespace Format {
 
             // Address of the tileset in the `DMA_Tile16Data` block
             // May be NULL
+            //
+            // If not NULL and tileset lifespan is dynamic then the
+            // tileset will be uploaded to the end of the VRAM slot on
+            // MetaSprite activation.
             field(tileset, 2)
 
             // The tileset size and lifestyle
