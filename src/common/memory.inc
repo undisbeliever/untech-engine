@@ -80,6 +80,13 @@ namespace private {
     }
 }
 
+
+// Pad output file to ROM_SIZE
+origin {ROM_SIZE} * 1024 * 1024 / 8 - 1
+db 0
+origin 0
+
+
 // When set to non-zero then no more memory can be created or allocated.
 variable __MEMORY__.finalized = 0
 
