@@ -79,6 +79,7 @@ unit-tests: directories $(BINARY)
 
 $(BINARY) $(BINARY:.sfc=.sym): $(MAIN) $(INCLUDES) $(TABLE_INCS) $(RESOURCES)
 	bass-untech -strict -o $@ -sym $(@:.sfc=.sym) $(MAIN)
+	untech-write-sfc-checksum --hirom $@
 
 
 .PHONY: memory-usage
