@@ -377,12 +377,12 @@ namespace BG12NBA {
 constant BG34NBA = 0x210C
 
 namespace BG34NBA {
-    namespace bg1 {
+    namespace bg3 {
         constant mask = %00001111
         constant shift = 0
     }
 
-    namespace bg2 {
+    namespace bg4 {
         constant mask = %11110000
         constant shift = 4
     }
