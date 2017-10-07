@@ -77,6 +77,8 @@ namespace Palette {
     }
 }
 
+expression ToPalette(r, g, b) = ((b & 31) << 10) | ((g & 31) << 5) | (r & 31)
+
 
 // OAM Table 0 Format
 //
