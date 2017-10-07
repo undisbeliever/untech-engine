@@ -140,7 +140,7 @@ a8()
 i16()
 code()
 function ClearCgram {
-    pha
+    php
 
     rep     #$30
     sep     #$10
