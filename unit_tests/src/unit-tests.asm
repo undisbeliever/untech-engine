@@ -60,6 +60,7 @@ include "tests/metasprite/animation.inc"
 
 include "tests/text/string.inc"
 
+include "interactive/metatiles-render.inc"
 include "interactive/entity-metasprite.inc"
 include "interactive/entity-actionpointspawner.inc"
 include "interactive/entityhitbox-collisions.inc"

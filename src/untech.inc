@@ -23,6 +23,7 @@ include "text/_variables.inc"
 include "metasprite/_variables.inc"
 include "entity/_variables.inc"
 include "camera/_variables.inc"
+include "metatiles/_variables.inc"
 
 
 include "hdma/circular-window.inc"
@@ -44,6 +45,8 @@ include "text/string.inc"
 
 
 include "camera/_common.inc"
+
+include "metatiles/render.inc"
 
 include "metasprite/animation.inc"
 include "metasprite/entityhitbox.inc"

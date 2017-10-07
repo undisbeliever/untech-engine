@@ -1,0 +1,396 @@
+// This file is part of the UnTech Game Engine.
+// Copyright (c) 2016 - 2017, Marcus Rowe <undisbeliever@gmail.com>.
+// Distributed under The MIT License: https://opensource.org/licenses/MIT
+
+namespace InteractiveTests {
+namespace MetaTileRenderTest {
+
+// Tests:
+//  * MetaTile.Render
+
+constant MAP_WIDTH = 28
+constant MAP_HEIGHT = 25
+
+constant MAP_GRID_WIDTH = 3
+constant MAP_GRID_HEIGHT = 3
+constant MAP_REPEAT_HORIZONTAL = 8
+constant MAP_REPEAT_VERTICAL = 7
+
+assert(MAP_GRID_WIDTH * MAP_REPEAT_HORIZONTAL <= MAP_WIDTH)
+assert(MAP_GRID_HEIGHT * MAP_REPEAT_VERTICAL <= MAP_HEIGHT)
+assert(MAP_WIDTH * MAP_HEIGHT < MetaTiles.MAP_SIZE)
+
+constant MIN_CAMERA_X = 0x1000
+constant MIN_CAMERA_Y = 0x8000
+
+constant MAX_CAMERA_X = MIN_CAMERA_X + MAP_WIDTH * 16 - Camera.DISPLAY_WIDTH
+constant MAX_CAMERA_Y = MIN_CAMERA_Y + MAP_HEIGHT * 16 - Camera.DISPLAY_HEIGHT
+
+
+// Initializes the screen and loads tiles/palette to PPU
+//
+// REQUIRES: 16 bit A, 16 bit Index, DB = 0x7e, ForceBlank
+macro SetupPpu() {
+    assert8a()
+    assert16i()
+
+    pea     (0x7e << 8) | REGISTER_DB
+    plb
+    // DB = REGISTER_DB
+
+
+    // Setup PPU
+    // MODE 1 - bg3 priority
+    //   BG1 - MetaTiles map
+    //   BG3 - text console buffer
+
+    lda.b   #BGMODE.mode1Bg3
+    sta.w   BGMODE
+
+    lda.b   #((METATILES_MAP_WADDR / BGXSC.base.walign) << BGXSC.base.shift) | BGXSC.map.s64x32
+    sta.w   BG1SC
+
+    lda.b   #((VRAM_CONSOLE_MAP_WADDR / BGXSC.base.walign) << BGXSC.base.shift) | BGXSC.map.s32x32
+    sta.w   BG3SC
+
+    lda.b   #(METATILES_TILES_WADDR / BG12NBA.walign) << BG12NBA.bg1.shift
+    sta.w   BG12NBA
+
+    lda.b   #(VRAM_CONSOLE_TILES_WADDR / BG34NBA.walign) << BG34NBA.bg3.shift
+    sta.w   BG34NBA
+
+    lda.b   #TM.bg1 | TM.bg3
+    sta.w   TM
+
+
+    // Copy Tiles to VRAM
+
+    ldx.w   #METATILES_TILES_WADDR
+    stx.w   VMADD
+    Dma.ForceBlank.ToVram(Tiles)
+
+
+    // Copy Palette to CGRAM
+
+    lda.b   #16
+    sta.w   CGADD
+
+    ldx.w   #0
+    PaletteLoop:
+        lda.l   Palette,x
+        sta.w   CGDATA
+        inx
+        cpx.w   #Palette.size
+        bcc     PaletteLoop
+
+
+    plb
+    // DB = 0x7e
+}
+
+
+// Loads the tileMap into WRAM
+//
+// REQUIRES: 16 bit A, 16 bit Index, DB = 0x7e
+macro LoadMetaTileMap() {
+    assert16a()
+    assert16i()
+
+    // Convert metatiles from interleaved format to planar format
+    ldx.w   #0
+    ldy.w   #0
+    LoadTileMapLoop:
+        lda.l   TileMap.Data,x
+        sta.w   MetaTiles.tileMap.topLeft,y
+
+        lda.l   TileMap.Data + 2,x
+        sta.w   MetaTiles.tileMap.topRight,y
+
+        lda.l   TileMap.Data + 4,x
+        sta.w   MetaTiles.tileMap.bottomLeft,y
+
+        lda.l   TileMap.Data + 6,x
+        sta.w   MetaTiles.tileMap.bottomRight,y
+
+        txa
+        clc
+        adc.w   #4 * 2
+        tax
+
+        iny
+        iny
+        cpy.w   #TileMap.N_TILES * 2
+        bcc     LoadTileMapLoop
+}
+
+
+// Generates the map.
+//
+// REQUIRES: 16 bit A, 16 bit Index, DB = 0x7e
+macro GenerateMap() {
+    assert16a()
+    assert16i()
+
+constant _columnsLeft = Test.dpTmp
+constant _columnIndex = Test.dpTmp + 2
+
+    assert(MetaTiles.map.width + 1 == MetaTiles.map.height)
+    lda.w   #MAP_WIDTH | (MAP_HEIGHT << 8)
+    sta.w   MetaTiles.map.width
+
+    lda.w   #MIN_CAMERA_Y
+    sta.w   MetaTiles.map.top
+
+    lda.w   #MIN_CAMERA_X
+    sta.w   MetaTiles.map.left
+
+    lda.w   #MAP_WIDTH * 2
+    sta.w   MetaTiles.map.bytesPerRow
+
+
+    // clear tilemap
+
+    ldx.w   #MetaTiles.MAP_SIZE * 2 - 2
+    ClearLoop:
+        stz.w   MetaTiles.map.data,x
+        dex
+        dex
+        bmi     ClearLoop
+
+
+    // Repeat grid pattern
+
+    constant MARGIN_X = (MAP_WIDTH - MAP_REPEAT_HORIZONTAL * MAP_GRID_WIDTH) / 2
+    constant MARGIN_Y = (MAP_HEIGHT - MAP_REPEAT_VERTICAL * MAP_GRID_HEIGHT) / 2
+
+    ldx.w   #(MARGIN_X + MARGIN_Y * MAP_WIDTH) * 2
+
+    lda.w   #MAP_REPEAT_VERTICAL
+    sta.b   _columnsLeft
+
+    Loop:
+        stx.b   _columnIndex
+
+        ldy.w   #MAP_REPEAT_HORIZONTAL
+
+        LineLoop:
+            variable yPos = 0
+            while yPos < MAP_GRID_HEIGHT {
+                variable xPos = 0
+                while xPos < MAP_GRID_WIDTH {
+                    lda.w   #(xPos + yPos * MAP_GRID_WIDTH + 1) * 2
+                    sta.w   MetaTiles.map.data + (xPos + MAP_WIDTH * yPos) * 2,x
+
+                    xPos = xPos + 1
+                }
+                yPos = yPos + 1
+            }
+
+            txa
+            clc
+            adc.w   #MAP_GRID_WIDTH * 2
+            tax
+
+            dey
+            bne     LineLoop
+
+        lda.b   _columnIndex
+        clc
+        adc.w   #MAP_WIDTH * MAP_GRID_HEIGHT * 2
+        tax
+
+        dec     _columnsLeft
+        bne     Loop
+}
+
+
+
+// MetaTile Render Test
+a16()
+i16()
+code()
+Test.add("MetaTile Render Test")
+function Test {
+    sep     #$20
+a8()
+
+    lda.b   #0
+    sta.l   NMITIMEN
+
+    lda.b   #INIDISP.force
+    sta.l   INIDISP
+
+    SetupPpu()
+
+    rep     #$30
+a16()
+
+    LoadMetaTileMap()
+
+    GenerateMap()
+
+    lda.w   #MIN_CAMERA_X + (MAX_CAMERA_X - MIN_CAMERA_X) / 2 - 7
+    sta.w   Camera.xPos
+
+    lda.w   #MIN_CAMERA_Y + (MAX_CAMERA_Y - MIN_CAMERA_Y) / 2 + 15
+    sta.w   Camera.yPos
+
+
+    jsr     MetaTiles.Render.DrawFullScreen_ForceBlank
+
+    sep     #$20
+a8()
+
+    lda.b   #15
+    sta.l   INIDISP
+
+    jsr     EnableVBlank
+
+    rep     #$30
+a16()
+
+    Loop:
+        jsr     Dma.TransferOnNextVBlank
+        jsr     WaitFrame
+
+
+        lda.l   JOY1
+        and.w   #JOY.buttons
+        bne     Pass
+
+        jmp     Loop
+
+Pass:
+    jmp     Test.ResetPpuState
+}
+
+
+// ROM Data
+// ========
+
+
+rodata(rom0)
+Palette:
+    dw  0, ToPalette(20, 15, 15), ToPalette(20, 0, 0), ToPalette(15, 0, 0)
+    fill 12 * 2
+
+    dw  0, ToPalette(15, 20, 15)
+
+constant Palette.size = pc() - Palette
+
+// inserts a single row of a 2bpp tile into the ROM
+macro TileRow(evaluate row) {
+    variable t = 0
+    variable n = 7
+    while n >= 0 {
+        variable i = ({row} >> (n * 4)) & 3
+
+        t = t << 1
+        t = t | (i & 1) | ((i & 2) << 7)
+
+        n = n - 1
+    }
+    dw  t
+}
+
+macro EndTile() {
+    fill 16, 0
+}
+
+rodata(rom0)
+// Tile 0 - blank
+Tiles:
+    fill 32, 0
+
+// Tile 1
+    TileRow(0x00001000)
+    TileRow(0x00010000)
+    TileRow(0x00100000)
+    TileRow(0x01010000)
+    TileRow(0x10001000)
+    TileRow(0x00000100)
+    TileRow(0x00000000)
+    TileRow(0x00000000)
+    EndTile()
+
+// Tile 2
+    TileRow(0x00000000)
+    TileRow(0x00000000)
+    TileRow(0x00000000)
+    TileRow(0x00000033)
+    TileRow(0x00000322)
+    TileRow(0x00003222)
+    TileRow(0x00032222)
+    TileRow(0x00032223)
+    EndTile()
+
+// Tile 3
+    TileRow(0x00000000)
+    TileRow(0x00000000)
+    TileRow(0x00000000)
+    TileRow(0x33333333)
+    TileRow(0x22222222)
+    TileRow(0x22222222)
+    TileRow(0x22222222)
+    TileRow(0x33333333)
+    EndTile()
+
+// Tile 4
+    TileRow(0x00032223)
+    TileRow(0x00032223)
+    TileRow(0x00032223)
+    TileRow(0x00032223)
+    TileRow(0x00032223)
+    TileRow(0x00032223)
+    TileRow(0x00032223)
+    TileRow(0x00032223)
+    EndTile()
+
+// Tile 5
+    TileRow(0x11111111)
+    TileRow(0x11111111)
+    TileRow(0x11111111)
+    TileRow(0x11111111)
+    TileRow(0x11111111)
+    TileRow(0x11111111)
+    TileRow(0x11111111)
+    TileRow(0x11111111)
+    EndTile()
+
+constant Tiles.size = pc() - Tiles
+
+
+namespace TileMap {
+    macro MT(char, pal, hFlip, vFlip) {
+        variable t = {char} | ({pal} << Tilemap.palette.shift)
+        if {hFlip} {
+            t = t | Tilemap.hFlip
+        }
+        if {vFlip} {
+            t = t | Tilemap.vFlip
+        }
+        dw  t
+    }
+
+    rodata(rom0)
+    //  top-left     top-right    bottom-left  bottom-right
+    Data:
+        MT(0, 1, 0, 0); MT(0, 1, 0, 0); MT(0, 1, 0, 0); MT(0, 1, 0, 0)
+        MT(1, 2, 0, 0); MT(0, 1, 0, 0); MT(0, 1, 0, 0); MT(2, 1, 0, 0)
+        MT(0, 1, 0, 0); MT(0, 1, 0, 0); MT(3, 1, 0, 0); MT(3, 1, 0, 0)
+        MT(0, 1, 0, 0); MT(1, 2, 1, 0); MT(2, 1, 1, 0); MT(0, 1, 0, 0)
+        MT(0, 1, 0, 0); MT(4, 1, 0, 0); MT(0, 1, 0, 0); MT(4, 1, 0, 0)
+        MT(5, 1, 0, 0); MT(5, 1, 0, 0); MT(5, 1, 0, 0); MT(5, 1, 0, 0)
+        MT(4, 1, 1, 0); MT(0, 1, 0, 0); MT(4, 1, 1, 0); MT(0, 1, 0, 0)
+        MT(0, 1, 0, 0); MT(2, 1, 0, 1); MT(1, 2, 0, 1); MT(0, 1, 0, 0)
+        MT(3, 1, 0, 1); MT(3, 1, 0, 1); MT(0, 1, 0, 0); MT(0, 1, 0, 0)
+        MT(2, 1, 1, 1); MT(0, 1, 0, 0); MT(0, 1, 0, 0); MT(1, 2, 1, 1)
+
+    constant N_TILES = (pc() - Data) / 4 / 2
+}
+
+}
+}
+
+// vim: ft=bass-65816 ts=4 sw=4 et:
+
