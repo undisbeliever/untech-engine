@@ -73,6 +73,24 @@ macro PrintConstString(s) {
 }
 
 
+// Prints a string from a label to the console.
+//
+// REQUIRES: 16 bit Index
+macro PrintString(label) {
+    assert16i()
+
+    ldx.w   #{label}
+    if __CPU__.aSize == 8 {
+        lda.b   #({label}) >> 16
+    } else if __CPU__.aSize == 16 {
+        lda.w   #({label}) >> 16
+    } else {
+        error "Unknown A size"
+    }
+    jsr     Text.Console.PrintString
+}
+
+
 // Sets the console cursor to a fixed location
 //
 // REQUIRES: 16 bit Index, DB access shadow

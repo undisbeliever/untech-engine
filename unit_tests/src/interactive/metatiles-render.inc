@@ -8,13 +8,13 @@ namespace MetaTileRenderTest {
 // Tests:
 //  * MetaTile.Render
 
-constant MAP_WIDTH = 28
-constant MAP_HEIGHT = 25
+constant MAP_WIDTH = 84
+constant MAP_HEIGHT = 75
 
 constant MAP_GRID_WIDTH = 3
 constant MAP_GRID_HEIGHT = 3
-constant MAP_REPEAT_HORIZONTAL = 8
-constant MAP_REPEAT_VERTICAL = 7
+constant MAP_REPEAT_HORIZONTAL = 24
+constant MAP_REPEAT_VERTICAL = 21
 
 assert(MAP_GRID_WIDTH * MAP_REPEAT_HORIZONTAL <= MAP_WIDTH)
 assert(MAP_GRID_HEIGHT * MAP_REPEAT_VERTICAL <= MAP_HEIGHT)
@@ -204,6 +204,99 @@ constant _columnIndex = Test.dpTmp + 2
 }
 
 
+// Moves the camera depending on the state of the joypad
+// REQUIRES: 16 bit A, 16 bit Index, DB = 0x7e, AutoJoy on
+macro MoveCamera() {
+    assert16a()
+    assert16i()
+
+constant _velocity = Test.dpTmp + 3 * 2
+
+    lda.l   JOY1
+    tax
+
+    ldy.w   #1
+
+    bit.w   #JOY.r
+    beq     +
+        ldy.w   #256
+    +
+    sty.b   _velocity
+
+
+    bit.w   #JOY.up
+    beq     ++
+        lda.w   Camera.yPos
+        sec
+        sbc.b   _velocity
+        cmp.w   #MIN_CAMERA_Y
+        bcs     +
+            lda.w   #MIN_CAMERA_Y
+        +
+        sta.w   Camera.yPos
+        txa
+    +
+    bit.w   #JOY.down
+    beq     ++
+        lda.w   Camera.yPos
+        clc
+        adc.b   _velocity
+        cmp.w   #MAX_CAMERA_Y + 1
+        bcc     +
+            lda.w   #MAX_CAMERA_Y
+        +
+        sta.w   Camera.yPos
+        txa
+    +
+    bit.w   #JOY.left
+    beq     ++
+        lda.w   Camera.xPos
+        sec
+        sbc.b   _velocity
+        cmp.w   #MIN_CAMERA_X
+        bcs     +
+            lda.w   #MIN_CAMERA_X
+        +
+        sta.w   Camera.xPos
+        txa
+    +
+    bit.w   #JOY.right
+    beq     ++
+        lda.w   Camera.xPos
+        clc
+        adc.b   _velocity
+        cmp.w   #MAX_CAMERA_X + 1
+        bcc     +
+            lda.w   #MAX_CAMERA_X
+        +
+        sta.w   Camera.xPos
+    +
+}
+
+
+// Prints the camera position on the screen
+// REQUIRES: 8 bit A, 16 bit Index, DB = 0x7e
+macro PrintCameraPos() {
+    assert8a()
+    assert16i()
+
+    constant textXPos = (Text.Console.TEXT_WIDTH - 10) / 2
+    constant textYPos = (Text.Console.TEXT_HEIGHT - 3) / 2
+
+
+    Text.Console.SetCursor(textXPos, textYPos)
+    Text.Console.PrintConstString("xPos: ")
+
+    ldy.w   Camera.xPos
+    jsr     Text.Console.PrintHex16Y
+
+    Text.Console.SetCursor(textXPos, textYPos + 2)
+    Text.Console.PrintConstString("yPos: ")
+
+    ldy.w   Camera.yPos
+    jsr     Text.Console.PrintHex16Y
+}
+
 
 // MetaTile Render Test
 a16()
@@ -211,6 +304,9 @@ i16()
 code()
 Test.add("MetaTile Render Test")
 function Test {
+    Text.Console.SetCursor(0, 20)
+    Text.Console.PrintString(UnitTestMessage)
+
     sep     #$20
 a8()
 
@@ -232,24 +328,45 @@ a16()
     lda.w   #MIN_CAMERA_X + (MAX_CAMERA_X - MIN_CAMERA_X) / 2 - 7
     sta.w   Camera.xPos
 
-    lda.w   #MIN_CAMERA_Y + (MAX_CAMERA_Y - MIN_CAMERA_Y) / 2 + 15
+    lda.w   #MIN_CAMERA_Y + (MAX_CAMERA_Y - MIN_CAMERA_Y) / 2 + 13
     sta.w   Camera.yPos
 
+RedrawMap:
+    sep     #$20
+a8()
+    lda.b   #INIDISP.force
+    sta.l   INIDISP
 
+    rep     #$20
+a16()
     jsr     MetaTiles.Render.DrawFullScreen_ForceBlank
 
     sep     #$20
 a8()
 
+    jsr     EnableVBlank
+    jsr     WaitFrame
+
     lda.b   #15
     sta.l   INIDISP
-
-    jsr     EnableVBlank
 
     rep     #$30
 a16()
 
     Loop:
+        lda.l   JOY1
+        bit.w   #JOY.select
+        bne     RedrawMap
+
+        MoveCamera()
+
+        sep     #$20
+    a8()
+        PrintCameraPos()
+
+        rep     #$30
+    a16()
+
         jsr     Dma.TransferOnNextVBlank
         jsr     WaitFrame
 
@@ -267,6 +384,12 @@ Pass:
 
 // ROM Data
 // ========
+
+rodata(rom0)
+UnitTestMessage:
+    db  "Use D-PAD to move the map\n"
+    db  "Hold R to zip\n"
+    db  "Press SELECT to redraw map", 0
 
 
 rodata(rom0)
