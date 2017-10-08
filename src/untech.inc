@@ -7,6 +7,7 @@ include "errors/warnings.inc"
 
 include "dma/forceblank.inc"
 include "dma/metasprite.inc"
+include "dma/metatiles.inc"
 include "dma/palette.inc"
 include "dma/text.inc"
 include "dma/tile16.inc"

@@ -54,6 +54,7 @@ macro VBlank() {
     stx.w   VMAIN
 
     Dma.MetaSprite._VBlank()
+    Dma.MetaTiles._VBlank()
     Dma.Palette._VBlank()
     Dma.Tile16._VBlank()
 
@@ -74,6 +75,7 @@ a16()
 i16()
 code()
 function Init {
+    MetaTiles._Init()
     Palette._Init()
     Tile16._Init()
 

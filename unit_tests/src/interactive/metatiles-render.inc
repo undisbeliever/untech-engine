@@ -147,6 +147,9 @@ constant _columnIndex = Test.dpTmp + 2
     lda.w   #MAP_WIDTH * 2
     sta.w   MetaTiles.map.bytesPerRow
 
+    lda.w   #MAP_WIDTH * MetaTiles.METATILE_DISPLAY_HEIGHT * 2
+    sta.w   MetaTiles.map.bytesPerDisplayHeight
+
 
     // clear tilemap
 
@@ -366,6 +369,8 @@ a16()
 
         rep     #$30
     a16()
+
+        jsr     MetaTiles.Render.Update
 
         jsr     Dma.TransferOnNextVBlank
         jsr     WaitFrame

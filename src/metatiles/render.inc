@@ -25,13 +25,25 @@ allocateTmpWord(tmp2)
 allocate(visibleMapIndex, wram7e, 2)
 
 
+// Offset between the Camera position and the display offset
+// Reset on every DrawFullScreen_ForceBlank
+// (2x sint16)
+allocate(cameraXoffset, wram7e, 2)
+allocate(cameraYoffset, wram7e, 2)
+
+
 // Display offset of the tilemap
 constant displayHoffset = ScrollBuffer.bg1.hOffset
 constant displayVoffset = ScrollBuffer.bg1.vOffset
 
 
+assertPowerOfTwo(horizontalBuffer.buffer.size)
+assertPowerOfTwo(verticalBuffer.buffer.size)
+
 
 // Draw the visible map directly to the VRAM
+//
+// Also initializes the buffer state
 //
 // ASSUMES: Camera position inside map
 //
@@ -53,10 +65,48 @@ constant _rowCount = tmp2
     lda.w   #0x2100
     tcd
 
-    // Reset map position to top/left of tilemap
+
+    // Reset render state
+    //
+    // horizontalBuffer.cursorIndex = 0
+    // horizontalBuffer.cursorYpos = Camera.yPos & ~(METATILE_SIZE_PX - 1)
+    //
+    // verticalBuffer.cursorIndex = 0
+    // verticalBuffer.cursorXpos = Camera.yPos & ~(METATILE_SIZE_PX - 1)
+    //
+    // cameraXoffset = Camera.xPos & ~(METATILE_SIZE_PX - 1)
+    // cameraYoffset = (Camera.yPos & ~(METATILE_SIZE_PX - 1)) + 1
+    //
+    // displayHoffset = Camera.xPos & (METATILE_SIZE_PX - 1)
+    // displayVoffset = Camera.yPos & (METATILE_SIZE_PX - 1) - 1
     //
     // visibleMapIndex = (Camera.xPos - map.left) / METATILE_SIZE_PX * 2
     //                   + (Camera.yPos - map.top) / METATILE_SIZE_PX * map.width * 2
+
+    stz.w   horizontalBuffer.cursorIndex
+
+    lda.w   Camera.yPos
+    and.w   #~(METATILE_SIZE_PX - 1)
+    sta.w   horizontalBuffer.cursorYpos
+    inc
+    sta.w   cameraYoffset
+
+    stz.w   verticalBuffer.cursorIndex
+
+    lda.w   Camera.xPos
+    and.w   #~(METATILE_SIZE_PX - 1)
+    sta.w   verticalBuffer.cursorXpos
+    sta.w   cameraXoffset
+
+    lda.w   Camera.xPos
+    and.w   #METATILE_SIZE_PX - 1
+    sta.w   displayHoffset
+
+    lda.w   Camera.yPos
+    and.w   #METATILE_SIZE_PX - 1
+    dec
+    sta.w   displayVoffset
+
 
     lda.w   Camera.yPos
     sec
@@ -118,6 +168,9 @@ a16()
 
     sep     #$20
 a8()
+    // don't upload buffers during VBlank
+    stz.w   bufferState
+
     lda.b   #VMAIN.incrementMode.high | VMAIN.increment.by1
     sta.b   VMAIN
 
@@ -265,23 +318,430 @@ a16()
         dec.w   _columnCount
         bne     RightLoop
 
+    pld
+
+    rts
+}
 
 
-    // Update Scroll Buffer
+
+// Draw Horizontal Buffer
+//
+// Input: A = index of map segment to draw
+//        Y = vBuffer offset (0 or DISPLAY_HEIGHT * 2)
+//
+// REQUIRES: 16 bit A, 16 bit Index, DB = 0x7e, DP = 0
+macro _DrawHorizontalBuffer() {
+    assert16a()
+    assert16i()
+
+    assert(verticalBuffer.buffer.size == 32 * 2 * 2)
+    assert(horizontalBuffer.buffer.size == 64 * 2 * 2)
+    assert(MAP_SIZE * 2 < 0x8000)
+
+    //  a = (verticalBuffer.cursorIndex + vBufferOffset) / 4 * 32 * 2
+    //  a &= (32 - 1) * 32
+    //  horizontalBuffer.vramWaddr = METATILES_MAP_WADDR + a
     //
-    // displayHoffset = Camera.xPos & (METATILE_SIZE_PX - 1)
-    // displayVoffset = Camera.yPos & (METATILE_SIZE_PX - 1) - 1
+    //  y = (horizontalBuffer.cursorIndex + DISPLAY_WIDTH) & 127
+    //  x = mapIndex + METATILE_DISPLAY_WIDTH * 2 bytes
+    //
+    //  while x >= mapIndex:
+    //      buffer[y] = tileMap.topLeft[map.data[x]]
+    //      buffer[y + 2] = tileMap.topRight[map.data[x]]
+    //      buffer[y + 128] = tileMap.bottomLeft[map.data[x]]
+    //      buffer[y + 128 + 2] = tileMap.bottomRight[map.data[x]]
+    //
+    //      y -= 2 // 4 bytes
+    //      if y < 0:
+    //          y = buffer.size / 2 - 4 bytes
+    //
+    //      x-- // 2 bytes
+
+    sta.b   _startingMapIndex
+    clc
+    adc.w   #METATILE_DISPLAY_WIDTH * 2
+    tax
+
+    tya
+    clc
+    adc.w   verticalBuffer.cursorIndex
+    and.w   #((32 - 1) * 32) >> 4
+    asl
+    asl
+    asl
+    asl
+    // c clear
+    adc.w   #METATILES_MAP_WADDR
+    sta.w   horizontalBuffer.vramWaddr
+
+    lda.w   horizontalBuffer.cursorIndex
+    clc
+    adc.w   #METATILE_DISPLAY_WIDTH * METATILE_SIZE * 2
+    and.w   #127
+    tay
+
+    Loop:
+        phx
+
+        lda.w   map.data,x
+        tax
+
+        lda.w   tileMap.topLeft,x
+        sta.w   horizontalBuffer.buffer,y
+
+        lda.w   tileMap.topRight,x
+        sta.w   horizontalBuffer.buffer + 2,y
+
+        lda.w   tileMap.bottomLeft,x
+        sta.w   horizontalBuffer.buffer + 128,y
+
+        lda.w   tileMap.bottomRight,x
+        sta.w   horizontalBuffer.buffer + 128 + 2,y
+
+        dey
+        dey
+        dey
+        dey
+        bpl     +
+            ldy.w   #horizontalBuffer.buffer.size / 2 - 4
+        +
+
+        plx
+        dex
+        dex
+        cpx.b   _startingMapIndex
+        bpl     Loop
+
+    Dma.MetaTiles.QueueHorizontalBuffer()
+}
+
+
+
+// Draw Vertical Buffer
+//
+// Input: A = index of map segment to draw
+//        Y = hBuffer offset (0 or DISPLAY_WIDTH * 2)
+//
+// REQUIRES: 16 bit A, 16 bit Index, DB = 0x7e, DP = 0
+macro _DrawVerticalBuffer() {
+    assert16a()
+    assert16i()
+
+    assert(verticalBuffer.buffer.size == 32 * 2 * 2)
+    assert(horizontalBuffer.buffer.size == 64 * 2 * 2)
+    assert(MAP_SIZE * 2 < 0x8000)
+
+    //  a = (horizontalBuffer.cursorIndex + hBufferOffset) / 4 * 2
+    //  a &= 32 * 2 - 1
+    //  if a & 32:
+    //      a ^= 32 + 32 * 32
+    //  verticalBuffer.vramWaddr = METATILES_MAP_WADDR + a
+    //
+    //  y = horizontalBuffer.cursorIndex + METATILE_DISPLAY_WIDTH * METATILE_SIZE * 2
+    //  x = mapIndex + map.bytesPerDisplayHeight
+    //
+    //  while x >= _startingMapIndex:
+    //      buffer[y] = tileMap.topLeft[map.data[x]]
+    //      buffer[y + 2] = tileMap.bottomLeft[map.data[x]]
+    //      buffer[y + 64] = tileMap.topRight[map.data[x]]
+    //      buffer[y + 64 + 2] = tileMap.bottomRight[map.data[x]]
+    //
+    //      y -= 2 // 4 bytes
+    //      if y < 0:
+    //          y = buffer.size / 2 - 4 bytes
+    //
+    //      x -= map.bytesPerRow
+
+    sta.b   _startingMapIndex
+    clc
+    adc.w   map.bytesPerDisplayHeight
+    tax
+
+    tya
+    clc
+    adc.w   horizontalBuffer.cursorIndex
+    lsr
+    and.w   #32 * 2 - 1
+    bit.w   #32
+    beq     +
+        eor.w   #32 + (32 * 32)
+    +
+    clc
+    adc.w   #METATILES_MAP_WADDR
+    sta.w   verticalBuffer.vramWaddr
+
+
+    lda.w   verticalBuffer.cursorIndex
+    clc
+    adc.w   #METATILE_DISPLAY_HEIGHT * METATILE_SIZE * 2
+    and.w   #63
+    tay
+
+    txa
+    Loop:
+        tax
+        phx
+
+        lda.w   map.data,x
+        tax
+
+        lda.w   tileMap.topLeft,x
+        sta.w   verticalBuffer.buffer,y
+
+        lda.w   tileMap.bottomLeft,x
+        sta.w   verticalBuffer.buffer + 2,y
+
+        lda.w   tileMap.topRight,x
+        sta.w   verticalBuffer.buffer + 64,y
+
+        lda.w   tileMap.bottomRight,x
+        sta.w   verticalBuffer.buffer + 64 + 2,y
+
+        dey
+        dey
+        dey
+        dey
+        bpl     +
+            ldy.w   #verticalBuffer.buffer.size / 2 - 4
+        +
+
+        pla
+        sec
+        sbc.w   map.bytesPerRow
+        cmp.b   _startingMapIndex
+        bpl     Loop
+
+    Dma.MetaTiles.QueueVerticalBuffer()
+}
+
+
+
+// Updates the position of the map, drawing new tiles as necessary
+//
+// Will change the camera position to ensure only 1 metatile row and/or column
+// is processed per frame.
+//
+// ASSUMES: DrawFullScreen_ForceBlank has been called to setup map state
+// ASSUMES: Camera position inside map
+//
+// REQUIRES: 16 bit A, 16 bit Index, DB = 0x7e
+a16()
+i16()
+code()
+function Update {
+constant _startingMapIndex = dpTmp0
+
+    //  xOffset = Camera.xPos - verticalBuffer.cursorXpos
+    //
+    //  if xOffset > METATILE_SIZE_PX:
+    //      if xOffset >= METATILE_SIZE_PX * 2:
+    //          Camera.xPos = verticalBuffer.cursorXpos + METATILE_SIZE_PX * 2 - 1
+    //
+    //      horizontalBuffer.cursorIndex += METATILE_SIZE * 2 bytes
+    //      horizontalBuffer.cursorIndex &= horizontalBuffer.buffer.size / 2 - 1
+    //
+    //      verticalBuffer.cursorXpos += METATILE_SIZE_PX
+    //      visibleMapIndex += 2 bytes
+    //
+    //      _DrawVerticalBuffer(visibleMapIndex + METATILE_DISPLAY_WIDTH,
+    //                          METATILE_DISPLAY_WIDTH * METATILE_SIZE * 2)
+    //
+    //  else if xOffset < 0:
+    //      if xOffset <= METATILE_SIZE_PX:
+    //          Camera.xPos = verticalBuffer.cursorXpos - METATILE_SIZE_PX + 1
+    //
+    //      horizontalBuffer.cursorIndex -= METATILE_SIZE * 2 bytes
+    //      horizontalBuffer.cursorIndex &= horizontalBuffer.buffer.size / 2 - 1
+    //
+    //      verticalBuffer.cursorXpos -= METATILE_SIZE_PX
+    //      visibleMapIndex -= 2 bytes
+    //
+    //      _DrawVerticalBuffer(visibleMapIndex, 0)
 
     lda.w   Camera.xPos
-    and.w   #METATILE_SIZE_PX - 1
+    sec
+    sbc.w   verticalBuffer.cursorXpos
+    bmi     XOffsetNegative
+    cmp.w   #METATILE_SIZE_PX
+    bcs     +
+        jmp     SkipDrawVerticalBuffer
+    +
+        cmp.w   #METATILE_SIZE_PX * 2
+        bcc     +
+            lda.w   verticalBuffer.cursorXpos
+            clc
+            adc.w   #METATILE_SIZE_PX * 2 - 1
+            sta.w   Camera.xPos
+        +
+
+        lda.w   horizontalBuffer.cursorIndex
+        clc
+        adc.w   #METATILE_SIZE * 2
+        and.w   #horizontalBuffer.buffer.size / 2 - 1
+        sta.w   horizontalBuffer.cursorIndex
+
+        lda.w   verticalBuffer.cursorXpos
+        clc
+        adc.w   #METATILE_SIZE_PX
+        sta.w   verticalBuffer.cursorXpos
+
+        lda.w   visibleMapIndex
+        inc
+        inc
+        sta.w   visibleMapIndex
+        clc
+        adc.w   #METATILE_DISPLAY_WIDTH * 2
+
+        ldy.w   #METATILE_DISPLAY_WIDTH * METATILE_SIZE * 2
+
+        bra     DrawVerticalBuffer
+
+XOffsetNegative:
+        cmp.w   #-METATILE_SIZE_PX + 1
+        bcs     +
+            lda.w   verticalBuffer.cursorXpos
+            sec
+            sbc.w   #METATILE_SIZE_PX - 1
+            sta.w   Camera.xPos
+        +
+
+        lda.w   horizontalBuffer.cursorIndex
+        sec
+        sbc.w   #METATILE_SIZE * 2
+        and.w   #horizontalBuffer.buffer.size / 2 - 1
+        sta.w   horizontalBuffer.cursorIndex
+
+        lda.w   verticalBuffer.cursorXpos
+        sec
+        sbc.w   #METATILE_SIZE_PX
+        sta.w   verticalBuffer.cursorXpos
+
+        lda.w   visibleMapIndex
+        dec
+        dec
+        sta.w   visibleMapIndex
+
+        ldy.w   #0
+
+    DrawVerticalBuffer:
+        // A = map Index, Y = vramOffset
+        _DrawVerticalBuffer()
+
+SkipDrawVerticalBuffer:
+
+
+    //  yOffset = Camera.yPos - horizontalBuffer.cursorYpos
+    //
+    //  if yOffset > METATILE_SIZE_PX:
+    //      if yOffset >= METATILE_SIZE_PX * 2:
+    //          Camera.yPos = horizontalBuffer.cursorYpos + METATILE_SIZE_PX * 2 - 1
+    //
+    //      verticalBuffer.cursorIndex += METATILE_SIZE * 2 bytes
+    //      verticalBuffer.cursorIndex &= verticalBuffer.buffer.size / 2 - 1
+    //
+    //      horizontalBuffer.cursorYpos += METATILE_SIZE_PX
+    //      visibleMapIndex += map.bytesPerRow
+    //
+    //      _DrawHorizontalBuffer(visibleMapIndex + map.bytesPerDisplayHeight,
+    //                            METATILE_DISPLAY_HEIGHT * METATILE_SIZE * 2)
+    //
+    //  else if yOffset < 0:
+    //      if yOffset <= METATILE_SIZE_PX:
+    //          Camera.yPos = horizontalBuffer.cursorYpos - METATILE_SIZE_PX + 1
+    //
+    //      verticalBuffer.cursorIndex -= METATILE_SIZE * 2 bytes
+    //      verticalBuffer.cursorIndex &= verticalBuffer.buffer.size / 2 - 1
+    //
+    //      horizontalBuffer.cursorYpos -= METATILE_SIZE_PX
+    //      visibleMapIndex -= map.bytesPerRow
+    //
+    //      _DrawHorizontalBuffer(visibleMapIndex, 0)
+
+    lda.w   Camera.yPos
+    sec
+    sbc.w   horizontalBuffer.cursorYpos
+    bmi     YOffsetNegative
+    cmp.w   #METATILE_SIZE_PX
+    bcs     +
+        jmp     SkipDrawHorizontalBuffer
+    +
+        cmp.w   #METATILE_SIZE_PX * 2
+        bcc     +
+            lda.w   horizontalBuffer.cursorYpos
+            clc
+            adc.w   #METATILE_SIZE_PX * 2 - 1
+            sta.w   Camera.yPos
+        +
+
+        lda.w   verticalBuffer.cursorIndex
+        clc
+        adc.w   #METATILE_SIZE * 2
+        and.w   #verticalBuffer.buffer.size / 2 - 1
+        sta.w   verticalBuffer.cursorIndex
+
+        lda.w   horizontalBuffer.cursorYpos
+        clc
+        adc.w   #METATILE_SIZE_PX
+        sta.w   horizontalBuffer.cursorYpos
+
+        lda.w   visibleMapIndex
+        clc
+        adc.w   map.bytesPerRow
+        sta.w   visibleMapIndex
+        clc
+        adc.w   map.bytesPerDisplayHeight
+
+        ldy.w   #METATILE_DISPLAY_HEIGHT * METATILE_SIZE * 2
+
+        bra     DrawHorizontalBuffer
+
+YOffsetNegative:
+        cmp.w   #-METATILE_SIZE_PX + 1
+        bcs     +
+            lda.w   horizontalBuffer.cursorYpos
+            sec
+            sbc.w   #METATILE_SIZE_PX - 1
+            sta.w   Camera.yPos
+        +
+
+        lda.w   verticalBuffer.cursorIndex
+        sec
+        sbc.w   #METATILE_SIZE * 2
+        and.w   #verticalBuffer.buffer.size / 2 - 1
+        sta.w   verticalBuffer.cursorIndex
+
+        lda.w   horizontalBuffer.cursorYpos
+        sec
+        sbc.w   #METATILE_SIZE_PX
+        sta.w   horizontalBuffer.cursorYpos
+
+        lda.w   visibleMapIndex
+        sec
+        sbc.w   map.bytesPerRow
+        sta.w   visibleMapIndex
+
+        ldy.w   #0
+
+    DrawHorizontalBuffer:
+        // A = map Index, Y = vramOffset
+        _DrawHorizontalBuffer()
+
+SkipDrawHorizontalBuffer:
+
+
+    //  displayHoffset = Camera.xPos - cameraXoffset
+    //  displayVoffset = Camera.yPos - cameraVoffset
+
+    lda.w   Camera.xPos
+    sec
+    sbc.w   cameraXoffset
     sta.w   displayHoffset
 
     lda.w   Camera.yPos
-    and.w   #METATILE_SIZE_PX - 1
-    dec
+    sec
+    sbc.w   cameraYoffset
     sta.w   displayVoffset
-
-    pld
 
     rts
 }

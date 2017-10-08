@@ -50,8 +50,14 @@ namespace MetaTiles {
         // Number of bytes per map row
         //
         // Equal to map.width * 2.
-        // (word index)
+        // (uint16)
         allocate(bytesPerRow, wram7e, 2)
+
+        // Number of bytes per display height
+        //
+        // Equal to map.width * METATILE_DISPLAY_HEIGHT * 2
+        // (uint16)
+        allocate(bytesPerDisplayHeight, wram7e, 2)
     }
 
 
@@ -63,6 +69,56 @@ namespace MetaTiles {
         allocate(topRight, wram7e, N_TILES * 2)
         allocate(bottomLeft, wram7e, N_TILES * 2)
         allocate(bottomRight, wram7e, N_TILES * 2)
+    }
+
+
+    // Horizontal SNES Tilemap Buffer
+    // A single tile map 64 * 2 tiles in size
+    namespace horizontalBuffer {
+        constant buffer.size = 64 * 2 * 2
+        allocate(buffer, wram7e, buffer.size)
+
+        // Vram word address to transfer the buffer to
+        // (word address - shadow)
+        allocate(vramWaddr, shadow, 2)
+
+        // Index of the leftmost visible tile in the buffer
+        // (word index)
+        allocate(cursorIndex, wram7e, 2)
+
+        // Y coordinate of the topmost visible tile in the buffer
+        // Used to determine when to update the buffer
+        // (uint16)
+        allocate(cursorYpos, wram7e, 2)
+    }
+
+
+    // Vertical SNES Tilemap Buffer
+    // Two tile maps, each 1 * 32 tiles in size
+    namespace verticalBuffer {
+        constant buffer.size = 32 * 2 * 2
+        allocate(buffer, wram7e, buffer.size)
+
+        // Vram word address to transfer the buffer to
+        // (word address - shadow)
+        allocate(vramWaddr, shadow, 2)
+
+        // Index of the topmost visible tile in the buffer
+        // (word index)
+        allocate(cursorIndex, wram7e, 2)
+
+        // X coordinate of the topmost visible tile in the buffer
+        // Used to determine when to update the buffer
+        // (uint16)
+        allocate(cursorXpos, wram7e, 2)
+    }
+
+
+    // Buffer state
+    allocate(bufferState, shadow, 1)
+    namespace bufferState {
+        constant VERTICAL = 0x80
+        constant HORIZONTAL = 0x7f
     }
 }
 
