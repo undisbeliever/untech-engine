@@ -382,7 +382,7 @@ macro _DrawHorizontalBuffer() {
     tay
 
     Loop:
-        phx
+        stx.b   _mapIndex
 
         lda.w   map.data,x
         tax
@@ -407,7 +407,7 @@ macro _DrawHorizontalBuffer() {
             ldy.w   #horizontalBuffer.buffer.size / 2 - 4
         +
 
-        plx
+        ldx.b   _mapIndex
         dex
         dex
         cpx.b   _startingMapIndex
@@ -481,7 +481,7 @@ macro _DrawVerticalBuffer() {
     txa
     Loop:
         tax
-        phx
+        stx.b   _mapIndex
 
         lda.w   map.data,x
         tax
@@ -506,7 +506,7 @@ macro _DrawVerticalBuffer() {
             ldy.w   #verticalBuffer.buffer.size / 2 - 4
         +
 
-        pla
+        lda.b   _mapIndex
         sec
         sbc.w   map.bytesPerRow
         cmp.b   _startingMapIndex
@@ -531,6 +531,7 @@ i16()
 code()
 function Update {
 constant _startingMapIndex = dpTmp0
+constant _mapIndex = dpTmp1
 
     //  xOffset = Camera.xPos - verticalBuffer.cursorXpos
     //
