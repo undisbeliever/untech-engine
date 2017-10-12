@@ -15,16 +15,17 @@ include "dma/_common.inc"
 
 include "math/_macros.inc"
 
+include "metatiles/_dataformat.inc"
 include "metasprite/_dataformat.inc"
 include "entity/_dataformat.inc"
 
 include "hdma/_variables.inc"
 include "math/_variables.inc"
 include "text/_variables.inc"
+include "metatiles/_variables.inc"
 include "metasprite/_variables.inc"
 include "entity/_variables.inc"
 include "camera/_variables.inc"
-include "metatiles/_variables.inc"
 
 
 include "hdma/circular-window.inc"
@@ -48,6 +49,7 @@ include "text/string.inc"
 include "camera/_common.inc"
 
 include "metatiles/render.inc"
+include "metatiles/tileset.inc"
 
 include "metasprite/animation.inc"
 include "metasprite/entityhitbox.inc"

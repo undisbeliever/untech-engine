@@ -7,6 +7,7 @@ namespace MetaTileRenderTest {
 
 // Tests:
 //  * MetaTile.Render
+//  * MetaTile.LoadTileset
 
 constant MAP_WIDTH = 84
 constant MAP_HEIGHT = 75
@@ -62,65 +63,8 @@ macro SetupPpu() {
     lda.b   #TM.bg1 | TM.bg3
     sta.w   TM
 
-
-    // Copy Tiles to VRAM
-
-    ldx.w   #METATILES_TILES_WADDR
-    stx.w   VMADD
-    Dma.ForceBlank.ToVram(Tiles)
-
-
-    // Copy Palette to CGRAM
-
-    lda.b   #16
-    sta.w   CGADD
-
-    ldx.w   #0
-    PaletteLoop:
-        lda.l   Palette,x
-        sta.w   CGDATA
-        inx
-        cpx.w   #Palette.size
-        bcc     PaletteLoop
-
-
     plb
     // DB = 0x7e
-}
-
-
-// Loads the tileMap into WRAM
-//
-// REQUIRES: 16 bit A, 16 bit Index, DB = 0x7e
-macro LoadMetaTileMap() {
-    assert16a()
-    assert16i()
-
-    // Convert metatiles from interleaved format to planar format
-    ldx.w   #0
-    ldy.w   #0
-    LoadTileMapLoop:
-        lda.l   TileMap.Data,x
-        sta.w   MetaTiles.tileMap.topLeft,y
-
-        lda.l   TileMap.Data + 2,x
-        sta.w   MetaTiles.tileMap.topRight,y
-
-        lda.l   TileMap.Data + 4,x
-        sta.w   MetaTiles.tileMap.bottomLeft,y
-
-        lda.l   TileMap.Data + 6,x
-        sta.w   MetaTiles.tileMap.bottomRight,y
-
-        txa
-        clc
-        adc.w   #4 * 2
-        tax
-
-        iny
-        iny
-        cpy.w   #TileMap.N_TILES * 2
-        bcc     LoadTileMapLoop
 }
 
 
@@ -324,7 +268,8 @@ a8()
     rep     #$30
 a16()
 
-    LoadMetaTileMap()
+    lda.w   #0
+    jsr     MetaTiles.LoadTileset
 
     GenerateMap()
 
@@ -397,98 +342,26 @@ UnitTestMessage:
     db  "Press SELECT to redraw map", 0
 
 
-rodata(rom0)
-Palette:
-    dw  0, ToPalette(20, 15, 15), ToPalette(20, 0, 0), ToPalette(15, 0, 0)
-    fill 12 * 2
+namespace Tileset {
+    // inserts a single row of a 2bpp tile into the ROM
+    macro TileRow(evaluate row) {
+        variable t = 0
+        variable n = 7
+        while n >= 0 {
+            variable i = ({row} >> (n * 4)) & 3
 
-    dw  0, ToPalette(15, 20, 15)
+            t = t << 1
+            t = t | (i & 1) | ((i & 2) << 7)
 
-constant Palette.size = pc() - Palette
-
-// inserts a single row of a 2bpp tile into the ROM
-macro TileRow(evaluate row) {
-    variable t = 0
-    variable n = 7
-    while n >= 0 {
-        variable i = ({row} >> (n * 4)) & 3
-
-        t = t << 1
-        t = t | (i & 1) | ((i & 2) << 7)
-
-        n = n - 1
+            n = n - 1
+        }
+        dw  t
     }
-    dw  t
-}
 
-macro EndTile() {
-    fill 16, 0
-}
+    macro EndTile() {
+        fill 16, 0
+    }
 
-rodata(rom0)
-// Tile 0 - blank
-Tiles:
-    fill 32, 0
-
-// Tile 1
-    TileRow(0x00001000)
-    TileRow(0x00010000)
-    TileRow(0x00100000)
-    TileRow(0x01010000)
-    TileRow(0x10001000)
-    TileRow(0x00000100)
-    TileRow(0x00000000)
-    TileRow(0x00000000)
-    EndTile()
-
-// Tile 2
-    TileRow(0x00000000)
-    TileRow(0x00000000)
-    TileRow(0x00000000)
-    TileRow(0x00000033)
-    TileRow(0x00000322)
-    TileRow(0x00003222)
-    TileRow(0x00032222)
-    TileRow(0x00032223)
-    EndTile()
-
-// Tile 3
-    TileRow(0x00000000)
-    TileRow(0x00000000)
-    TileRow(0x00000000)
-    TileRow(0x33333333)
-    TileRow(0x22222222)
-    TileRow(0x22222222)
-    TileRow(0x22222222)
-    TileRow(0x33333333)
-    EndTile()
-
-// Tile 4
-    TileRow(0x00032223)
-    TileRow(0x00032223)
-    TileRow(0x00032223)
-    TileRow(0x00032223)
-    TileRow(0x00032223)
-    TileRow(0x00032223)
-    TileRow(0x00032223)
-    TileRow(0x00032223)
-    EndTile()
-
-// Tile 5
-    TileRow(0x11111111)
-    TileRow(0x11111111)
-    TileRow(0x11111111)
-    TileRow(0x11111111)
-    TileRow(0x11111111)
-    TileRow(0x11111111)
-    TileRow(0x11111111)
-    TileRow(0x11111111)
-    EndTile()
-
-constant Tiles.size = pc() - Tiles
-
-
-namespace TileMap {
     macro MT(char, pal, hFlip, vFlip) {
         variable t = {char} | ({pal} << Tilemap.palette.shift)
         if {hFlip} {
@@ -499,26 +372,152 @@ namespace TileMap {
         }
         dw  t
     }
+}
 
-    rodata(rom0)
-    //  top-left     top-right    bottom-left  bottom-right
-    Data:
-        MT(0, 1, 0, 0); MT(0, 1, 0, 0); MT(0, 1, 0, 0); MT(0, 1, 0, 0)
-        MT(1, 2, 0, 0); MT(0, 1, 0, 0); MT(0, 1, 0, 0); MT(2, 1, 0, 0)
-        MT(0, 1, 0, 0); MT(0, 1, 0, 0); MT(3, 1, 0, 0); MT(3, 1, 0, 0)
-        MT(0, 1, 0, 0); MT(1, 2, 1, 0); MT(2, 1, 1, 0); MT(0, 1, 0, 0)
-        MT(0, 1, 0, 0); MT(4, 1, 0, 0); MT(0, 1, 0, 0); MT(4, 1, 0, 0)
-        MT(5, 1, 0, 0); MT(5, 1, 0, 0); MT(5, 1, 0, 0); MT(5, 1, 0, 0)
-        MT(4, 1, 1, 0); MT(0, 1, 0, 0); MT(4, 1, 1, 0); MT(0, 1, 0, 0)
-        MT(0, 1, 0, 0); MT(2, 1, 0, 1); MT(1, 2, 0, 1); MT(0, 1, 0, 0)
-        MT(3, 1, 0, 1); MT(3, 1, 0, 1); MT(0, 1, 0, 0); MT(0, 1, 0, 0)
-        MT(2, 1, 1, 1); MT(0, 1, 0, 0); MT(0, 1, 0, 0); MT(1, 2, 1, 1)
+rodata(rom0)
+Tileset:
+namespace Tileset {
+    dw  N_TILES * 32        // tilesetSize
 
-    constant N_TILES = (pc() - Data) / 4 / 2
+TileMapBlock:
+    // TileMap Block
+    // top-left
+        MT(0, 1, 0, 0)
+        MT(1, 2, 0, 0)
+        MT(0, 1, 0, 0)
+        MT(0, 1, 0, 0)
+        MT(0, 1, 0, 0)
+        MT(5, 1, 0, 0)
+        MT(4, 1, 1, 0)
+        MT(0, 1, 0, 0)
+        MT(3, 1, 0, 1)
+        MT(2, 1, 1, 1)
+        fill (MetaTiles.N_TILES - 10) * 2
+
+    // top-right
+        MT(0, 1, 0, 0)
+        MT(0, 1, 0, 0)
+        MT(0, 1, 0, 0)
+        MT(1, 2, 1, 0)
+        MT(4, 1, 0, 0)
+        MT(5, 1, 0, 0)
+        MT(0, 1, 0, 0)
+        MT(2, 1, 0, 1)
+        MT(3, 1, 0, 1)
+        MT(0, 1, 0, 0)
+        fill (MetaTiles.N_TILES - 10) * 2
+
+    // bottom-left
+        MT(0, 1, 0, 0)
+        MT(0, 1, 0, 0)
+        MT(3, 1, 0, 0)
+        MT(2, 1, 1, 0)
+        MT(0, 1, 0, 0)
+        MT(5, 1, 0, 0)
+        MT(4, 1, 1, 0)
+        MT(1, 2, 0, 1)
+        MT(0, 1, 0, 0)
+        MT(0, 1, 0, 0)
+        fill (MetaTiles.N_TILES - 10) * 2
+
+    // bottom-right
+        MT(0, 1, 0, 0)
+        MT(2, 1, 0, 0)
+        MT(3, 1, 0, 0)
+        MT(0, 1, 0, 0)
+        MT(4, 1, 0, 0)
+        MT(5, 1, 0, 0)
+        MT(0, 1, 0, 0)
+        MT(0, 1, 0, 0)
+        MT(0, 1, 0, 0)
+        MT(1, 2, 1, 1)
+        fill (MetaTiles.N_TILES - 10) * 2
+
+    assert(pc() - TileMapBlock == MetaTiles.N_TILES * 4 * 2)
+
+
+TilesBlock:
+    constant N_TILES = 6
+    // Tiles Block
+    // Tile 0 - blank
+        fill 32, 0
+
+    // Tile 1
+        TileRow(0x00001000)
+        TileRow(0x00010000)
+        TileRow(0x00100000)
+        TileRow(0x01010000)
+        TileRow(0x10001000)
+        TileRow(0x00000100)
+        TileRow(0x00000000)
+        TileRow(0x00000000)
+        EndTile()
+
+    // Tile 2
+        TileRow(0x00000000)
+        TileRow(0x00000000)
+        TileRow(0x00000000)
+        TileRow(0x00000033)
+        TileRow(0x00000322)
+        TileRow(0x00003222)
+        TileRow(0x00032222)
+        TileRow(0x00032223)
+        EndTile()
+
+    // Tile 3
+        TileRow(0x00000000)
+        TileRow(0x00000000)
+        TileRow(0x00000000)
+        TileRow(0x33333333)
+        TileRow(0x22222222)
+        TileRow(0x22222222)
+        TileRow(0x22222222)
+        TileRow(0x33333333)
+        EndTile()
+
+    // Tile 4
+        TileRow(0x00032223)
+        TileRow(0x00032223)
+        TileRow(0x00032223)
+        TileRow(0x00032223)
+        TileRow(0x00032223)
+        TileRow(0x00032223)
+        TileRow(0x00032223)
+        TileRow(0x00032223)
+        EndTile()
+
+    // Tile 5
+        TileRow(0x11111111)
+        TileRow(0x11111111)
+        TileRow(0x11111111)
+        TileRow(0x11111111)
+        TileRow(0x11111111)
+        TileRow(0x11111111)
+        TileRow(0x11111111)
+        TileRow(0x11111111)
+        EndTile()
+
+    assert(pc() - TilesBlock == N_TILES * 32)
+
+
+    //Palette Data
+        dw  ToPalette(31, 31, 31)
+        fill 15 * 2
+
+        dw  0, ToPalette(20, 15, 15), ToPalette(20, 0, 0), ToPalette(15, 0, 0)
+        fill 12 * 2
+
+        dw  0, ToPalette(15, 20, 15)
+        fill 14 * 2
 }
 
 }
 }
+
+rodata(rom0)
+MetaTiles.TilesetList:
+    dl  InteractiveTests.MetaTileRenderTest.Tileset
+constant MetaTiles.TilesetList.count = 1
 
 // vim: ft=bass-65816 ts=4 sw=4 et:
 
