@@ -39,9 +39,6 @@ namespace Format {
             //   * Tiles
             //      - tilesSize bytes in size
             //      - copied straight to VRAM at METATILES_TILES_WADDR
-            //   * Palette
-            //      - 256 bytes in size
-            //      - copied straight to CGRAM at color 0
             field(dataBlocks, 1)
         endstruct()
     }

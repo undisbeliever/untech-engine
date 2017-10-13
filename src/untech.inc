@@ -15,6 +15,7 @@ include "dma/_common.inc"
 
 include "math/_macros.inc"
 
+include "resources/_dataformat.inc"
 include "metatiles/_dataformat.inc"
 include "metasprite/_dataformat.inc"
 include "entity/_dataformat.inc"
@@ -45,6 +46,7 @@ include "math/multiplication.inc"
 include "text/console.inc"
 include "text/string.inc"
 
+include "resources/palettes.inc"
 
 include "camera/_common.inc"
 

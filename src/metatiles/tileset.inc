@@ -12,7 +12,7 @@ RegisterBreakId(INVALID_METATILE_TILEMAP)
 
 namespace MetaTiles {
 
-// Load a MetaSprite Tileset into WRAM/VRAM/CGRAM
+// Load a MetaSprite Tileset into WRAM/VRAM
 //
 // REQUIRES: 16 bit A, 16 bit Index, DB = 0x7e, DP = 0, force blank
 // DMA: Uses DMA channel 0
@@ -64,9 +64,8 @@ assert(_tilesetPtr + 2 == _tilesetPtrBank)
     sep     #$20
 a8()
 i16()
-    // Disable NMI/HDMA to prevent VRAM/CGRAM corruption
+    // Disable NMI to prevent VRAM corruption
     stz.w   NMITIMEN
-    stz.w   HDMAEN
 
     lda.b   #INIDISP.force
     sta.w   INIDISP
@@ -114,19 +113,6 @@ i16()
     lda.b   #MDMAEN.dma0
     sta.w   MDMAEN
 
-
-    // Transfer palette to CGRAM
-
-    stz.w   CGADD
-
-    ldx.w   #DMAP.direction.toPpu | DMAP.transfer.one | (CGDATA << 8)
-    stx.w   DMAP0   // also sets BBAD0
-
-    ldx.w   #8 * 16 * 2
-    stx.w   DAS0
-
-    lda.b   #MDMAEN.dma0
-    sta.w   MDMAEN
 
     plb
     // DB = 0x7e
