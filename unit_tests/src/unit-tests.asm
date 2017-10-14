@@ -60,6 +60,8 @@ include "tests/metasprite/animation.inc"
 
 include "tests/text/string.inc"
 
+include "tests/util/lz4.inc"
+
 include "interactive/metatiles-render.inc"
 include "interactive/entity-metasprite.inc"
 include "interactive/entity-actionpointspawner.inc"

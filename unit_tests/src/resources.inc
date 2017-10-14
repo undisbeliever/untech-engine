@@ -13,5 +13,12 @@ rodata(rom0)
     }
 }
 
+namespace LZ4Test {
+rodata(rom0)
+    insert FontFixed_LZ4, "../gen/lz4-test/font-fixed.1bpp.lz4b"
+    insert OneKZeros_LZ4, "../gen/lz4-test/1kzeros.lz4b"
+    insert Incompressable_LZ4, "../gen/lz4-test/incompressable.lz4b"
+}
+
 // vim: ft=bass-65816 ts=4 sw=4 et:
 

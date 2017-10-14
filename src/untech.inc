@@ -46,6 +46,8 @@ include "math/multiplication.inc"
 include "text/console.inc"
 include "text/string.inc"
 
+include "util/lz4.inc"
+
 include "resources/palettes.inc"
 
 include "camera/_common.inc"

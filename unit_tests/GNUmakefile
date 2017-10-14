@@ -64,6 +64,19 @@ gen/font-fixed.1bpp: resources/text/font-fixed.png
 RESOURCES += gen/font-fixed.1bpp
 
 
+.PHONY: lz4-test-data
+lz4-test-data: gen/lz4-test/font-fixed.1bpp.lz4b gen/lz4-test/1kzeros.lz4b gen/lz4-test/incompressable.lz4b
+
+gen/lz4-test/font-fixed.1bpp.lz4b: gen/font-fixed.1bpp
+	untech-lz4c -v -o "$@" "$<"
+
+gen/lz4-test/%.lz4b: gen/lz4-test/%.bin
+	untech-lz4c -v -o "$@" "$<"
+
+gen/lz4-test/%.bin: resources/lz4-test/%.asm
+	bass-untech -strict -o "$@" "$<"
+
+RESOURCES += gen/lz4-test/font-fixed.1bpp.lz4b gen/lz4-test/1kzeros.lz4b gen/lz4-test/incompressable.lz4b
 
 
 .PHONY: directories
