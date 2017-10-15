@@ -80,17 +80,17 @@ constant sourceBank = 2
 }
 
 
-// Reads the optional length token of an lz4 stream
+// Reads the length bytes from an lz4 stream
 //
 // REQUIRES: 16 bit A, 16 bit Index, DP = 0
 //
 // INPUT: DB:X = lz4 stream ptr
-//        A = length from first token block
+//        A = length from token block
 // MODIFIES: _lengthTmp
 // KEEP: Y
-// OUTPUT: DB:X = lz4 stream ptr after length block
+// OUTPUT: DB:X = lz4 stream ptr after length bytes
 //         A = length
-macro _ReadLengthToken() {
+macro _ReadLength() {
     assert16a()
     assert16i()
 
@@ -155,7 +155,7 @@ constant _destBank = _tmp3
 // only used in loop
 // (dp)
 constant _lengthTmp = _tmp1
-constant _firstToken = _tmp2
+constant _token = _tmp2
 constant _matchStart = _tmp3
 
 
@@ -204,7 +204,7 @@ i16()
 
     // Read output size from header and calculate outputBufferEnd
 
-    lda.w   0,x
+    lda.w   0,x                     // output size
     beq     OutputSizeInvalid       // output size == 0 is invalid
     cmp.b   _maxDecompressedSize    // don't decompress data larger than maxDecompressedSize
     bcc     +
@@ -232,10 +232,8 @@ OutputSizeInvalid:
         // DB:X = compressed source
         //    Y = output destination
 
-        // Calculate literal length
-
-        lda.w   0,x
-        sta.b   _firstToken
+        lda.w   0,x                 // token
+        sta.b   _token
         inx
 
         and.w   #0xf0
@@ -247,7 +245,7 @@ OutputSizeInvalid:
             lsr
             lsr
 
-            _ReadLengthToken()
+            _ReadLength()
 
             dec
 
@@ -272,11 +270,11 @@ OutputSizeInvalid:
         inx
         inx
 
-        lda.b   _firstToken
+        lda.b   _token
         and.w   #0xf
-        _ReadLengthToken()
+        _ReadLength()
         clc
-        adc.w   #4 - 1              // -1 for mvn
+        adc.w   #4 - 1              // minimum match length is 4, -1 for mvn
 
         stx.b   ptr
 
