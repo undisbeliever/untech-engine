@@ -10,6 +10,10 @@
 
 namespace Resources {
 
+constant decompressionBuffer.size = 32 * 1024
+allocate(decompressionBuffer, wram7f, decompressionBuffer.size)
+
+
 namespace Palettes {
     // memory buffer to store the decompressed palettes in
     // (wram7f)

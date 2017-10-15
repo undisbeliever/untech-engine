@@ -1,0 +1,91 @@
+// resources/_common.inc
+// =====================
+//
+// Resource Management routines
+//
+// This file is part of the UnTech Game Engine.
+// Copyright (c) 2016 - 2017, Marcus Rowe <undisbeliever@gmail.com>.
+// Distributed under The MIT License: https://opensource.org/licenses/MIT
+
+
+namespace Resources {
+
+// Decompress a lz4 block to VRAM at a given word address
+//
+// REQUIRES: 16 bit A, 16 bit Index, DB = 0x7e, DP = 0, force blank
+// DMA: Uses DMA channel 0
+// MODIFIES: Disable HDMA, Disable Interrupts, Force Blank
+// MODIFIES: decompressionBuffer
+//
+// INPUT: LZ4.ptr = address of the lz4 block
+//              X = vram word address to load tiles to
+a16()
+i16()
+code()
+function DecompressToVram_FromPtr {
+    pea     (0x7e << 8) | REGISTER_DB
+    plb
+    // DB == REGISTER_DB
+
+    sep     #$20
+a8()
+i16()
+    // Disable NMI to prevent VRAM corruption
+    stz.w   NMITIMEN
+
+    lda.b   #INIDISP.force
+    sta.w   INIDISP
+
+    stx.w   VMADD
+
+
+    // Decompress tiles
+
+    ldx.w   #decompressionBuffer
+    lda.b   #decompressionBuffer >> 16
+    ldy.w   #decompressionBuffer.size
+
+    jsr     LZ4.Decompress
+
+
+    // Transfer tiles to VRAM
+
+    rep     #$30
+a16()
+    // Y = end of decompressed buffer
+    tya
+    clc
+    adc.w   #-decompressionBuffer
+    sta.w   DAS0
+
+    sep     #$20
+a8()
+
+    ldx.w   #decompressionBuffer
+    stx.w   A1T0
+    lda.b   #decompressionBuffer >> 16
+    sta.w   A1B0
+
+    lda.b   #VMAIN.increment.by1 | VMAIN.incrementMode.high
+    sta.w   VMAIN
+
+    ldx.w   #DMAP.direction.toPpu | DMAP.transfer.two | (VMDATA << 8)
+    stx.w   DMAP0   // also sets BBAD0
+
+    lda.b   #MDMAEN.dma0
+    sta.w   MDMAEN
+
+
+    plb
+    // DB = 0x7e
+
+    rep     #$30
+a16()
+i16()
+    rts
+}
+
+}
+
+// vim: ft=bass-65816 ts=4 sw=4 et:
+

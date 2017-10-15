@@ -50,6 +50,7 @@ include "text/string.inc"
 include "util/lz4.inc"
 
 include "resources/palettes.inc"
+include "resources/_common.inc"
 
 include "camera/_common.inc"
 

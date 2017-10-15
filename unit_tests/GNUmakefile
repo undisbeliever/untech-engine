@@ -91,6 +91,20 @@ gen/palettes/%.bin: resources/palettes/%.asm
 RESOURCES += gen/palettes/metatile-render-test.lz4b
 
 
+.PHONY: metatile-tileset-data
+metatile-tileset-data: gen/metatile-tilesets/metatile-render-test.tiles.lz4b
+metatile-tileset-data: gen/metatile-tilesets/metatile-render-test.tilemap.lz4b
+
+gen/metatile-tilesets/%.lz4b: gen/metatile-tilesets/%.bin
+	untech-lz4c -v -o "$@" "$<"
+
+gen/metatile-tilesets/%.bin: resources/metatile-tilesets/%.asm
+	bass-untech -strict -o "$@" "$<"
+
+RESOURCES += gen/metatile-tilesets/metatile-render-test.tiles.lz4b
+RESOURCES += gen/metatile-tilesets/metatile-render-test.tilemap.lz4b
+
+
 .PHONY: directories
 DIRS := $(sort $(dir $(BINARY) $(RESOURCES) $(TABLE_INCS)))
 directories: $(DIRS)

@@ -70,6 +70,8 @@ namespace MetaTiles {
         allocate(bottomLeft, wram7e, N_TILES * 2)
         allocate(bottomRight, wram7e, N_TILES * 2)
     }
+    constant tileMap = tileMap.topLeft
+    constant tileMap.size = N_TILES * 2 * 4
 
 
     // Horizontal SNES Tilemap Buffer

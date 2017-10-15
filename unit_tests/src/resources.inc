@@ -43,5 +43,26 @@ namespace PaletteList {
 }
 }
 
+namespace MetaTiles {
+
+namespace TilesetData {
+}
+
+rodata(rom0)
+TilesetList:
+namespace TilesetList {
+    variable i = 0
+    inline _add(l) {
+        dl TilesetData.{l}
+        constant {l} = i
+        i = i + 1
+    }
+    _add(MetaTileRenderTest)
+
+
+    constant count = i
+}
+}
+
 // vim: ft=bass-65816 ts=4 sw=4 et:
 

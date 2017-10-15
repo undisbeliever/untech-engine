@@ -23,24 +23,13 @@ namespace MetaTiles {
 namespace Format {
     // MetaTile Tileset data format
     namespace Tileset {
-        struct()
-            // Size of the tiles data block
-            // number of bytes to upload to VRAM
-            // (uint16)
-            field(tilesSize, 2)
-
-            // ::TODO data block compression::
-
-            // Three data blocks, one after each other
-            //   * tilemap block
-            //      - MetaTiles.N_TILES * 8 bytes in size
-            //      - copied straight to WRAM
-            //      - same format as MetaTiles.tileMap
-            //   * Tiles
-            //      - tilesSize bytes in size
-            //      - copied straight to VRAM at METATILES_TILES_WADDR
-            field(dataBlocks, 1)
-        endstruct()
+        // Two lz4 compressed data blocks, one after each other
+        //   * tilemap block
+        //      - lz4 compressed block, same format as MetaTiles.tileMap
+        //      - copied straight to WRAM
+        //   * Tileset block
+        //      - lz4 compressed block of 4bpp tiles
+        //      - copied to VRAM at METATILES_TILES_WADDR
     }
 }
 
