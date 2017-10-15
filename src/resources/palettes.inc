@@ -1,7 +1,7 @@
 // resources/palettes.inc
 // ======================
 //
-// MetaTile Tileset routines.
+// Palette resource management.
 //
 // This file is part of the UnTech Game Engine.
 // Copyright (c) 2016 - 2017, Marcus Rowe <undisbeliever@gmail.com>.
@@ -26,12 +26,7 @@ a16()
 i16()
 code()
 function LoadPalette {
-constant _palettePtr = dpTmp0
-constant _palettePtrBank = dpTmp1
-
-assert(_palettePtr + 2 == _palettePtrBank)
-
-assert(Format.PaletteHeader.size == 1)
+constant _palettePtr = LZ4.ptr
 
     cmp.w   #Resources.PaletteList.count
     bcc     +
@@ -47,17 +42,6 @@ assert(Format.PaletteHeader.size == 1)
     sta.b   _palettePtr + 1
     lda.l   Resources.PaletteList,x
     sta.b   _palettePtr
-
-    // Palette data address
-    inc
-    tax
-
-    // Palette Size
-    lda     [_palettePtr]
-    and.w   #0xff
-    inc
-    asl
-    tay
 
 
     pea     (0x7e << 8) | REGISTER_DB
@@ -75,20 +59,37 @@ i16()
     sta.w   INIDISP
 
 
+    // Decompress lz4 block
+
+    ldx.w   #paletteBuffer
+    lda.b   #paletteBuffer >> 16
+    ldy.w   #paletteBuffer.size
+
+    jsr     LZ4.Decompress
+
+
     // Transfer palette to CGRAM
 
-    stz.w   CGADD
+    rep     #$30
+a16()
+    // Y = end of decompressed buffer
+    tya
+    clc
+    adc.w   #-paletteBuffer
+    sta.w   DAS0
 
-    // X = palette data address
+    sep     #$20
+a8()
+
+    ldx.w   #paletteBuffer
     stx.w   A1T0
-    lda.b   _palettePtrBank
+    lda.b   #paletteBuffer >> 16
     sta.w   A1B0
-
-    // Y = palette size
-    sty.w   DAS0
 
     ldy.w   #DMAP.direction.toPpu | DMAP.transfer.one | (CGDATA << 8)
     sty.w   DMAP0   // also sets BBAD0
+
+    stz.w   CGADD
 
     lda.b   #MDMAEN.dma0
     sta.w   MDMAEN

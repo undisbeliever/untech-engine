@@ -20,5 +20,28 @@ rodata(rom0)
     insert Incompressable_LZ4, "../gen/lz4-test/incompressable.lz4b"
 }
 
+namespace Resources {
+
+namespace PaletteData {
+rodata(rom0)
+    insert MetaTileRenderTest, "../gen/palettes/metatile-render-test.lz4b"
+}
+
+rodata(rom0)
+PaletteList:
+namespace PaletteList {
+    variable i = 0
+    inline _add(l) {
+        dl PaletteData.{l}
+        constant {l} = i
+        i = i + 1
+    }
+    _add(MetaTileRenderTest)
+
+
+    constant count = i
+}
+}
+
 // vim: ft=bass-65816 ts=4 sw=4 et:
 

@@ -271,7 +271,7 @@ a16()
     lda.w   #0
     jsr     MetaTiles.LoadTileset
 
-    lda.w   #0
+    lda.w   #Resources.PaletteList.MetaTileRenderTest
     jsr     Resources.Palettes.LoadPalette
 
     GenerateMap()
@@ -502,21 +502,6 @@ TilesBlock:
 
     assert(pc() - TilesBlock == N_TILES * 32)
 }
-
-
-//Palette Data
-Palette:
-    db  Palette.N_COLORS - 1
-
-    dw  ToPalette(31, 31, 31)
-    fill 15 * 2
-
-    dw  0, ToPalette(20, 15, 15), ToPalette(20, 0, 0), ToPalette(15, 0, 0)
-    fill 12 * 2
-
-    dw  0, ToPalette(15, 20, 15)
-
-constant Palette.N_COLORS = (pc() - Palette - 1) / 2
 }
 }
 
@@ -524,11 +509,6 @@ rodata(rom0)
 MetaTiles.TilesetList:
     dl  InteractiveTests.MetaTileRenderTest.Tileset
 constant MetaTiles.TilesetList.count = 1
-
-
-Resources.PaletteList:
-    dl  InteractiveTests.MetaTileRenderTest.Palette
-constant Resources.PaletteList.count = 1
 
 // vim: ft=bass-65816 ts=4 sw=4 et:
 

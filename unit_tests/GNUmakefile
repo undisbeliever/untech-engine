@@ -79,6 +79,18 @@ gen/lz4-test/%.bin: resources/lz4-test/%.asm
 RESOURCES += gen/lz4-test/font-fixed.1bpp.lz4b gen/lz4-test/1kzeros.lz4b gen/lz4-test/incompressable.lz4b
 
 
+.PHONY: palette-data
+palette-data: gen/palettes/metatile-render-test.lz4b
+
+gen/palettes/%.lz4b: gen/palettes/%.bin
+	untech-lz4c -v -o "$@" "$<"
+
+gen/palettes/%.bin: resources/palettes/%.asm
+	bass-untech -strict -o "$@" "$<"
+
+RESOURCES += gen/palettes/metatile-render-test.lz4b
+
+
 .PHONY: directories
 DIRS := $(sort $(dir $(BINARY) $(RESOURCES) $(TABLE_INCS)))
 directories: $(DIRS)

@@ -1,5 +1,5 @@
-// resourcess/_dataformat.inc
-// ==========================
+// resources/_dataformat.inc
+// =========================
 //
 // Data format of the resources subsystem.
 //
@@ -13,25 +13,11 @@ namespace Resources {
 // The Resources subsystem requires the following to be defined:
 //
 //   Resources.PaletteList
-//      a list of long pointers that point to Palette data format
+//      a list of long pointers that point to lz4 compressed palette data
 //
 //   Resources.PaletteList.count
 //      the number of elements in the PaletteList
 //
-
-namespace Format {
-    // Palette data format
-    //
-    //   Header
-    //   PaletteData: 2 * (nColors + 1) bytes
-    namespace PaletteHeader {
-        struct()
-            // number of colors to transfer - 1
-            // (uint8)
-            field(nColors, 1)
-        endstruct()
-    }
-}
 
 }
 

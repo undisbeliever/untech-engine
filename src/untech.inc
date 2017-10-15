@@ -20,6 +20,7 @@ include "metatiles/_dataformat.inc"
 include "metasprite/_dataformat.inc"
 include "entity/_dataformat.inc"
 
+include "resources/_variables.inc"
 include "hdma/_variables.inc"
 include "math/_variables.inc"
 include "text/_variables.inc"

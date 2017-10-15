@@ -39,6 +39,7 @@ createRamBlock(entityBlock, 0x7e0100, 0x7e10ff)
 createRamBlock(shadow,      0x7e1100, 0x7e1f7f)
 createRamBlock(stack,       0x7e1f80, 0x7e1fff)
 createRamBlock(wram7e,      0x7e2000, 0x7effff)
+createRamBlock(wram7f,      0x7f0000, 0x7fffff)
 
 
 
