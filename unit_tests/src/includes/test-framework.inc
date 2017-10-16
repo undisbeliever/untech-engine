@@ -365,6 +365,15 @@ i16()
     Text.Console.PrintConstString("UnTech Unit Tests:")
 
 
+    // reset scroll buffer
+    ldx.w   #0
+    ldy.w   #-1
+    stx.w   ScrollBuffer.bg1.hOffset
+    sty.w   ScrollBuffer.bg1.vOffset
+    stx.w   ScrollBuffer.bg2.hOffset
+    sty.w   ScrollBuffer.bg2.vOffset
+
+
     lda.b   #15
     sta.w   INIDISP
 
