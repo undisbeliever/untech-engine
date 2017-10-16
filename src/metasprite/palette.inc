@@ -310,13 +310,13 @@ a8()
     rep     #$30
 a16()
 
-    // Copy Palette to PaletteBuffer
+    // Copy Palette to object palette buffer
     // A = slot index
     asl
     asl
     asl
     asl
-    adc.w   #Dma.Palette.buffer + 129 * 2
+    adc.w   #Dma.ObjPalette.buffer + 2
     tay
 
     ldx.w   tmp_paletteAddr
@@ -326,7 +326,7 @@ a16()
     sep     #$30
 a8()
 i8()
-    Dma.Palette.MarkDirty(objects)
+    Dma.ObjPalette.MarkDirty()
 
     bra     SetMetaSpriteState
 

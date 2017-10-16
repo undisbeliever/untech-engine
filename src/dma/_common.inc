@@ -55,7 +55,7 @@ macro VBlank() {
 
     Dma.MetaSprite._VBlank()
     Dma.MetaTiles._VBlank()
-    Dma.Palette._VBlank()
+    Dma.ObjPalette._VBlank()
     Dma.Tile16._VBlank()
 
     // Text module is low priority.
@@ -76,7 +76,7 @@ i16()
 code()
 function Init {
     MetaTiles._Init()
-    Palette._Init()
+    ObjPalette._Init()
     Tile16._Init()
 
     Dma.ResetTransfersLeft()
@@ -94,7 +94,6 @@ a16()
 i16()
 code()
 function TransferOnNextVBlank {
-    Palette._TransferOnNextVBlank()
     Tile16._TransferOnNextVBlank()
 
     rts

@@ -32,14 +32,13 @@ constant tmp_paletteBits = tmp0
 
     sep     #$20
 a8()
-    lda.w   Dma.Palette.dirty
-    cmp.b   #Dma.Palette.dirty.objects
-    bne     Fail
+    lda.w   Dma.ObjPalette.dirty
+    beq     Fail
 
     lda.b   BaseEntity.MetaSprite.status
     bpl     Fail
 
-    stz.w   Dma.Palette.dirty
+    stz.w   Dma.ObjPalette.dirty
 
 
 
@@ -50,7 +49,7 @@ a16()
 
     sep     #$20
 a8()
-    lda.w   Dma.Palette.dirty
+    lda.w   Dma.ObjPalette.dirty
     bne     Fail
 
     lda.b   BaseEntity.MetaSprite.status
@@ -76,7 +75,7 @@ a16()
 
     sep     #$20
 a8()
-    lda.w   Dma.Palette.dirty
+    lda.w   Dma.ObjPalette.dirty
     bne     Fail
 
     lda.b   BaseEntity.MetaSprite.status
@@ -101,7 +100,7 @@ a16()
 
     sep     #$20
 a8()
-    lda.w   Dma.Palette.dirty
+    lda.w   Dma.ObjPalette.dirty
     beq     Fail
 
     lda.b   BaseEntity.MetaSprite.status
@@ -145,13 +144,13 @@ a8()
     and.b   #OamFormat.attr.palette.mask
     sta.w   tmp_paletteBits
 
-    stz.w   Dma.Palette.dirty
+    stz.w   Dma.ObjPalette.dirty
 
     lda.b   #9
     jsr     MetaSprite.Palette.SetPalette
     bcc     Fail
 
-    lda.w   Dma.Palette.dirty
+    lda.w   Dma.ObjPalette.dirty
     beq     Fail
 
     lda.b   BaseEntity.MetaSprite.status
@@ -169,13 +168,13 @@ a8()
     and.b   #OamFormat.attr.palette.mask
     sta.w   tmp_paletteBits
 
-    stz.w   Dma.Palette.dirty
+    stz.w   Dma.ObjPalette.dirty
 
     lda.b   #3
     jsr     MetaSprite.Palette.SetPalette
     bcc     Fail
 
-    lda.w   Dma.Palette.dirty
+    lda.w   Dma.ObjPalette.dirty
     bne     Fail
 
     lda.b   BaseEntity.MetaSprite.status
@@ -189,13 +188,13 @@ a8()
 
     // Test that setting the palette to the same palette id does nothing
 
-    stz.w   Dma.Palette.dirty
+    stz.w   Dma.ObjPalette.dirty
 
     lda.b   #3
     jsr     MetaSprite.Palette.SetPalette
     bcc     Fail
 
-    lda.w   Dma.Palette.dirty
+    lda.w   Dma.ObjPalette.dirty
     bne     Fail
 
     lda.b   BaseEntity.MetaSprite.status
@@ -235,13 +234,13 @@ function Deactivate {
     // does not upload a palette
     sep     #$20
 a8()
-    stz.w   Dma.Palette.dirty
+    stz.w   Dma.ObjPalette.dirty
 
     lda.b   #9
     jsr     MetaSprite.Palette.SetPalette
     bcc     Fail
 
-    lda.w   Dma.Palette.dirty
+    lda.w   Dma.ObjPalette.dirty
     bne     Fail
 
     jsr     _ValidateUsedSlotList
@@ -361,7 +360,7 @@ function Overflow {
     // The overflow should still fail here
     sep     #$20
 a8()
-    stz.w   Dma.Palette.dirty
+    stz.w   Dma.ObjPalette.dirty
 
     lda.b   #8
     jsr     MetaSprite.Palette.SetPalette

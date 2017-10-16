@@ -35,7 +35,7 @@ function SuccessTest {
 }
 
 
-include "tests/dma/palette.inc"
+include "tests/dma/obj-palette.inc"
 include "tests/dma/tile16.inc"
 
 include "tests/entity/entities/blank.inc"
