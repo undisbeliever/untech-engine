@@ -220,10 +220,16 @@ i8()
 
     // Registers $210d - $2114
     // BG Scroll Locations - Write twice
-    ldx.b   #0x2114 - 0x210d
+    // horizontal offset set to 0
+    // vertical offset set to -1
+    ldx.b   #0x2114 - 0x210d - 1
+    lda.b   #0xff
 -
         stz.b   0x0d,x
         stz.b   0x0d,x
+        sta.b   0x0e,x
+        sta.b   0x0e,x
+        dex
         dex
         bpl     -
 
