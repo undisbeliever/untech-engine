@@ -10,6 +10,49 @@
 
 namespace Resources {
 
+// Initializes the Resources module
+//
+// REQUITES: 16 bit A, 16 bit Index, DB = 0x7e
+a16()
+i16()
+code()
+function Init {
+    Palettes.DisableAnimation()
+
+    // Set animation speed
+
+    lda.l   STAT77
+    and.w   #STAT78.pal << 8
+    beq     +
+        // pal
+        lda.w   #ANIMATION_TICKS_PER_SECOND / 50
+        bra     ++
+    +
+        // ntsc
+        lda.w   #ANIMATION_TICKS_PER_SECOND / 60
+    +
+    sta.w   animationSpeed
+
+    rts
+}
+
+
+// Process one display from of the any active resource animations.
+//
+// MUST be called once per frame
+//
+// REQUIRES: 16 bit A, 16 bit Index, DB = 0x7e
+a16()
+i16()
+code()
+function ProcessAnimations {
+    Palettes._ProcessAnimation()
+
+    rts
+}
+
+
+
 // Decompress a lz4 block to VRAM at a given word address
 //
 // REQUIRES: 16 bit A, 16 bit Index, DB = 0x7e, DP = 0, force blank

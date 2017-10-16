@@ -3,10 +3,31 @@
 
 include "../../../src/common/registers.inc"
 
+// frame 0
 dw  ToPalette(31, 31, 31)
 fill 15 * 2
 
 dw  0, ToPalette(20, 15, 15), ToPalette(20, 0, 0), ToPalette(15, 0, 0)
+fill 12 * 2
+
+dw  0, ToPalette(15, 20, 15)
+
+
+// frame 1
+dw  ToPalette(31, 31, 31)
+fill 15 * 2
+
+dw  0, ToPalette(25, 25, 10), ToPalette(20, 20, 0), ToPalette(5, 5, 0)
+fill 12 * 2
+
+dw  0, ToPalette(15, 20, 15)
+
+
+// frame 2
+dw  ToPalette(31, 31, 31)
+fill 15 * 2
+
+dw  0, ToPalette(15, 15, 20), ToPalette(10, 10, 25), ToPalette(0, 0, 15)
 fill 12 * 2
 
 dw  0, ToPalette(15, 20, 15)

@@ -24,7 +24,10 @@ namespace Resources {
 
 namespace PaletteData {
 rodata(rom0)
-    insert MetaTileRenderTest, "../gen/palettes/metatile-render-test.lz4b"
+MetaTileRenderTest:
+    db  3
+    dw  300
+    insert "../gen/palettes/metatile-render-test.lz4b"
 }
 
 rodata(rom0)

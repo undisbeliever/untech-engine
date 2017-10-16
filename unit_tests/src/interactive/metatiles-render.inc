@@ -8,6 +8,8 @@ namespace MetaTileRenderTest {
 // Tests:
 //  * MetaTile.Render
 //  * MetaTile.LoadTileset
+//  * Resource palette animations
+
 
 constant MAP_WIDTH = 84
 constant MAP_HEIGHT = 75
@@ -268,6 +270,8 @@ a8()
     rep     #$30
 a16()
 
+    jsr     Resources.Init
+
     lda.w   #MetaTiles.TilesetList.MetaTileRenderTest
     jsr     MetaTiles.LoadTileset
 
@@ -311,6 +315,8 @@ a16()
 
         MoveCamera()
 
+        jsr     Resources.ProcessAnimations
+
         sep     #$20
     a8()
         PrintCameraPos()
@@ -331,6 +337,8 @@ a16()
         jmp     Loop
 
 Pass:
+    Resources.Palettes.DisableAnimation()
+
     jmp     Test.ResetPpuState
 }
 

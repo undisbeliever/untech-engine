@@ -56,6 +56,7 @@ macro VBlank() {
     Dma.MetaSprite._VBlank()
     Dma.MetaTiles._VBlank()
     Dma.ObjPalette._VBlank()
+    Dma.Resources._VBlank()
     Dma.Tile16._VBlank()
 
     // Text module is low priority.
@@ -66,7 +67,7 @@ macro VBlank() {
 }
 
 
-// Initializes the tables.
+// Initializes the dma module.
 //
 // This MUST be called before using this module.
 //
@@ -77,6 +78,7 @@ code()
 function Init {
     MetaTiles._Init()
     ObjPalette._Init()
+    Resources._Init()
     Tile16._Init()
 
     Dma.ResetTransfersLeft()

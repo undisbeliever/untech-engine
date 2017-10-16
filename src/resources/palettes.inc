@@ -13,94 +13,155 @@ RegisterBreakId(INVALID_PALETTE_ID)
 namespace Resources {
 namespace Palettes {
 
-// Load a Palette into CGRAM
+
+// Load Palette resource.
 //
-// Will always load the palette to the beginning of CGRAM
+// The palette will be loaded into WRAM and uploaded to CGRAM on the next VBlank.
 //
-// REQUIRES: 16 bit A, 16 bit Index, DB = 0x7e, DP = 0, force blank
-// DMA: Uses DMA channel 0
-// MODIFIES: Disable HDMA, Disable Interrupts, Force Blank
+// REQUIRES: 16 bit A, 16 bit Index, DB = 0x7e, DP = 0
 //
 // INPUT: A = palette Id
 a16()
 i16()
 code()
 function LoadPalette {
-constant _palettePtr = LZ4.ptr
+constant _ptr = LZ4.ptr
+assert(Format.PaletteHeader.size == 3)
 
     cmp.w   #Resources.PaletteList.count
     bcc     +
         break(INVALID_PALETTE_ID)
     +
-    sta.b   _palettePtr
+    sta.b   _ptr
     asl
     clc
-    adc.b   _palettePtr
+    adc.b   _ptr
     tax
 
     lda.l   Resources.PaletteList + 1,x
-    sta.b   _palettePtr + 1
+    sta.b   _ptr + 1
     lda.l   Resources.PaletteList,x
-    sta.b   _palettePtr
+    sta.b   _ptr
+    tax
 
 
-    pea     (0x7e << 8) | REGISTER_DB
-    plb
-    // DB == REGISTER_DB
+    lda     [_ptr]              // nAnimations
+    inx
+    and.w   #0xff
+    bne     HasAnimation
+        // no animation
+
+        ldy.w   #1
+        lda.w   #0
+
+        bra     EndIf
+
+    HasAnimation:
+        // palette has an animation
+
+        tay
+
+        stx.b   _ptr
+        lda     [_ptr]          // animationDelay
+        inx
+        inx
+    EndIf:
+
+    // Y = nAnimations
+    // A = animationDelay
+
+    sta.w   animationDelay
+    sta.w   animationCountdown
+    stx.b   _ptr
+
+
+    // animationFrameSize = *_ptr / nAnimations
+    // paletteBufferEnd = LZ4.Decompress(_ptr, paletteBuffer, paletteBuffer.size)
+
+    lda     [_ptr]              // lz4 decompressed size
+    sta.l   WRDIV
+
+    sep     #$30
+a8()
+i8()
+    // Y = max(nAnimations, 1)
+    tya
+    sta.l   WRDIVB                  // wait 16 cycles
+
+    rep     #$30                    // 3
+a16()
+i16()
+    ldx.w   #paletteBuffer          // 3
+    stx.w   animationPos            // 5
+    ldy.w   #paletteBuffer.size     // 3
+
+    lda.l   RDDIV                   // 2 from loading instruction
+    sta.l   animationFrameSize
 
     sep     #$20
 a8()
-i16()
-    // Disable NMI/HDMA to prevent CGRAM corruption
-    stz.w   NMITIMEN
-    stz.w   HDMAEN
-
-    lda.b   #INIDISP.force
-    sta.w   INIDISP
-
-
-    // Decompress lz4 block
-
-    ldx.w   #paletteBuffer
     lda.b   #paletteBuffer >> 16
-    ldy.w   #paletteBuffer.size
 
     jsr     LZ4.Decompress
 
-
-    // Transfer palette to CGRAM
-
-    rep     #$30
-a16()
-    // Y = end of decompressed buffer
-    tya
-    clc
-    adc.w   #-paletteBuffer
-    sta.w   DAS0
-
-    sep     #$20
-a8()
-
-    ldx.w   #paletteBuffer
-    stx.w   A1T0
-    lda.b   #paletteBuffer >> 16
-    sta.w   A1B0
-
-    ldy.w   #DMAP.direction.toPpu | DMAP.transfer.one | (CGDATA << 8)
-    sty.w   DMAP0   // also sets BBAD0
-
-    stz.w   CGADD
-
-    lda.b   #MDMAEN.dma0
-    sta.w   MDMAEN
-
-    plb
-    // DB = 0x7e
+    sty.w   paletteBufferEnd
 
     rep     #$30
 a16()
-i16()
+    Dma.Resources.QueuePaletteUpload(NotEnoughDmaTime)
+
     rts
+
+NotEnoughDmaTime:
+    // upload on next frame
+    stz.w   animationCountdown
+    rts
+}
+
+
+// Disables the palette animation
+// REQUIRES: 16 bit A, DB = 0x7e
+macro DisableAnimation() {
+    assert16a()
+
+    stz.w   Resources.Palettes.animationDelay
+}
+
+
+
+// Processes one display frame of the palette animation (if enabled).
+//
+// REQUIRES: 16 bit A, 16 bit Index, DB = 0x7e
+macro _ProcessAnimation() {
+    assert16a()
+    assert16i()
+
+    ldy.w   Palettes.animationDelay
+    beq     Return
+        lda.w   Palettes.animationCountdown
+        sec
+        sbc.w   animationSpeed
+        bcs     AnimationUnchanged
+
+            Dma.Resources.QueuePaletteUpload(NotEnoughDmaTime)
+
+            lda.w   Palettes.animationPos
+            clc
+            adc.w   Palettes.animationFrameSize
+            cmp.w   Palettes.paletteBufferEnd
+            bcc     +
+                lda.w   #Palettes.paletteBuffer
+            +
+            sta.w   Palettes.animationPos
+
+            // Y = animationDelay
+            tya
+
+    AnimationUnchanged:
+        sta.w   Palettes.animationCountdown
+
+    NotEnoughDmaTime:
+Return:
 }
 
 }
