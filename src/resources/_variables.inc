@@ -22,6 +22,43 @@ allocate(decompressionBuffer, wram7f, decompressionBuffer.size)
 allocate(animationSpeed, wram7e, 2)
 
 
+namespace AnimatedTileset {
+    // buffer to hold the decompressed animated tiles
+    // (wram7f)
+    constant animationBuffer.size = Format.AnimatedTilesetHeader.MAX_ANIMATED_TILES_SIZE
+    allocate(animationBuffer, wram7f, animationBuffer.size)
+    assert(decompressionBuffer + decompressionBuffer.size == animationBuffer)
+
+    // Vram word address to store the upload the buffer to
+    // (vram word address)
+    allocate(animationVramWaddr, shadow, 2)
+
+    // Address of the current animation frame in the paletteBuffer
+    // If 0 then animation is disabled
+    // (word addr - shadow)
+    allocate(animationBufferPos, shadow, 2)
+
+    // The size of the palette animation frame in bytes
+    // (uint16 - shadow)
+    allocate(animationFrameSize, shadow, 2)
+
+    // The address following the end of the data in the palette buffer
+    // (word addr - shadow)
+    allocate(animationBufferEnd, wram7e, 2)
+
+
+    // Animation frame delay
+    // Copy of `Format.PaletteHeader.animationDelay`
+    // If zero then animation is disabled
+    // (uint16 - animationTicks)
+    allocate(animationDelay, wram7e, 2)
+
+    // Animation frame countdown
+    // When < 0 then a queue the next animation
+    // (uint16 - animationTicks)
+    allocate(animationCountdown, wram7e, 2)
+}
+
 namespace Palettes {
     // memory buffer to store the decompressed palettes in
     // (wram7f)

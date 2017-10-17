@@ -8,6 +8,7 @@ namespace MetaTileRenderTest {
 // Tests:
 //  * MetaTile.Render
 //  * MetaTile.LoadTileset
+//  * Resources.AnimatedTileset
 //  * Resource palette animations
 
 
@@ -337,6 +338,7 @@ a16()
         jmp     Loop
 
 Pass:
+    Resources.AnimatedTileset.DisableAnimation()
     Resources.Palettes.DisableAnimation()
 
     jmp     Test.ResetPpuState
@@ -359,6 +361,10 @@ UnitTestMessage:
 rodata(rom0)
 MetaTiles.TilesetData.MetaTileRenderTest:
     insert "../../gen/metatile-tilesets/metatile-render-test.tilemap.lz4b"
+
+    db  2
+    db  1
+    dw  35
     insert "../../gen/metatile-tilesets/metatile-render-test.tiles.lz4b"
 
 // vim: ft=bass-65816 ts=4 sw=4 et:

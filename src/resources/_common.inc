@@ -17,6 +17,7 @@ a16()
 i16()
 code()
 function Init {
+    AnimatedTileset.DisableAnimation()
     Palettes.DisableAnimation()
 
     // Set animation speed
@@ -46,6 +47,7 @@ a16()
 i16()
 code()
 function ProcessAnimations {
+    AnimatedTileset._ProcessAnimation()
     Palettes._ProcessAnimation()
 
     rts

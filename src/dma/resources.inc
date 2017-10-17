@@ -13,9 +13,13 @@ namespace Dma {
 namespace Resources {
 
 
+// Upload animated tiles to VRAM on next vblank
+// (byte - shadow)
+allocate(uploadAnimatedTilesetOnZero, shadow, 1)
+
 // Upload palette to CGRAM during next vblank
 // (byte - shadow)
-allocate(uploadPaletteOnZero, shadow, 1)
+allocate(uploadPalettesOnZero, shadow, 1)
 
 
 // Initialize the tables/variables
@@ -27,20 +31,22 @@ macro _Init() {
     sep     #$20
 a8()
     lda.b   #1
-    sta.w   Dma.Resources.uploadPaletteOnZero
+    sta.w   Dma.Resources.uploadAnimatedTilesetOnZero
+    sta.w   Dma.Resources.uploadPalettesOnZero
 
     rep     #$20
 a16()
 }
 
 
-
-// Queue the current position of the resource palette buffer to CGRAM
+// Tests that there is enough DMA time to upload the animation frame
+// during VBlank and either sets the upload flag if it is possible,
+// or branches to NotEnoughDmaTime.
 //
 // REQUIRES: 16 bit A, DB access shadow
 // BRANCH: to NotEnoughDmaTime if out of dma time
 // KEEP: X, Y
-macro QueuePaletteUpload(NotEnoughDmaTime) {
+macro TestDmaTimeAndSetUploadFlag(name, NotEnoughDmaTime) {
     assert16a()
     assert(Dma.TRANSFER_SCALE == 128)
 
@@ -49,7 +55,7 @@ macro QueuePaletteUpload(NotEnoughDmaTime) {
     // Dma.transfersLeft -= time
     // uploadPaletteOnZero = 0
 
-    lda.w   Resources.Palettes.animationFrameSize
+    lda.w   Resources.{name}.animationFrameSize
     clc
     adc.w   #Dma.TRANSFER_SCALE + Dma.TRANSFER_SCALE / 2
     asl
@@ -63,7 +69,7 @@ macro QueuePaletteUpload(NotEnoughDmaTime) {
     sta.w   Dma.transfersLeft
 
     lda.w   #0xff
-    trb.w   Dma.Resources.uploadPaletteOnZero
+    trb.w   Dma.Resources.upload{name}OnZero
 }
 
 
@@ -71,13 +77,40 @@ macro QueuePaletteUpload(NotEnoughDmaTime) {
 // VBlank code.
 //
 // REQUIRES: 16 bit A, 8 bit Index, DB = $80, DP = $4300
+// REQUIRES: VMAIN = VMAIN.incrementMode.high | VMAIN.increment.by1
 //
-// MODIFIES: CGADD, DMA Channel 0
+// MODIFIES: CGADD, VMADD, DMA Channel 0
 macro _VBlank() {
     assert16a()
     assert8i()
 
-    ldx.w   Dma.Resources.uploadPaletteOnZero
+    ldx.w   Dma.Resources.uploadAnimatedTilesetOnZero
+    bne     SkipAnimatedTilesetUpload
+        // upload animation tiles to VRAM
+
+        lda.w   Resources.AnimatedTileset.animationVramWaddr
+        sta.w   VMADD
+
+        lda.w   #DMAP.direction.toPpu | DMAP.transfer.two | (VMDATA << 8)
+        sta.b   DMAP0       // Also set BBAD0
+
+        lda.w   Resources.AnimatedTileset.animationBufferPos
+        sta.b   A1T0
+        ldx.b   #Resources.AnimatedTileset.animationBuffer >> 16
+        stx.b   A1B0
+
+        lda.w   Resources.AnimatedTileset.animationFrameSize
+        sta.b   DAS0
+
+        ldx.b   #MDMAEN.dma0
+        stx.w   MDMAEN
+
+        stx.w   Dma.Resources.uploadAnimatedTilesetOnZero
+
+    SkipAnimatedTilesetUpload:
+
+
+    ldx.w   Dma.Resources.uploadPalettesOnZero
     bne     SkipPaletteUpload
         // upload current palette animation frame to CGRAM
 
@@ -98,7 +131,7 @@ macro _VBlank() {
         ldx.b   #MDMAEN.dma0
         stx.w   MDMAEN
 
-        stx.w   Dma.Resources.uploadPaletteOnZero
+        stx.w   Dma.Resources.uploadPalettesOnZero
 
     SkipPaletteUpload:
 }

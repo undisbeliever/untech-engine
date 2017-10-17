@@ -50,6 +50,7 @@ include "text/string.inc"
 
 include "util/lz4.inc"
 
+include "resources/animated-tileset.inc"
 include "resources/palettes.inc"
 include "resources/_common.inc"
 

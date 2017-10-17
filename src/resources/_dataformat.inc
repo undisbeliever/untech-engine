@@ -26,6 +26,35 @@ constant ANIMATION_TICKS_PER_SECOND = 300
 
 namespace Format {
 
+    // AnimatedTileset resource data format.
+    //   <header> <lz4 static tiles + animated tiles>
+    //
+    // NOTE: The size of the animated tiles block must be <= MAX_ANIMATED_TILES_SIZE
+    // NOTE: The number of tiles being animated must be <= MAX_TILES_PER_FRAME
+    //
+    namespace AnimatedTilesetHeader {
+        constant MAX_TILES_PER_FRAME = 32
+        constant MAX_ANIMATED_TILES_SIZE = 8192
+
+        struct()
+            // Number of animation frames
+            // (uint8)
+            field(nAnimations, 1)
+
+            // Number of 4bpp tiles per animation
+            // Optional field, only exists if number of animation frames > 0
+            // This value MUST BE <= MAX_TILES_PER_FRAME
+            // (uint8)
+            field(nTiles, 1)
+
+            // Delay between palette animation frames
+            // Optional field, only exists if number of animation frames > 0
+            // (uint16 - ticks)
+            field(animationDelay, 2)
+        endstruct()
+    }
+
+
     // Palette resource data format.
     //   <header> <lz4 compressed snes colors>
     //

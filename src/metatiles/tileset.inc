@@ -56,7 +56,7 @@ constant _tilesetPtr = LZ4.ptr
     // Load tiles
 
     ldx.w   #METATILES_TILES_WADDR
-    jmp     Resources.DecompressToVram_FromPtr
+    jmp     Resources.AnimatedTileset.LoadAnimatedTileset_FromPtr
 
 
 Fail:

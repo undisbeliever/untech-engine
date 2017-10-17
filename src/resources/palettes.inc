@@ -108,7 +108,7 @@ a8()
 
     rep     #$30
 a16()
-    Dma.Resources.QueuePaletteUpload(NotEnoughDmaTime)
+    Dma.Resources.TestDmaTimeAndSetUploadFlag(Palettes, NotEnoughDmaTime)
 
     rts
 
@@ -143,7 +143,7 @@ macro _ProcessAnimation() {
         sbc.w   animationSpeed
         bcs     AnimationUnchanged
 
-            Dma.Resources.QueuePaletteUpload(NotEnoughDmaTime)
+            Dma.Resources.TestDmaTimeAndSetUploadFlag(Palettes, NotEnoughDmaTime)
 
             lda.w   Palettes.animationPos
             clc

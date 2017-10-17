@@ -23,17 +23,6 @@ macro EndTile() {
     fill 32, 0
 
 // Tile 1
-    TileRow(0x00001000)
-    TileRow(0x00010000)
-    TileRow(0x00100000)
-    TileRow(0x01010000)
-    TileRow(0x10001000)
-    TileRow(0x00000100)
-    TileRow(0x00000000)
-    TileRow(0x00000000)
-    EndTile()
-
-// Tile 2
     TileRow(0x00000000)
     TileRow(0x00000000)
     TileRow(0x00000000)
@@ -44,36 +33,63 @@ macro EndTile() {
     TileRow(0x00032223)
     EndTile()
 
+// Tile 2
+    TileRow(0x00000000)
+    TileRow(0x00000000)
+    TileRow(0x00000000)
+    TileRow(0x33333333)
+    TileRow(0x22222222)
+    TileRow(0x22222222)
+    TileRow(0x22222222)
+    TileRow(0x33333333)
+    EndTile()
+
 // Tile 3
-    TileRow(0x00000000)
-    TileRow(0x00000000)
-    TileRow(0x00000000)
-    TileRow(0x33333333)
-    TileRow(0x22222222)
-    TileRow(0x22222222)
-    TileRow(0x22222222)
-    TileRow(0x33333333)
+    TileRow(0x00032223)
+    TileRow(0x00032223)
+    TileRow(0x00032223)
+    TileRow(0x00032223)
+    TileRow(0x00032223)
+    TileRow(0x00032223)
+    TileRow(0x00032223)
+    TileRow(0x00032223)
     EndTile()
 
 // Tile 4
-    TileRow(0x00032223)
-    TileRow(0x00032223)
-    TileRow(0x00032223)
-    TileRow(0x00032223)
-    TileRow(0x00032223)
-    TileRow(0x00032223)
-    TileRow(0x00032223)
-    TileRow(0x00032223)
+    TileRow(0x11111111)
+    TileRow(0x11111111)
+    TileRow(0x11111111)
+    TileRow(0x11111111)
+    TileRow(0x11111111)
+    TileRow(0x11111111)
+    TileRow(0x11111111)
+    TileRow(0x11111111)
     EndTile()
 
+
+// Animated Tiles
+
+// Frame 0
 // Tile 5
-    TileRow(0x11111111)
-    TileRow(0x11111111)
-    TileRow(0x11111111)
-    TileRow(0x11111111)
-    TileRow(0x11111111)
-    TileRow(0x11111111)
-    TileRow(0x11111111)
-    TileRow(0x11111111)
+    TileRow(0x00001000)
+    TileRow(0x00010000)
+    TileRow(0x00100000)
+    TileRow(0x01110000)
+    TileRow(0x10011000)
+    TileRow(0x00001100)
+    TileRow(0x00000000)
+    TileRow(0x00000000)
+    EndTile()
+
+// Frame 1
+// Tile 5
+    TileRow(0x00011110)
+    TileRow(0x00010000)
+    TileRow(0x00010000)
+    TileRow(0x11100000)
+    TileRow(0x10000000)
+    TileRow(0x10000000)
+    TileRow(0x10000000)
+    TileRow(0x00000000)
     EndTile()
 
