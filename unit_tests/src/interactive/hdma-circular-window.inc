@@ -67,8 +67,7 @@ a8()
     pea     (0x7e << 8) | REGISTER_DB
     plb
 
-    lda.b   #INIDISP.force
-    sta.w   INIDISP
+    jsr     ForceBlank
 
     lda.b   #(WSEL.win1.enable | WSEL.win1.outside) << WOBJSEL.color.shift
     sta.w   WOBJSEL
@@ -84,8 +83,7 @@ a8()
     lda.b   #COLDATA.plane.all | (15 & COLDATA.intensity.mask)
     sta.w   COLDATA
 
-    lda.b   #15
-    sta.w   INIDISP
+    jsr     EnableDisplay_Full
 
     plb
 

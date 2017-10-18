@@ -501,15 +501,7 @@ code()
 function _CheckTile {
     allocate(tmp, wram7e, 2)
 
-
-    sep     #$20
-a8()
-    lda.b   #INIDISP.force
-    sta.l   INIDISP
-
-
-    rep     #$30
-a16()
+    jsr     ForceBlank
 
     sty.w   tmp
     tya
@@ -551,6 +543,8 @@ a16()
         inx
         dey
         bne     -
+
+    jsr     EnableDisplay
 
     sec
     rts

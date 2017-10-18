@@ -50,6 +50,8 @@ i8()
     FrameCounter.VBlank()
     Controller.VBlank()
 
+    InidispBuffer.VBlank()
+
 
     rep     #$30
 

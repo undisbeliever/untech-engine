@@ -172,8 +172,7 @@ i16()
 
 
         // restore screen brightness (if necessary)
-        lda.b   #15
-        sta.l   INIDISP
+        jsr     EnableDisplay_Full
 
         plb
         plp
@@ -201,8 +200,7 @@ i16()
     pha
     plb
 
-    lda.b   #INIDISP.force
-    sta.w   INIDISP
+    jsr     ForceBlank
 
     stz.w   CGADD
 
@@ -220,8 +218,7 @@ i16()
 
     Text.Console.PrintConstString(" tests passed")
 
-    lda.b   #15
-    sta.w   INIDISP
+    jsr     EnableDisplay_Full
 
 
     // Don't use STP, it causes some versions of snes9x to stall
@@ -249,8 +246,7 @@ i16()
     pha
     plb
 
-    lda.b   #INIDISP.force
-    sta.w   INIDISP
+    jsr     ForceBlank
 
     // Show failure color
 
@@ -293,8 +289,7 @@ a8()
     lda.b   #TestNameList >> 16
     jsr     Text.Console.PrintString
 
-    lda.b   #15
-    sta.w   INIDISP
+    jsr     EnableDisplay_Full
 
     // Don't use STP, it causes some versions of snes9x to stall
 -
@@ -374,8 +369,7 @@ i16()
     sty.w   ScrollBuffer.bg2.vOffset
 
 
-    lda.b   #15
-    sta.w   INIDISP
+    jsr     EnableDisplay_Full
 
     plb
 // DB = 0x7e

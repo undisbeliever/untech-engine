@@ -263,8 +263,7 @@ a8()
     lda.b   #0
     sta.l   NMITIMEN
 
-    lda.b   #INIDISP.force
-    sta.l   INIDISP
+    jsr     ForceBlank
 
     SetupPpu()
 
@@ -288,13 +287,8 @@ a16()
     sta.w   Camera.yPos
 
 RedrawMap:
-    sep     #$20
-a8()
-    lda.b   #INIDISP.force
-    sta.l   INIDISP
+    jsr     ForceBlank
 
-    rep     #$20
-a16()
     jsr     MetaTiles.Render.DrawFullScreen_ForceBlank
 
     sep     #$20
@@ -303,8 +297,7 @@ a8()
     jsr     EnableVBlank
     jsr     WaitFrame
 
-    lda.b   #15
-    sta.l   INIDISP
+    jsr     EnableDisplay_Full
 
     rep     #$30
 a16()

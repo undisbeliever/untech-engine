@@ -22,8 +22,7 @@ function Init {
 
     sep     #$20
 a8()
-    lda.b   #INIDISP.force
-    sta.w   INIDISP
+    jsr     ForceBlank
 
     assert(VRAM_OBJ_WADDR % OBSEL.base.walign == 0)
 
@@ -34,9 +33,7 @@ a8()
     sta.w   TM
 
     jsr     EnableVBlank
-
-    lda.b   #15
-    sta.w   INIDISP
+    jsr     EnableDisplay_Full
 
     rep     #$30
 a16()

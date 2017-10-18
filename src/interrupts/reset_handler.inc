@@ -211,6 +211,9 @@ i8()
     sta.l   NMITIMEN
     sta.l   HDMAEN
 
+    NmiHandler.InidispBuffer.Init()
+
+
     // Force Screen Blank
     lda.b   #INIDISP.force
     sta.b   INIDISP

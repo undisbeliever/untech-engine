@@ -63,8 +63,7 @@ a8()
     // verify that colors 128 - 255 of CGRAM is 0x1f1f
 
     pha
-        lda.b   #INIDISP.force
-        sta.l   INIDISP
+        jsr     ForceBlank
     pla
 
     lda.b   #128

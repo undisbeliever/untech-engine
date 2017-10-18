@@ -34,12 +34,13 @@ include "camera/_variables.inc"
 include "hdma/circular-window.inc"
 include "hdma/_common.inc"
 
-include "interrupts/reset_handler.inc"
 include "interrupts/break_handler.inc"
 include "interrupts/nmi/controller.inc"
-include "interrupts/nmi/scrollbuffer.inc"
 include "interrupts/nmi/framecounter.inc"
+include "interrupts/nmi/inidisp-buffer.inc"
+include "interrupts/nmi/scrollbuffer.inc"
 include "interrupts/nmi_handler.inc"
+include "interrupts/reset_handler.inc"
 
 
 include "math/division.inc"
