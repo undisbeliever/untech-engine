@@ -44,7 +44,7 @@ macro VBlank() {
 }
 
 
-// Enables the display.
+// Enables the display, NMI (VBlank) ISR and autoJoy
 //
 // The brightness of the display is set to the brightness bits
 // of `inidispBuffer`
@@ -62,12 +62,15 @@ a8()
     sta.l   inidispBuffer
     sta.l   INIDISP
 
+    lda.b   #NMITIMEN.vBlank | NMITIMEN.autoJoy
+    sta.l   NMITIMEN
+
     plp
     rts
 }
 
 
-// Enables the display at full brightness.
+// Enables the display at full brightness, NMI (VBlank) ISR and autoJoy
 au()
 iu()
 code()
@@ -80,14 +83,21 @@ a8()
     sta.l   inidispBuffer
     sta.l   INIDISP
 
+    lda.b   #NMITIMEN.vBlank | NMITIMEN.autoJoy
+    sta.l   NMITIMEN
+
     plp
     rts
 }
 
 
-// Force blank the display.
+// Force blank the display and disables interrupts and HDMA.
 //
-// This routine should be the only way to force blank the display.
+// Interrupts and HDMA are disabled to prevent to VRAM/CGRAM/OAM registers from
+// unexpectedly changing in the middle of an upload routine.
+//
+// This routine should be the only way to force blank the display or to disable
+// interrupts.
 au()
 iu()
 code()
@@ -96,6 +106,11 @@ function ForceBlank {
 
     sep     #$20
 a8()
+
+    lda.b   #0
+    sta.l   NMITIMEN
+    sta.l   HDMAEN
+
 
     lda.l   inidispBuffer
     ora.b   #INIDISP.force

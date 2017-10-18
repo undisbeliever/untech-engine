@@ -294,9 +294,6 @@ RedrawMap:
     sep     #$20
 a8()
 
-    jsr     EnableVBlank
-    jsr     WaitFrame
-
     jsr     EnableDisplay_Full
 
     rep     #$30

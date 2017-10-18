@@ -190,9 +190,6 @@ inline _DeallocateTest(type) {
         jsr     _Init_Fill{type}
         bcc     Fail
 
-        // Disable VBlank - prevent Warnings from corrupting CGRAM
-        jsr     DisableVBlank
-
         // Try to create a new entity, even though the slots are full
         // This should fail
 

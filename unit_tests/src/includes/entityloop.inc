@@ -32,7 +32,6 @@ a8()
     lda.b   #TM.bg1 | TM.obj
     sta.w   TM
 
-    jsr     EnableVBlank
     jsr     EnableDisplay_Full
 
     rep     #$30

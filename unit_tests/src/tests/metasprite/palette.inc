@@ -322,9 +322,6 @@ function Overflow {
     jsr     _Init_8Palettes
     bcc     Fail
 
-    // Disable VBlank - prevent Warnings from corrupting CGRAM
-    jsr     DisableVBlank
-
     // Test that overflowing the palettes slots fails
 
     lda.w   #EntityPool.entity8

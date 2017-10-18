@@ -124,8 +124,6 @@ i16()
 
         Warnings.Reset_a16()
 
-        jsr     EnableVBlank
-
 
         lda.w   testId
         asl
@@ -319,7 +317,6 @@ i16()
 // DB = REGISTER_DB
 
     jsr     ResetRegisters
-    jsr     EnableVBlank
 
     Warnings.Reset()
 
