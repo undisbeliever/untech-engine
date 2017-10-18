@@ -59,7 +59,6 @@ function ProcessAnimations {
 //
 // REQUIRES: 16 bit A, 16 bit Index, DB = 0x7e, DP = 0, force blank
 // DMA: Uses DMA channel 0
-// MODIFIES: Disable HDMA, Disable Interrupts, Force Blank
 // MODIFIES: decompressionBuffer
 //
 // INPUT: LZ4.ptr = address of the lz4 block
@@ -75,11 +74,6 @@ function DecompressToVram_FromPtr {
     sep     #$20
 a8()
 i16()
-    // Disable NMI to prevent VRAM corruption
-    stz.w   NMITIMEN
-
-    lda.b   #INIDISP.force
-    sta.w   INIDISP
 
     stx.w   VMADD
 
@@ -101,25 +95,14 @@ a16()
     tya
     clc
     adc.w   #-decompressionBuffer
-    sta.w   DAS0
+    tay
 
     sep     #$20
 a8()
-
     ldx.w   #decompressionBuffer
-    stx.w   A1T0
     lda.b   #decompressionBuffer >> 16
-    sta.w   A1B0
 
-    lda.b   #VMAIN.increment.by1 | VMAIN.incrementMode.high
-    sta.w   VMAIN
-
-    ldx.w   #DMAP.direction.toPpu | DMAP.transfer.two | (VMDATA << 8)
-    stx.w   DMAP0   // also sets BBAD0
-
-    lda.b   #MDMAEN.dma0
-    sta.w   MDMAEN
-
+    jsr     Dma.ForceBlank.TransferToVram
 
     plb
     // DB = 0x7e
