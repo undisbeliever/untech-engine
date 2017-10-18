@@ -9,8 +9,27 @@
 // Distributed under The MIT License: https://opensource.org/licenses/MIT
 
 
+RegisterBreakId(NOT_IN_FORCE_BLANK)
+
 namespace Dma {
 namespace ForceBlank {
+
+// Breaks execution if not in force blank
+//
+// REQUIRES: DB access shadow
+// KEEP: A, X, Y
+macro AssertForceBlank() {
+    if __CPU__.aSize == 8 {
+        bit.w   inidispBuffer
+    } else if __CPU__.aSize == 16 {
+        bit.w   inidispBuffer - 1
+    } else {
+        error "Unknown A size"
+    }
+    bmi     InForceBlank{#}
+        break(NOT_IN_FORCE_BLANK)
+    InForceBlank{#}:
+}
 
 
 // Transfers a block of memory to VRAM
@@ -91,6 +110,8 @@ function ClearVram {
     stx.w   A1T0
     stz.w   A1B0
 
+    AssertForceBlank()
+
     lda.b   #MDMAEN.dma0
     sta.w   MDMAEN
 
@@ -121,6 +142,8 @@ function ClearVramH {
     ldx.w   #SnesHeader.EmptyBytes
     stx.w   A1T0
     stz.w   A1B0
+
+    AssertForceBlank()
 
     lda.b   #MDMAEN.dma0
     sta.w   MDMAEN
@@ -160,6 +183,8 @@ i8()
     lda.w   #SnesHeader.EmptyBytes
     sta.w   A1T0
 
+    AssertForceBlank()
+
     ldx.b   #MDMAEN.dma0
     stx.w   MDMAEN
 
@@ -189,6 +214,8 @@ function TransferToVram {
     ldx.w   #DMAP.direction.toPpu | DMAP.transfer.two | (VMDATA << 8)
     stx.w   DMAP0
 
+    AssertForceBlank()
+
     lda.b   #MDMAEN.dma0
     sta.w   MDMAEN
 
@@ -217,6 +244,8 @@ function TransferToVramL {
     ldx.w   #DMAP.direction.toPpu | DMAP.transfer.one | (VMDATAL << 8)
     stx.w   DMAP0
 
+    AssertForceBlank()
+
     lda.b   #MDMAEN.dma0
     sta.w   MDMAEN
 
@@ -244,6 +273,8 @@ function TransferToVramH {
 
     ldx.w   #DMAP.direction.toPpu | DMAP.transfer.one | (VMDATAH << 8)
     stx.w   DMAP0
+
+    AssertForceBlank()
 
     lda.b   #MDMAEN.dma0
     sta.w   MDMAEN
@@ -290,6 +321,8 @@ a8()
 
     ldy.w   #32 * 32
     sty.w   DAS0
+
+    AssertForceBlank()
 
     lda.b   #MDMAEN.dma0
     sta.w   MDMAEN

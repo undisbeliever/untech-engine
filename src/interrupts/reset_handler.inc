@@ -131,9 +131,7 @@ i16()
     stz.w   NMITIMEN
     stz.w   HDMAEN
 
-    // Force Screen Blank
-    lda.b   #INIDISP.force
-    sta.w   INIDISP
+    jsr     ForceBlank
 
 
     // Fill VRAM with 0 bytes
