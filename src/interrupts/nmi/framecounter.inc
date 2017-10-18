@@ -11,6 +11,11 @@
 
 allocate(frameCounter, shadow, 2)
 
+// If non-zero then show the CPU usage meter on screen
+// (byte flag - shadow)
+allocate(showCpuUsageMeter, shadow, 1)
+
+
 namespace NmiHandler {
 // VBlank code, increase frameCounter
 //
@@ -22,11 +27,34 @@ macro FrameCounter.VBlank() {
 }
 }
 
-// REQUIRES: DB access shadow, VBlank Enabled
+// Wait until the start of the next frame.
+//
+// If in force blank then this routine does nothing.
+//
+// If `showCpuUsageMeter` is non-zero then the screen brightness is changed to
+// show the user the scanline that this routine is called at.
+//
+// REQUIRES: DB access shadow
 au()
 iu()
 code()
 function WaitFrame {
+    php
+    sep     #$30
+a8()
+i8()
+
+    // Don't wait for frame when in force-blank
+    assert(INIDISP.force == 0x80)
+    lda.w   inidispBuffer
+    bmi     Return
+
+    ldx.w   showCpuUsageMeter
+    beq     +
+        eor.b   #7
+        sta.l   INIDISP
+    +
+
     lda.w   frameCounter
 
     -
@@ -34,6 +62,8 @@ function WaitFrame {
         cmp.w   frameCounter
         beq     -
 
+Return:
+    plp
     rts
 }
 
