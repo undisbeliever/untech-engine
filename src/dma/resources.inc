@@ -48,19 +48,22 @@ a16()
 // KEEP: X, Y
 macro TestDmaTimeAndSetUploadFlag(name, NotEnoughDmaTime) {
     assert16a()
-    assert(Dma.TRANSFER_SCALE == 128)
 
-    // time = (animationFrameSize + TRANSFER_SCALE/2) / TRANSFER_SCALE + 1
+    // time = (animationFrameSize + VRAM_CYCLES + TRANSFER_SCALE - 1) / TRANSFER_SCALE
     // if Dma.transfersLeft < time: goto NotEnoughDmaTimeBranch
     // Dma.transfersLeft -= time
     // uploadPaletteOnZero = 0
 
+    // assumes animationFrameSize > 0x8000
+    assert(Dma.TRANSFER_SCALE == 128)
+
     lda.w   Resources.{name}.animationFrameSize
     clc
-    adc.w   #Dma.TRANSFER_SCALE + Dma.TRANSFER_SCALE / 2
+    adc.w   #Dma.Resources.VBLANK_CYCLES_PER_RESOURCE + Dma.TRANSFER_SCALE - 1
     asl
     xba
     and.w   #0xff
+
     eor.w   #0xffff
     sec
     adc.w   Dma.transfersLeft
@@ -135,6 +138,9 @@ macro _VBlank() {
 
     SkipPaletteUpload:
 }
+
+// maximum number of cycles (excluding dma) per resource
+constant VBLANK_CYCLES_PER_RESOURCE = 50
 
 }
 }

@@ -35,12 +35,14 @@ a16()
 macro QueueHorizontalBuffer() {
     assert16a()
 
+    constant VC = Dma.MetaTiles.VBLANK_CYCLES_HORIZONTAL
+
     lda.w   #MetaTiles.bufferState.HORIZONTAL
     tsb.w   MetaTiles.bufferState
 
     lda.w   Dma.transfersLeft
     sec
-    sbc.w   #MetaTiles.horizontalBuffer.buffer.size / Dma.TRANSFER_SCALE + 1
+    sbc.w   #Dma.CalcDmaTime(MetaTiles.horizontalBuffer.buffer.size, VC)
     sta.w   Dma.transfersLeft
 }
 
@@ -51,12 +53,14 @@ macro QueueHorizontalBuffer() {
 macro QueueVerticalBuffer() {
     assert16a()
 
+    constant VC = Dma.MetaTiles.VBLANK_CYCLES_VERTICAL
+
     lda.w   #MetaTiles.bufferState.VERTICAL
     tsb.w   MetaTiles.bufferState
 
     lda.w   Dma.transfersLeft
     sec
-    sbc.w   #MetaTiles.verticalBuffer.buffer.size / Dma.TRANSFER_SCALE + 1
+    sbc.w   #Dma.CalcDmaTime(MetaTiles.verticalBuffer.buffer.size, VC)
     sta.w   Dma.transfersLeft
 }
 
@@ -169,6 +173,10 @@ macro _VBlank() {
 
     Return:
 }
+
+// cpu of cycles (excluding dma) used in the _VBlank macro
+constant VBLANK_CYCLES_VERTICAL = 87
+constant VBLANK_CYCLES_HORIZONTAL = 92
 
 }
 }

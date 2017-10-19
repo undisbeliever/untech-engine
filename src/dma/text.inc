@@ -29,7 +29,7 @@ macro _VBlank() {
 
         // Test if there is enough VBlank time available
         ldx.w   Dma.transfersLeft
-        cpx.b   #Text.buffer.size / Dma.TRANSFER_SCALE + 2
+        cpx.b   #Dma.CalcDmaTime(Text.buffer.size, Dma.Text.VBLANK_CYCLES) + 1
         bcc     EndIf
 
             // Buffer is dirty, and we have the time available to
@@ -62,6 +62,9 @@ macro _VBlank() {
             sty.w   Text.bufferDirty
     EndIf:
 }
+
+// cpu of cycles (excluding dma) used in the _VBlank macro
+constant VBLANK_CYCLES = 54
 
 }
 }

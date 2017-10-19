@@ -60,6 +60,9 @@ macro _VBlank() {
     EndIf:
 }
 
+// cpu of cycles (excluding dma) used in the _VBlank macro
+constant VBLANK_CYCLES = 43
+
 
 // Marks the object palette buffer as dirty
 // REQUIRES: 8 bit A.
@@ -71,7 +74,7 @@ macro MarkDirty() {
 
         lda.w   Dma.transfersLeft
         sec
-        sbc.b   #Dma.ObjPalette.buffer.size / Dma.TRANSFER_SCALE + 1
+        sbc.b   #Dma.CalcDmaTime(Dma.ObjPalette.buffer.size, Dma.ObjPalette.VBLANK_CYCLES)
         sta.w   Dma.transfersLeft
 
         lda.b   #1

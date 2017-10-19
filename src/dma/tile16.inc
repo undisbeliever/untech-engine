@@ -142,6 +142,7 @@ macro _TransferOnNextVBlank() {
 macro _VBlank() {
     assert16a()
     assert8i()
+        // REMEMBER to update DmaTransferTime if you change this routine
 
         ldy.w   Dma.Tile16.processVBlankOnZero
         bne     Return
@@ -234,6 +235,8 @@ namespace _ProcessDMA {
     allocate(tileQueuePos, shadow, 2)
 
     inline ProcessTiles(evaluate nTiles) {
+        // REMEMBER to update DmaTransferTimeTable if you change this routine
+
         a16()
         i8()
         code()
@@ -298,6 +301,28 @@ namespace _ProcessDMA {
 }
 
 
+// DMA Time required for each tile count
+rodata(rom0)
+DmaTransferTimeTable:
+namespace DmaTransferTimeTable {
+
+expression _DmaTime_Single(n) = CalcDmaTime(n * 128, n * 21 + 55 + (n == 1 ? 8 : 12) + (n < 8 ? 17 : 0))
+expression _DmaTime_Dual(n) = _DmaTime_Single(8) + _DmaTime_Single(n - 8)
+expression _DmaTime(n) = n <= 8 ? _DmaTime_Single(n) : _DmaTime_Dual(n)
+
+constant ONE_TILE = _DmaTime(1)
+constant TWO_TILES = _DmaTime(2)
+
+    db  0
+    variable n = 1
+    while n <= 16 {
+        db  _DmaTime(n)
+        n = n + 1
+    }
+
+assert(pc() - DmaTransferTimeTable == 16 + 1)
+}
+
 
 // Queues one 16x16px tile from a tile list
 //
@@ -338,6 +363,7 @@ AfterLoadTileset:
     bcs     Fail
 
 
+    assert(DmaTransferTimeTable.ONE_TILE == 2)
     lda.w   Dma.transfersLeft
     dec
     dec
@@ -438,7 +464,7 @@ i16()
 
     lda.w   Dma.transfersLeft
     sec
-    sbc.b   #2 + 1
+    sbc.b   #DmaTransferTimeTable.TWO_TILES
     bcc     Fail
     sta.w   Dma.transfersLeft
 
@@ -598,7 +624,7 @@ i16()
 
 NTilesA:
     sta.w   tmp_nTiles
-
+    tax
 
     asl
     // C clear
@@ -607,21 +633,23 @@ NTilesA:
     bcs     Fail
 
 
+    sep     #$30
+i8()
+    // X = tmp_nTiles
+    lda.w   Dma.transfersLeft
+    sec
+    sbc.l   DmaTransferTimeTable,x
+    bcc     Fail
+    sta.w   Dma.transfersLeft
+
+    rep     #$10
+i16()
+
+
     ldy.w   transferQueueIndex
     cpy.w   #TRANSFER_QUEUE_INDEX_END
     bcs     Fail
 
-
-    lda.w   Dma.transfersLeft
-    clc                 // -1 code overhead
-    sbc.w   tmp_nTiles
-    bcc     Fail
-
-    sta.w   Dma.transfersLeft
-
-
-
-    // Y = transferQueueIndex
 
     lda.w   tmp_nTiles
     asl
@@ -639,12 +667,11 @@ a16()
 
 
 BuildDmaQueue:
-    // X = tileListAddr
-
     sep     #$20
 a8()
 
-    ldy     tileQueueIndex
+    ldx.w   tileListAddr
+    ldy.w   tileQueueIndex
 
     Loop:
         // bank = (tileList.addr << 7) >> 16
@@ -679,8 +706,10 @@ a8()
     sec
     rts
 
+
 Fail:
-    clc
+    rep     #$11
+    // c clear
     rts
 }
 
@@ -722,7 +751,7 @@ i16()
     and.b   #15
     inc
     sta.w   tmp_nTiles
-
+    tax
 
     asl
     // C clear
@@ -731,19 +760,23 @@ i16()
     bcs     Fail
 
 
+    sep     #$30
+i8()
+    // X = tmp_nTiles
+
+    lda.w   Dma.transfersLeft
+    sec
+    sbc.l   DmaTransferTimeTable,x
+    bcc     Fail
+    sta.w   Dma.transfersLeft
+
+    rep     #$10
+i16()
+
+
     ldy.w   transferQueueIndex
     cpy.w   #TRANSFER_QUEUE_INDEX_END - 2
     bcs     Fail
-
-
-    lda.w   Dma.transfersLeft
-    dec
-    clc                 // -2 code overhead
-    sbc.w   tmp_nTiles
-    bcc     Fail
-
-    sta.w   Dma.transfersLeft
-
 
 
     // Y = transferQueueIndex
@@ -814,6 +847,7 @@ i16()
     and.b   #15
     inc
     sta.w   tmp_nTiles
+    tax
 
     asl
     // C clear
@@ -822,18 +856,23 @@ i16()
     bcs     Fail
 
 
+    sep     #$30
+i8()
+    // X = tmp_nTiles
+
+    lda.w   Dma.transfersLeft
+    sec
+    sbc.l   DmaTransferTimeTable,x
+    bcc     Fail
+    sta.w   Dma.transfersLeft
+
+    rep     #$10
+i16()
+
+
     ldy.w   transferQueueIndex
     cpy.w   #TRANSFER_QUEUE_INDEX_END - 2
     bcs     Fail
-
-
-    lda.w   Dma.transfersLeft
-    dec
-    clc                 // -2 code overhead
-    sbc.w   tmp_nTiles
-    bcc     Fail
-
-    sta.w   Dma.transfersLeft
 
 
     // Y = transferQueueIndex
@@ -876,7 +915,8 @@ a16()
     jmp     QueueOneRowFromList.BuildDmaQueue
 
 Fail:
-    clc
+    rep     #$11
+    // c clear
     rts
 }
 

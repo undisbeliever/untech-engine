@@ -15,14 +15,8 @@ namespace Dma {
 //
 // This is reset every NMI interrupt.
 //
-// SCALE: each value represents transferring 128 bytes during DMA.
+// Each value represents transferring TRANSFER_SCALE bytes during DMA.
 allocate(transfersLeft, shadow, 2)
-
-constant TRANSFER_SCALE = 128
-
-// ::TODO get proper numbers::
-constant TRANSFERS_PER_NTSC_FRAME = 4000 / TRANSFER_SCALE
-constant TRANSFERS_PER_PAL_FRAME = 5000 / TRANSFER_SCALE
 
 
 // Initialize the counters

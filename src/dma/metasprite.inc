@@ -12,6 +12,8 @@
 namespace Dma {
 namespace MetaSprite {
 
+constant BYTES_TO_TRANSFER = 128 * 4 + 128 / 4
+
 // Preform DMA transfer if zero
 // (byte)
 allocate(transferOnZero, shadow, 1)
@@ -27,7 +29,7 @@ macro _InitLoop() {
 
     lda.w   Dma.transfersLeft
     sec
-    sbc.w   #(128 * 4 + 128 / 4) / Dma.TRANSFER_SCALE
+    sbc.w   #Dma.CalcDmaTime(Dma.MetaSprite.BYTES_TO_TRANSFER, Dma.MetaSprite.VBLANK_CYCLES)
     sta.w   Dma.transfersLeft
 }
 
@@ -57,11 +59,11 @@ macro _VBlank() {
         sta.b   DMAP0       // Also set BBAD0
 
         lda.w   #MetaSprite.Render.oamBuffer
-        sta.w   A1T0
+        sta.b   A1T0
         ldx.b   #MetaSprite.Render.oamBuffer >> 16
         stx.b   A1B0
 
-        lda.w   #128 * 4 + 128 / 4
+        lda.w   #Dma.MetaSprite.BYTES_TO_TRANSFER
         sta.b   DAS0
 
         ldy.b   #MDMAEN.dma0
@@ -70,6 +72,9 @@ macro _VBlank() {
         sty.w   Dma.MetaSprite.transferOnZero
     EndIf:
 }
+
+// cpu of cycles (excluding dma) used in the _VBlank macro
+constant VBLANK_CYCLES = 41
 
 }
 }

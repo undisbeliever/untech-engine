@@ -635,6 +635,8 @@ inline __Init_Fill(type, nSlots) {
         jsr     _InitEntity0PaletteAndActivate
         bcc     Fail
 
+        jsr     Dma.Init
+
         lda.w   #EntityPool.entity2
         tcd
         lda.w   #MSFS.FST_One{type}

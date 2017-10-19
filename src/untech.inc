@@ -5,6 +5,7 @@
 include "errors/break.inc"
 include "errors/warnings.inc"
 
+include "dma/_transferscale.inc"
 include "dma/forceblank.inc"
 include "dma/metasprite.inc"
 include "dma/metatiles.inc"
