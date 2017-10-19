@@ -11,7 +11,7 @@
 
 namespace Dma {
 
-constant TRANSFER_SCALE = 128
+constant TRANSFER_SCALE = 32
 
 
 // ::TODO get proper numbers::

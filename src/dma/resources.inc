@@ -54,15 +54,16 @@ macro TestDmaTimeAndSetUploadFlag(name, NotEnoughDmaTime) {
     // Dma.transfersLeft -= time
     // uploadPaletteOnZero = 0
 
-    // assumes animationFrameSize > 0x8000
-    assert(Dma.TRANSFER_SCALE == 128)
+    assert(Dma.TRANSFER_SCALE == 32)
 
     lda.w   Resources.{name}.animationFrameSize
     clc
     adc.w   #Dma.Resources.VBLANK_CYCLES_PER_RESOURCE + Dma.TRANSFER_SCALE - 1
-    asl
-    xba
-    and.w   #0xff
+    lsr
+    lsr
+    lsr
+    lsr
+    lsr
 
     eor.w   #0xffff
     sec

@@ -363,11 +363,10 @@ AfterLoadTileset:
     bcs     Fail
 
 
-    assert(DmaTransferTimeTable.ONE_TILE == 2)
     lda.w   Dma.transfersLeft
-    dec
-    dec
-    bmi     Fail
+    sec
+    sbc.b   #DmaTransferTimeTable.ONE_TILE
+    bcc     Fail
     sta.w   Dma.transfersLeft
 
 
