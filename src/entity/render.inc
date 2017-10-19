@@ -15,8 +15,7 @@ namespace Entity {
 //
 // Renders all entities to screen
 //
-// REQUIRES: 16 bit A, 16 bit Index, DB = $7E
-// MODIFIES: DP
+// REQUIRES: 16 bit A, 16 bit Index, DB = $7E, DP = 0
 a16()
 i16()
 code()
@@ -41,11 +40,10 @@ End:
 
 // Render a list of entities
 //
-// REQUIRES: 16 bit A, 16 bit Index, DB = 0x7e
+// REQUIRES: 16 bit A, 16 bit Index, DB = 0x7e, DP = 0
 //
 // INPUT: A - address of first entity in list
 // INPUT: z - set if list is empty
-// MODIFIES: DP
 a16()
 i16()
 code()
@@ -79,6 +77,10 @@ assert(pc() == RenderLoop.End)
         lda.b   BaseEntity.next
         bne     Loop
 Skip:
+
+    lda.w   #0
+    tcd
+
     rts
 }
 

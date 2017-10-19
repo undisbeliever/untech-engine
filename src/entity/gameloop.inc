@@ -141,7 +141,7 @@ EndLoop:
 a16()
 i16()
 code()
-function ProcessEntityList_DeactivateOffscreen {
+function _ProcessEntityList_DeactivateOffscreen {
     _LOOP_Y()
         ldx.b   BaseEntity.functionTable
         jsr     (BaseEntityFunctionTable.Process,x)
@@ -186,7 +186,7 @@ function ProcessEntityList_DeactivateOffscreen {
 a16()
 i16()
 code()
-function ProcessEntityList_DeleteOffscreen {
+function _ProcessEntityList_DeleteOffscreen {
     _LOOP_Y()
         ldx.b   BaseEntity.functionTable
         jsr     (BaseEntityFunctionTable.Process,x)
@@ -486,10 +486,9 @@ macro _ProcessActiveWindow() {
 
 // Process the entity gameloop
 //
-// REQUIRES: 16 bit A, 16 bit Index, DB = 0x7e
+// REQUIRES: 16 bit A, 16 bit Index, DB = 0x7e, DP = 0
 //
 // INPUT: Y - address of list
-// MODIFIES: DP
 a16()
 i16()
 code()
@@ -502,13 +501,13 @@ function ProcessGameLoop {
 
 
     ldy.w   #lists.playerProjectiles
-    jsr     ProcessEntityList_DeleteOffscreen
+    jsr     _ProcessEntityList_DeleteOffscreen
 
     ldy.w   #lists.enemyProjectiles
-    jsr     ProcessEntityList_DeleteOffscreen
+    jsr     _ProcessEntityList_DeleteOffscreen
 
     ldy.w   #lists.platforms
-    jsr     ProcessEntityList_DeactivateOffscreen
+    jsr     _ProcessEntityList_DeactivateOffscreen
 
     _ProcessEnemyList(enemies, 1)
     _ProcessEnemyList(bosses, 0)
@@ -516,12 +515,16 @@ function ProcessGameLoop {
     _ProcessPlayerList()
 
     ldy.w   #lists.npcs
-    jsr     ProcessEntityList_DeactivateOffscreen
+    jsr     _ProcessEntityList_DeactivateOffscreen
 
     _ProcessParticleList()
 
 
     _DeleteAllInList(toDelete)
+
+
+    lda.w   #0
+    tcd
 
     rts
 }

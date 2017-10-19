@@ -4,6 +4,10 @@
 // MetaSprite Entity-Hitbox collision behaviour.
 //
 //
+// These routines MUST ONLY be called by the MetaSprite.EntityHitbox
+// routines and macros.
+//
+//
 // This file is part of the UnTech Game Engine.
 // Copyright (c) 2016 - 2017, Marcus Rowe <undisbeliever@gmail.com>.
 // Distributed under The MIT License: https://opensource.org/licenses/MIT
@@ -11,7 +15,7 @@
 
 namespace MetaSprite {
 namespace EntityHitbox {
-namespace CollisionTable {
+namespace _CollisionTable {
 
 allocateTmpWord(tmp)
 

@@ -70,8 +70,7 @@ function Init {
 //
 // Should be called at the start of each level
 //
-// REQUIRES: 16 bit A, 16 bit Index, DB = 0x7e
-// MODIFIES: DP
+// REQUIRES: 16 bit A, 16 bit Index, DB = 0x7e, DP = 0
 a16()
 i16()
 code()
@@ -100,6 +99,10 @@ function ClearTryToActivateAgainList {
     sta.w   lists.free
 
     stz.w   lists.tryToActivateAgain
+
+
+    lda.w   #0
+    tcd
 
 Return:
     rts

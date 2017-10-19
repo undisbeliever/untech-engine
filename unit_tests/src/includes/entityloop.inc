@@ -67,7 +67,6 @@ function Cleanup {
 // Process the Entity Loop until a joypad button has been pressed
 //
 // REQUIRES: 16 bit A, 16 bit Index, DB = 0x7e, Init called
-// MODIFIES: DP
 //
 // OUTPUT: c set
 a16()
@@ -93,7 +92,6 @@ function ProcessUntilButtonPress {
 // Processes a single frame of the Entity Loop
 //
 // REQUIRES: 16 bit A, 16 bit Index, DB = 0x7e, Init called
-// MODIFIES: DP
 //
 // OUTPUT: z clear if a button has been pressed
 a16()

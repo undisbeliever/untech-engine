@@ -61,8 +61,7 @@ inline _DeleteAllInList(listId) {
 
 // Deletes all of the entities in the deactivated list
 //
-// REQUIRES: 16 bit A, 16 bit Index, DB = 0x7e
-// MODIFIES: DP
+// REQUIRES: 16 bit A, 16 bit Index, DB = 0x7e, DP = 0
 a16()
 i16()
 code()
@@ -95,6 +94,10 @@ function DeleteDeactivatedEntities {
     sta.w   lists.free
 
     stz.w   lists.deactivated
+
+
+    lda.w   #0
+    tcd
 
 NoneToDelete:
     rts

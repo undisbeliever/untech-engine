@@ -333,11 +333,11 @@ function _TestList_CurrentHasSingleHitbox {
             asl
             ldx.w   currentEntity.hitboxAddress
             ora.l   Format.EntityHitbox.Inner.type,x
-            and.w   #CollisionTable.TABLE_MASK
+            and.w   #_CollisionTable.TABLE_MASK
             tax
 
             ldy     currentEntity.entityAddress
-            jsr     (CollisionTable.FunctionTable,x)
+            jsr     (_CollisionTable.FunctionTable,x)
             bra     EndEntityLoop
 
     EntityLoop_Continue:
@@ -460,11 +460,11 @@ function _InnerTest_Multiple_Single {
         asl
         ldx.w   toTestEntity.hitboxAddress
         ora.l   Format.EntityHitbox.Inner.type,x
-        and.w   #CollisionTable.TABLE_MASK
+        and.w   #_CollisionTable.TABLE_MASK
         tax
 
         ldy     toTestEntity.entityAddress
-        jsr     (CollisionTable.FunctionTable,x)
+        jsr     (_CollisionTable.FunctionTable,x)
 
 Return:
     jmp     InnerTest_Return
@@ -579,11 +579,11 @@ InnerCollision:
 
     tyx
     ora.l   Format.EntityHitbox.Inner.type,x
-    and.w   #CollisionTable.TABLE_MASK
+    and.w   #_CollisionTable.TABLE_MASK
     tax
 
     ldy.w   toTestEntity.entityAddress
-    jsr     (CollisionTable.FunctionTable,x)
+    jsr     (_CollisionTable.FunctionTable,x)
 
     jmp     InnerTest_Return
 }
