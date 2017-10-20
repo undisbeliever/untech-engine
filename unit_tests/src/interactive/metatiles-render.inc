@@ -300,6 +300,9 @@ a8()
 a16()
 
     Loop:
+        jsr     WaitFrame
+
+
         lda.l   JOY1
         bit.w   #JOY.select
         bne     RedrawMap
@@ -316,8 +319,6 @@ a16()
     a16()
 
         jsr     MetaTiles.Render.Update
-
-        jsr     WaitFrame
 
 
         lda.l   JOY1
