@@ -78,7 +78,6 @@ function ProcessUntilButtonPress {
 
         jsr     ProcessFrame
 
-        jsr     Dma.TransferOnNextVBlank
         jsr     WaitFrame
 
         lda.l   JOY1

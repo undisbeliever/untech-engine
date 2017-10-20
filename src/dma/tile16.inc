@@ -119,18 +119,21 @@ macro _Init() {
 
 
 
-// Enable transfer queue on next VBlank.
+// Finalize the transfer queue for the current frame and prep it for VBlank.
 //
-// REQUIRES: 16 bit A, DB = 0x7e
-macro _TransferOnNextVBlank() {
+// REQUIRES: 16 bit A, DB unknown
+macro _FinalizeFrame() {
     assert16a()
 
-    ldx.w   Dma.Tile16.transferQueueIndex
-    stz.w   Dma.Tile16.transferQueue.vblankFunctionAddr,x
-    stz.w   Dma.Tile16.processVBlankOnZero
+    lda.w   #0
 
-    stz.w   Dma.Tile16.transferQueueIndex
-    stz.w   Dma.Tile16.tileQueueIndex
+    ldx.w   Dma.Tile16.transferQueueIndex
+    sta.l   Dma.Tile16.transferQueue.vblankFunctionAddr,x
+
+    sta.l   Dma.Tile16.transferQueueIndex
+    sta.l   Dma.Tile16.tileQueueIndex
+
+    sta.l   Dma.Tile16.processVBlankOnZero
 }
 
 

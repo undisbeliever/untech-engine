@@ -43,11 +43,11 @@ function WaitFrame {
     sep     #$30
 a8()
 i8()
-
     // Don't wait for frame when in force-blank
     assert(INIDISP.force == 0x80)
     lda.w   inidispBuffer
     bmi     Return
+
 
     ldx.w   showCpuUsageMeter
     beq     +
@@ -55,11 +55,16 @@ i8()
         sta.l   INIDISP
     +
 
-    lda.w   frameCounter
 
+    rep     #$20
+a16()
+    Dma.FinalizeFrame()
+
+
+    ldx.w   frameCounter
     -
         wai
-        cmp.w   frameCounter
+        cpx.w   frameCounter
         beq     -
 
 Return:

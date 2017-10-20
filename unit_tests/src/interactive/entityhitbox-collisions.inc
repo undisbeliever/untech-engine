@@ -303,7 +303,6 @@ constant tmp_index = Test.tmp
 
         jsr     EntityLoop.ProcessFrame
 
-        jsr     Dma.TransferOnNextVBlank
         jsr     WaitFrame
 
         lda.l   JOY1

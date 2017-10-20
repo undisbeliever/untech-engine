@@ -149,7 +149,6 @@ a8()
 
         rep     #$30
     a16()
-        jsr     Dma.TransferOnNextVBlank
         jsr     WaitFrame
 
 

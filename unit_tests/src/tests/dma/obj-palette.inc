@@ -52,19 +52,12 @@ a8()
     bne     Fail
 
 
-    rep     #$30
-a16()
-        jsr     Dma.TransferOnNextVBlank
-        jsr     WaitFrame
-    sep     #$20
-a8()
-
+    jsr     WaitFrame
 
     // verify that colors 128 - 255 of CGRAM is 0x1f1f
 
-    pha
-        jsr     ForceBlank
-    pla
+    jsr     ForceBlank
+
 
     lda.b   #128
     sta.l   CGADD

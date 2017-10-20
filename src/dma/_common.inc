@@ -81,18 +81,16 @@ function Init {
 }
 
 
-// Transfer the buffer on the next VBlank Interrupt.
+// Finalize the transfer queues for the current frame and prep them for
+// VBlank.
 //
-// To prevent a glitch no uploads are to be processed until VBlank completed
+// Called by WaitFrame, just before the `wai` instruction.
 //
-// REQUIRES: 16 bit A, 16 bit Index, DB = $7E
-a16()
-i16()
-code()
-function TransferOnNextVBlank {
-    Tile16._TransferOnNextVBlank()
+// REQUIRES: 16 bit A, DB unknown
+macro FinalizeFrame() {
+    assert16a()
 
-    rts
+    Dma.Tile16._FinalizeFrame()
 }
 
 }

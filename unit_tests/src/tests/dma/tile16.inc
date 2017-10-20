@@ -26,11 +26,10 @@ function QueueOneTileFromList {
 
     jsr     Dma.Tile16.QueueOneTileFromList
     bcc     Fail
-
+au()
 
     rep     #$30
 a16()
-    jsr     Dma.TransferOnNextVBlank
 
     jsr     WaitFrame
 
@@ -70,12 +69,10 @@ function QueueTwoTilesFromList {
 
     jsr     Dma.Tile16.QueueTwoTilesFromList
     bcc     Fail
-
+au()
 
     rep     #$30
 a16()
-    jsr     Dma.TransferOnNextVBlank
-
     jsr     WaitFrame
 
 
@@ -116,12 +113,10 @@ function QueueOneRowFromList {
 
     jsr     Dma.Tile16.QueueOneRowFromList
     bcc     Fail
-
+au()
 
     rep     #$30
 a16()
-    jsr     Dma.TransferOnNextVBlank
-
     jsr     WaitFrame
 
     ldx.w   #TileData.Tile4
@@ -168,12 +163,11 @@ function QueueTwoRowsFromList_one {
 
     jsr     Dma.Tile16.QueueTwoRowsFromList
     bcc     Fail
+au()
 
 
     rep     #$30
 a16()
-    jsr     Dma.TransferOnNextVBlank
-
     jsr     WaitFrame
 
     ldx.w   #TileData.Tile2
@@ -216,12 +210,11 @@ function QueueTwoRowsFromList_two {
 
     jsr     Dma.Tile16.QueueTwoRowsFromList
     bcc     Fail
+au()
 
 
     rep     #$30
 a16()
-    jsr     Dma.TransferOnNextVBlank
-
     jsr     WaitFrame
 
     rep     #$30
@@ -306,12 +299,11 @@ function QueueListAtEndOfRow {
 
     jsr     Dma.Tile16.QueueListAtEndOfRow
     bcc     Fail
+au()
 
 
     rep     #$30
 a16()
-    jsr     Dma.TransferOnNextVBlank
-
     jsr     WaitFrame
 
     ldx.w   #TileData.Tile4
@@ -371,12 +363,11 @@ function QueueListAtEndOfTwoRows_one {
 
     jsr     Dma.Tile16.QueueListAtEndOfTwoRows
     bcc     Fail
+au()
 
 
     rep     #$30
 a16()
-    jsr     Dma.TransferOnNextVBlank
-
     jsr     WaitFrame
 
     ldx.w   #TileData.Tile2
@@ -419,17 +410,13 @@ function QueueListAtEndOfTwoRows_two {
 
     jsr     Dma.Tile16.QueueListAtEndOfTwoRows
     bcc     Fail
+au()
 
 
     rep     #$30
 a16()
-    jsr     Dma.TransferOnNextVBlank
-
     jsr     WaitFrame
 
-    rep     #$30
-a16()
-i16()
     ldx.w   #TileData.Tile7
     ldy.w   #VRAM_1 + 32 * 6
     jsr     _CheckTile

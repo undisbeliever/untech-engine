@@ -317,7 +317,6 @@ a16()
 
         jsr     MetaTiles.Render.Update
 
-        jsr     Dma.TransferOnNextVBlank
         jsr     WaitFrame
 
 

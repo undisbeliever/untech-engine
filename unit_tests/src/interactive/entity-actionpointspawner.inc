@@ -370,7 +370,6 @@ function Test {
 
         PrintListSizes()
 
-        jsr     Dma.TransferOnNextVBlank
         jsr     WaitFrame
 
         lda.l   JOY1
