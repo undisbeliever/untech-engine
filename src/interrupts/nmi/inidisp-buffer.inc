@@ -46,8 +46,11 @@ macro VBlank() {
 
 // Enables the display, NMI (VBlank) ISR and autoJoy
 //
-// The brightness of the display is set to the brightness bits
-// of `inidispBuffer`
+// Does not immediately turn on the display. The screen will be turned
+// on during the next VBlank to prevent screen tearing.
+//
+// The brightness of the display will be unchanged from the previous
+// value of `inidispBuffer`.
 au()
 iu()
 code()
@@ -60,7 +63,7 @@ a8()
     lda.l   inidispBuffer
     and.b   #INIDISP.brightness.mask
     sta.l   inidispBuffer
-    sta.l   INIDISP
+
 
     lda.b   #NMITIMEN.vBlank | NMITIMEN.autoJoy
     sta.l   NMITIMEN
@@ -71,6 +74,9 @@ a8()
 
 
 // Enables the display at full brightness, NMI (VBlank) ISR and autoJoy
+//
+// Does not immediately turn on the display. The screen will be turned
+// on during the next VBlank to prevent screen tearing.
 au()
 iu()
 code()
@@ -81,7 +87,7 @@ a8()
 
     lda.b   #15
     sta.l   inidispBuffer
-    sta.l   INIDISP
+
 
     lda.b   #NMITIMEN.vBlank | NMITIMEN.autoJoy
     sta.l   NMITIMEN
@@ -92,6 +98,9 @@ a8()
 
 
 // Force blank the display and disables interrupts and HDMA.
+//
+// The screen is immediately blanked. To prevent screen tearing this
+// routine should called after a `WaitFrame` call.
 //
 // Interrupts and HDMA are disabled to prevent to VRAM/CGRAM/OAM registers from
 // unexpectedly changing in the middle of an upload routine.
