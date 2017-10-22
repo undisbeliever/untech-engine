@@ -276,7 +276,7 @@ a16()
     jsr     MetaTiles.LoadTileset
 
     lda.w   #Resources.PaletteList.MetaTileRenderTest
-    jsr     Resources.Palettes.LoadPalette
+    jsr     Resources.Palette.LoadPalette
 
     GenerateMap()
 
@@ -329,7 +329,7 @@ a16()
 
 Pass:
     Resources.AnimatedTileset.DisableAnimation()
-    Resources.Palettes.DisableAnimation()
+    Resources.Palette.DisableAnimation()
 
     jmp     Test.ResetPpuState
 }

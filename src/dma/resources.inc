@@ -19,7 +19,7 @@ allocate(uploadAnimatedTilesetOnZero, shadow, 1)
 
 // Upload palette to CGRAM during next vblank
 // (byte - shadow)
-allocate(uploadPalettesOnZero, shadow, 1)
+allocate(uploadPaletteOnZero, shadow, 1)
 
 
 // Initialize the tables/variables
@@ -32,7 +32,7 @@ macro _Init() {
 a8()
     lda.b   #1
     sta.w   Dma.Resources.uploadAnimatedTilesetOnZero
-    sta.w   Dma.Resources.uploadPalettesOnZero
+    sta.w   Dma.Resources.uploadPaletteOnZero
 
     rep     #$20
 a16()
@@ -114,7 +114,7 @@ macro _VBlank() {
     SkipAnimatedTilesetUpload:
 
 
-    ldx.w   Dma.Resources.uploadPalettesOnZero
+    ldx.w   Dma.Resources.uploadPaletteOnZero
     bne     SkipPaletteUpload
         // upload current palette animation frame to CGRAM
 
@@ -124,18 +124,18 @@ macro _VBlank() {
         lda.w   #DMAP.direction.toPpu | DMAP.transfer.one | (CGDATA << 8)
         sta.b   DMAP0       // Also set BBAD0
 
-        lda.w   Resources.Palettes.animationPos
+        lda.w   Resources.Palette.animationPos
         sta.b   A1T0
-        ldx.b   #Resources.Palettes.paletteBuffer >> 16
+        ldx.b   #Resources.Palette.paletteBuffer >> 16
         stx.b   A1B0
 
-        lda.w   Resources.Palettes.animationFrameSize
+        lda.w   Resources.Palette.animationFrameSize
         sta.b   DAS0
 
         ldx.b   #MDMAEN.dma0
         stx.w   MDMAEN
 
-        stx.w   Dma.Resources.uploadPalettesOnZero
+        stx.w   Dma.Resources.uploadPaletteOnZero
 
     SkipPaletteUpload:
 }

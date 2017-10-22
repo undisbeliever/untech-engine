@@ -1,5 +1,5 @@
-// resources/palettes.inc
-// ======================
+// resources/palette.inc
+// =====================
 //
 // Palette resource management.
 //
@@ -11,7 +11,7 @@
 RegisterBreakId(INVALID_PALETTE_ID)
 
 namespace Resources {
-namespace Palettes {
+namespace Palette {
 
 
 // Load Palette resource.
@@ -108,7 +108,7 @@ a8()
 
     rep     #$30
 a16()
-    Dma.Resources.TestDmaTimeAndSetUploadFlag(Palettes, NotEnoughDmaTime)
+    Dma.Resources.TestDmaTimeAndSetUploadFlag(Palette, NotEnoughDmaTime)
 
     rts
 
@@ -124,7 +124,7 @@ NotEnoughDmaTime:
 macro DisableAnimation() {
     assert16a()
 
-    stz.w   Resources.Palettes.animationDelay
+    stz.w   Resources.Palette.animationDelay
 }
 
 
@@ -136,29 +136,29 @@ macro _ProcessAnimation() {
     assert16a()
     assert16i()
 
-    ldy.w   Palettes.animationDelay
+    ldy.w   Palette.animationDelay
     beq     Return
-        lda.w   Palettes.animationCountdown
+        lda.w   Palette.animationCountdown
         sec
         sbc.w   animationSpeed
         bcs     AnimationUnchanged
 
-            Dma.Resources.TestDmaTimeAndSetUploadFlag(Palettes, NotEnoughDmaTime)
+            Dma.Resources.TestDmaTimeAndSetUploadFlag(Palette, NotEnoughDmaTime)
 
-            lda.w   Palettes.animationPos
+            lda.w   Palette.animationPos
             clc
-            adc.w   Palettes.animationFrameSize
-            cmp.w   Palettes.paletteBufferEnd
+            adc.w   Palette.animationFrameSize
+            cmp.w   Palette.paletteBufferEnd
             bcc     +
-                lda.w   #Palettes.paletteBuffer
+                lda.w   #Palette.paletteBuffer
             +
-            sta.w   Palettes.animationPos
+            sta.w   Palette.animationPos
 
             // Y = animationDelay
             tya
 
     AnimationUnchanged:
-        sta.w   Palettes.animationCountdown
+        sta.w   Palette.animationCountdown
 
     NotEnoughDmaTime:
 Return:

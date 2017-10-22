@@ -59,7 +59,7 @@ namespace AnimatedTileset {
     allocate(animationCountdown, wram7e, 2)
 }
 
-namespace Palettes {
+namespace Palette {
     // memory buffer to store the decompressed palettes in
     // (wram7f)
     constant paletteBuffer.size = 32 * 128 * 2
