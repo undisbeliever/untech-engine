@@ -37,7 +37,7 @@ assert(decompressionBuffer + decompressionBuffer.size == animationBuffer)
 
     ldy.b   _ptr
 
-    lda     [_ptr]                  // nAnimations/nTiles
+    lda     [_ptr]                  // nAnimations & animationFrameSizeScaled
     iny
     bit.w   #0xff
     bne     HasAnimation
@@ -54,13 +54,15 @@ HasAnimation:
 
     sta.l   WRMPYA                  // also set WRMPYB
 
+    assert(Format.AnimatedTilesetHeader.ANIMATION_FRAME_SIZE_SCALE == 16)
     and.w   #0xff00
     lsr
     lsr
     lsr
-    // A = nTiles * 32
+    lsr
+    // A = animationFrameSizeScaled * ANIMATION_FRAME_SIZE_SCALE
 
-    cmp.w   #Format.AnimatedTilesetHeader.MAX_TILES_PER_FRAME * 32 + 1
+    cmp.w   #Format.AnimatedTilesetHeader.MAX_ANIMATION_FRAME_SIZE + 1
     bcc     +
         // too many tiles per frame
     Fail:
@@ -83,24 +85,24 @@ HasAnimation:
     // Calculate location to decompress the buffer to.
     // Align _staticTilesPtr so that the animated tiles start at animationBuffer
 
-    //  RDMPY = nTiles * nFrames  (from above)
-    //  if (RDMPY > animationBuffer.size / 32):
+    //  RDMPY = nTiles * animationFrameSizeScaled  (from above)
+    //  if RDMPY * ANIMATION_FRAME_SIZE_SCALE > animationBuffer.size:
     //      goto Fail
     //
-    //  _staticTilesSize = decompressedDataSize - RDMPY * 32
+    //  _staticTilesSize = decompressedDataSize - RDMPY * ANIMATION_FRAME_SIZE_SCALE
     //  _staticTilesPtr = animationBuffer - _staticTilesPtr
     //
     //  if _staticTilesPtr < decompressionBuffer:
     //      goto Fail
 
+    assert(Format.AnimatedTilesetHeader.ANIMATION_FRAME_SIZE_SCALE == 16)
     lda.l   RDMPY
-    cmp.w   #animationBuffer.size / 32
+    asl
+    asl
+    asl
+    asl
+    cmp.w   #animationBuffer.size
     bcs     Fail
-    asl
-    asl
-    asl
-    asl
-    asl
 
     // A = size of animation Block
     eor.w   #0xffff
@@ -147,7 +149,7 @@ HasAnimation:
     plb
     // DB == REGISTER_DB
 
-    // transfer size = _staticTilesSize + animatedFrameSize
+    // transfer size = _staticTilesSize + animationFrameSize
     lda.b   _staticTilesSize
     clc
     adc.w   animationFrameSize

@@ -353,7 +353,7 @@ MetaTiles.TilesetData.MetaTileRenderTest:
     insert "../../gen/metatile-tilesets/metatile-render-test.tilemap.lz4b"
 
     db  2
-    db  1
+    db  32 / Resources.Format.AnimatedTilesetHeader.ANIMATION_FRAME_SIZE_SCALE
     dw  35
     insert "../../gen/metatile-tilesets/metatile-render-test.tiles.lz4b"
 

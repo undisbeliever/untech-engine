@@ -25,7 +25,7 @@ allocate(animationSpeed, wram7e, 2)
 namespace AnimatedTileset {
     // buffer to hold the decompressed animated tiles
     // (wram7f)
-    constant animationBuffer.size = Format.AnimatedTilesetHeader.MAX_ANIMATED_TILES_SIZE
+    constant animationBuffer.size = Format.AnimatedTilesetHeader.MAX_ANIMATED_TILES_BLOCK_SIZE
     allocate(animationBuffer, wram7f, animationBuffer.size)
     assert(decompressionBuffer + decompressionBuffer.size == animationBuffer)
 

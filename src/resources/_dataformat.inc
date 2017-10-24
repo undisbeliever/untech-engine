@@ -29,23 +29,31 @@ namespace Format {
     // AnimatedTileset resource data format.
     //   <header> <lz4 static tiles + animated tiles>
     //
-    // NOTE: The size of the animated tiles block must be <= MAX_ANIMATED_TILES_SIZE
-    // NOTE: The number of tiles being animated must be <= MAX_TILES_PER_FRAME
+    // NOTE: The size of the animated tiles block must be <= MAX_ANIMATED_TILES_BLOCK_SIZE
+    // NOTE: The size of the animated tiles frame must be <= MAX_ANIMATION_FRAME_SIZE
     //
     namespace AnimatedTilesetHeader {
-        constant MAX_TILES_PER_FRAME = 32
-        constant MAX_ANIMATED_TILES_SIZE = 8192
+        constant MAX_ANIMATED_TILES_BLOCK_SIZE = 8192
+        constant MAX_ANIMATION_FRAME_SIZE = 32 * 32 // 32 4bpp tiles
+        constant ANIMATION_FRAME_SIZE_SCALE = 16
+
+        assert(MAX_ANIMATION_FRAME_SIZE / ANIMATION_FRAME_SIZE_SCALE < 255)
 
         struct()
             // Number of animation frames
             // (uint8)
             field(nAnimations, 1)
 
-            // Number of 4bpp tiles per animation
+            // Size of an animation frame, scaled by ANIMATION_FRAME_SIZE_SCALE.
             // Optional field, only exists if number of animation frames > 0
-            // This value MUST BE <= MAX_TILES_PER_FRAME
+            //
+            // This value is scaled so it can fit inside an 8 bit integer.
+            // The number of bytes transferred per frame is:
+            //     `animationFrameSizeScaled` * ANIMATION_FRAME_SIZE_SCALE
+            //
+            // This value MUST BE <= MAX_ANIMATION_FRAME_SIZE / ANIMATION_FRAME_SIZE_SCALE
             // (uint8)
-            field(nTiles, 1)
+            field(animationFrameSizeScaled, 1)
 
             // Delay between palette animation frames
             // Optional field, only exists if number of animation frames > 0
