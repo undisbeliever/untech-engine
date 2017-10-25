@@ -41,7 +41,7 @@ gen/tables/%.inc: ../tables/%.py
 
 
 .PHONY: resources
-resources: metasprites font
+resources: metasprites font gen/resources.inc
 RESOURCES :=
 
 
@@ -64,6 +64,16 @@ gen/font-fixed.1bpp: resources/text/font-fixed.png
 RESOURCES += gen/font-fixed.1bpp
 
 
+gen/resources.inc: $(wildcard resources/palettes/*.*)
+gen/resources.inc: $(wildcard resources/palettes/*/*.*)
+gen/resources.inc: $(wildcard resources/metatile-tilesets/*.*)
+gen/resources.inc: $(wildcard resources/metatile-tilesets/*/*.*)
+gen/resources.inc gen/resources.bin: resources/resources.utres
+	untech-resc --output-inc gen/resources.inc --output-bin gen/resources.bin "$<"
+
+RESOURCES += gen/resources.inc gen/resources.bin
+
+
 .PHONY: lz4-test-data
 lz4-test-data: gen/lz4-test/font-fixed.1bpp.lz4b gen/lz4-test/1kzeros.lz4b gen/lz4-test/incompressable.lz4b
 
@@ -78,31 +88,6 @@ gen/lz4-test/%.bin: resources/lz4-test/%.asm
 
 RESOURCES += gen/lz4-test/font-fixed.1bpp.lz4b gen/lz4-test/1kzeros.lz4b gen/lz4-test/incompressable.lz4b
 
-
-.PHONY: palette-data
-palette-data: gen/palettes/metatile-render-test.lz4b
-
-gen/palettes/%.lz4b: gen/palettes/%.bin
-	untech-lz4c -v -o "$@" "$<"
-
-gen/palettes/%.bin: resources/palettes/%.asm
-	bass-untech -strict -o "$@" "$<"
-
-RESOURCES += gen/palettes/metatile-render-test.lz4b
-
-
-.PHONY: metatile-tileset-data
-metatile-tileset-data: gen/metatile-tilesets/metatile-render-test.tiles.lz4b
-metatile-tileset-data: gen/metatile-tilesets/metatile-render-test.tilemap.lz4b
-
-gen/metatile-tilesets/%.lz4b: gen/metatile-tilesets/%.bin
-	untech-lz4c -v -o "$@" "$<"
-
-gen/metatile-tilesets/%.bin: resources/metatile-tilesets/%.asm
-	bass-untech -strict -o "$@" "$<"
-
-RESOURCES += gen/metatile-tilesets/metatile-render-test.tiles.lz4b
-RESOURCES += gen/metatile-tilesets/metatile-render-test.tilemap.lz4b
 
 
 .PHONY: directories

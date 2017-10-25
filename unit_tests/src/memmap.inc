@@ -30,7 +30,10 @@ createDataBlock(EN_EntityList,          0xc19000, 0xc1907f)
 createDataBlock(EN_ProjectileList,      0xc19080, 0xc190ff)
 createDataBlock(EN_RomData,             0xc19100, 0xc19fff)
 
-createDataBlock(rom0,                   0xc1a000, 0xc1cfff)
+createDataBlock(RES_Lists,              0xc1a000, 0xc1a0ff)
+createDataBlock(RES_Block0,             0xc1a100, 0xc1afff)
+
+createDataBlock(rom0,                   0xc1b000, 0xc1cfff)
 createDataBlock(testNameBlock,          0xc1d000, 0xc1ffff)
 
 
