@@ -30,6 +30,10 @@ namespace Format {
         //   * Animated Tileset block
         //      - see Resources.Format.AnimatedTilesetHeader for data format
     }
+
+    if MetaTiles.TILESET_FORMAT_VERSION != 1 {
+        error "Invalid untech-resc MetaTile Tileset Format"
+    }
 }
 
 }

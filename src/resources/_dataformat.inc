@@ -62,6 +62,10 @@ namespace Format {
         endstruct()
     }
 
+    if Resources.ANIMATED_TILESET_FORMAT_VERSION != 2 {
+        error "Invalid untech-resc Animated Tileset Format"
+    }
+
 
     // Palette resource data format.
     //   <header> <lz4 compressed snes colors>
@@ -81,6 +85,10 @@ namespace Format {
             // (uint16 - ticks)
             field(animationDelay, 2)
         endstruct()
+    }
+
+    if Resources.PALETTE_FORMAT_VERSION != 1 {
+        error "Invalid untech-resc Palette Format"
     }
 }
 
