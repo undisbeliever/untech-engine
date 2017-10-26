@@ -11,7 +11,7 @@
 
 namespace MetaTiles {
     assert(MAP_SIZE >= 1024)
-    assert(N_TILES >= 64)
+    assert(N_META_TILES >= 64)
 
     constant METATILE_SIZE = 2
     constant METATILE_SIZE_PX = 16
@@ -64,13 +64,13 @@ namespace MetaTiles {
     //
     // (structure of arrays -> Tilemap)
     namespace tileMap {
-        allocate(topLeft, wram7e, N_TILES * 2)
-        allocate(topRight, wram7e, N_TILES * 2)
-        allocate(bottomLeft, wram7e, N_TILES * 2)
-        allocate(bottomRight, wram7e, N_TILES * 2)
+        allocate(topLeft, wram7e, N_META_TILES * 2)
+        allocate(topRight, wram7e, N_META_TILES * 2)
+        allocate(bottomLeft, wram7e, N_META_TILES * 2)
+        allocate(bottomRight, wram7e, N_META_TILES * 2)
     }
     constant tileMap = tileMap.topLeft
-    constant tileMap.size = N_TILES * 2 * 4
+    constant tileMap.size = N_META_TILES * 2 * 4
 
 
     // Horizontal SNES Tilemap Buffer

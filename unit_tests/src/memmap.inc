@@ -80,7 +80,7 @@ namespace EntityPool {
 // MetaTile engine settings
 // ========================
 constant MetaTiles.MAP_SIZE = 8192
-constant MetaTiles.N_TILES = 512
+constant MetaTiles.N_META_TILES = 512
 
 
 
