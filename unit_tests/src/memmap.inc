@@ -3,8 +3,8 @@
 // Distributed under The MIT License: https://opensource.org/licenses/MIT
 
 createCodeBlock(code,                   0xc08000, 0xc0ffaf)
-createDataBlock(testTableBlock,         0xc00000, 0xc04fff)
-createDataBlock(breakIdStrings,         0xc05000, 0xc07fff)
+createDataBlock(breakIdStrings,         0xc00000, 0xc01fff)
+createDataBlock(testTableBlock,         0xc02000, 0xc03fff)
 
 createDataBlock(MS_FrameSetList,        0xc10000, 0xc100ff)
 createDataBlock(MS_PaletteList,         0xc10100, 0xc101ff)
@@ -31,9 +31,10 @@ createDataBlock(EN_ProjectileList,      0xc19080, 0xc190ff)
 createDataBlock(EN_RomData,             0xc19100, 0xc19fff)
 
 createDataBlock(RES_Lists,              0xc1a000, 0xc1a0ff)
-createDataBlock(RES_Block0,             0xc1a100, 0xc1afff)
+createDataBlock(RES_Block0,             0xc04000, 0xc05fff)
+createDataBlock(RES_Block1,             0xc06000, 0xc07fff)
 
-createDataBlock(rom0,                   0xc1b000, 0xc1cfff)
+createDataBlock(rom0,                   0xc1a100, 0xc1cfff)
 createDataBlock(testNameBlock,          0xc1d000, 0xc1ffff)
 
 
