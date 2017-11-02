@@ -138,10 +138,10 @@ namespace ProjectileEntity {
             lda.b   BaseEntity.{c}Vecl + 1
             xba
             bpl     +
-                ora     #$ff00
+                ora.w   #$ff00
                 bra     ++
             +
-                and     #$00ff
+                and.w   #$00ff
             +
             adc.b   BaseEntity.{c}Pos + 2
             sta.b   BaseEntity.{c}Pos + 2

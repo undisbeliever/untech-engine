@@ -150,7 +150,7 @@ constant _columnIndex = Test.dpTmp + 2
         adc.w   #MAP_WIDTH * MAP_GRID_HEIGHT * 2
         tax
 
-        dec     _columnsLeft
+        dec.b   _columnsLeft
         bne     Loop
 }
 

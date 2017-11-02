@@ -472,7 +472,7 @@ a8()
 
             inx
 
-            dec     byteCount
+            dec.w   byteCount
             bne     LineLoop
 
 
@@ -515,7 +515,7 @@ i16()
     phk
     plb
 
-    lda     #$2100
+    lda.w   #$2100
     tcd
 
     sep     #$20

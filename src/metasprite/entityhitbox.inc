@@ -336,7 +336,7 @@ function _TestList_CurrentHasSingleHitbox {
             and.w   #_CollisionTable.TABLE_MASK
             tax
 
-            ldy     currentEntity.entityAddress
+            ldy.w   currentEntity.entityAddress
             jsr     (_CollisionTable.FunctionTable,x)
             bra     EndEntityLoop
 
@@ -463,7 +463,7 @@ function _InnerTest_Multiple_Single {
         and.w   #_CollisionTable.TABLE_MASK
         tax
 
-        ldy     toTestEntity.entityAddress
+        ldy.w   toTestEntity.entityAddress
         jsr     (_CollisionTable.FunctionTable,x)
 
 Return:

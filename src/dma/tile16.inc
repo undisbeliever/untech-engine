@@ -390,7 +390,7 @@ a16()
 
     sep     #$20
 a8()
-    ldy     tileQueueIndex
+    ldy.w   tileQueueIndex
 
     // bank = (tileList.addr << 7) >> 16
     // address = word(tileList.addr << 7)
@@ -492,7 +492,7 @@ a16()
 
     sep     #$20
 a8()
-    ldy     tileQueueIndex
+    ldy.w   tileQueueIndex
 
     // bank = (tileList.addr << 7) >> 16
     // address = word(tileList.addr << 7)

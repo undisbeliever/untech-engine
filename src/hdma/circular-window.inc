@@ -667,7 +667,7 @@ i16()
             EndLoop:
 
             tya
-            eor     #0xff
+            eor.b   #0xff
             sec
             adc.w   HdmaTable.count,x
             sta.w   HdmaTable.count,x
