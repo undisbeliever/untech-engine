@@ -14,8 +14,6 @@
 // Distributed under The MIT License: https://opensource.org/licenses/MIT
 
 
-architecture wdc65816
-
 namespace BreakHandler {
 
 constant BSOD_BG_COLOR = 13 << Palette.blue.shift

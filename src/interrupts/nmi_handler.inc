@@ -9,8 +9,6 @@
 // Distributed under The MIT License: https://opensource.org/licenses/MIT
 
 
-architecture wdc65816
-
 au()
 iu()
 code()
