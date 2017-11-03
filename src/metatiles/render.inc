@@ -119,13 +119,12 @@ constant _rowCount = tmp2
 
     sep     #$20
 a8()
-    sta.l   WRMPYA
-
+    xba
     lda.w   map.width
-    sta.l   WRMPYB
 
     rep     #$30
 a16()
+    sta.l   WRMPYA          // also sets WRMPYB
 
     lda.w   Camera.xPos
     sec
