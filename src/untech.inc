@@ -63,6 +63,7 @@ include "camera/_common.inc"
 
 include "metatiles/render.inc"
 include "metatiles/tileset.inc"
+include "metatiles/_common.inc"
 
 include "metasprite/animation.inc"
 include "metasprite/entityhitbox.inc"
