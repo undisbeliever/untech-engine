@@ -8,6 +8,7 @@ namespace MetaTileRenderTest {
 // Tests:
 //  * MetaTile.Render
 //  * MetaTile.LoadTileset
+//  * MetaTile.EntityPositionToMapIndex
 //  * Resources.AnimatedTileset
 //  * Resource palette animations
 
@@ -30,6 +31,236 @@ constant MIN_CAMERA_Y = 0x8000
 
 constant MAX_CAMERA_X = MIN_CAMERA_X + MAP_WIDTH * 16 - Camera.DISPLAY_WIDTH
 constant MAX_CAMERA_Y = MIN_CAMERA_Y + MAP_HEIGHT * 16 - Camera.DISPLAY_HEIGHT
+
+constant CAMERA_START_X = MIN_CAMERA_X + (MAX_CAMERA_X - MIN_CAMERA_X) / 2 - 7
+constant CAMERA_START_Y = MIN_CAMERA_Y + (MAX_CAMERA_Y - MIN_CAMERA_Y) / 2 + 13
+
+
+namespace MapCursorEntity {
+    buildFunctionTable(BaseEntityFunctionTable, MapCursorEntity)
+    Entity.useDefaultRenderer()
+
+    namespace EntityStruct {
+        childstruct(BaseEntity)
+        field(tmp, 2)
+        endstruct()
+    }
+
+
+    // REQUIRES: 16 bit A, 16 bit Index, DB = 0x7e
+    // INPUT: DP = entity
+    a16()
+    i16()
+    code()
+    function Init {
+        lda.w   #0
+        jmp     MetaSprite.SetFrame
+    }
+
+
+    // REQUIRES: 16 bit A, 16 bit Index, DB = 0x7e
+    // INPUT: DP = entity
+    a16()
+    i16()
+    code()
+    Destructor:
+    TakeDamageFromEntity:
+    CollideWithBody:
+    CollideWithShield:
+    BlockWithShield:
+    CalculateAttackValue:
+    function Null {
+        rts
+    }
+
+
+    // REQUIRES: Map Loaded
+    // REQUIRES: 16 bit A, 16 bit Index, DB = 0x7e
+    // INPUT: DP = entity
+    a16()
+    i16()
+    code()
+    function Process {
+
+        // Set Velocity depending on joypad settings
+
+        lda.w   Controller.Joy1.current
+
+        ldx.w   #1
+        bit.w   #JOY.r
+        beq     +
+            ldx.w   #32
+        +
+
+        // X = speed
+        // A = Controller.Joy1.current
+        ldy.w   #0
+        bit.w   #JOY.up | JOY.down
+        beq     SkipUpDown
+            bit.w   #JOY.down
+            beq     +
+                txy
+                bra     ++
+            +
+            txa
+            eor.w   #0xffff
+            inc
+            tay
+            lda.w   Controller.Joy1.current
+        +
+    SkipUpDown:
+        sty.b   EntityStruct.yVecl + 2
+
+
+        // X = speed
+        // A = Controller.Joy1.current
+        ldy.w   #0
+        bit.w   #JOY.left | JOY.right
+        beq     SkipLeftRight
+            bit.w   #JOY.right
+            beq     +
+                txy
+                bra     ++
+            +
+            txa
+            eor.w   #0xffff
+            inc
+            tay
+        +
+    SkipLeftRight:
+        sty.b   EntityStruct.xVecl + 2
+
+
+        macro _processAxis(c, minMap, maxMap, displaySize) {
+            //  pos += vecl
+            //
+            //  if pos < minMap:
+            //      pos = minMap
+            //  else if pos >= maxMap:
+            //      pos = mapMap - 1
+            //
+            //  if pos < Camera.pos:
+            //      Camera.pos = Pos
+            //  else if pos - displaySize > Camera.pos:
+            //      Camera.pos = pos - displaySize
+
+            clc
+            lda.b   EntityStruct.{c}Pos
+            adc.b   EntityStruct.{c}Vecl
+            sta.b   EntityStruct.{c}Pos
+            lda.b   EntityStruct.{c}Pos + 2
+            adc.b   EntityStruct.{c}Vecl + 2
+
+            cmp.w   MetaTiles.map.{minMap}
+            bcs     +
+                lda.w   MetaTiles.map.{minMap}
+                bra     ++
+            +
+            cmp.w   MetaTiles.map.{maxMap}
+            bcc     +
+                lda.w   MetaTiles.map.{maxMap}
+                dec
+            +
+            sta.b   EntityStruct.{c}Pos + 2
+
+            cmp.w   Camera.{c}Pos
+            bcc     +
+            sec
+            sbc.w   #Camera.{displaySize}
+            cmp.w   Camera.{c}Pos
+            bcc     ++
+            +
+                sta.w   Camera.{c}Pos
+            +
+        }
+        _processAxis(x, left, right, DISPLAY_WIDTH)
+        _processAxis(y, top, bottom, DISPLAY_HEIGHT)
+
+
+        lda.w   Controller.Joy1.current
+        and.w   #JOY.l
+        beq     SkipSetCell
+            // Set tile under cursor if L is down
+
+            constant _mapIndex = EntityStruct.tmp
+
+            jsr     MetaTiles.EntityPositionToMapIndex
+            stx.b   _mapIndex
+            lda.w   #1
+            jsr     _SetMapCell
+
+            // If R is down then draw map cells to the left and right of
+            // current cell (if possible)
+
+            lda.w   Controller.Joy1.current
+            and.w   #JOY.r
+            beq     SkipSetCell
+                lda.b   EntityStruct.xPos.px
+                sec
+                sbc.w   #MetaTiles.METATILE_SIZE_PX
+                cmp.w   MetaTiles.map.left
+                bcc     +
+                    ldx.b   _mapIndex
+                    dex
+                    dex
+                    lda.w   #1
+                    jsr     _SetMapCell
+                +
+
+                lda.b   EntityStruct.xPos.px
+                clc
+                adc.w   #MetaTiles.METATILE_SIZE_PX
+                cmp.w   MetaTiles.map.right
+                bcs     +
+                    ldx.b   _mapIndex
+                    inx
+                    inx
+                    lda.w   #1
+                    jsr     _SetMapCell
+                +
+
+    SkipSetCell:
+        rts
+    }
+
+    // Set the map cell and draw it to the display
+    // Will be replaced with MetaTiles.SetMapCell later
+    //
+    // REQUIRES: 16 bit A, 16 bit Index, DB = 0x7e
+    // INPUT: DP = entity
+    //         A = tileId
+    //         X = map cell index
+    a16()
+    i16()
+    code()
+    function _SetMapCell {
+        asl
+        cmp.w   MetaTiles.map.data,x
+        beq     Return
+
+        sta.w   MetaTiles.map.data,x
+
+        // ::HACK redraw the entire screen using force blank::
+
+        jsr     ForceBlank
+        jsr     MetaTiles.Render.DrawFullScreen_ForceBlank
+        jsr     EnableDisplay_Full
+    Return:
+        rts
+    }
+
+
+    rodata(EN_RomData)
+    RomData:
+        dw  FunctionTable
+        db  Entity.ListId.PLAYER    // initial List
+        dw  MSFS.Cursor             // frameSetId
+        db  0                       // defaultPalette
+
+    rodata(EN_EntityList)
+    constant ENTITY_ID = (pc() - Entity.Data.EntityList) / 2
+        dw  RomData
+}
 
 
 // Initializes the screen and loads tiles/palette to PPU
@@ -64,7 +295,10 @@ macro SetupPpu() {
     lda.b   #(VRAM_CONSOLE_TILES_WADDR / BG34NBA.walign) << BG34NBA.bg3.shift
     sta.w   BG34NBA
 
-    lda.b   #TM.bg1 | TM.bg3
+    lda.b   #(VRAM_OBJ_WADDR / OBSEL.base.walign) | OBSEL.size.s8_16
+    sta.w   OBSEL
+
+    lda.b   #TM.bg1 | TM.bg3 | TM.obj
     sta.w   TM
 
     plb
@@ -91,6 +325,12 @@ constant _columnIndex = Test.dpTmp + 2
 
     lda.w   #MIN_CAMERA_X
     sta.w   MetaTiles.map.left
+
+    lda.w   #MIN_CAMERA_Y + MAP_HEIGHT * 16
+    sta.w   MetaTiles.map.bottom
+
+    lda.w   #MIN_CAMERA_X + MAP_WIDTH * 16
+    sta.w   MetaTiles.map.right
 
     lda.w   #MAP_WIDTH * 2
     sta.w   MetaTiles.map.bytesPerRow
@@ -155,84 +395,14 @@ constant _columnIndex = Test.dpTmp + 2
 }
 
 
-// Moves the camera depending on the state of the joypad
-// REQUIRES: 16 bit A, 16 bit Index, DB = 0x7e, AutoJoy on
-macro MoveCamera() {
-    assert16a()
-    assert16i()
-
-constant _velocity = Test.dpTmp + 3 * 2
-
-    lda.l   JOY1
-    tax
-
-    ldy.w   #1
-
-    bit.w   #JOY.r
-    beq     +
-        ldy.w   #256
-    +
-    sty.b   _velocity
-
-
-    bit.w   #JOY.up
-    beq     ++
-        lda.w   Camera.yPos
-        sec
-        sbc.b   _velocity
-        cmp.w   #MIN_CAMERA_Y
-        bcs     +
-            lda.w   #MIN_CAMERA_Y
-        +
-        sta.w   Camera.yPos
-        txa
-    +
-    bit.w   #JOY.down
-    beq     ++
-        lda.w   Camera.yPos
-        clc
-        adc.b   _velocity
-        cmp.w   #MAX_CAMERA_Y + 1
-        bcc     +
-            lda.w   #MAX_CAMERA_Y
-        +
-        sta.w   Camera.yPos
-        txa
-    +
-    bit.w   #JOY.left
-    beq     ++
-        lda.w   Camera.xPos
-        sec
-        sbc.b   _velocity
-        cmp.w   #MIN_CAMERA_X
-        bcs     +
-            lda.w   #MIN_CAMERA_X
-        +
-        sta.w   Camera.xPos
-        txa
-    +
-    bit.w   #JOY.right
-    beq     ++
-        lda.w   Camera.xPos
-        clc
-        adc.b   _velocity
-        cmp.w   #MAX_CAMERA_X + 1
-        bcc     +
-            lda.w   #MAX_CAMERA_X
-        +
-        sta.w   Camera.xPos
-    +
-}
-
-
 // Prints the camera position on the screen
 // REQUIRES: 8 bit A, 16 bit Index, DB = 0x7e
 macro PrintCameraPos() {
     assert8a()
     assert16i()
 
-    constant textXPos = (Text.Console.TEXT_WIDTH - 10) / 2
-    constant textYPos = (Text.Console.TEXT_HEIGHT - 3) / 2
+    constant textXPos = 0
+    constant textYPos = 4
 
 
     Text.Console.SetCursor(textXPos, textYPos)
@@ -255,14 +425,11 @@ i16()
 code()
 Test.add("MetaTile Render Test")
 function Test {
-    Text.Console.SetCursor(0, 20)
+    Text.Console.SetCursor(0, 19)
     Text.Console.PrintString(UnitTestMessage)
 
     sep     #$20
 a8()
-
-    lda.b   #0
-    sta.l   NMITIMEN
 
     jsr     ForceBlank
 
@@ -271,6 +438,7 @@ a8()
     rep     #$30
 a16()
 
+    jsr     Entity.Init
     jsr     Resources.Init
 
     lda.w   #MetaTiles.TilesetList.MetaTileRenderTest
@@ -281,11 +449,25 @@ a16()
 
     GenerateMap()
 
-    lda.w   #MIN_CAMERA_X + (MAX_CAMERA_X - MIN_CAMERA_X) / 2 - 7
+    lda.w   #CAMERA_START_X
     sta.w   Camera.xPos
 
-    lda.w   #MIN_CAMERA_Y + (MAX_CAMERA_Y - MIN_CAMERA_Y) / 2 + 13
+    lda.w   #CAMERA_START_Y
     sta.w   Camera.yPos
+
+
+    lda.w   #CAMERA_START_X + Camera.DISPLAY_WIDTH / 2
+    sta.w   Entity.Spawn.xPos
+
+    lda.w   #CAMERA_START_Y + Camera.DISPLAY_HEIGHT / 2
+    sta.w   Entity.Spawn.yPos
+
+    lda.w   #MapCursorEntity.ENTITY_ID
+    jsr     Entity.Spawn
+    bcs     +
+        rts
+    +
+
 
 RedrawMap:
     jsr     ForceBlank
@@ -302,15 +484,17 @@ a16()
 
     Loop:
         jsr     WaitFrame
-
+        jsr     MetaSprite.Render.InitLoop
 
         lda.l   JOY1
         bit.w   #JOY.select
         bne     RedrawMap
 
-        MoveCamera()
+        jsr     EntityLoop.ProcessFrame
 
         jsr     Resources.ProcessAnimations
+
+        jsr     MetaTiles.Render.Update
 
         sep     #$20
     a8()
@@ -318,8 +502,8 @@ a16()
 
         rep     #$30
     a16()
-
-        jsr     MetaTiles.Render.Update
+        jsr     Entity.RenderLoop
+        jsr     MetaSprite.Render.EndLoop
 
 
         lda.l   JOY1
@@ -341,9 +525,11 @@ Pass:
 
 rodata(rom0)
 UnitTestMessage:
-    db  "Use D-PAD to move the map\n"
+    db  "Use D-PAD to move cursor\n"
     db  "Hold R to zip\n"
-    db  "Press SELECT to redraw map", 0
+    db  "Press SELECT to redraw map\n"
+    db  "Press L to set map cell\n"
+    db  "Press L&R to set 3 map cells",0
 
 }
 }

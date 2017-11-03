@@ -46,6 +46,14 @@ namespace MetaTiles {
         // Calculated values
         // =================
 
+        // The bottom-most y coordinate of the map
+        // (uint16)
+        allocate(bottom, wram7e, 2)
+
+        // The right-most x coordinate of the map
+        // (uint16)
+        allocate(right, wram7e, 2)
+
         // Number of bytes per map row
         //
         // Equal to map.width * 2.

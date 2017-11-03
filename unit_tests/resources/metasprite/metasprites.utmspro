@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF_8"?>
 <!DOCTYPE untech>
 <metaspriteproject>
+  <frameset src="utsi/Cursor.utsi"/>
   <frameset src="utms/FST_10Palettes.utms"/>
   <frameset/>
   <frameset/>
