@@ -32,6 +32,10 @@ i16()
     sep     #$10
 i8()
 
+    // Force Blank to prevent PPU corruption if VBlank overruns
+    ldx.b   #INIDISP.force
+    stx.w   INIDISP
+
     // Reset NMI Flag.
     ldy.w   RDNMI
 
