@@ -11,7 +11,66 @@
 // Distributed under The MIT License: https://opensource.org/licenses/MIT
 
 
+Warnings.Register(SET_MAP_CELL_ERROR, 24, 0, 12)
+
+
 namespace MetaTiles {
+
+a16()
+i16()
+// DP unknown
+code()
+namespace SetMapCell {
+ReturnWithWarning:
+    Warnings.Warn(SET_MAP_CELL_ERROR)
+
+Return:
+    rts
+}
+
+// Sets a map cell to a given value.
+//
+// If the screen is enabled, then the cell will then be drawn to VRAM during
+// VBlank.
+//
+// This routine will silently fail and emit a warning if the tile/index is out
+// of bounds.
+//
+// If the VBlank buffer is full then the map cell will be set but not drawn and
+// a warning will be emitted.
+//
+// ASSUMES: Map is on screen if the screen is enabled.
+// ASSUMES: DrawFullScreen_ForceBlank has been called if screen is enabled
+// REQUIRES: 16 bit A, 16 bit Index, DB = 0x7e
+//
+// INPUT: A = tile Id
+// INPUT: X = map index
+a16()
+i16()
+// DP unknown
+code()
+function SetMapCell {
+    cpx.w   map.dataSize
+    bcs     ReturnWithWarning
+
+    asl
+    cmp.w   #N_META_TILES
+    bcs     ReturnWithWarning
+
+    cmp.w   map.data,x
+    beq     Return
+
+    sta.w   map.data,x
+
+    // skip draw if in force-blank
+    lda.w   inidispBuffer - 1
+    bmi     Return
+
+    Render._DrawMapCell()
+
+    rts
+}
+
 
 // Converts an entity's position into a map index
 //

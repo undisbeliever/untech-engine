@@ -38,6 +38,8 @@ include "camera/_variables.inc"
 include "hdma/circular-window.inc"
 include "hdma/_common.inc"
 
+include "metatiles/_vblank.inc"
+
 include "interrupts/break_handler.inc"
 include "interrupts/nmi/controller.inc"
 include "interrupts/nmi/framecounter.inc"

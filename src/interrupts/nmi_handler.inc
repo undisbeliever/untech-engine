@@ -43,6 +43,8 @@ i8()
     Dma.VBlank()
     Hdma.VBlank()
 
+    MetaTiles.Render.DrawMapCell_VBlank()
+
     Warnings.VBlank()
     ScrollBuffer.VBlank()
     FrameCounter.VBlank()

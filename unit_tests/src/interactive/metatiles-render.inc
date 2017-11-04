@@ -187,7 +187,7 @@ namespace MapCursorEntity {
             jsr     MetaTiles.EntityPositionToMapIndex
             stx.b   _mapIndex
             lda.w   #1
-            jsr     _SetMapCell
+            jsr     MetaTiles.SetMapCell
 
             // If R is down then draw map cells to the left and right of
             // current cell (if possible)
@@ -204,7 +204,7 @@ namespace MapCursorEntity {
                     dex
                     dex
                     lda.w   #1
-                    jsr     _SetMapCell
+                    jsr     MetaTiles.SetMapCell
                 +
 
                 lda.b   EntityStruct.xPos.px
@@ -216,36 +216,10 @@ namespace MapCursorEntity {
                     inx
                     inx
                     lda.w   #1
-                    jsr     _SetMapCell
+                    jsr     MetaTiles.SetMapCell
                 +
 
     SkipSetCell:
-        rts
-    }
-
-    // Set the map cell and draw it to the display
-    // Will be replaced with MetaTiles.SetMapCell later
-    //
-    // REQUIRES: 16 bit A, 16 bit Index, DB = 0x7e
-    // INPUT: DP = entity
-    //         A = tileId
-    //         X = map cell index
-    a16()
-    i16()
-    code()
-    function _SetMapCell {
-        asl
-        cmp.w   MetaTiles.map.data,x
-        beq     Return
-
-        sta.w   MetaTiles.map.data,x
-
-        // ::HACK redraw the entire screen using force blank::
-
-        jsr     ForceBlank
-        jsr     MetaTiles.Render.DrawFullScreen_ForceBlank
-        jsr     EnableDisplay_Full
-    Return:
         rts
     }
 
@@ -331,6 +305,9 @@ constant _columnIndex = Test.dpTmp + 2
 
     lda.w   #MIN_CAMERA_X + MAP_WIDTH * 16
     sta.w   MetaTiles.map.right
+
+    lda.w   #MAP_WIDTH * MAP_HEIGHT * 2
+    sta.w   MetaTiles.map.dataSize
 
     lda.w   #MAP_WIDTH * 2
     sta.w   MetaTiles.map.bytesPerRow

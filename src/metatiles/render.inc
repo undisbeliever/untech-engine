@@ -68,6 +68,7 @@ constant _rowCount = tmp2
 
     // Reset render state
     //
+    // drawMapCellBufferIndex = 0
     // horizontalBuffer.cursorIndex = 0
     // horizontalBuffer.cursorYpos = Camera.yPos & ~(METATILE_SIZE_PX - 1)
     //
@@ -83,6 +84,8 @@ constant _rowCount = tmp2
     // visibleMapPtr = (Camera.xPos - map.left) / METATILE_SIZE_PX * 2
     //                   + (Camera.yPos - map.top) / METATILE_SIZE_PX * map.width * 2
     //                   + map.data
+
+    stz.w   drawMapCellBufferIndex
 
     stz.w   horizontalBuffer.cursorIndex
 
@@ -752,6 +755,158 @@ SkipDrawHorizontalBuffer:
     sta.w   displayVoffset
 
     rts
+}
+
+
+
+// Draws a map cell to the VBlank buffer (if necessary).
+//
+// ASSUMES: DrawFullScreen_ForceBlank has been called to setup map state
+// ASSUMES: Camera position inside map
+// ASSUMES: X is inside the map
+//
+// REQUIRES: 16 bit A, 16 bit Index, DB = 0x7e
+//
+// INPUT: X = index of map cell to draw
+//
+// BRANCH: to Return if cell outside visible range
+// BRANCH: to RetrunWithWarning if drawMapCellBuffer is full
+a16()
+i16()
+// DP unknown
+code()
+macro _DrawMapCell() {
+    assert16a()
+    assert16i()
+
+allocateTmpWord(_tmp)
+
+    // test if cell is above/below visible display
+    //
+    //  offset = cellIndex + map.data
+    //  if offset < visibleMapPtr:
+    //      return
+    //  offset -= visibleMapPtr
+    //  if offset - map.bytesPerRow >= map.bytesPerDisplayHeight:
+    //      return
+    //
+    //  RDDIV,RDMPY = offset / 2 / map.width
+
+    txa
+    clc
+    adc.w   #map.data
+    sec
+    sbc.w   Render.visibleMapPtr
+    bcc     Return
+    // c set
+    sbc.w   map.bytesPerRow
+    bcc     +
+        cmp.w   map.bytesPerDisplayHeight
+        bcs     Return
+    +
+    // c clear
+    adc.w   map.bytesPerRow
+
+    lsr
+    sta.l   WRDIV
+
+    sep     #$20
+a8()
+    lda.w   map.width
+    sta.l   WRDIVB
+
+
+    // Get MetaTile index and drawMapCellBuffer index
+    // And decrement Dma.transfersLeft
+
+    ldy.w   map.data,x
+
+    lda.b   #-Dma.CalcDmaTime(Render.DRAW_MAP_CELL_VBLANK_LOOP_CYCLES)
+    ldx.w   drawMapCellBufferIndex
+    bne     +
+        lda.b   #-Dma.CalcDmaTime(Render.DRAW_MAP_CELL_VBLANK_INIT_CYCLES + Render.DRAW_MAP_CELL_VBLANK_LOOP_CYCLES)
+    +
+    clc
+    adc.w   Dma.transfersLeft
+    sta.w   Dma.transfersLeft
+
+
+    // Test if cell is outside the display on the horizontal axis
+    rep     #$30
+a16()
+    lda.l   RDMPY
+    cmp.w   #METATILE_DISPLAY_WIDTH + 1
+    bcs     Return
+
+    // Exit with warning if drawMapCellBuffer is full
+    cpx.w   #drawMapCellBuffer.BUFFER_SIZE * 2
+    bcs     ReturnWithWarning
+
+
+    // calculate Vram Word Address of map Cell
+    //
+    //  tmp = (RDMPY * METATILE_SIZE * 2 + horizontalBuffer.cursorIndex) / 2
+    //  tmp &= (32 * 2 - 1)
+    //  if tmp & 32:
+    //      tmp += 32 * 32 - 32
+    //
+    //  a = RDDIV * METATILE_SIZE * 2 + verticalBuffer.cursorIndex
+    //  a *= 32 / METATILE_SIZE
+    //  a &= (32 - 1) * 32
+    //
+    //  vramWaddr = tmp + a + METATILES_MAP_WADDR
+
+    assert(METATILE_SIZE == 2)
+
+    // a = RDMPY
+    asl
+    asl
+    // c clear
+    adc.w   horizontalBuffer.cursorIndex
+    lsr
+    and.w   #32 * 2 - 1
+    bit.w   #32
+    beq     +
+        clc
+        adc.w   #32 * 32 - 32
+    +
+    sta.w   _tmp
+
+    lda.l   RDDIV
+    asl
+    asl
+    // c clear
+    adc.w   verticalBuffer.cursorIndex
+    and.w   #((32 - 1) * 32) >> 4
+    asl
+    asl
+    asl
+    asl
+    // c clear
+    adc.w   _tmp
+    clc
+    adc.w   #METATILES_MAP_WADDR
+
+
+    // Fill drawMapCellBuffer
+    //
+    // a = vramWaddr
+    // y = tileMap index
+    // x = drawMapCellBufferIndex
+    sta.w   drawMapCellBuffer.vramWaddr,x
+
+    lda.w   tileMap.topLeft,y
+    sta.w   drawMapCellBuffer.topLeft,x
+    lda.w   tileMap.topRight,y
+    sta.w   drawMapCellBuffer.topRight,x
+    lda.w   tileMap.bottomLeft,y
+    sta.w   drawMapCellBuffer.bottomLeft,x
+    lda.w   tileMap.bottomRight,y
+    sta.w   drawMapCellBuffer.bottomRight,x
+
+    inx
+    inx
+    stx.w   drawMapCellBufferIndex
 }
 
 }

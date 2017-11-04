@@ -46,6 +46,11 @@ namespace MetaTiles {
         // Calculated values
         // =================
 
+        // The number of bytes in the data
+        // (Equal to width * height * 2)
+        // (uint16)
+        allocate(dataSize, wram7e, 2)
+
         // The bottom-most y coordinate of the map
         // (uint16)
         allocate(bottom, wram7e, 2)
@@ -129,6 +134,27 @@ namespace MetaTiles {
         constant VERTICAL = 0x80
         constant HORIZONTAL = 0x7f
     }
+
+
+    // DrawMapCell VBlank buffer
+    // (Structure of arrays)
+    namespace drawMapCellBuffer {
+        constant BUFFER_SIZE = 3
+
+        // Vram word address to transfer the MetaTile to
+        // (word address - shadow)
+        allocate(vramWaddr, shadow, BUFFER_SIZE * 2)
+
+        // The four map tiles to transfer to VRAM
+        // (Tilemap word * 4)
+        allocate(topLeft, shadow, BUFFER_SIZE * 2)
+        allocate(topRight, shadow, BUFFER_SIZE * 2)
+        allocate(bottomLeft, shadow, BUFFER_SIZE * 2)
+        allocate(bottomRight, shadow, BUFFER_SIZE * 2)
+    }
+    // Index to the current position on the drawMapCellBuffer
+    // (word index)
+    allocate(drawMapCellBufferIndex, shadow, 2)
 }
 
 // vim: ft=bass-65816 ts=4 sw=4 et:
