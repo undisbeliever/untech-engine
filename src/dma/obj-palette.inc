@@ -65,6 +65,11 @@ constant VBLANK_CYCLES = 43
 
 
 // Marks the object palette buffer as dirty
+//
+// NOTE: This macro will always mark the buffer as dirty, even if
+// `Dma.transfersLeft` does not contain enough time to upload the ObjPalette
+// buffer.
+//
 // REQUIRES: 8 bit A.
 macro MarkDirty() {
     assert8a()

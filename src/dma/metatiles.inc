@@ -31,6 +31,9 @@ a16()
 
 // Queue the horizontal buffer for transfer to VRAM
 //
+// NOTE: This macro will always queue the transfer, even if `Dma.transfersLeft`
+// does not contain enough time to upload the horizontal buffer.
+//
 // REQUIRES: 16 bit A, DB access shadow
 macro QueueHorizontalBuffer() {
     assert16a()
@@ -51,6 +54,9 @@ NoUnderflow{#}:
 
 
 // Queue the vertical buffer for transfer to VRAM
+//
+// NOTE: This macro will always queue the transfer, even if `Dma.transfersLeft`
+// does not contain enough time to upload the vertical buffer.
 //
 // REQUIRES: 16 bit A, DB access shadow
 macro QueueVerticalBuffer() {

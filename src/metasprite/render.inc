@@ -52,6 +52,9 @@ macro _Init() {
 
 // Start the render loop
 //
+// This routine MUST BE called directly after WaitFrame in the game loop to
+// prevent a VBlank overrun.
+//
 // REQUITES: 16 bit A, DB = $7e
 a16()
 iu()

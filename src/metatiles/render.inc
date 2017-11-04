@@ -532,6 +532,10 @@ macro _DrawVerticalBuffer() {
 // Will change the camera position to ensure only 1 metatile row and/or column
 // is processed per frame.
 //
+// This routine SHOULD BE called early in the game loop (ie, before
+// `Entities.ProcessGameLoop` and `Resources.ProcessAnimations`) to prevent a
+// VBlank overrun.
+//
 // ASSUMES: DrawFullScreen_ForceBlank has been called to setup map state
 // ASSUMES: Camera position inside map
 //
@@ -764,6 +768,10 @@ SkipDrawHorizontalBuffer:
 // ASSUMES: DrawFullScreen_ForceBlank has been called to setup map state
 // ASSUMES: Camera position inside map
 // ASSUMES: X is inside the map
+//
+// NOTE: This macro will always add the MetaTile to the buffer, even if
+// `Dma.transfersLeft` does not contain enough time to upload the
+// MetaTile.
 //
 // REQUIRES: 16 bit A, 16 bit Index, DB = 0x7e
 //

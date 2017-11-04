@@ -21,7 +21,8 @@ allocate(transferOnZero, shadow, 1)
 
 // Decrement transfers left Counter
 //
-// Done at the start of the frame to ensure we never run out of DMA time
+// NOTE: This macro will always succeed, even if `Dma.transfersLeft`
+// does not contain enough time to upload the OAM buffer.
 //
 // REQUIRES: 16 bit A, DB access shadow
 macro _InitLoop() {
