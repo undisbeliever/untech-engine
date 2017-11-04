@@ -75,6 +75,9 @@ macro MarkDirty() {
         lda.w   Dma.transfersLeft
         sec
         sbc.b   #Dma.CalcDmaTime(Dma.ObjPalette.buffer.size, Dma.ObjPalette.VBLANK_CYCLES)
+        bcs     NoUnderflow{#}
+            lda.b   #0
+    NoUnderflow{#}:
         sta.w   Dma.transfersLeft
 
         lda.b   #1

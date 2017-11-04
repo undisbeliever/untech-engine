@@ -828,6 +828,10 @@ a8()
     +
     clc
     adc.w   Dma.transfersLeft
+    bcs     +
+        // Dma.transfersLeft underflowed
+        lda.b   #0
+    +
     sta.w   Dma.transfersLeft
 
 

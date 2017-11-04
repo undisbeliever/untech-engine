@@ -43,6 +43,9 @@ macro QueueHorizontalBuffer() {
     lda.w   Dma.transfersLeft
     sec
     sbc.w   #Dma.CalcDmaTime(MetaTiles.horizontalBuffer.buffer.size, VC)
+    bcs     NoUnderflow{#}
+        lda.w   #0
+NoUnderflow{#}:
     sta.w   Dma.transfersLeft
 }
 
@@ -61,6 +64,9 @@ macro QueueVerticalBuffer() {
     lda.w   Dma.transfersLeft
     sec
     sbc.w   #Dma.CalcDmaTime(MetaTiles.verticalBuffer.buffer.size, VC)
+    bcs     NoUnderflow{#}
+        lda.w   #0
+NoUnderflow{#}:
     sta.w   Dma.transfersLeft
 }
 

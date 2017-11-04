@@ -30,6 +30,9 @@ macro _InitLoop() {
     lda.w   Dma.transfersLeft
     sec
     sbc.w   #Dma.CalcDmaTime(Dma.MetaSprite.BYTES_TO_TRANSFER, Dma.MetaSprite.VBLANK_CYCLES)
+    bcs     NoUnderflow{#}
+        lda.w   #0
+NoUnderflow{#}:
     sta.w   Dma.transfersLeft
 }
 
