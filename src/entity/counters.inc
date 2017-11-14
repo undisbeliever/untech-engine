@@ -110,8 +110,8 @@ function CountEntitiesInList {
 
     Loop:
         inc
-        txy
-        ldx.w   BaseEntity.next,y
+        tyx
+        ldy.w   BaseEntity.next,x
         bne     Loop
 
 EndLoop:
