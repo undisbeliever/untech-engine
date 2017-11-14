@@ -13,6 +13,12 @@ namespace Entity {
 
 // Counts the number of enemies of a specific Id
 //
+// This routine will also search the deactivated and tryToActivateAgain entity
+// lists.
+//
+// This routine SHOULD ONLY be called on entities that will not change its
+// entity type as it does not check which list a deactivated entity belongs to.
+//
 // REQUIRES: 16 bit A, 16 bit Index, DB = 0x7e
 //
 // INPUT: A = entity Id
@@ -23,32 +29,40 @@ code()
 function CountEnemiesWithId {
 allocateTmpWord(tmp_count)
 
+    stz.w   tmp_count
+
     asl
     tax
     lda.l   Entity.Data.EntityList,x
-    // A = entity romPtr
 
     ldx.w   Entity.lists.enemies
-    beq     EmptyList
-
-    stz.w   tmp_count
-
-    Loop:
-        cmp.w   BaseEntity.romPtr,x
-        bne     +
-            inc.w   tmp_count
-        +
-
-        txy
-        ldx.w   BaseEntity.next,y
-        bne     Loop
+    jsr     _TestList
+    ldx.w   Entity.lists.deactivated
+    jsr     _TestList
+    ldx.w   Entity.lists.tryToActivateAgain
+    jsr     _TestList
 
     lda.w   tmp_count
     rts
 
-EmptyList:
-    lda.w   #0
-    rts
+    // IN: A = entity romPtr
+    //     X = first entity in the list
+    //     n = set if list if empty
+    function _TestList {
+        beq     SkipLoop
+
+        Loop:
+            cmp.w   BaseEntity.romPtr,x
+            bne     +
+                inc.w   tmp_count
+            +
+            txy
+            ldx.w   BaseEntity.next,y
+            bne     Loop
+    SkipLoop:
+
+        rts
+    }
 }
 
 
