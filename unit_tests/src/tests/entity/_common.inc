@@ -10,8 +10,8 @@ a16()
 i16()
 code()
 function _FreeListLength {
-    ldx.w   Entity.lists.free
-    bra     __ListLength
+    ldx.w   #Entity.lists.free
+    jmp     Entity.CountEntitiesInList
 }
 
 // OUT: A = number of entities in deactivated list
@@ -20,8 +20,8 @@ a16()
 i16()
 code()
 function _DeactivatedListLength {
-    ldx.w   Entity.lists.deactivated
-    bra     __ListLength
+    ldx.w   #Entity.lists.deactivated
+    jmp     Entity.CountEntitiesInList
 }
 
 // OUT: A = number of entities in the tryToActivateAgain list
@@ -30,8 +30,8 @@ a16()
 i16()
 code()
 function _TryToActivateAgainListLength {
-    ldx.w   Entity.lists.tryToActivateAgain
-    bra     __ListLength
+    ldx.w   #Entity.lists.tryToActivateAgain
+    jmp     Entity.CountEntitiesInList
 }
 
 // OUT: A = number of entities in player list
@@ -40,8 +40,8 @@ a16()
 i16()
 code()
 function _FirstListLength {
-    ldx.w   Entity.lists.FIRST
-    bra     __ListLength
+    ldx.w   #Entity.lists.FIRST
+    jmp     Entity.CountEntitiesInList
 }
 
 // IN: Y = list id
@@ -53,32 +53,10 @@ code()
 function _ListLength_Y {
     tya
     asl
-    tay
-    ldx.w   Entity.lists.FIRST,y
-    bra     __ListLength
-}
-
-// IN: X = first entity address
-// OUT: A = number of entities in list
-// MODIFIES: DP
-a16()
-i16()
-code()
-function __ListLength {
-    lda.w   #0
-
-    cpx.w   #0
-    beq     EndLoop
-
-    Loop:
-        inc
-
-        txy
-        ldx.w   BaseEntity.next,y
-        bne     Loop
-
-EndLoop:
-    rts
+    clc
+    adc.w   #Entity.lists.FIRST
+    tax
+    jmp     Entity.CountEntitiesInList
 }
 
 
@@ -154,8 +132,7 @@ allocateTmpWord(tmp_count)
     }
 
 
-    ldx.w   Entity.lists.toDelete
-    jsr     __ListLength
+    Entity.CountEntitiesInList(toDelete)
     clc
     adc.w   tmp_count
     sta.w   tmp_count
