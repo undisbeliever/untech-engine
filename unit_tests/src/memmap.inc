@@ -57,6 +57,18 @@ allocate(dpTmp4, dp, 2)
 allocate(dpTmp5, dp, 2)
 allocate(dpTmp6, dp, 2)
 allocate(dpTmp7, dp, 2)
+allocate(dpTmp8, dp, 2)
+allocate(dpTmp9, dp, 2)
+allocate(dpTmp10, dp, 2)
+allocate(dpTmp11, dp, 2)
+allocate(dpTmp12, dp, 2)
+allocate(dpTmp13, dp, 2)
+allocate(dpTmp14, dp, 2)
+allocate(dpTmp15, dp, 2)
+allocate(dpTmp16, dp, 2)
+allocate(dpTmp17, dp, 2)
+allocate(dpTmp18, dp, 2)
+allocate(dpTmp19, dp, 2)
 
 
 

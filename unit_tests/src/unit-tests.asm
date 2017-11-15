@@ -67,6 +67,7 @@ include "interactive/entity-metasprite.inc"
 include "interactive/entity-actionpointspawner.inc"
 include "interactive/entityhitbox-collisions.inc"
 include "interactive/hdma-circular-window.inc"
+include "interactive/hdma-horizontal-trapezium-window.inc"
 include "interactive/errors.inc"
 
 
