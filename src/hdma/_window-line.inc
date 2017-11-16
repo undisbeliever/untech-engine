@@ -38,11 +38,19 @@ constant _err = dpTmp14
 // (msb flag word - dp)
 constant _slope = dpTmp13
 
+// Remaining height for the current xPos value
+//
+// If 0 then the height will be calculated at the start of a DrawLine
+// without changing the current xPos.
+//
+// MUST BE set to > 0x8000 if the line is vertical.
+//
+// (uint16 - dp)
+constant _remainingHeight = dpTmp12
+
 // The number of scanlines remaining in the DrawLine routine
 // (uint8 - dp)
-constant _count = dpTmp12
-
-constant _tmp = dpTmp11
+constant _count = dpTmp11
 
 constant LAST_DP_TMP = dpTmp11
 
@@ -71,10 +79,15 @@ constant x1 = _x1
     //  x1 = x1
     //  scanlinesLeft = height
     //
+    //  remainingHeight = 0
+    //
     //  dy2 = height * 2
     //
     //  slope = (x1 - x0)
     //  dx2 = abs(x1 - x0) * 2
+    //
+    //  if dx2 == 0:
+    //      remainingHeight = 0xffff
     //
     //  err = dx2 / 2 - 1
     //  if err < 0:
@@ -85,6 +98,8 @@ constant x1 = _x1
     //  if skip > 0:
     //      scanlinesLeft -= skip
     //      err += dx2 * skip
+
+    stz.b   _remainingHeight
 
     sta.b   _scanlinesLeft
     asl
@@ -100,6 +115,12 @@ constant x1 = _x1
     +
     asl
     sta.b   _dx2
+
+    bne     +
+        dec
+        sta.b   _remainingHeight
+        inc
+    +
 
     asl
     dec
@@ -163,9 +184,21 @@ code()
 function DrawLine {
 
     //  scanlinesLeft -= count
+    //  sx = slope > 0 ? 1 : -1
+    //
+    //  h = remainingHeight
+    //  if h != 0: goto Resume
+    //
     //  if err >= dy2: goto ShiftXpos
     //
     //  while True:
+    //      h = 0
+    //      repeat:
+    //          h++
+    //          err += dx2
+    //      until err >= dy2
+    //
+    //    Resume:
     //      xClipped = bound(xPos, 0, 255)
     //
     //      repeat:
@@ -175,21 +208,17 @@ function DrawLine {
     //          buffer[x] = xClipped
     //          x += 2
     //
-    //          err += dx2
-    //      until err >= dy2
+    //          h--
+    //      until h == 0
     //
     //    ShiftXPos:
-    //      if slope positive:
-    //          repeat:
-    //              xPos++
-    //              err -= dy2
-    //          until err < dy2
-    //      else:
-    //          repeat:
-    //              xPos--
-    //              err -= dy2
-    //          until err < dy2
+    //      repeat:
+    //          xPos += sx
+    //          err -= dy2
+    //      until err < dy2
     //  EndLoop:
+    //
+    //  remainingHeight = h
     //
     //  if scanlinesLeft <= 0:
     //      xClipped = bound(x1, 0, 255)
@@ -198,97 +227,109 @@ function DrawLine {
     //  x += 2
     //  return x
 
+    inline _Loop(sx) {
+        assert16a()
+        assert16i()
+
+        if {sx} > 0 {
+            define l = PostitiveSlope_
+            define addSXtoY = iny
+            define takeSXfromY = dey
+        } else {
+            define l = NegativeSlope_
+            define addSXtoY = dey
+            define takeSXfromY = iny
+        }
+
+        ldy.b   _remainingHeight
+        bne     {l}Resume
+
+        lda.b   _err
+        cmp.b   _dy2
+        bcs     {l}ShiftXpos
+
+        {l}Loop:
+            // A = err
+            // X = bufferPos
+
+            // do not have to worry about _dx2 == 0
+            // when _dx2 == 0 _remainingHeight is large and this loop is skipped
+            ldy.w   #0
+            clc
+            -
+                iny
+                // c clear
+                adc.b   _dx2
+                cmp.b   _dy2
+                bcc     -
+            sta.b   _err
+
+        {l}Resume:
+            // Y = height of xPos segment
+            // clip xPos to between 0 and 255
+            lda.w   _xPos
+            bpl     +
+                lda.w   #0
+                bra     ++
+            +
+                cmp.w   #256
+                bcc     +
+                    lda.w   #255
+            +
+
+            sep     #$20
+        a8()
+            -
+                dec.b   _count
+                beq     EndLoop
+
+                sta.w   0,x
+                inx
+                inx
+
+                dey
+                bne     -
+
+            rep     #$30
+        a16()
+
+            lda.b   _err
+
+        {l}ShiftXpos:
+            // A = err
+            ldy.b   _xPos
+            sec
+            -
+                {addSXtoY}
+                // c set
+                sbc.b   _dy2
+                bcs     -
+            {takeSXfromY}
+            // c clear
+            adc.b   _dy2
+
+            sty.b   _xPos
+            bra     {l}Loop
+    }
+
+
     sta.b   _count
     eor.w   #0xffff
     sec
     adc.b   _scanlinesLeft
     sta.b   _scanlinesLeft
 
-    ldy.b   _err
-    tya
-    cmp.b   _dy2
-    bcs     ShiftXpos
+    lda.b   _slope
+    bmi     NegativeSlope
+        _Loop(1)
 
-    lda.b   _xPos
-
-    Loop:
-        // A = xPos
-        // Y = err
-        // X = bufferPos
-
-        // clip xPos to between 0 and 255
-        cmp.w   #0x8000
-        bcc     +
-            lda.w   #0
-            bra     ++
-        +
-            cmp.w   #256
-            bcc     +
-                lda.w   #255
-        +
-
-        sta.b   _tmp
-
-        -
-            sep     #$20
-        a8()
-            lda.b   _tmp
-            // A = xPos clipped
-            dec.b   _count
-            beq     EndLoop
-
-            sta.w   0,x
-            inx
-            inx
-
-            rep     #$31
-        a16()
-            tya
-            // c clear
-            adc.b   _dx2
-            tay
-            cmp.b   _dy2
-            bcc     -
-
-
-    ShiftXpos:
-        // A = err
-        stx.b   _tmp
-        ldx.b   _xPos
-        sec
-
-        bit.b   _slope
-        bmi     SlopeNeg
-        SlopePos:
-            -
-                inx
-                // c set
-                tay
-                sbc.b   _dy2
-                bcs     -
-            dex
-            bra     EndIf
-
-        SlopeNeg:
-            -
-                dex
-                // c set
-                tay
-                sbc.b   _dy2
-                bcs     -
-            inx
-        EndIf:
-
-        stx.b   _xPos
-        txa
-
-        ldx.b   _tmp
-        bra     Loop
+    NegativeSlope:
+        _Loop(-1)
 
     EndLoop:
 a8()
-
-    sty.b   _err
+    // y = remaining height for the current xPos
+    sty.b   _remainingHeight
 
     // A = xClipped
     ldy.b   _scanlinesLeft
