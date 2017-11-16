@@ -127,6 +127,7 @@ constant x1 = _x1
     bpl     +
         lda.w   #0
         bra     ++
+    +
     cmp.w   _scanlinesLeft
     bcs     +
         lda.w   _scanlinesLeft
