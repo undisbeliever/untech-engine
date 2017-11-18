@@ -148,6 +148,7 @@ a16()
     // Setup HDMA count bytes
 
     //  if (nLines) > 0x7f:
+    //      buffer[127 * 2 + 1] = nLines + 1
     //      buffer[0] = 0x80 | 0x7f
     //  else:
     //      buffer[0] = 0x80 | nLines
@@ -156,6 +157,9 @@ a16()
 
     cmp.w   #0x7f + 1
     bcc     +
+        inc
+        sta.w   127 * 2 + 1,x
+
         lda.w   #0x7f
     +
     ora.w   #0x80
@@ -166,9 +170,15 @@ a16()
 
     // Draw Lines
     //
+    //  DrawLine.bufferSecondCount = buffer + 127 * 2
     //  x = _WindowLine.DrawLine(topLeft, bottomLeft, height, skip, nLines, buffer)
     //  x = _WindowLine.DrawLine(topRight, bottomRight, height, skip, nLines, buffer + 1)
     //  buffer = x - 1
+
+    txa
+    clc
+    adc.w   #127 * 2
+    sta.b   _WindowLine.DrawLine.bufferSecondCount
 
     lda.b   height
     sta.b   _WindowLine.DrawLine.height        // Not modified in DrawLine
@@ -192,41 +202,6 @@ a16()
     inx
     jsr     _WindowLine.DrawLine
     dex
-
-
-    //  Shift HDMA buffer one byte over if and insert the second count byte if
-    //  nLines > 127
-    //
-    //  if nLines > 127:
-    //      x = buffer
-    //      buffer = buffer + 1
-    //      src, dest = MVP(x - 1, x, (nLines - 127) * 2 - 1)
-    //      *dest = nLines + 1
-
-    lda.b   _nLines
-    asl
-    cmp.w   #127 * 2 + 1
-    bcc     +
-        inx
-        stx.b   _bufferPos
-        dex
-
-        // c set
-        sbc.w   #127 * 2 + 1
-        txy
-        dex
-        mvp     0x7e=0x7e
-
-        sep     #$20
-    a8()
-        lda.b   _nLines
-        inc
-        sta.w   0,y
-
-        rep     #$20
-    a16()
-        ldx.b   _bufferPos
-    +
 
 
     // Add terminator to HDMA buffer

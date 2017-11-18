@@ -5,7 +5,7 @@
 //
 // This code is based on Bresenham's line drawing algorithm
 //
-// NOTE: This code uses dpTmp11 to dpTmp19 to store state. Ensure that all
+// NOTE: This code uses dpTmp10 to dpTmp19 to store state. Ensure that all
 // calling code does not use these variables.
 //
 // This file is part of the UnTech Game Engine.
@@ -42,9 +42,15 @@ constant _lastScanline = dpTmp13
 // (word ptr - dp)
 constant _bufferLast = dpTmp12
 
-constant _tmp = dpTmp11
+// Address of the second HDMA count byte in the buffer
+// (word ptr - dp)
+constant _bufferSecondCount = dpTmp11
 
-constant LAST_DP_TMP = dpTmp11
+// Address of the next break in the line drawing loop
+// (word ptr - dp)
+constant _bufferTest = dpTmp10
+
+constant LAST_DP_TMP = dpTmp10
 
 
 // Draws a single line to a single side of the HDMA window buffer.
@@ -53,16 +59,21 @@ constant LAST_DP_TMP = dpTmp11
 //  * contain both the left and right window registers
 //  * be in continuous mode
 //
+// This routine will skip over the second HDMA count byte.
+//
 // REQUIRES: 16 bit A, 16 bit Index, DB = 0x7e, DP = 0
 //
 // INPUT: DrawLine.x0 - top x coordinate of the line
 //        DrawLine.x1 - bottom x coordinate of the line
 //        DrawLine.height - height of the line
+//        DrawLine.bufferSecondCount - address of the second HDMA count byte
+//                                     (`start of line buffer + 127 * 2`)
 //        Y - number of scanlines to skip
 //        A - number of scanlines to draw
 //        X - address of the HDMA buffer
 //
 // KEEP: height is not modified by this routine
+//       bufferSecondCount is not modified by this routine
 //
 // LIMITS: abs(x0 - x1) < 0x8000
 //         abs(x0 - x1) * skip < 0x10000
@@ -78,6 +89,7 @@ function DrawLine {
 constant x0 = _xPos
 constant x1 = _x1
 constant height = _height
+constant bufferSecondCount = _bufferSecondCount
 
     //  xPos = x0
     //  x1 = x1
@@ -138,7 +150,7 @@ constant height = _height
         adc.b   _lastScanline
         sta.b   _lastScanline
 
-        stx.b   _tmp
+        stx.b   _bufferTest
 
         sep     #$20
     a8()
@@ -153,10 +165,15 @@ constant height = _height
         adc.b   _err
         sta.b   _err
 
-        ldx.b   _tmp
+        ldx.b   _bufferTest
     +
 
 
+    //  if buffer < bufferSecondCount and bufferSecondCount < bufferLast:
+    //      bufferTest = bufferSecondCount
+    //  else:
+    //      bufferTest = bufferLast
+    //
     //  sx = x1 >= xPos ? 1 : -1
     //
     //  if dx == 0:
@@ -176,7 +193,12 @@ constant height = _height
     //      xClipped = bound(xPos, 0, 255)
     //
     //      repeat:
-    //          if buffer >= bufferLast: goto EndLoop
+    //          if buffer >= bufferTest:
+    //              if buffer >= bufferLast:
+    //                  goto EndLoop
+    //              else:
+    //                  buffer++
+    //                  bufferTest = bufferLast
     //
     //          *buffer = xClipped
     //          buffer += 2
@@ -253,8 +275,9 @@ constant height = _height
             sep     #$20
         a8()
             -
-                cpx.b   _bufferLast
-                bcs     EndLoop
+                cpx.b   _bufferTest
+                bcs     {l}TestBufferPos
+            {l}ContinueLoop:
 
                 sta.w   0,x
                 inx
@@ -283,7 +306,34 @@ constant height = _height
 
             sty.b   _xPos
             bra     {l}Loop
+
+
+    {l}TestBufferPos:
+    a8()
+        cpx.b   _bufferLast
+        bcs     EndLoop
+
+        // skip over second count byte
+        inx
+
+        phx
+        ldx.b   _bufferLast
+        stx.b   _bufferTest
+        plx
+
+        bra     {l}ContinueLoop
     }
+
+
+    cpx.b   _bufferSecondCount
+    bcs     +
+        lda.b   _bufferSecondCount
+        cmp.b   _bufferLast
+        bcc     ++
+    +
+        lda.b   _bufferLast
+    +
+    sta.b   _bufferTest
 
 
     lda.b   _x1
@@ -292,6 +342,7 @@ constant height = _height
         _Loop(1)
 
     NegativeSlope:
+    a16()
         _Loop(-1)
 
     EndLoop:
