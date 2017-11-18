@@ -47,7 +47,7 @@ constant bottomRight =  dpTmp5
 
 constant _skip =        dpTmp6
 constant _hdmaBuffer =  dpTmp7
-constant _count =       dpTmp8
+constant _nLines =      dpTmp8
 constant _bufferPos =   dpTmp9
 
 assert(_bufferPos < _WindowLine.LAST_DP_TMP)
@@ -64,7 +64,6 @@ a16()
     //  if yPos < 0:
     //      skip = -yPos
     //      if skip > height: goto NotVisible
-    //
     //  else:
     //      skip = 0
     //      if yPos > DISPLAY_HEIGHT: goto NotVisible
@@ -125,9 +124,9 @@ a16()
 
 
     //  if height + yPos >= DISPLAY_HEIGHT:
-    //      count = DISPLAY_HEIGHT - yPos - skip
+    //      nLines = DISPLAY_HEIGHT - yPos - skip
     //  else:
-    //      count = height - skip
+    //      nLines = height - skip
 
     lda.b   height
     clc
@@ -143,25 +142,20 @@ a16()
     +
     sec
     sbc.b   _skip
-    sta.b   _count
+    sta.b   _nLines
 
 
     // Setup HDMA count bytes
 
-    //  if (count) > 0x7f:
-    //      buffer[0x7f * 2 + 1] = 0x80 | (count - 0x7f)
+    //  if (nLines) > 0x7f:
     //      buffer[0] = 0x80 | 0x7f
     //  else:
-    //      buffer[0] = 0x80 | count
+    //      buffer[0] = 0x80 | nLines
+    //
+    //  buffer++
 
     cmp.w   #0x7f + 1
     bcc     +
-        tay
-        sec
-        sbc.w   #0x7f
-        ora.w   #0x80
-        sta.w   0x7f * 2 + 1,x
-
         lda.w   #0x7f
     +
     ora.w   #0x80
@@ -171,14 +165,9 @@ a16()
 
 
     // Draw Left Line
-
+    //
     //  _WindowLine.SetupLine(topLeft, bottomLeft, height, skip)
-    //  x = buffer
-    //  if count > 0x7f:
-    //      x = _WindowLine.DrawLine(0x7f, x)
-    //      x = _WindowLine.DrawLine(c - 0x7f, x + 1)
-    //  else:
-    //      x = _WindowLine.DrawLine(0x7f, x)
+    //  _WindowLine.DrawLine(nLines, buffer)
 
     lda.b   topLeft
     sta.b   _WindowLine.SetupLine.x0
@@ -189,29 +178,14 @@ a16()
     jsr     _WindowLine.SetupLine
 
     ldx.b   _bufferPos
-    lda.b   _count
-    cmp.w   #0x7f + 1
-    bcc     +
-        lda.w   #0x7f
-        jsr     _WindowLine.DrawLine
-        lda.b   _count
-        sec
-        sbc.w   #0x7f
-        inx
-    +
+    lda.b   _nLines
     jsr     _WindowLine.DrawLine
 
 
     // Draw Right Line
-
-    //  _WindowLine.SetupLine(topRight, bottomRight, height, skip)
-    //  x = buffer + 1
-    //  if count > 0x7f:
-    //      x = _WindowLine.DrawLine(0x7f, x)
-    //      x = _WindowLine.DrawLine(c - 0x7f, x + 1)
-    //  else:
-    //      x = _WindowLine.DrawLine(0x7f, x)
-    //  buffer = x - 1
+    //
+    //  _WindowLine.SetupLine(topLeft, bottomLeft, height, skip)
+    //  buffer = _WindowLine.DrawLine(nLines, buffer + 1) - 1
 
     lda.b   topRight
     sta.b   _WindowLine.SetupLine.x0
@@ -223,19 +197,44 @@ a16()
 
     ldx.b   _bufferPos
     inx
-    lda.b   _count
-    cmp.w   #0x7f + 1
-    bcc     +
-        lda.w   #0x7f
-        jsr     _WindowLine.DrawLine
-        lda.b   _count
-        sec
-        sbc.w   #0x7f
-        inx
-    +
+    lda.b   _nLines
     jsr     _WindowLine.DrawLine
-
     dex
+
+
+    //  Shift HDMA buffer one byte over if and insert the second count byte if
+    //  nLines > 127
+    //
+    //  if nLines > 127:
+    //      x = buffer
+    //      buffer = buffer + 1
+    //      src, dest = MVP(x - 1, x, (nLines - 127) * 2 - 1)
+    //      *dest = nLines + 1
+
+    lda.b   _nLines
+    asl
+    cmp.w   #127 * 2 + 1
+    bcc     +
+        inx
+        stx.b   _bufferPos
+        dex
+
+        // c set
+        sbc.w   #127 * 2 + 1
+        txy
+        dex
+        mvp     0x7e=0x7e
+
+        sep     #$20
+    a8()
+        lda.b   _nLines
+        inc
+        sta.w   0,y
+
+        rep     #$20
+    a16()
+        ldx.b   _bufferPos
+    +
 
 
     // Add terminator to HDMA buffer
