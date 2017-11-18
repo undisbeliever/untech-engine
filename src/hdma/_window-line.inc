@@ -24,9 +24,9 @@ constant _xPos = dpTmp19
 // (sint16 - dp)
 constant _x1 = dpTmp18
 
-// Number of scanlines left to draw until the end of the line
+// Height of the line
 // (uint16 - dp)
-constant _scanlinesLeft = dpTmp17
+constant _height = dpTmp17
 
 // Parameters for Bresenham's line drawing algorithm
 // (3 x uint16 - dp)
@@ -34,79 +34,87 @@ constant _dx2 = dpTmp16
 constant _dy2 = dpTmp15
 constant _err = dpTmp14
 
-// if MSB is set then the slope is negative
-// (msb flag word - dp)
-constant _slope = dpTmp13
-
-// Remaining height for the current xPos value
-//
-// If 0 then the height will be calculated at the start of a DrawLine
-// without changing the current xPos.
-//
-// MUST BE set to > 0x8000 if the line is vertical.
-//
+// The last scanline that is drawn
 // (uint16 - dp)
-constant _remainingHeight = dpTmp12
+constant _lastScanline = dpTmp13
 
-// The number of scanlines remaining in the DrawLine routine
-// (uint8 - dp)
-constant _count = dpTmp11
+// Address in the buffer of the last scanline of the current line
+// (word ptr - dp)
+constant _bufferLast = dpTmp12
+
+constant _tmp = dpTmp11
 
 constant LAST_DP_TMP = dpTmp11
 
 
-// Initializes the HDMA Window line drawing algorithm
+// Draws a single line to a single side of the HDMA window buffer.
 //
-// REQUIRES: 16 bit A, 16 bit Index, DP = 0, DB = 0x7e
+// The HDMA window buffer MUST:
+//  * contain both the left and right window registers
+//  * be in continuous mode
 //
-// INPUT: SetupLine.x0 - top x coordinate of the line
-//        SetupLine.x1 - bottom x coordinate of the line
-//        A - height of the line
-//        X - number of scanlines to skip
+// REQUIRES: 16 bit A, 16 bit Index, DB = 0x7e, DP = 0
+//
+// INPUT: DrawLine.x0 - top x coordinate of the line
+//        DrawLine.x1 - bottom x coordinate of the line
+//        DrawLine.height - height of the line
+//        Y - number of scanlines to skip
+//        A - number of scanlines to draw
+//        X - address of the HDMA buffer
+//
+// KEEP: height is not modified by this routine
 //
 // LIMITS: abs(x0 - x1) < 0x8000
 //         abs(x0 - x1) * skip < 0x10000
+//         height > 0
 //         skip < 256
+//         nScanlines > 0
+//         nScanlines + skip <= height
 a16()
 i16()
 code()
-function SetupLine {
+function DrawLine {
 // Reuse variables to reduce load/stores
 constant x0 = _xPos
 constant x1 = _x1
+constant height = _height
 
     //  xPos = x0
     //  x1 = x1
-    //  scanlinesLeft = height
+    //  height = height
     //
-    //  remainingHeight = 0
+    //  lastScanline = nScanlines
+    //  bufferLast = buffer + (nScanlines - 1) * 2
     //
     //  dy2 = height * 2
-    //
-    //  slope = (x1 - x0)
     //  dx2 = abs(x1 - x0) * 2
-    //
-    //  if dx2 == 0:
-    //      remainingHeight = 0xffff
     //
     //  err = dx2 / 2 - 1
     //  if err < height:    // (signed comparison)
     //      err = height
     //
     //  if skip > 0:
-    //      scanlinesLeft -= skip
+    //      lastScanline += skip
     //      err += dx2 * skip
 
-    stz.b   _remainingHeight
+    sta.b   _lastScanline
 
-    sta.b   _scanlinesLeft
+    dec
+    asl
+    sta.b   _bufferLast
+    txa
+    clc
+    adc.b   _bufferLast
+    sta.b   _bufferLast
+
+    lda.b   _height
     asl
     sta.b   _dy2
+
 
     lda.b   _x1
     sec
     sbc.b   x0
-    sta.b   _slope
     bpl     +
         eor.w   #0xffff
         inc
@@ -114,34 +122,28 @@ constant x1 = _x1
     asl
     sta.b   _dx2
 
-    bne     +
-        dec
-        sta.b   _remainingHeight
-        inc
-    +
-
     lsr
     dec
     bmi     +
-    cmp.b   _scanlinesLeft
+    cmp.b   _height
     bcs     ++
     +
-        lda.b   _scanlinesLeft
+        lda.b   _height
     +
     sta.b   _err
 
-    cpx.w   #0
+    tya
     beq     +
-        txa
-        eor.w   #0xffff
-        sec
-        adc.b   _scanlinesLeft
-        sta.b   _scanlinesLeft
+        clc
+        adc.b   _lastScanline
+        sta.b   _lastScanline
+
+        stx.b   _tmp
 
         sep     #$20
     a8()
+        tya
         ldy.b   _dx2
-        txa
         jsr     Math.Multiply.u16y_u8a_u16y
 
         rep     #$20
@@ -150,41 +152,16 @@ constant x1 = _x1
         clc
         adc.b   _err
         sta.b   _err
+
+        ldx.b   _tmp
     +
 
-    rts
-}
 
-
-// Draws a single line to a single side of the HDMA window buffer.
-//
-// This routine can be called sequentially.
-//
-// The HDMA window buffer MUST:
-//  * contain both the left and right window registers
-//  * be in continuous mode with the length already set
-//
-// This routine MUST NOT CROSS a continuous HDMA boundary.
-//
-// REQUIRES: 16 bit A, 16 bit Index, DB = 0x7e, DP = 0
-//
-// INPUT: A - number of scanlines to draw (MUST BE <= 0x7f)
-//        X - address of HDMA buffer
-//
-// LIMITS: A <= 0x7f
-// ASSUMES: A <= _scanlinesLeft
-//
-// OUTPUT: X - address HDMA buffer after
-a16()
-i16()
-code()
-function DrawLine {
-
-    //  scanlinesLeft -= count
-    //  sx = slope > 0 ? 1 : -1
+    //  sx = x1 >= xPos ? 1 : -1
     //
-    //  h = remainingHeight
-    //  if h != 0: goto Resume
+    //  if dx == 0:
+    //      h = 0xffff
+    //      goto SetXPos
     //
     //  if err >= dy2: goto ShiftXpos
     //
@@ -195,15 +172,14 @@ function DrawLine {
     //          err += dx2
     //      until err >= dy2
     //
-    //    Resume:
+    //    SetXPos:
     //      xClipped = bound(xPos, 0, 255)
     //
     //      repeat:
-    //          count--
-    //          if count == 0: goto EndLoop
+    //          if buffer >= bufferLast: goto EndLoop
     //
-    //          buffer[x] = xClipped
-    //          x += 2
+    //          *buffer = xClipped
+    //          buffer += 2
     //
     //          h--
     //      until h == 0
@@ -215,14 +191,12 @@ function DrawLine {
     //      until err < dy2
     //  EndLoop:
     //
-    //  remainingHeight = h
-    //
-    //  if scanlinesLeft <= 0:
+    //  if lastScanline == height:
     //      xClipped = bound(x1, 0, 255)
     //
-    //  buffer[x] = xClipped
-    //  x += 2
-    //  return x
+    //  *buffer = xClipped
+    //  buffer += 2
+    //  return buffer
 
     inline _Loop(sx) {
         assert16a()
@@ -238,8 +212,11 @@ function DrawLine {
             define takeSXfromY = iny
         }
 
-        ldy.b   _remainingHeight
-        bne     {l}Resume
+        lda.b   _dx2
+        bne     +
+            ldy.w   #0xffff
+            bra     {l}SetXPos
+        +
 
         lda.b   _err
         cmp.b   _dy2
@@ -249,8 +226,7 @@ function DrawLine {
             // A = err
             // X = bufferPos
 
-            // do not have to worry about _dx2 == 0
-            // when _dx2 == 0 _remainingHeight is large and this loop is skipped
+            // This is skipped when dx == 0
             ldy.w   #0
             clc
             -
@@ -261,10 +237,10 @@ function DrawLine {
                 bcc     -
             sta.b   _err
 
-        {l}Resume:
+        {l}SetXPos:
             // Y = height of xPos segment
             // clip xPos to between 0 and 255
-            lda.w   _xPos
+            lda.b   _xPos
             bpl     +
                 lda.w   #0
                 bra     ++
@@ -277,8 +253,8 @@ function DrawLine {
             sep     #$20
         a8()
             -
-                dec.b   _count
-                beq     EndLoop
+                cpx.b   _bufferLast
+                bcs     EndLoop
 
                 sta.w   0,x
                 inx
@@ -310,13 +286,8 @@ function DrawLine {
     }
 
 
-    sta.b   _count
-    eor.w   #0xffff
-    sec
-    adc.b   _scanlinesLeft
-    sta.b   _scanlinesLeft
-
-    lda.b   _slope
+    lda.b   _x1
+    cmp.b   _xPos
     bmi     NegativeSlope
         _Loop(1)
 
@@ -325,14 +296,11 @@ function DrawLine {
 
     EndLoop:
 a8()
-    // y = remaining height for the current xPos
-    sty.b   _remainingHeight
 
     // A = xClipped
-    ldy.b   _scanlinesLeft
-    beq     LastScanline
-    bpl     NotLastScanline
-    LastScanline:
+    ldy.b   _lastScanline
+    cpy.b   _height
+    bcc     NotEndOfLine
         // clip x1
         ldy.b   _x1
         bpl     +
@@ -344,7 +312,7 @@ a8()
             bcc     +
                 lda.b   #255
         +
-    NotLastScanline:
+    NotEndOfLine:
 
     sta.w   0,x
     inx

@@ -164,40 +164,32 @@ a16()
     stx.b   _bufferPos
 
 
-    // Draw Left Line
+    // Draw Lines
     //
-    //  _WindowLine.SetupLine(topLeft, bottomLeft, height, skip)
-    //  _WindowLine.DrawLine(nLines, buffer)
+    //  x = _WindowLine.DrawLine(topLeft, bottomLeft, height, skip, nLines, buffer)
+    //  x = _WindowLine.DrawLine(topRight, bottomRight, height, skip, nLines, buffer + 1)
+    //  buffer = x - 1
+
+    lda.b   height
+    sta.b   _WindowLine.DrawLine.height        // Not modified in DrawLine
 
     lda.b   topLeft
-    sta.b   _WindowLine.SetupLine.x0
+    sta.b   _WindowLine.DrawLine.x0
     lda.b   bottomLeft
-    sta.b   _WindowLine.SetupLine.x1
-    lda.b   height
-    ldx.b   _skip
-    jsr     _WindowLine.SetupLine
-
-    ldx.b   _bufferPos
+    sta.b   _WindowLine.DrawLine.x1
+    ldy.b   _skip
     lda.b   _nLines
+    // X = bufferPos
     jsr     _WindowLine.DrawLine
 
-
-    // Draw Right Line
-    //
-    //  _WindowLine.SetupLine(topLeft, bottomLeft, height, skip)
-    //  buffer = _WindowLine.DrawLine(nLines, buffer + 1) - 1
-
     lda.b   topRight
-    sta.b   _WindowLine.SetupLine.x0
+    sta.b   _WindowLine.DrawLine.x0
     lda.b   bottomRight
-    sta.b   _WindowLine.SetupLine.x1
-    lda.b   height
-    ldx.b   _skip
-    jsr     _WindowLine.SetupLine
-
+    sta.b   _WindowLine.DrawLine.x1
+    ldy.b   _skip
+    lda.b   _nLines
     ldx.b   _bufferPos
     inx
-    lda.b   _nLines
     jsr     _WindowLine.DrawLine
     dex
 
