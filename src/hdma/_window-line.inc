@@ -90,9 +90,7 @@ constant x1 = _x1
     //      remainingHeight = 0xffff
     //
     //  err = dx2 / 2 - 1
-    //  if err < 0:
-    //      err = 0
-    //  else if err < height:
+    //  if err < height:    // (signed comparison)
     //      err = height
     //
     //  if skip > 0:
@@ -122,15 +120,13 @@ constant x1 = _x1
         inc
     +
 
-    asl
+    lsr
     dec
-    bpl     +
-        lda.w   #0
-        bra     ++
+    bmi     +
+    cmp.b   _scanlinesLeft
+    bcs     ++
     +
-    cmp.w   _scanlinesLeft
-    bcs     +
-        lda.w   _scanlinesLeft
+        lda.b   _scanlinesLeft
     +
     sta.b   _err
 
