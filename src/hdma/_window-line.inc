@@ -106,8 +106,8 @@ constant bufferSecondCount = _bufferSecondCount
     //  dy2 = height * 2
     //  dx2 = abs(x1 - x0) * 2
     //
-    //  err = dx2 / 2 - 1
-    //  if err < height:    // (signed comparison)
+    //  err = dx2
+    //  if err < height:
     //      err = height
     //
     //  if skip > 0:
@@ -163,12 +163,8 @@ constant bufferSecondCount = _bufferSecondCount
     asl
     sta.b   _dx2
 
-    lsr
-    dec
-    bmi     +
     cmp.b   _height
-    bcs     ++
-    +
+    bcs     +
         lda.b   _height
     +
     sta.b   _err
