@@ -100,6 +100,8 @@ constant bufferSecondCount = _bufferSecondCount
     //
     //  lastScanline = nScanlines
     //  bufferLast = buffer + (nScanlines - 1) * 2
+    //  if bufferLast >= bufferSecondCount:
+    //      bufferLast++
     //
     //  dy2 = height * 2
     //  dx2 = abs(x1 - x0) * 2
@@ -140,6 +142,10 @@ constant bufferSecondCount = _bufferSecondCount
     txa
     clc
     adc.b   _bufferLast
+    cmp.b   _bufferSecondCount
+    bcc     +
+        inc
+    +
     sta.b   _bufferLast
 
     lda.b   _height
@@ -291,6 +297,7 @@ function _DrawSteepLine {
     //                  goto EndLoop
     //              else:
     //                  buffer++
+    //                  if buffer >= bufferLast: goto EndLoop
     //                  bufferTest = bufferLast
     //
     //          *buffer = xClipped
@@ -387,6 +394,8 @@ function _DrawSteepLine {
 
         // skip over second count byte
         inx
+        cpx.b   _bufferLast
+        bcs     EndLoop
 
         phx
         ldx.b   _bufferLast
@@ -454,6 +463,7 @@ function _DrawShallowLine {
     //              goto EndLoop
     //          else:
     //              buffer++
+    //              if buffer >= bufferLast: goto EndLoop
     //              bufferTest = bufferLast
     //
     //      *buffer = bound(xPos, 0, 255)
@@ -548,6 +558,8 @@ function _DrawShallowLine {
 
         // skip over second count byte
         inx
+        cpx.b   _bufferLast
+        bcs     EndLoop
 
         phx
         ldx.b   _bufferLast
