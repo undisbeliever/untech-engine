@@ -72,6 +72,8 @@ constant LAST_DP_TMP = dpTmp10
 //        A - number of scanlines to draw
 //        X - address of the HDMA buffer
 //
+// OUTPUT: X - address of the HDMA buffer after final scanline
+//
 // KEEP: height is not modified by this routine
 //       bufferSecondCount is not modified by this routine
 //
@@ -118,6 +120,16 @@ constant bufferSecondCount = _bufferSecondCount
     //        xPos += div
     //    else:
     //        xPos -= div
+    //
+    //  if buffer < bufferSecondCount and bufferSecondCount < bufferLast:
+    //      bufferTest = bufferSecondCount
+    //  else:
+    //      bufferTest = bufferLast
+    //
+    //  if dx2 >= dy2:
+    //      return _DrawShallowLine()
+    //  else:
+    //      return _DrawSteepLine()
 
 
     sta.b   _lastScanline
@@ -222,11 +234,40 @@ constant bufferSecondCount = _bufferSecondCount
     SkipDy2Division:
 
 
-    //  if buffer < bufferSecondCount and bufferSecondCount < bufferLast:
-    //      bufferTest = bufferSecondCount
-    //  else:
-    //      bufferTest = bufferLast
-    //
+    cpx.b   _bufferSecondCount
+    bcs     +
+        lda.b   _bufferSecondCount
+        cmp.b   _bufferLast
+        bcc     ++
+    +
+        lda.b   _bufferLast
+    +
+    sta.b   _bufferTest
+
+
+    lda.b   _dx2
+    cmp.b   _dy2
+    bcc     +
+        jmp     _DrawShallowLine
+    +
+
+_DrawSteepLine_Followthrough:
+}
+
+
+// Draw a steep Line (dx2 < dy2) to the HDMA Buffer
+//
+// INTERNAL: called by DrawLine
+// REQUIRES: 16 bit A, 16 bit Index, DB = 0x7e, DP = 0
+//
+// INPUT: X - address of the HDMA buffer
+// OUTPUT: X - address of the HDMA buffer after final scanline
+a16()
+i16()
+code()
+function _DrawSteepLine {
+    assert(pc() == DrawLine._DrawSteepLine_Followthrough)
+
     //  sx = x1 >= xPos ? 1 : -1
     //
     //  if dx == 0:
@@ -239,11 +280,12 @@ constant bufferSecondCount = _bufferSecondCount
     //          h++
     //          err += dx2
     //      until err >= dy2
+    //      err -= dy2
     //
     //    SetXPos:
     //      xClipped = bound(xPos, 0, 255)
     //
-    //      repeat:
+    //      repeat h times:
     //          if buffer >= bufferTest:
     //              if buffer >= bufferLast:
     //                  goto EndLoop
@@ -254,13 +296,8 @@ constant bufferSecondCount = _bufferSecondCount
     //          *buffer = xClipped
     //          buffer += 2
     //
-    //          h--
-    //      until h == 0
+    //      xPos += sx
     //
-    //      repeat:
-    //          xPos += sx
-    //          err -= dy2
-    //      until err < dy2
     //  EndLoop:
     //
     //  if lastScanline == height:
@@ -270,18 +307,16 @@ constant bufferSecondCount = _bufferSecondCount
     //  buffer += 2
     //  return buffer
 
-    inline _Loop(sx) {
+    inline _ProcessSx(sx) {
         assert16a()
         assert16i()
 
         if {sx} > 0 {
             define l = PostitiveSlope_
-            define addSXtoY = iny
-            define takeSXfromY = dey
+            define addSxToXpos = inc.b  _xPos
         } else {
             define l = NegativeSlope_
-            define addSXtoY = dey
-            define takeSXfromY = iny
+            define addSxToXpos = dec.b  _xPos
         }
 
         lda.b   _dx2
@@ -305,11 +340,13 @@ constant bufferSecondCount = _bufferSecondCount
                 adc.b   _dx2
                 cmp.b   _dy2
                 bcc     -
+            // c set
+            sbc.b   _dy2
             sta.b   _err
 
         {l}SetXPos:
             // Y = height of xPos segment
-            // clip xPos to between 0 and 255
+
             lda.b   _xPos
             bpl     +
                 lda.w   #0
@@ -336,22 +373,10 @@ constant bufferSecondCount = _bufferSecondCount
 
             rep     #$30
         a16()
+            {addSxToXpos}
 
             lda.b   _err
 
-            // A = err
-            ldy.b   _xPos
-            sec
-            -
-                {addSXtoY}
-                // c set
-                sbc.b   _dy2
-                bcs     -
-            {takeSXfromY}
-            // c clear
-            adc.b   _dy2
-
-            sty.b   _xPos
             bra     {l}Loop
 
 
@@ -372,29 +397,17 @@ constant bufferSecondCount = _bufferSecondCount
     }
 
 
-    cpx.b   _bufferSecondCount
-    bcs     +
-        lda.b   _bufferSecondCount
-        cmp.b   _bufferLast
-        bcc     ++
-    +
-        lda.b   _bufferLast
-    +
-    sta.b   _bufferTest
-
-
     lda.b   _x1
     cmp.b   _xPos
     bmi     NegativeSlope
-        _Loop(1)
+        _ProcessSx(1)
 
     NegativeSlope:
     a16()
-        _Loop(-1)
+        _ProcessSx(-1)
 
     EndLoop:
 a8()
-
     // A = xClipped
     ldy.b   _lastScanline
     cpy.b   _height
@@ -412,6 +425,171 @@ a8()
         +
     NotEndOfLine:
 
+    sta.w   0,x
+    inx
+    inx
+
+    rep     #$30
+a16()
+    rts
+}
+
+
+// Draw a shallow (dx2 >= dy2) Line to the HDMA Buffer
+//
+// INTERNAL: called by DrawLine
+// REQUIRES: 16 bit A, 16 bit Index, DB = 0x7e, DP = 0
+//
+// INPUT: X - address of the HDMA buffer
+// OUTPUT: X - address of the HDMA buffer after final scanline
+a16()
+i16()
+code()
+function _DrawShallowLine {
+    //  sx = x1 >= xPos ? 1 : -1
+    //
+    //  while True:
+    //      if buffer >= bufferTest:
+    //          if buffer >= bufferLast:
+    //              goto EndLoop
+    //          else:
+    //              buffer++
+    //              bufferTest = bufferLast
+    //
+    //      *buffer = bound(xPos, 0, 255)
+    //      buffer += 2
+    //
+    //      err += dx2
+    //
+    //      repeat:
+    //          xPos += sx
+    //          err -= dy2
+    //      until err < dy2
+    //
+    //  EndLoop:
+    //
+    //  if lastScanline == height:
+    //      *buffer = bound(x1, 0, 255)
+    //  else:
+    //      *buffer = bound(xPos, 0, 255)
+    //
+    //  buffer += 2
+    //  return buffer
+
+    inline _ProcessSx(sx) {
+        assert16a()
+        assert16i()
+
+        if {sx} > 0 {
+            define l = PostitiveSlope_
+            define addSXtoY = iny
+            define takeSXfromY = dey
+        } else {
+            define l = NegativeSlope_
+            define addSXtoY = dey
+            define takeSXfromY = iny
+        }
+
+        ldy.b   _err
+
+        {l}Loop:
+            // Y = err
+            // X = bufferPos
+
+            cpx.b   _bufferTest
+            bcs     {l}TestBufferPos
+        {l}ContinueLoop:
+
+            // clip xPos to between 0 and 255
+            lda.b   _xPos
+            bpl     +
+                lda.w   #0
+                bra     ++
+            +
+                cmp.w   #256
+                bcc     +
+                    lda.w   #255
+            +
+
+            sep     #$20
+        a8()
+            sta.w   0,x
+            inx
+            inx
+
+
+            rep     #$31
+        a16()
+            tya
+            // c clear
+            adc.b   _dx2
+
+            ldy.b   _xPos
+            sec
+            -
+                {addSXtoY}
+                // c set
+                sbc.b   _dy2
+                bcs     -
+            {takeSXfromY}
+            // c clear
+            adc.b   _dy2
+
+            sty.b   _xPos
+            tay
+
+            bra     {l}Loop
+
+
+    {l}TestBufferPos:
+    a8()
+        cpx.b   _bufferLast
+        bcs     EndLoop
+
+        // skip over second count byte
+        inx
+
+        phx
+        ldx.b   _bufferLast
+        stx.b   _bufferTest
+        plx
+
+        bra     {l}ContinueLoop
+    }
+
+
+    lda.b   _x1
+    cmp.b   _xPos
+    bmi     NegativeSlope
+        _ProcessSx(1)
+
+    NegativeSlope:
+    a16()
+        _ProcessSx(-1)
+
+    EndLoop:
+a16()
+    ldy.b   _lastScanline
+    cpy.b   _height
+    bcs     ClipX1
+        lda.b   _xPos
+        bra     ClipA
+
+    ClipX1:
+        lda.b   _x1
+
+    ClipA:
+        bpl     +
+            lda.w   #0
+            bra     ++
+        +
+            cmp.w   #256
+            bcc     +
+                lda.w   #255
+        +
+
+    sep     #$20
+a8()
     sta.w   0,x
     inx
     inx
