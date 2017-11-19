@@ -31,7 +31,7 @@ NotVisible:
 // LIMITS: topLeft <= topRight
 //         bottomLeft <= bottomRight
 //         height >= 1
-//         yPos > -256
+//         height < 256
 a16()
 i16()
 code()

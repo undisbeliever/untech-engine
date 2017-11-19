@@ -78,6 +78,7 @@ constant LAST_DP_TMP = dpTmp10
 // LIMITS: abs(x0 - x1) < 0x8000
 //         abs(x0 - x1) * skip < 0x10000
 //         height > 0
+//         height < 256
 //         skip < 256
 //         nScanlines > 0
 //         nScanlines + skip <= height
@@ -108,6 +109,16 @@ constant bufferSecondCount = _bufferSecondCount
     //  if skip > 0:
     //      lastScanline += skip
     //      err += dx2 * skip
+    //
+    //  if err >= dy2:
+    //    err = err % dy2
+    //    div = err / dy2
+    //
+    //    if xPos < x1:
+    //        xPos += div
+    //    else:
+    //        xPos -= div
+
 
     sta.b   _lastScanline
 
@@ -169,6 +180,48 @@ constant bufferSecondCount = _bufferSecondCount
     +
 
 
+    lda.b   _err
+    cmp.b   _dy2
+    bcc     SkipDy2Division
+        // since dy2 is equal to `height * 2` and height < 256
+        // we can optimize the code into a single 16 by 8 bit division
+        //
+        //      c = A & 1
+        //      err = ((A / 2) % height) * 2 + c
+        //      div = (A / 2) / height
+
+        lsr                 // MUST NOT edit carry until rol
+        sta.l   WRDIV
+
+        sep     #$20
+    a8()
+        lda.b   _height
+        sta.l   WRDIVB      // Wait 16 cycles
+        nop                 // 2
+        nop                 // 2
+        nop                 // 2
+        ldy.b   _xPos       // 4
+
+        rep     #$30        // 3
+    a16()
+        lda.l   RDMPY       // 3
+        rol                 // A * 2 + c
+        sta.b   _err
+
+        tya
+        cmp.b   _x1
+        bpl     +
+            clc
+            adc.l   RDDIV
+            bra     ++
+        +
+            sec
+            sbc.l   RDDIV
+        +
+        sta.b   _xPos
+    SkipDy2Division:
+
+
     //  if buffer < bufferSecondCount and bufferSecondCount < bufferLast:
     //      bufferTest = bufferSecondCount
     //  else:
@@ -179,8 +232,6 @@ constant bufferSecondCount = _bufferSecondCount
     //  if dx == 0:
     //      h = 0xffff
     //      goto SetXPos
-    //
-    //  if err >= dy2: goto ShiftXpos
     //
     //  while True:
     //      h = 0
@@ -206,7 +257,6 @@ constant bufferSecondCount = _bufferSecondCount
     //          h--
     //      until h == 0
     //
-    //    ShiftXPos:
     //      repeat:
     //          xPos += sx
     //          err -= dy2
@@ -241,8 +291,6 @@ constant bufferSecondCount = _bufferSecondCount
         +
 
         lda.b   _err
-        cmp.b   _dy2
-        bcs     {l}ShiftXpos
 
         {l}Loop:
             // A = err
@@ -291,7 +339,6 @@ constant bufferSecondCount = _bufferSecondCount
 
             lda.b   _err
 
-        {l}ShiftXpos:
             // A = err
             ldy.b   _xPos
             sec

@@ -238,13 +238,18 @@ macro UpdateVariables() {
 
     ldx.b   cursor
 
+    // height must be between 1 and 255
     lda.b   height
     bmi     +
     bne     ++
     +
         lda.w   #1
-        sta.b   height
     +
+    cmp.w   #256
+    bcc     +
+        lda.w   #255
+    +
+    sta.b   height
 
     inline _LimitX(left, right) {
         lda.b   {left}
