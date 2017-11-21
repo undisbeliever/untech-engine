@@ -264,6 +264,95 @@ a16()
 }
 
 
+// Calculates the X position within a line for a given yPos
+//
+// REQUIRES: 16 bit A, 16 bit Index, DB = 0x7e, DP = 0
+//
+// INPUT: DrawLine.x0 - top x coordinate of the line
+//        DrawLine.x1 - bottom x coordinate of the line
+//        DrawLine.height - height of the line
+//        Y = y pos within the line to calculate the xPos for
+//
+// KEEP: This routine does not modify the line coordinates
+//
+// LIMITS: height > 0
+//         height < 256
+//         Y < 256
+//
+// OUTPUT: A - x coordinate within the line at Y
+a16()
+i16()
+code()
+function CalcLineXpos {
+    //  dx2 = abs(x1 - x0) * 2
+    //
+    //  err = dx2
+    //  if err < height:
+    //      err = height
+    //
+    //  err += dx2 * skip
+    //  div = err / 2 / height
+    //
+    //  if xPos < x1:
+    //      return xPos + div
+    //  else:
+    //      return xPos - div
+
+    lda.b   _x1
+    sec
+    sbc.b   _xPos
+    bpl     +
+        eor.w   #0xffff
+        inc
+    +
+    asl
+    tax
+
+    // err MUST MATCH DrawLine
+    // A = _dx2
+    cmp.b   _height
+    bcs     +
+        lda.b   _height
+    +
+    sta.b   _err
+
+
+    sep     #$20
+a8()
+    tya
+    txy
+    jsr     Math.Multiply.u16y_u8a_u16y
+
+    rep     #$20
+a16()
+    tya
+    clc
+    adc.b   _err
+
+    lsr
+    sta.l   WRDIV
+
+    sep     #$20
+a8()
+    lda.b   _height
+    sta.l   WRDIVB      // Wait 16 cycles
+
+    rep     #$30        // 3
+a16()
+    lda.b   _xPos       // 4
+    cmp.b   _x1         // 4
+    bpl     +           // 2
+        clc             // 2
+        adc.l   RDDIV   // 1
+        rts
+
+    +
+        sec
+        sbc.l   RDDIV
+        rts
+}
+
+
 
 // Draws a single line to a single side of the HDMA window buffer.
 //
@@ -373,6 +462,8 @@ constant height = _height
     asl
     sta.b   _dx2
 
+    // err MUST MATCH CalcLineXpos
+    // A = _dx2
     cmp.b   _height
     bcs     +
         lda.b   _height
