@@ -5,7 +5,7 @@
 //
 // This code is based on Bresenham's line drawing algorithm
 //
-// NOTE: This code uses dpTmp10 to dpTmp19 to store state. Ensure that all
+// NOTE: This code uses dpTmp7 to dpTmp19 to store state. Ensure that all
 // calling code does not use these variables.
 //
 // This file is part of the UnTech Game Engine.
@@ -16,41 +16,253 @@
 namespace Hdma {
 namespace _WindowLine {
 
-// current x coordinate of the line
-// (sint16 - dp)
-constant _xPos = dpTmp19
-
-// final x coordinate of the line
-// (sint16 - dp)
-constant _x1 = dpTmp18
-
-// Height of the line
-// (uint16 - dp)
-constant _height = dpTmp17
-
-// Parameters for Bresenham's line drawing algorithm
-// (3 x uint16 - dp)
-constant _dx2 = dpTmp16
-constant _dy2 = dpTmp15
-constant _err = dpTmp14
-
-// The last scanline that is drawn
-// (uint16 - dp)
-constant _lastScanline = dpTmp13
-
-// Address in the buffer of the last scanline of the current line
+// Current HDMA buffer
 // (word ptr - dp)
-constant _bufferLast = dpTmp12
+constant _hdmaBuffer = dpTmp19
 
 // Address of the second HDMA count byte in the buffer
 // (word ptr - dp)
-constant _bufferSecondCount = dpTmp11
+constant _bufferSecondCount = dpTmp18
+
+// Number of lines from the top of the window to skip (offscreen)
+// (uint16 - dp)
+constant skip = dpTmp17
+
+// Number of visible lines in the window
+// This value is always <= 244.
+// (uint16 - dp)
+constant nLines = dpTmp16
+
+
+
+// current x coordinate of the line
+// (sint16 - dp)
+constant _xPos = dpTmp15
+
+// final x coordinate of the line
+// (sint16 - dp)
+constant _x1 = dpTmp14
+
+// Height of the line or window
+// (uint16 - dp)
+constant _height = dpTmp13
+
+// Parameters for Bresenham's line drawing algorithm
+// (3 x uint16 - dp)
+constant _dx2 = dpTmp12
+constant _dy2 = dpTmp11
+constant _err = dpTmp10
+
+// The last scanline of the current DrawLine call
+// (uint16 - dp)
+constant _lastScanline = dpTmp9
+
+// Address in the buffer of the last scanline of the current line
+// (word ptr - dp)
+constant _bufferLast = dpTmp8
 
 // Address of the next break in the line drawing loop
 // (word ptr - dp)
-constant _bufferTest = dpTmp10
+constant _bufferTest = dpTmp7
 
-constant LAST_DP_TMP = dpTmp10
+constant LAST_DP_TMP = dpTmp7
+
+
+
+// Setup and initialize a continuous HDMA window buffer.
+//
+// NOTE: This routine does not terminate the buffer, you must call
+//       `FinalizeBuffer` even if there is nothing on screen.
+//
+// REQUIRES: 16 bit A, 16 bit Index, DB = 0x7e, DP = 0
+//
+// INPUT: SetupWindowBuffer.height - height of the effect
+//        SetupWindowBuffer.yPos - topmost position of the window
+//
+// OUTPUT: carry set if window visible on screen
+//         X - buffer after count byte
+//         nLines - number of lines to draw
+//         skip - number of lines to skip when drawing the window
+//         DrawLine.height = height
+//
+// NOTE: SetupWindowBuffer.yPos is temporary and overridden in DrawLine
+a16()
+i16()
+code()
+function SetupWindowBuffer {
+assert(BUFFER_SIZE >= 256 * 2 + 3)
+
+constant height = _height
+constant yPos = _lastScanline   // reuse variable, not used in setup
+
+    //  hdmaBuffer = GetBuffer()
+    //  buffer = hdmaBuffer
+    //
+    //  bufferSecondCount = buffer + 127 * 2
+    //
+    //  if yPos < 0:
+    //      skip = -yPos
+    //      if skip > height: goto NotVisible
+    //  else:
+    //      skip = 0
+    //      if yPos > DISPLAY_HEIGHT: goto NotVisible
+    //
+    //      if yPos != 0:
+    //          if yPos > 0x7f
+    //              buffer[0] = yPos - 0x7f
+    //              buffer[1] = 0xff
+    //              buffer[2] = 0
+    //              buffer[3] = 0x7f
+    //              buffer[4] = 0xff
+    //              buffer[5] = 0
+    //              buffer += 6
+    //          buffer[0] = yPos
+    //          buffer[1] = 0xff
+    //          buffer[2] = 0
+    //          buffer += 3
+
+    sep     #$20
+a8()
+    jsr     GetBuffer
+    rep     #$20
+a16()
+    txy
+    stx.b   _hdmaBuffer
+
+    lda.b   yPos
+    bpl     TopLineInsideScreen
+        // Top line above screen
+        eor.w   #0xffff
+        inc
+
+        cmp.b   height
+        bcs     NotVisible
+
+        sta.b   skip
+        bra     End_TopVisibleIf
+
+
+    TopLineInsideScreen:
+        stz.b   skip
+        beq     End_TopVisibleIf
+
+        cmp.w   #Camera.DISPLAY_HEIGHT
+        bcs     NotVisible
+
+        cmp.w   #0x7f + 1
+        bcc     +
+            sec
+            sbc.w   #0x7f
+            sta.w   0,x
+            lda.w   #0xff
+            sta.w   1,x
+            inx
+            inx
+            inx
+
+            lda.w   #0x7f
+        +
+        sta.w   0,x
+        lda.w   #0xff
+        sta.w   1,x
+        inx
+        inx
+        inx
+    End_TopVisibleIf:
+
+
+    //  if height + yPos >= DISPLAY_HEIGHT:
+    //      nLines = DISPLAY_HEIGHT - yPos - skip
+    //  else:
+    //      nLines = height - skip
+
+    lda.b   height
+    clc
+    adc.b   yPos
+    cmp.w   #Camera.DISPLAY_HEIGHT
+    bcc     +
+        lda.w   #Camera.DISPLAY_HEIGHT
+        sec
+        sbc.b   yPos
+        bra     ++
+    +
+        lda.b   height
+    +
+    sec
+    sbc.b   skip
+    sta.b   nLines
+
+
+    // Setup HDMA count bytes
+
+    //  if (nLines) > 0x7f:
+    //      buffer[127 * 2 + 1] = nLines + 1
+    //      buffer[0] = 0x80 | 0x7f
+    //  else:
+    //      buffer[0] = 0x80 | nLines
+    //
+    //  buffer++
+
+    cmp.w   #0x7f + 1
+    bcc     +
+        inc
+        sta.w   127 * 2 + 1,x
+
+        lda.w   #0x7f
+    +
+    ora.w   #0x80
+    sta.w   0,x
+    inx
+
+    txa
+    clc
+    adc.w   #127 * 2
+    sta.b   _bufferSecondCount
+
+    sec
+    rts
+
+NotVisible:
+    clc
+    rts
+}
+
+
+// Finalize and enable the continuous HDMA window buffer
+//
+// REQUIRES: 16 bit A, 16 bit Index, DB = 0x7e, DP = 0
+//
+// INPUT: X = the end of the hdma buffer
+a16()
+i16()
+code()
+function FinalizeBuffer {
+    // Add terminator to HDMA buffer
+
+    lda.w   #0xff01
+    sta.w   0,x
+    stz.w   2,x
+
+    // Setup HDMA Channel
+
+    ldx.w   _hdmaBuffer
+    sep     #$20
+a8()
+    stx.w   ChannelSettings.tableAddr
+
+    assert(ChannelSettings.dmap + 1 == ChannelSettings.register)
+
+    ldx.w   #DMAP.direction.toPpu | DMAP.addressing.absolute | DMAP.transfer.two | (WH0 << 8)
+    stx.w   ChannelSettings.dmap
+
+    lda.b   #1
+    sta.w   ChannelSettings.enabled
+
+    rep     #$30
+a16()
+    rts
+}
+
 
 
 // Draws a single line to a single side of the HDMA window buffer.
@@ -61,13 +273,13 @@ constant LAST_DP_TMP = dpTmp10
 //
 // This routine will skip over the second HDMA count byte.
 //
+// ASSUMES: buffer is the one created by `SetupWindowBuffer` call
+//
 // REQUIRES: 16 bit A, 16 bit Index, DB = 0x7e, DP = 0
 //
 // INPUT: DrawLine.x0 - top x coordinate of the line
 //        DrawLine.x1 - bottom x coordinate of the line
 //        DrawLine.height - height of the line
-//        DrawLine.bufferSecondCount - address of the second HDMA count byte
-//                                     (`start of line buffer + 127 * 2`)
 //        Y - number of scanlines to skip
 //        A - number of scanlines to draw
 //        X - address of the HDMA buffer
@@ -75,7 +287,6 @@ constant LAST_DP_TMP = dpTmp10
 // OUTPUT: X - address of the HDMA buffer after final scanline
 //
 // KEEP: height is not modified by this routine
-//       bufferSecondCount is not modified by this routine
 //
 // LIMITS: abs(x0 - x1) < 0x8000
 //         abs(x0 - x1) * skip < 0x10000
@@ -92,7 +303,6 @@ function DrawLine {
 constant x0 = _xPos
 constant x1 = _x1
 constant height = _height
-constant bufferSecondCount = _bufferSecondCount
 
     //  xPos = x0
     //  x1 = x1
