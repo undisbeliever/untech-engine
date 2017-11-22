@@ -161,12 +161,15 @@ function Test {
         lda.w   #{val}
         sta.b   {name}
     }
-    SetVar(x0, 128 - 63)
-    SetVar(y0, 112 + 63)
-    SetVar(x1, 128 - 24)
-    SetVar(y1, 112 - 86)
-    SetVar(x2, 128 + 86)
-    SetVar(y2, 112 + 24)
+
+    // These value represent a former bug that occurred when the middle point
+    // is 0x7e pixels below the top point.
+    SetVar(x0, 0x22)
+    SetVar(y0, 0x9d)
+    SetVar(x1, 0x80)
+    SetVar(y1, 0x1f)
+    SetVar(x2, 0xdd)
+    SetVar(y2, 0xb6)
 
     SetVar(cursor, 0)
 

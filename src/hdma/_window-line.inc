@@ -607,8 +607,10 @@ function _DrawSteepLine {
     //  if lastScanline == height:
     //      xClipped = bound(x1, 0, 255)
     //
-    //  *buffer = xClipped
-    //  buffer += 2
+    //  repeat 2 times:
+    //      buffer++
+    //      if buffer == bufferSecondCount: buffer++
+    //
     //  return buffer
 
     inline _ProcessSx(sx) {
@@ -733,7 +735,15 @@ a8()
 
     sta.w   0,x
     inx
+    cpx.b   _bufferSecondCount
+    bne     +
+        inx
+    +
     inx
+    cpx.b   _bufferSecondCount
+    bne     +
+        inx
+    +
 
     rep     #$30
 a16()
@@ -780,7 +790,10 @@ function _DrawShallowLine {
     //  else:
     //      *buffer = bound(xPos, 0, 255)
     //
-    //  buffer += 2
+    //  repeat 2 times:
+    //      buffer++
+    //      if buffer == bufferSecondCount: buffer++
+    //
     //  return buffer
 
     inline _ProcessSx(sx) {
@@ -901,7 +914,15 @@ a16()
 a8()
     sta.w   0,x
     inx
+    cpx.b   _bufferSecondCount
+    bne     +
+        inx
+    +
     inx
+    cpx.b   _bufferSecondCount
+    bne     +
+        inx
+    +
 
     rep     #$30
 a16()
