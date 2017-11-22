@@ -23,6 +23,10 @@ namespace Hdma {
 //          (in dpTmp, will be modified by this routine)
 //
 // LIMITS: triangle height < 256
+//
+// NOTE: If the triangle is too large then an overflow that corrupts the
+//       window can occur. An overflow cannot occur if the triangle
+//       width and height is < 256.
 a16()
 i16()
 code()

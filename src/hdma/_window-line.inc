@@ -278,20 +278,22 @@ a16()
 // LIMITS: height > 0
 //         height < 256
 //         Y < 256
+//         abs(x0 - x1) * (Y + 1) + height / 2 < 0x10000
 //
 // OUTPUT: A - x coordinate within the line at Y
 a16()
 i16()
 code()
 function CalcLineXpos {
-    //  dx2 = abs(x1 - x0) * 2
+    //  dx = abs(x1 - x0)
     //
-    //  err = dx2
+    //  err = dx * 2
     //  if err < height:
     //      err = height
     //
-    //  err += dx2 * skip
-    //  div = err / 2 / height
+    //  err /= 2
+    //  err += dx * skip
+    //  div = err / height
     //
     //  if xPos < x1:
     //      return xPos + div
@@ -305,15 +307,20 @@ function CalcLineXpos {
         eor.w   #0xffff
         inc
     +
-    asl
     tax
 
-    // err MUST MATCH DrawLine
-    // A = _dx2
+    asl
+    // this MUST MATCH DrawLine
+    // A = dx * 2
     cmp.b   _height
     bcs     +
         lda.b   _height
     +
+
+
+    // Have to do the /2 here to minimize the risk of an unsigned
+    // overflow in the multiplication
+    lsr
     sta.b   _err
 
 
@@ -329,7 +336,6 @@ a16()
     clc
     adc.b   _err
 
-    lsr
     sta.l   WRDIV
 
     sep     #$20
