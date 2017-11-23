@@ -16,6 +16,7 @@ include "memmap.inc"
 include "resources.inc"
 
 include "../gen/tables/entityhitbox-collisionorder.inc"
+include "../gen/tables/sine-table.inc"
 
 include "../../src/untech.inc"
 
