@@ -69,6 +69,7 @@ include "interactive/entity-actionpointspawner.inc"
 include "interactive/entityhitbox-collisions.inc"
 include "interactive/hdma-circular-window.inc"
 include "interactive/hdma-horizontal-trapezium-window.inc"
+include "interactive/hdma-rotated-triangular-window.inc"
 include "interactive/hdma-triangular-window.inc"
 include "interactive/errors.inc"
 

@@ -258,6 +258,121 @@ NotVisible:
     jmp     _WindowLine.FinalizeBuffer
 }
 
+
+
+// Builds and enables the HdmaTable for a screen window containing a
+// equilateral triangle rotated by a given angle.
+//
+// REQUIRES: 16 bit A, 16 bit Index, DB = 0x7e, DP = 0
+// REQUIRES: all dpTmp variables unused
+// REQUIRES: not in Mode 7
+//
+// INPUT: xPos, yPos - location of the centre of the triangle
+//        A - triangle angle (256 = 1 revolution)
+//        Y - triangle diameter
+//
+// LIMITS: Y < 256
+//
+// NOTE: xPos/yPos are overwritten by this routine
+a16()
+i16()
+code()
+function RotatedTriangularWindow {
+
+constant xPos = TriangularWindow.x0
+constant yPos = TriangularWindow.y0
+
+constant _angle = TriangularWindow._tmp
+allocateTmpWord(_pos)
+
+constant DEG_90  = SineTable.size / 4
+constant DEG_120 = SineTable.size / 3
+
+    sta.b   _angle
+
+    // DP access registers
+    lda.w   #$2100
+    tcd
+
+    sep     #$30
+a8()
+i8()
+    sty.b   M7A
+    stz.b   M7A
+
+    rep     #$30
+a16()
+i16()
+
+    // Calculate triangle coordinates
+
+    lda.w   xPos
+    sta.w   _pos
+
+    lda.w   #DEG_90
+    jsr     _CalcPos
+    sta.w   TriangularWindow.x0
+
+    lda.w   #DEG_120 + DEG_90
+    jsr     _CalcPos
+    sta.w   TriangularWindow.x1
+
+    lda.w   #DEG_120 * 2 + DEG_90
+    jsr     _CalcPos
+    sta.w   TriangularWindow.x2
+
+
+    lda.w   yPos
+    sta.w   _pos
+
+    lda.w   #0
+    jsr     _CalcPos
+    sta.w   TriangularWindow.y0
+
+    lda.w   #DEG_120
+    jsr     _CalcPos
+    sta.w   TriangularWindow.y1
+
+    lda.w   #DEG_120 * 2
+    jsr     _CalcPos
+    sta.w   TriangularWindow.y2
+
+
+    // restore DP
+    lda.w   #0
+    tcd
+
+    jmp     TriangularWindow
+
+
+// INPUT:   A = angle offset
+//     _angle = angle
+//       _pos = position
+//        M7A = diameter
+// OUTPUT: sin(A + angle) * diameter + position
+// DP access registers
+a16()
+i16()
+_CalcPos:
+    assert(SineTable.size == 256)
+
+    sep     #$20
+a8()
+    clc
+    adc.w   _angle
+    tax
+
+    lda.l   SineTable,x
+    sta.b   M7B
+
+    rep     #$31
+a16()
+    // c clear
+    lda.b   MPYM
+    adc.w   _pos
+    rts
+}
+
 }
 
 // vim: ft=bass-65816 ts=4 sw=4 et:
