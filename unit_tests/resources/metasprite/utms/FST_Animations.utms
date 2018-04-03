@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="UTF_8"?>
 <!DOCTYPE untech>
-<metasprite id="FST_Animations" tilesettype="TWO_TILES_FIXED">
-  <exportorder src="../formats/AnimationTest.utfseo"/>
+<metasprite id="FST_Animations" tilesettype="TWO_TILES_FIXED" exportorder="AnimationTest">
   <smalltileset>
     GAA8AGYAwwDDAGYAPAAYAAAAAAAAAAAAAAAAAAAAAAA=
   </smalltileset>

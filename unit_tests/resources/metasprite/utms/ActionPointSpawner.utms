@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="UTF_8"?>
 <!DOCTYPE untech>
-<metasprite id="ActionPointSpawner" tilesettype="ONE_TILE_FIXED">
-  <exportorder src="../formats/OneFrame.utfseo"/>
+<metasprite id="ActionPointSpawner" tilesettype="ONE_TILE_FIXED" exportorder="OneFrame">
   <largetileset>
     AAAAAAAAAAADAAQDCAcIBwAAAAAAAAAAAAAAAAAAAAADAAYBBAMEAwQDhANEgyTD
     AAAAAAAAAAAAAAAAAAAAAAQDAgEBAAAAAAB/AIB/gH8AAAAAAAAAAAAAAAAAAAAA

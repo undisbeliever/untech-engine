@@ -1,8 +1,7 @@
 <?xml version="1.0" encoding="UTF_8"?>
 <!DOCTYPE untech>
-<spriteimporter id="SpikedWalker" tilesettype="ONE_ROW_FIXED" image="SpikedWalker.png" transparent="d34dfd">
+<spriteimporter id="SpikedWalker" tilesettype="ONE_ROW_FIXED" exportorder="Walker" image="SpikedWalker.png" transparent="d34dfd">
   <grid width="16" height="16" xoffset="0" yoffset="0" xpadding="0" ypadding="0" xorigin="6" yorigin="12"/>
-  <exportorder src="../formats/Walker.utfseo"/>
   <palette npalettes="3" colorsize="4"/>
   <frame id="Fall_Left" order="2">
     <gridlocation x="6" y="0"/>

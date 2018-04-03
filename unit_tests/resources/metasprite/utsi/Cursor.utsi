@@ -1,8 +1,7 @@
 <?xml version="1.0" encoding="UTF_8"?>
 <!DOCTYPE untech>
-<spriteimporter id="Cursor" tilesettype="ONE_TILE_FIXED" image="Cursor.png" transparent="ffff00">
+<spriteimporter id="Cursor" tilesettype="ONE_TILE_FIXED" exportorder="OneFrame" image="Cursor.png" transparent="ffff00">
   <grid width="16" height="16" xoffset="0" yoffset="0" xpadding="0" ypadding="0" xorigin="4" yorigin="4"/>
-  <exportorder src="../formats/OneFrame.utfseo"/>
   <frame id="frame" order="3">
     <gridlocation x="0" y="0"/>
     <object size="large" x="0" y="0"/>

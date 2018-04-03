@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="UTF_8"?>
 <!DOCTYPE untech>
-<metasprite id="FST_OneTile" tilesettype="ONE_TILE">
-  <exportorder src="../formats/OneSmallAndLarge.utfseo"/>
+<metasprite id="FST_OneTile" tilesettype="ONE_TILE" exportorder="OneSmallAndLarge">
   <smalltileset>
     GAA8AGYAwwDDAGYAPAAYAAAAAAAAAAAAAAAAAAAAAAA=
   </smalltileset>

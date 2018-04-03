@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="UTF_8"?>
 <!DOCTYPE untech>
-<metasprite id="FST_TwoTiles" tilesettype="TWO_TILES">
-  <exportorder src="../formats/TwoFrames.utfseo"/>
+<metasprite id="FST_TwoTiles" tilesettype="TWO_TILES" exportorder="TwoFrames">
   <smalltileset>
     AAADAAMAAwADAAcADwAPAAAAAAAAAAAAAAAAAAAAAAAAAOAA8AC8QPwA8ACwQMAw
     AAAAAAAAAAAAAAAAAAAAAA==

@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="UTF_8"?>
 <!DOCTYPE untech>
-<metasprite id="FST_TwoRowsFixed2" tilesettype="TWO_ROWS_FIXED">
-  <exportorder src="../formats/OneFrame.utfseo"/>
+<metasprite id="FST_TwoRowsFixed2" tilesettype="TWO_ROWS_FIXED" exportorder="OneFrame">
   <largetileset>
     AAAAAB8AEAAQABAAHgAQAAAAAAAAAAAAAAAAAAAAAAAAAAAAPABCAEAAQABAADwA
     AAAAAAAAAAAAAAAAAAAAABAAEAAQABAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA

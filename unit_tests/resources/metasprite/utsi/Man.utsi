@@ -1,8 +1,7 @@
 <?xml version="1.0" encoding="UTF_8"?>
 <!DOCTYPE untech>
-<spriteimporter id="Man" tilesettype="TWO_ROWS_FIXED" image="Man.png" transparent="ed63ff">
+<spriteimporter id="Man" tilesettype="TWO_ROWS_FIXED" exportorder="Human" image="Man.png" transparent="ed63ff">
   <grid width="16" height="32" xoffset="0" yoffset="0" xpadding="0" ypadding="0" xorigin="8" yorigin="16"/>
-  <exportorder src="../formats/Human.utfseo"/>
   <palette npalettes="3" colorsize="4"/>
   <frame id="Blink_Right" order="2">
     <gridlocation x="1" y="0"/>

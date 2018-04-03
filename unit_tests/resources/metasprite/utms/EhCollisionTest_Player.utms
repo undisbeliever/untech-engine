@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="UTF_8"?>
 <!DOCTYPE untech>
-<metasprite id="EhCollisionTest_Player" tilesettype="TWO_TILES_FIXED">
-  <exportorder src="../formats/EhCollisionTest_Player.utfseo"/>
+<metasprite id="EhCollisionTest_Player" tilesettype="TWO_TILES_FIXED" exportorder="EhCollisionTest_Player">
   <smalltileset>
     AAB+fn5+fn5+fn5+fn4AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
     AAB+AH4AfgB+AH4AfgAAAAAAfgB+AH4AfgB+AH4AAAAAAH4AfgB+AH4AfgB+AAAA

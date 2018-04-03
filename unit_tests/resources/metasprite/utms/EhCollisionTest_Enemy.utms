@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="UTF_8"?>
 <!DOCTYPE untech>
-<metasprite id="EhCollisionTest_Enemy" tilesettype="ONE_ROW_FIXED">
-  <exportorder src="../formats/EhCollisionTest_Enemy.utfseo"/>
+<metasprite id="EhCollisionTest_Enemy" tilesettype="ONE_ROW_FIXED" exportorder="EhCollisionTest_Enemy">
   <largetileset>
     AAAAAAAAfwB/P34/fT99PwAAAAAAAAAAAAAAAAAAAAAAAAAAAAD+AP78fvy+/L78
     AAAAAAAAAAAAAAAAAAAAAHw/fT99P38/fwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA

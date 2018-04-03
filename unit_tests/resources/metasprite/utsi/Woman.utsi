@@ -1,8 +1,7 @@
 <?xml version="1.0" encoding="UTF_8"?>
 <!DOCTYPE untech>
-<spriteimporter id="Woman" tilesettype="ONE_ROW" image="Woman.png" transparent="feb3b2">
+<spriteimporter id="Woman" tilesettype="ONE_ROW" exportorder="Human" image="Woman.png" transparent="feb3b2">
   <grid width="24" height="32" xoffset="0" yoffset="0" xpadding="0" ypadding="0" xorigin="12" yorigin="14"/>
-  <exportorder src="../formats/Human.utfseo"/>
   <frame id="Fall_Right" order="2">
     <gridlocation x="4" y="0"/>
     <tilehitbox x="5" y="2" width="14" height="29"/>

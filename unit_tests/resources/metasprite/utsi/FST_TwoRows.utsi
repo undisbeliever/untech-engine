@@ -1,8 +1,7 @@
 <?xml version="1.0" encoding="UTF_8"?>
 <!DOCTYPE untech>
-<spriteimporter id="FST_TwoRows" tilesettype="TWO_ROWS" image="FST_TwoRows.png" transparent="00b800">
+<spriteimporter id="FST_TwoRows" tilesettype="TWO_ROWS" exportorder="TwoFrames" image="FST_TwoRows.png" transparent="00b800">
   <grid width="128" height="32" xoffset="0" yoffset="0" xpadding="0" ypadding="0" xorigin="64" yorigin="0"/>
-  <exportorder src="../formats/TwoFrames.utfseo"/>
   <frame id="frame1" order="2">
     <gridlocation x="0" y="0"/>
     <object size="large" x="0" y="0"/>
