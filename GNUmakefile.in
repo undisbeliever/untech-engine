@@ -1,0 +1,72 @@
+
+.DELETE_ON_ERROR:
+.SUFFIXES:
+
+rwildcard_all = $(foreach d,$(wildcard $(addsuffix /*,$(1))),$d $(call rwildcard_all, $d))
+
+
+GEN_DIR        ?= gen
+
+TABLE_DIRS     += $(UNTECH_DIR)/tables
+TABLE_INCS     := $(foreach d,$(TABLE_DIRS),$(patsubst $d/%.py,$(GEN_DIR)/tables/%.inc,$(wildcard $d/*.py)))
+
+
+RESOURCES      += $(GEN_DIR)/metasprites.inc
+RESOURCES      += $(GEN_DIR)/resources.inc $(GEN_DIR)/resources.bin
+
+
+
+.PHONY: all
+all: directories $(BINARY)
+
+
+$(BINARY): $(call rwildcard_all, $(SRC_DIRS) $(UNTECH_DIR)/src)
+$(BINARY): $(TABLE_INCS)
+$(BINARY): $(RESOURCES)
+
+$(BINARY) $(BINARY:.sfc=.sym): $(MAIN)
+	bass-untech -strict -o $(BINARY) -sym $(BINARY:.sfc=.sym) $(MAIN)
+	untech-write-sfc-checksum --hirom $(BINARY)
+
+
+.PHONY: memory-usage
+memory-usage: directories $(BINARY)
+	bass-untech -d SHOW_MEMORY_USAGE -strict $(MAIN)
+
+
+.PHONY: tables
+tables: $(TABLE_INCS)
+
+define TABLE_template =
+  $(GEN_DIR)/tables/%.inc: $(1)/%.py
+	python3 $$< >| $$@
+endef
+$(foreach d, $(TABLE_DIRS), $(eval $(call TABLE_template, $d)))
+
+
+
+$(GEN_DIR)/metasprites.inc: $(call rwildcard_all, $(dir $(METASPRITE_PRO)))
+$(GEN_DIR)/metasprites.inc: $(METASPRITE_PRO)
+	untech-msc -o "$(GEN_DIR)/metasprites.inc" "$(METASPRITE_PRO)"
+
+
+$(GEN_DIR)/resources.inc: $(call rwildcard_all, $(dir $(RESOURCES_PRO)))
+$(GEN_DIR)/resources.inc $(GEN_DIR)/resources.bin: $(RESOURCES_PRO)
+	untech-resc --output-inc "$(GEN_DIR)/resources.inc" --output-bin "$(GEN_DIR)/resources.bin" "$(RESOURCES_PRO)"
+
+
+
+.PHONY: directories
+DIRS := $(sort $(dir $(BINARY) $(RESOURCES) $(TABLE_INCS)))
+directories: $(DIRS)
+$(DIRS):
+	mkdir -p $@
+
+
+
+.PHONY: clean
+clean:
+	$(RM) $(BINARY) $(BINARY:.sfc=.sym)
+	$(RM) $(sort $(TABLE_INCS))
+	$(RM) $(sort $(RESOURCES))
+
