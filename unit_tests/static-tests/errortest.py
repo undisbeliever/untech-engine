@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 
+import argparse
 import os
 import re
 import subprocess
@@ -17,9 +18,9 @@ def searchErrorLine(filename):
     raise Exception(filename + ": Error token `// ERROR` not found")
 
 
-def doTest(filename):
+def doTest(bass_executable, filename):
     process = subprocess.Popen(
-        ("bass-untech", "-strict", "-o", os.devnull, filename),
+        (bass_executable, "-strict", "-o", os.devnull, filename),
         stdout=subprocess.PIPE,
         stderr=subprocess.PIPE)
     pout, perr = process.communicate()
@@ -46,6 +47,19 @@ def doTest(filename):
         raise Exception(filename + ": did not error out on marked line")
 
 
+
+def main():
+    parser = argparse.ArgumentParser()
+    parser.add_argument('-b', '--bass', required=True,
+                        help='bass executable')
+    parser.add_argument('tests', nargs='+',
+                        help='File to test')
+
+    args = parser.parse_args()
+
+    for test in args.tests:
+        doTest(args.bass, test)
+
+
 if __name__ == "__main__":
-    for arg in sys.argv[1:]:
-        doTest(arg)
+    main();

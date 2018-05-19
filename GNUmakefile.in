@@ -15,6 +15,19 @@ RESOURCES      += $(GEN_DIR)/metasprites.inc
 RESOURCES      += $(GEN_DIR)/resources.inc $(GEN_DIR)/resources.bin
 
 
+UTEDITOR_DIR   := $(UNTECH_DIR)/tools/untech-editor
+BASS_DIR       := $(UNTECH_DIR)/tools/bass-untech
+
+bass			  := $(BASS_DIR)/bass/out/bass-untech
+untech-lz4c               := $(UTEDITOR_DIR)/bin/untech-lz4c
+untech-msc                := $(UTEDITOR_DIR)/bin/untech-msc
+untech-png2snes           := $(UTEDITOR_DIR)/bin/untech-png2snes
+untech-png2tileset        := $(UTEDITOR_DIR)/bin/untech-png2tileset
+untech-resc               := $(UTEDITOR_DIR)/bin/untech-resc
+untech-utsi2utms          := $(UTEDITOR_DIR)/bin/untech-utsi2utms
+untech-write-sfc-checksum := $(UTEDITOR_DIR)/bin/untech-write-sfc-checksum
+
+
 
 .PHONY: all
 all: directories $(BINARY)
@@ -24,14 +37,14 @@ $(BINARY): $(call rwildcard_all, $(SRC_DIRS) $(UNTECH_DIR)/src)
 $(BINARY): $(TABLE_INCS)
 $(BINARY): $(RESOURCES)
 
-$(BINARY) $(BINARY:.sfc=.sym): $(MAIN)
-	bass-untech -strict -o $(BINARY) -sym $(BINARY:.sfc=.sym) $(MAIN)
-	untech-write-sfc-checksum --hirom $(BINARY)
+$(BINARY) $(BINARY:.sfc=.sym): bass $(MAIN)
+	$(bass) -strict -o $(BINARY) -sym $(BINARY:.sfc=.sym) $(MAIN)
+	$(untech-write-sfc-checksum) --hirom $(BINARY)
 
 
 .PHONY: memory-usage
-memory-usage: directories $(BINARY)
-	bass-untech -d SHOW_MEMORY_USAGE -strict $(MAIN)
+memory-usage: directories bass $(BINARY)
+	$(bass) -d SHOW_MEMORY_USAGE -strict $(MAIN)
 
 
 .PHONY: tables
@@ -47,12 +60,37 @@ $(foreach d, $(TABLE_DIRS), $(eval $(call TABLE_template, $d)))
 
 $(GEN_DIR)/metasprites.inc: $(call rwildcard_all, $(dir $(METASPRITE_PRO)))
 $(GEN_DIR)/metasprites.inc: $(METASPRITE_PRO)
-	untech-msc -o "$(GEN_DIR)/metasprites.inc" "$(METASPRITE_PRO)"
+	$(untech-msc) -o "$(GEN_DIR)/metasprites.inc" "$(METASPRITE_PRO)"
 
 
 $(GEN_DIR)/resources.inc: $(call rwildcard_all, $(dir $(RESOURCES_PRO)))
 $(GEN_DIR)/resources.inc $(GEN_DIR)/resources.bin: $(RESOURCES_PRO)
-	untech-resc --output-inc "$(GEN_DIR)/resources.inc" --output-bin "$(GEN_DIR)/resources.bin" "$(RESOURCES_PRO)"
+	$(untech-resc) --output-inc "$(GEN_DIR)/resources.inc" --output-bin "$(GEN_DIR)/resources.bin" "$(RESOURCES_PRO)"
+
+
+
+.INTERMEDIATE: bass
+bass: $(call rwildcard_all $(BASS_DIR))
+	$(MAKE) -C "$(BASS_DIR)/bass"
+
+$(bass): bass
+
+
+
+$(RESOURCES): untech-editor
+
+.INTERMEDIATE: untech-editor
+
+untech-editor: $(call rwildcard_all, $(UTEDITOR_DIR)/src/)
+	$(MAKE) -C "$(UTEDITOR_DIR)" cli
+
+$(untech-lz4c): untech-editor
+$(untech-msc): untech-editor
+$(untech-png2snes): untech-editor
+$(untech-png2tileset): untech-editor
+$(untech-resc): untech-editor
+$(untech-utsi2utms): untech-editor
+$(untech-write-sfc-checksum): untech-editor
 
 
 
@@ -69,4 +107,12 @@ clean:
 	$(RM) $(BINARY) $(BINARY:.sfc=.sym)
 	$(RM) $(sort $(TABLE_INCS))
 	$(RM) $(sort $(RESOURCES))
+
+.PHONY: clean-tools
+clean-tools:
+	$(MAKE) -C "$(BASS_DIR)/bass" clean
+	$(MAKE) -C "$(UTEDITOR_DIR)" clean
+
+.PHONY: clean-all
+clean-all: clean clean-tools
 
