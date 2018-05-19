@@ -1,0 +1,6 @@
+[submodule "tools/bass-untech"]
+	path = tools/bass-untech
+	url = ../bass-untech.git
+[submodule "tools/untech-editor"]
+	path = tools/untech-editor
+	url = ../untech-editor.git
