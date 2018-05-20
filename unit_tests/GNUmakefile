@@ -29,7 +29,11 @@ static-tests/%.success.asm: FORCE_TEST
 	$(bass) -strict $@
 
 static-tests/%.error.asm: FORCE_TEST
+  ifeq ($(VANILLA_BASS), n)
 	python3 static-tests/errortest.py -b $(bass) $@
+  else
+	$(warning "Cannot test '$@' in vanilla bass: Skipped")
+  endif
 
 FORCE_TEST:
 

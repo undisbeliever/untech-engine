@@ -15,11 +15,15 @@ RESOURCES      += $(GEN_DIR)/metasprites.inc
 RESOURCES      += $(GEN_DIR)/resources.inc $(GEN_DIR)/resources.bin
 
 
+# If VANILLA_BASS is not 'n' then the Makefile will use vanilla bass instead of bass-untech
+VANILLA_BASS   ?= n
 # If LOCAL_TOOLS is not 'n' then the Makefile will use the tools installed in the user's $PATH
 LOCAL_TOOLS    ?= n
 
 
-ifneq ($(LOCAL_TOOLS), n)
+ifneq ($(VANILLA_BASS), n)
+  bass         ?= bass
+else ifneq ($(LOCAL_TOOLS), n)
   bass         := bass-untech
 endif
 
@@ -60,7 +64,11 @@ $(BINARY): $(TABLE_INCS)
 $(BINARY): $(RESOURCES)
 
 $(BINARY) $(BINARY:.sfc=.sym): $(MAIN)
+  ifeq ($(VANILLA_BASS), n)
 	$(bass) -strict -o $(BINARY) -sym $(BINARY:.sfc=.sym) $(MAIN)
+  else
+	$(bass) -strict -o $(BINARY) $(MAIN)
+  endif
 	$(untech-write-sfc-checksum) --hirom $(BINARY)
 
 
