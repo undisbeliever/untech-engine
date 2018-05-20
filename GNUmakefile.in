@@ -15,17 +15,39 @@ RESOURCES      += $(GEN_DIR)/metasprites.inc
 RESOURCES      += $(GEN_DIR)/resources.inc $(GEN_DIR)/resources.bin
 
 
-UTEDITOR_DIR   := $(UNTECH_DIR)/tools/untech-editor
-BASS_DIR       := $(UNTECH_DIR)/tools/bass-untech
+# If LOCAL_TOOLS is not 'n' then the Makefile will use the tools installed in the user's $PATH
+LOCAL_TOOLS    ?= n
 
-bass			  := $(BASS_DIR)/bass/out/bass-untech
-untech-lz4c               := $(UTEDITOR_DIR)/bin/untech-lz4c
-untech-msc                := $(UTEDITOR_DIR)/bin/untech-msc
-untech-png2snes           := $(UTEDITOR_DIR)/bin/untech-png2snes
-untech-png2tileset        := $(UTEDITOR_DIR)/bin/untech-png2tileset
-untech-resc               := $(UTEDITOR_DIR)/bin/untech-resc
-untech-utsi2utms          := $(UTEDITOR_DIR)/bin/untech-utsi2utms
-untech-write-sfc-checksum := $(UTEDITOR_DIR)/bin/untech-write-sfc-checksum
+
+ifneq ($(LOCAL_TOOLS), n)
+  bass         := bass-untech
+endif
+
+ifndef bass
+  BASS_DIR     := $(UNTECH_DIR)/tools/bass-untech
+  bass         := $(BASS_DIR)/bass/out/bass-untech
+endif
+
+
+ifeq ($(LOCAL_TOOLS), n)
+  UTEDITOR_DIR := $(UNTECH_DIR)/tools/untech-editor
+
+  untech-lz4c               := $(UTEDITOR_DIR)/bin/untech-lz4c
+  untech-msc                := $(UTEDITOR_DIR)/bin/untech-msc
+  untech-png2snes           := $(UTEDITOR_DIR)/bin/untech-png2snes
+  untech-png2tileset        := $(UTEDITOR_DIR)/bin/untech-png2tileset
+  untech-resc               := $(UTEDITOR_DIR)/bin/untech-resc
+  untech-utsi2utms          := $(UTEDITOR_DIR)/bin/untech-utsi2utms
+  untech-write-sfc-checksum := $(UTEDITOR_DIR)/bin/untech-write-sfc-checksum
+else
+  untech-lz4c               := untech-lz4c
+  untech-msc                := untech-msc
+  untech-png2snes           := untech-png2snes
+  untech-png2tileset        := untech-png2tileset
+  untech-resc               := untech-resc
+  untech-utsi2utms          := untech-utsi2utms
+  untech-write-sfc-checksum := untech-write-sfc-checksum
+endif
 
 
 
@@ -37,13 +59,13 @@ $(BINARY): $(call rwildcard_all, $(SRC_DIRS) $(UNTECH_DIR)/src)
 $(BINARY): $(TABLE_INCS)
 $(BINARY): $(RESOURCES)
 
-$(BINARY) $(BINARY:.sfc=.sym): bass $(MAIN)
+$(BINARY) $(BINARY:.sfc=.sym): $(MAIN)
 	$(bass) -strict -o $(BINARY) -sym $(BINARY:.sfc=.sym) $(MAIN)
 	$(untech-write-sfc-checksum) --hirom $(BINARY)
 
 
 .PHONY: memory-usage
-memory-usage: directories bass $(BINARY)
+memory-usage: directories $(BINARY)
 	$(bass) -d SHOW_MEMORY_USAGE -strict $(MAIN)
 
 
@@ -68,29 +90,33 @@ $(GEN_DIR)/resources.inc $(GEN_DIR)/resources.bin: $(RESOURCES_PRO)
 	$(untech-resc) --output-inc "$(GEN_DIR)/resources.inc" --output-bin "$(GEN_DIR)/resources.bin" "$(RESOURCES_PRO)"
 
 
+ifdef BASS_DIR
+  $(BINARY): bass
 
-.INTERMEDIATE: bass
-bass: $(call rwildcard_all $(BASS_DIR))
+  .INTERMEDIATE: bass
+  bass: $(call rwildcard_all $(BASS_DIR))
 	$(MAKE) -C "$(BASS_DIR)/bass"
 
-$(bass): bass
+  $(bass): bass
+endif
 
 
+ifdef UTEDITOR_DIR
+  $(RESOURCES): untech-editor
 
-$(RESOURCES): untech-editor
+  .INTERMEDIATE: untech-editor
 
-.INTERMEDIATE: untech-editor
-
-untech-editor: $(call rwildcard_all, $(UTEDITOR_DIR)/src/)
+  untech-editor: $(call rwildcard_all, $(UTEDITOR_DIR)/src/)
 	$(MAKE) -C "$(UTEDITOR_DIR)" cli
 
-$(untech-lz4c): untech-editor
-$(untech-msc): untech-editor
-$(untech-png2snes): untech-editor
-$(untech-png2tileset): untech-editor
-$(untech-resc): untech-editor
-$(untech-utsi2utms): untech-editor
-$(untech-write-sfc-checksum): untech-editor
+  $(untech-lz4c): untech-editor
+  $(untech-msc): untech-editor
+  $(untech-png2snes): untech-editor
+  $(untech-png2tileset): untech-editor
+  $(untech-resc): untech-editor
+  $(untech-utsi2utms): untech-editor
+  $(untech-write-sfc-checksum): untech-editor
+endif
 
 
 
@@ -102,17 +128,22 @@ $(DIRS):
 
 
 
+.PHONY: clean-all
+clean-all: clean
+
 .PHONY: clean
 clean:
 	$(RM) $(BINARY) $(BINARY:.sfc=.sym)
 	$(RM) $(sort $(TABLE_INCS))
 	$(RM) $(sort $(RESOURCES))
 
-.PHONY: clean-tools
-clean-tools:
+
+ifeq ($(LOCAL_TOOLS), n)
+  clean-all: clean-tools
+
+  .PHONY: clean-tools
+  clean-tools:
 	$(MAKE) -C "$(BASS_DIR)/bass" clean
 	$(MAKE) -C "$(UTEDITOR_DIR)" clean
-
-.PHONY: clean-all
-clean-all: clean clean-tools
+endif
 

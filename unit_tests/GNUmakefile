@@ -25,13 +25,19 @@ include ../GNUmakefile.in
 .PHONY: static-tests
 static-tests: $(STATIC_TESTS)
 
-static-tests/%.success.asm: bass FORCE
+static-tests/%.success.asm: FORCE_TEST
 	$(bass) -strict $@
 
-static-tests/%.error.asm: bass FORCE
+static-tests/%.error.asm: FORCE_TEST
 	python3 static-tests/errortest.py -b $(bass) $@
 
-FORCE:
+FORCE_TEST:
+
+ifdef BASS_DIR
+  FORCE_TEST: bass REALLY_FORCE_TEST
+
+  REALLY_FORCE_TEST:
+endif
 
 
 gen/font-fixed.1bpp: resources/text/font-fixed.png
