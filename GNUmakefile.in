@@ -36,6 +36,7 @@ endif
 ifeq ($(LOCAL_TOOLS), n)
   UTEDITOR_DIR := $(UNTECH_DIR)/tools/untech-editor
 
+  untech-editor-gui         := $(UTEDITOR_DIR)/bin/untech-editor-gui
   untech-lz4c               := $(UTEDITOR_DIR)/bin/untech-lz4c
   untech-msc                := $(UTEDITOR_DIR)/bin/untech-msc
   untech-png2snes           := $(UTEDITOR_DIR)/bin/untech-png2snes
@@ -44,6 +45,7 @@ ifeq ($(LOCAL_TOOLS), n)
   untech-utsi2utms          := $(UTEDITOR_DIR)/bin/untech-utsi2utms
   untech-write-sfc-checksum := $(UTEDITOR_DIR)/bin/untech-write-sfc-checksum
 else
+  untech-editor-gui         := untech-editor-gui
   untech-lz4c               := untech-lz4c
   untech-msc                := untech-msc
   untech-png2snes           := untech-png2snes
@@ -57,6 +59,9 @@ endif
 
 .PHONY: all
 all: directories $(BINARY)
+
+.PHONY: tools
+
 
 
 $(BINARY): $(call rwildcard_all, $(SRC_DIRS) $(UNTECH_DIR)/src)
@@ -75,6 +80,17 @@ $(BINARY) $(BINARY:.sfc=.sym): $(MAIN)
 .PHONY: memory-usage
 memory-usage: directories $(BINARY)
 	$(bass) -d SHOW_MEMORY_USAGE -strict $(MAIN)
+
+
+
+.PHONY: edit-metasprites
+edit-metasprites:
+	$(untech-editor-gui) $(METASPRITE_PRO)
+
+.PHONY: edit-resources
+edit-resources:
+	$(untech-editor-gui) $(RESOURCES_PRO)
+
 
 
 .PHONY: tables
@@ -99,6 +115,8 @@ $(GEN_DIR)/resources.inc $(GEN_DIR)/resources.bin: $(RESOURCES_PRO)
 
 
 ifdef BASS_DIR
+  tools: bass
+
   $(BINARY): bass
 
   .INTERMEDIATE: bass
@@ -110,6 +128,9 @@ endif
 
 
 ifdef UTEDITOR_DIR
+  tools: untech-editor untech-editor-gui
+
+
   $(RESOURCES): untech-editor
 
   .INTERMEDIATE: untech-editor
@@ -124,6 +145,16 @@ ifdef UTEDITOR_DIR
   $(untech-resc): untech-editor
   $(untech-utsi2utms): untech-editor
   $(untech-write-sfc-checksum): untech-editor
+
+  edit-metasprites: untech-editor-gui
+  edit-resources: untech-editor-gui
+
+  .INTERMEDIATE: untech-editor-gui
+
+  untech-editor-gui: $(call rwildcard_all, $(UTEDITOR_DIR)/src/)
+	$(MAKE) -C "$(UTEDITOR_DIR)" gui-qt
+
+  $(untech-editor-gui): untech-editor-gui
 endif
 
 
