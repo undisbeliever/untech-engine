@@ -1,6 +1,6 @@
 // Ensure that warnings do register similar colors
 
-architecture wdc65816
+architecture wdc65816-strict
 
 define MEMORY_MAP = HIROM
 define ROM_SIZE = 1

@@ -1,6 +1,6 @@
 // Test push/pop ROM blocks
 
-architecture wdc65816
+architecture wdc65816-strict
 
 define MEMORY_MAP = LOROM
 define ROM_SIZE = 2

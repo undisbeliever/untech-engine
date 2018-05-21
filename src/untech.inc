@@ -3,7 +3,7 @@
 // Distributed under The MIT License: https://opensource.org/licenses/MIT
 
 
-architecture wdc65816
+architecture wdc65816-strict
 
 include "errors/break.inc"
 include "errors/warnings.inc"
