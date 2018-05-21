@@ -27,12 +27,12 @@ def main():
         else:
             print(", ", end="")
 
-        r = math.tau * a / 256
+        r = math.pi * 2 * a / 256
         s = int(math.sin(r) * 0x7f)
         if s < 0:
             s += 0x100
 
-        print(f"{s:#04x}", end="")
+        print("{:#04x}".format(s), end="")
 
     print("\n")
 
