@@ -98,7 +98,7 @@ tables: $(TABLE_INCS)
 
 define TABLE_template =
   $(GEN_DIR)/tables/%.inc: $(1)/%.py
-	python3 $$< >| $$@
+	python3 $$< > $$@
 endef
 $(foreach d, $(TABLE_DIRS), $(eval $(call TABLE_template, $d)))
 
@@ -161,9 +161,14 @@ endif
 
 .PHONY: directories
 DIRS := $(sort $(dir $(BINARY) $(RESOURCES) $(TABLE_INCS)))
+DIRS := $(patsubst %/,%,$(DIRS))
 directories: $(DIRS)
 $(DIRS):
+  ifeq ($(OS),Windows_NT)
+	mkdir $(subst /,\,$@)
+  else
 	mkdir -p $@
+  endif
 
 
 
