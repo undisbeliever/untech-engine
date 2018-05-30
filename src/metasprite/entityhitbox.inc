@@ -12,6 +12,11 @@
 namespace MetaSprite {
 namespace EntityHitbox {
 
+// Temporary store for the current offset/size pair from EntityHitbox struct
+// Used to convert width/height from uint8 to uint16
+// (3x uint8_t, third byte always 0)
+allocate(_offsetSizePair, wram7e, 3)
+
 namespace currentEntity {
     // address of the current entity
     allocateTmpWord(entityAddress)
@@ -80,6 +85,7 @@ macro _SetupOuterAabb(aabb) {
     sta.w   {aabb}.xPos
 
     lda.l   Format.EntityHitbox.Outer.width,x
+    and.w   #0xff
     sta.w   {aabb}.width
 
 
@@ -90,6 +96,7 @@ macro _SetupOuterAabb(aabb) {
     sta.w   {aabb}.yPos
 
     lda.l   Format.EntityHitbox.Outer.height,x
+    and.w   #0xff
     sta.w   {aabb}.height
 }
 
@@ -111,6 +118,7 @@ macro _BranchIfNoOuterCollision(aabb, NoCollision) {
 
     namespace {#} {
         lda.l   Format.EntityHitbox.Outer.xOffset,x
+        sta.w   _offsetSizePair
         and.w   #0xff
         clc
         adc.b   BaseEntity.xPos.px
@@ -118,7 +126,7 @@ macro _BranchIfNoOuterCollision(aabb, NoCollision) {
         cmp.w   {aabb}.xPos
         bcs     XAhead
             // c clear
-            adc.l   Format.EntityHitbox.Outer.width,x
+            adc.w   _offsetSizePair + 1     // width
             cmp.w   {aabb}.xPos
             bcc     {NoCollision}
             bra     XMatch
@@ -131,13 +139,14 @@ macro _BranchIfNoOuterCollision(aabb, NoCollision) {
 
 
         lda.l   Format.EntityHitbox.Outer.yOffset,x
+        sta.w   _offsetSizePair
         and.w   #0xff
         clc
         adc.b   BaseEntity.yPos.px
         cmp.w   {aabb}.yPos
         bcs     YAhead
             // c clear
-            adc.l   Format.EntityHitbox.Outer.height,x
+            adc.w   _offsetSizePair + 1     // height
             cmp.w   {aabb}.yPos
             bcc     {NoCollision}
             bra     YMatch
@@ -169,6 +178,7 @@ macro _BranchOnInnerCollision(aabb, Collision) {
 
     namespace {#} {
         lda.l   Format.EntityHitbox.Inner.xOffset,x
+        sta.w   _offsetSizePair
         and.w   #0xff
         clc
         adc.b   BaseEntity.xPos.px
@@ -176,7 +186,7 @@ macro _BranchOnInnerCollision(aabb, Collision) {
         cmp.w   {aabb}.xPos
         bcs     XAhead
             // c clear
-            adc.l   Format.EntityHitbox.Inner.width,x
+            adc.w   _offsetSizePair + 1     // width
             cmp.w   {aabb}.xPos
             bcc     NoCollision
             bra     XMatch
@@ -189,13 +199,14 @@ macro _BranchOnInnerCollision(aabb, Collision) {
 
 
         lda.l   Format.EntityHitbox.Inner.yOffset,x
+        sta.w   _offsetSizePair
         and.w   #0xff
         clc
         adc.b   BaseEntity.yPos.px
         cmp.w   {aabb}.yPos
         bcs     YAhead
             // c clear
-            adc.l   Format.EntityHitbox.Inner.height,x
+            adc.w   _offsetSizePair + 1     // height
             cmp.w   {aabb}.yPos
             bcs     {Collision}
             bra     NoCollision
@@ -489,6 +500,9 @@ allocateTmpWord(tmp_row)
 
 constant NoCollisions = _InnerTest_Multiple_Single.Return
 
+    assert(Tables.EntityHitbox.MAX_INNER_HITBOXES - 1 == Format.EntityHitbox.COUNT_MASK)
+    assert(Tables.EntityHitbox.INNER_OFFSET == Format.EntityHitbox.Inner.size)
+
     // current entity has mutliple hitboxes
     // entity being tested has multiple hitboxes
 
@@ -533,6 +547,7 @@ constant NoCollisions = _InnerTest_Multiple_Single.Return
         sta.w   toTestEntity.aabb.xPos
 
         lda.l   Format.EntityHitbox.Inner.width,x
+        and.w   #0xff
         sta.w   toTestEntity.aabb.width
 
 
@@ -543,6 +558,7 @@ constant NoCollisions = _InnerTest_Multiple_Single.Return
         sta.w   toTestEntity.aabb.yPos
 
         lda.l   Format.EntityHitbox.Inner.height,x
+        and.w   #0xff
         sta.w   toTestEntity.aabb.height
 
 
