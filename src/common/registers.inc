@@ -1289,9 +1289,9 @@ constant TIMEUP = 0x4211
 // v = V-Blank Flag. Set during V-Blank
 // h = H-Blank Flag. Set during H-Blank
 // a = Auto Joypad read status. Set while reading, cleared when completed.
-constant HVJOY = 0x4212
+constant HVBJOY = 0x4212
 
-namespace HVJOY {
+namespace HVBJOY {
     constant vBlank = %10000000
     constant hBlank = %01000000
     constant autoJoy = %00000001
@@ -1337,7 +1337,7 @@ constant RDMPYH = 0x4217
 // Autojoy Controller Ports
 //(read, word, any)
 //
-// Should not be read when bit 0 of `HVJOY` set.
+// Should not be read when bit 0 of `HVBJOY` set.
 constant JOY1 = 0x4218
 constant JOY2 = 0x421A
 constant JOY3 = 0x421C

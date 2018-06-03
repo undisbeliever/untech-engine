@@ -37,9 +37,10 @@ if {defined CONTROLLER_USE_JOY2} {
 // REQUIRES: 16 bit A, 8 bit Index, DB = $80
 macro VBlank() {
 	assert16a()
+    assert(HVBJOY.autoJoy == 1)
 
     -
-        ldx.w	HVJOY			// MUST do 8 bit read on HVJOY
+        ldx.w	HVBJOY			// MUST do 8 bit read on HVBJOY
         txa
         lsr
         bcs		-
