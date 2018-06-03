@@ -267,8 +267,8 @@ a16()
     ldx.b   #0x7e
 -
         stz.b   0,x
-        inx
-        inx
+        dex
+        dex
         bpl     -
 
     pld
