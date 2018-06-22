@@ -72,7 +72,6 @@ include "metatiles/_common.inc"
 
 include "metasprite/animation.inc"
 include "metasprite/entityhitbox.inc"
-include "metasprite/entityhitbox-collisions.inc"
 include "metasprite/palette.inc"
 include "metasprite/vram.inc"
 include "metasprite/render.inc"

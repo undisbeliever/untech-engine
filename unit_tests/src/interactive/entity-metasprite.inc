@@ -39,7 +39,9 @@ namespace ShowAllFramesEntity {
     a16()
     i16()
     code()
-    function Destructor {
+    Destructor:
+    ProcessCollision:
+    function Null {
         rts
     }
 
@@ -106,16 +108,6 @@ namespace ShowAllFramesEntity {
     a16()
         rts
     }
-
-    a16()
-    i16()
-    code()
-    CalculateAttackValue:
-    TakeDamageFromEntity:
-    BlockWithShield:
-    CollideWithBody:
-    CollideWithShield:
-        rts
 
 
     inline BuildEntityData(name) {

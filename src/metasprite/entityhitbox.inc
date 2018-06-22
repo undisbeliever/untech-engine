@@ -19,6 +19,7 @@ allocate(_offsetSizePair, wram7e, 3)
 
 namespace currentEntity {
     // address of the current entity
+    // (word addr, same address as Collision.otherEntity)
     allocateTmpWord(entityAddress)
 
     // address of the entity hitbox
@@ -222,6 +223,81 @@ macro _BranchOnInnerCollision(aabb, Collision) {
 }
 
 
+// Process the collision
+//
+// Calls BaseEntityFunctionTable.ProcessCollision for both entities
+// with the appropriate collisionBits
+//
+// REQUIRES: 16 bit A, 16 bit Index, DB = 0x7e
+//
+// INPUT: DP = this entity address
+//         X = this inner collision address
+//         ns = namespace holding the other entity
+macro _ProcessCollision(ns) {
+    assert16a()
+    assert16i()
+
+    assert(Format.EntityHitboxType._N_BITS == 4)
+
+    lda.l   Format.EntityHitbox.Inner.type,x
+    asl
+    asl
+    asl
+    asl
+    ldx.w   {ns}.hitboxAddress
+    ora.l   Format.EntityHitbox.Inner.type,x
+    sta.w   MetaSprite.Collision.bits
+
+    ldy.w   {ns}.entityAddress
+    sty.w   MetaSprite.Collision.otherEntity
+
+    // A = collision bits
+    // Y = otherEntity
+    ldx.b   BaseEntity.functionTable
+    jsr     (BaseEntityFunctionTable.ProcessCollision,x)
+
+
+    // Swap DP and otherEntity
+    tdc
+    tay
+    lda.w   MetaSprite.Collision.otherEntity
+    sty.w   MetaSprite.Collision.otherEntity
+    tcd
+
+    assert(Format.EntityHitboxType._N_BITS == 4)
+
+    // swap Collision.bits nibbles
+
+    // ::KUDOS Dragonstomper on the AtariAge Forums::
+    // http://atariage.com/forums/topic/71120-6502-killer-hacks/page-6#entry1689548
+
+    sep     #$20
+a8()
+    lda.w   MetaSprite.Collision.bits
+    asl
+    adc.b   #0x80
+    rol
+    asl
+    adc.b   #0x80
+    rol
+    sta.w   MetaSprite.Collision.bits
+
+
+    rep     #$20
+a16()
+    // DP = other entity
+    // Y = this entity
+    // A = collision bits
+    ldx.b   BaseEntity.functionTable
+    jsr     (BaseEntityFunctionTable.ProcessCollision,x)
+
+
+    // Restore DP to current Entity
+    lda.w   Collision.otherEntity
+    tcd
+}
+
+
 namespace _TestList {
 NoHitbox:
     rts
@@ -336,20 +412,8 @@ function _TestList_CurrentHasSingleHitbox {
             // DP = toTest entity
             // X = toTest inner collision
 
-            assert(Format.EntityHitboxType._TABLE_SHIFT == 3)
+            _ProcessCollision(currentEntity)
 
-            lda.l   Format.EntityHitbox.Inner.type,x
-            asl
-            asl
-            asl
-            ldx.w   currentEntity.hitboxAddress
-            ora.l   Format.EntityHitbox.Inner.type,x
-            and.w   #_CollisionTable.TABLE_MASK
-            tax
-
-            ldy.w   currentEntity.entityAddress
-            jsr     (_CollisionTable.FunctionTable,x)
-            bra     EndEntityLoop
 
     EntityLoop_Continue:
         lda.b   BaseEntity.next
@@ -462,20 +526,9 @@ function _InnerTest_Multiple_Single {
     InnerCollision:
         // DP = currentEntity
         // X = currentEntity inner collision
+        // toTestEntity.entityAddress and toTestEntity.hitboxAddress filled
 
-        assert(Format.EntityHitboxType._TABLE_SHIFT == 3)
-
-        lda.l   Format.EntityHitbox.Inner.type,x
-        asl
-        asl
-        asl
-        ldx.w   toTestEntity.hitboxAddress
-        ora.l   Format.EntityHitbox.Inner.type,x
-        and.w   #_CollisionTable.TABLE_MASK
-        tax
-
-        ldy.w   toTestEntity.entityAddress
-        jsr     (_CollisionTable.FunctionTable,x)
+        _ProcessCollision(toTestEntity)
 
 Return:
     jmp     InnerTest_Return
@@ -578,30 +631,14 @@ InnerCollision:
     // DP = currentEntity
     // X = currentEntity inner collision
 
+    // calculate toTestEntity.hitboxAddress
     lda.w   tmp_row
     and.w   #0xff
     clc
     adc.w   toTestEntity.hitboxAddress
-    tay
+    sta.w   toTestEntity.hitboxAddress
 
-
-    // Y = toTestEntity hitbox address
-    assert(Format.EntityHitboxType._TABLE_SHIFT == 3)
-
-    lda.l   Format.EntityHitbox.Inner.type,x
-    asl
-    asl
-    asl
-
-    tyx
-    ora.l   Format.EntityHitbox.Inner.type,x
-    and.w   #_CollisionTable.TABLE_MASK
-    tax
-
-    ldy.w   toTestEntity.entityAddress
-    jsr     (_CollisionTable.FunctionTable,x)
-
-    jmp     InnerTest_Return
+    jmp     _InnerTest_Multiple_Single.InnerCollision
 }
 }
 

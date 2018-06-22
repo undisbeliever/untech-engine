@@ -11,6 +11,92 @@ namespace EntityHitboxCollisionsTest {
 
 
 constant _waitCount                   = Test.tmp
+constant _tmp_index                   = Test.tmp + 2
+constant _collisionBits               = Test.tmp + 4
+constant _processCollisionArgumentsOk = Test.tmp + 6
+
+
+// Prints the ProcessCollision arguments to screen
+//
+// Also Tests that A/Y are set correctly, sets `_processCollisionArgumentsOk`
+// to zero if they do not match.
+//
+// REQUIRES: 16 bit A, 16 bit Index, DB = 0x7e
+// DP = entity
+// A = MetaSprite.Collision.bits
+// Y = MetaSprite.Collision.otherEntity
+a16()
+i16()
+code()
+function PrintProcessCollisionArgs {
+constant tmpString = Text.tmpString
+
+    sep     #$20
+a8()
+    cmp.w   MetaSprite.Collision.bits
+    bne     _ArgumentsFail
+
+    rep     #$30
+a16()
+i16()
+    cpy.w   MetaSprite.Collision.otherEntity
+    beq     +
+_ArgumentsFail:
+        rep     #$30
+        stz.w   _processCollisionArgumentsOk
+    +
+
+    tdc
+    jsr     Text.Console.PrintHex16A
+
+
+    Text.Console.PrintConstString(" ")
+
+    sep     #$20
+a8()
+    lda.w    MetaSprite.Collision.bits
+    sta.w   _collisionBits
+
+    jsr     Text.Console.PrintHex8A
+
+
+    // Convert _collisionBits to a human readable string
+    lda.b   #Text.Font.SPACE
+    sta.w   tmpString
+    sta.w   tmpString + 8 + 1
+    stz.w   tmpString + 8 + 2
+
+    ldx.w   #7
+    Loop:
+        lsr.w   _collisionBits
+        bcc     +
+            lda.l   BitsString,x
+            bra     ++
+        +
+            lda.b   #Text.Font.MINUS
+        +
+        sta.w   tmpString + 1,x
+        dex
+        bpl     Loop
+
+    lda.b   #tmpString >> 16
+    ldx.w   #tmpString
+    jsr     Text.Console.PrintString
+
+    ldy.w   MetaSprite.Collision.otherEntity
+    jsr     Text.Console.PrintHex16Y
+
+    rep     #$20
+a16()
+i16()
+
+    jmp     Text.Console.NewLine
+
+
+rodata(rom0)
+BitsString:
+    db      "WSABwsab"
+}
 
 
 namespace PlayerEntity {
@@ -82,46 +168,8 @@ namespace PlayerEntity {
         rts
     }
 
-    function CalculateAttackValue {
-        bcc     +
-            Text.Console.PrintConstString("P.CalculateAttackValue (s)\n")
-            rts
-        +
-            Text.Console.PrintConstString("P.CalculateAttackValue (n)\n")
-            rts
-    }
+    constant ProcessCollision = PrintProcessCollisionArgs
 
-    a16()
-    i16()
-    code()
-    function TakeDamageFromEntity {
-        bcc     +
-            Text.Console.PrintConstString("P.TakeDamageFromEntity (wk)\n")
-            rts
-        +
-            Text.Console.PrintConstString("P.TakeDamageFromEntity (n)\n")
-            rts
-        rts
-    }
-
-    function BlockWithShield {
-        bcc     +
-            Text.Console.PrintConstString("P.BlockWithShield (attack)\n")
-            rts
-        +
-            Text.Console.PrintConstString("P.BlockWithShield (body)\n")
-            rts
-    }
-
-    function CollideWithBody {
-        Text.Console.PrintConstString("P.CollideWithBody\n")
-        rts
-    }
-
-    function CollideWithShield {
-        Text.Console.PrintConstString("P.CollideWithShield\n")
-        rts
-    }
 
     rodata(EN_RomData)
     RomData:
@@ -163,46 +211,8 @@ namespace EnemyEntity {
         rts
     }
 
-    function CalculateAttackValue {
-        bcc     +
-            Text.Console.PrintConstString("E.CalculateAttackValue (s)\n")
-            rts
-        +
-            Text.Console.PrintConstString("E.CalculateAttackValue (n)\n")
-            rts
-    }
+    constant ProcessCollision = PrintProcessCollisionArgs
 
-    a16()
-    i16()
-    code()
-    function TakeDamageFromEntity {
-        bcc     +
-            Text.Console.PrintConstString("E.TakeDamageFromEntity (wk)\n")
-            rts
-        +
-            Text.Console.PrintConstString("E.TakeDamageFromEntity (n)\n")
-            rts
-        rts
-    }
-
-    function BlockWithShield {
-        bcc     +
-            Text.Console.PrintConstString("E.BlockWithShield (attack)\n")
-            rts
-        +
-            Text.Console.PrintConstString("E.BlockWithShield (body)\n")
-            rts
-    }
-
-    function CollideWithBody {
-        Text.Console.PrintConstString("E.CollideWithBody\n")
-        rts
-    }
-
-    function CollideWithShield {
-        Text.Console.PrintConstString("E.CollideWithShield\n")
-        rts
-    }
 
     rodata(EN_RomData)
     RomData:
@@ -278,7 +288,10 @@ i16()
 code()
 Test.add("EntityHitbox Collisions Tst")
 function Test {
-constant tmp_index = Test.tmp
+
+    lda.w   #0xffff
+    sta.w   _processCollisionArgumentsOk
+
 
     jsr     EntityLoop.Init
 
@@ -286,7 +299,7 @@ constant tmp_index = Test.tmp
 
     ldx.w   #0
     SpawnEnemyLoop:
-        stx.w   tmp_index
+        stx.w   _tmp_index
 
         lda.l   EnemyTable.xPos,x
         sta.w   Entity.Spawn.xPos
@@ -302,7 +315,7 @@ constant tmp_index = Test.tmp
         jsr     Entity.Spawn
         bcc     Fail
 
-        lda.w   tmp_index
+        lda.w   _tmp_index
         clc
         adc.w   #EnemyTable.size
         tax
@@ -329,6 +342,10 @@ constant tmp_index = Test.tmp
         jsr     EntityLoop.ProcessFrame
 
         jsr     dirtyDpTmp
+
+        // test ProcessCollision arguments still Ok
+        lda.w   _processCollisionArgumentsOk
+        beq     Fail
 
         jsr     WaitFrame_Count
         sty.w   _waitCount

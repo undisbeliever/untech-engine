@@ -116,6 +116,7 @@ namespace ProjectileEntity {
     i16()
     code()
     Destructor:
+    ProcessCollision:
     TakeDamageFromEntity:
     CollideWithBody:
     CollideWithShield:
@@ -203,11 +204,7 @@ namespace SpawnerEntity {
     i16()
     code()
     Destructor:
-    TakeDamageFromEntity:
-    CollideWithBody:
-    CollideWithShield:
-    BlockWithShield:
-    CalculateAttackValue:
+    ProcessCollision:
     function Null {
         rts
     }

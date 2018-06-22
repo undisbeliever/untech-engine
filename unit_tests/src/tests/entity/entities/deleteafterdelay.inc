@@ -29,7 +29,9 @@ function Init {
 a16()
 i16()
 code()
-function Destructor {
+Destructor:
+ProcessCollision:
+function Null {
     rts
 }
 
@@ -46,17 +48,6 @@ function Process {
 
     rts
 }
-
-
-a16()
-i16()
-code()
-CalculateAttackValue:
-TakeDamageFromEntity:
-BlockWithShield:
-CollideWithBody:
-CollideWithShield:
-    rts
 
 
 

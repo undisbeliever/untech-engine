@@ -19,11 +19,12 @@ function Init {
 }
 
 
-// IN: A = parameter
 a16()
 i16()
 code()
-function Destructor {
+Destructor:
+ProcessCollision:
+function Null {
     rts
 }
 
@@ -38,19 +39,6 @@ function Process {
 
     rts
 }
-
-
-// Empty hitbox collision hooks
-a16()
-i16()
-code()
-CalculateAttackValue:
-TakeDamageFromEntity:
-BlockWithShield:
-CollideWithBody:
-CollideWithShield:
-    rts
-
 
 
 evaluate n = 0
