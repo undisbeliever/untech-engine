@@ -12,12 +12,97 @@
 namespace MetaSprite {
 namespace EntityHitbox {
 
+// PUBLIC API
+// ==========
+
+// Preforms a collision tests between two entity lists.
+//
+// REQUIRES: 16 bit A, 16 bit Index, DB = 0x7e, DP = 0
+//
+// PARAM: aList - first entity list
+// PARAM: bList - second entity list
+macro TestCollisions(aList, bList) {
+    assert16a()
+    assert16i()
+
+    ldx.w   Entity.lists.{aList}
+    beq     EndIf{#}
+
+        MetaSprite.EntityHitbox._TestTwoEntityLists({aList}, {bList}, 1)
+EndIf{#}:
+}
+
+
+// Preforms a collision test an entity list and multiple entity lists
+//
+// REQUIRES: 16 bit A, 16 bit Index, DB = 0x7e, DP = 0
+//
+// PARAM: aList - first entity list
+// PARAM: bList1 : bListN - entity lists to test collisison with aList
+macro TestCollisions(aList, bList1, bList2) {
+    assert16a()
+    assert16i()
+
+    ldx.w   Entity.lists.{aList}
+    beq     EndIf{#}
+
+        MetaSprite.EntityHitbox._TestTwoEntityLists({aList}, {bList1}, 1)
+        MetaSprite.EntityHitbox._TestTwoEntityLists({aList}, {bList2}, 0)
+EndIf{#}:
+}
+
+macro TestCollisions(aList, bList1, bList2, bList3) {
+    assert16a()
+    assert16i()
+
+    ldx.w   Entity.lists.{aList}
+    beq     EndIf{#}
+
+        MetaSprite.EntityHitbox._TestTwoEntityLists({aList}, {bList1}, 1)
+        MetaSprite.EntityHitbox._TestTwoEntityLists({aList}, {bList2}, 0)
+        MetaSprite.EntityHitbox._TestTwoEntityLists({aList}, {bList3}, 0)
+EndIf{#}:
+}
+
+macro TestCollisions(aList, bList1, bList2, bList3, bList4) {
+    assert16a()
+    assert16i()
+
+    ldx.w   Entity.lists.{aList}
+    beq     EndIf{#}
+
+        MetaSprite.EntityHitbox._TestTwoEntityLists({aList}, {bList1}, 1)
+        MetaSprite.EntityHitbox._TestTwoEntityLists({aList}, {bList2}, 0)
+        MetaSprite.EntityHitbox._TestTwoEntityLists({aList}, {bList3}, 0)
+        MetaSprite.EntityHitbox._TestTwoEntityLists({aList}, {bList4}, 0)
+EndIf{#}:
+}
+
+macro TestCollisions(aList, bList1, bList2, bList3, bList4, bList5) {
+    assert16a()
+    assert16i()
+
+    ldx.w   Entity.lists.{aList}
+    beq     EndIf{#}
+
+        MetaSprite.EntityHitbox._TestTwoEntityLists({aList}, {bList1}, 1)
+        MetaSprite.EntityHitbox._TestTwoEntityLists({aList}, {bList2}, 0)
+        MetaSprite.EntityHitbox._TestTwoEntityLists({aList}, {bList3}, 0)
+        MetaSprite.EntityHitbox._TestTwoEntityLists({aList}, {bList4}, 0)
+        MetaSprite.EntityHitbox._TestTwoEntityLists({aList}, {bList5}, 0)
+EndIf{#}:
+}
+
+
+// VARIABLES
+// =========
+
 // Temporary store for the offset/size pair from EntityHitbox struct
 // Used to convert width/height from uint8 to uint16
 // (3x uint8_t, third byte always 0)
 allocate(_offsetSizePair, wram7e, 3)
 
-// The current entity that is being tested
+// The outer loop entity
 namespace entityA {
     // address of the entity
     // (word addr)
@@ -40,7 +125,10 @@ namespace entityA {
     }
 }
 
-// The entity in the list that is being tested
+// The inner loop list
+allocateTmpWord(listB)
+
+// The inner loop entity
 namespace entityB {
     allocateTmpWord(entityAddress)
     allocateTmpWord(hitboxAddress)
@@ -55,20 +143,33 @@ namespace entityB {
 }
 
 
+// PRIVATE API
+// ===========
 
-// Preforms a collision test between the current entity and an entity list.
+
+// Preforms a collision test between two entity lists
 //
-// REQUIRES: 16 bit A, 16 bit Index, DB = 0x7e
-// INPUT: dp = entity to test
-// PARAM: list = the list to test with
-macro ProcessList(list) {
+// REQUIRES: 16 bit A, 16 bit Index, DB = 0x7e, DP = 0
+//
+// PARAM: aList - the first entityList
+// PARAM: bList - the second entityList
+// PARAM: isFirst - non-zero if the this is the first test against aList
+// INPUT: X = first entity in aList (MUST NOT BE NULL) (only used if isFirst is true)
+inline _TestTwoEntityLists(aList, bList, evaluate isFirst) {
     assert16a()
     assert16i()
 
-    ldy.w   Entity.lists.{list}
-    beq     Skip_{list}
-        jsr     MetaSprite.EntityHitbox._TestList
-Skip_{list}:
+    if Entity.lists.{aList} == Entity.lists.{bList} {
+        error "Cannot preform a collision test between the same list ({aList} and {bList})"
+    }
+
+    ldy.w   Entity.lists.{bList}
+    beq     EndIf{#}
+        if {isFirst} == 0 {
+            ldx.w   Entity.lists.{aList}
+        }
+        jsr     MetaSprite.EntityHitbox._TestTwoEntityLists
+    EndIf{#}:
 }
 
 
@@ -237,6 +338,8 @@ macro _BranchOnInnerCollision(aabb, Collision) {
 // INPUT: DP = this entity address
 //         X = this inner collision address
 //         ns = namespace holding the other entity
+// MODIFIES: DP
+// OUTPUT: Collision.otherEntity = original value of DP
 macro _ProcessCollision(ns) {
     assert16a()
     assert16i()
@@ -294,51 +397,67 @@ a16()
     // A = collision bits
     ldx.b   BaseEntity.functionTable
     jsr     (BaseEntityFunctionTable.ProcessCollision,x)
-
-
-    // Restore DP
-    lda.w   Collision.otherEntity
-    tcd
 }
 
 
-namespace _TestList {
-NoHitbox:
-    rts
-}
-
-// Preforms a collision test between the current entity and an entity list.
+// Preforms a collision test between two entity lists
 //
-// REQUIRES: 16 bit A, 16 bit Index, DB = 0x7e
-// INPUT: dp = entity to test
-//         Y = first item in entity list (NOT NULL)
+// REQUIRE: 16 bit A, 16 bit Index, DB = 0x7e, DP = 0
+//
+// INPUT: X = first item in listA (NOT NULL)
+// INPUT: Y = first item in listB (NOT NULL)
 a16()
 i16()
 code()
-function _TestList {
-    ldx.b   BaseEntity.MetaSprite.currentFrame
-    beq     NoHitbox
-
-    lda.l   Format.Frame.entityHitbox,x
-    beq     NoHitbox
-    tax
-
-    _SetupOuterAabb(entityA.outer)
+function _TestTwoEntityLists {
+    sty.w   listB
 
 
-    // remember current entity
-    tdc
-    sta.w   entityA.entityAddress
+    OuterLoop:
+        // X = entityA
 
-    // X = EntityHitbox Address
-    stx.w   entityA.hitboxAddress
+        txy
+        // Y = entityA
 
-    lda.l   Format.EntityHitbox.count,x
-    and.w   #Format.EntityHitbox.COUNT_MASK
-    beq     _TestList_EntityA_SingleHitbox
-    jmp     _TestList_EntityA_MultipleHitboxes
+        ldx.w   BaseEntity.MetaSprite.currentFrame,y
+        beq     NoHitbox
+
+        lda.l   Format.Frame.entityHitbox,x
+        beq     NoHitbox
+        tax
+
+        sty.w   entityA.entityAddress
+        stx.w   entityA.hitboxAddress
+
+        tya
+        tcd
+
+        _SetupOuterAabb(entityA.outer)
+
+        ldy.w   listB
+
+        lda.l   Format.EntityHitbox.count,x
+        and.w   #Format.EntityHitbox.COUNT_MASK
+        beq     _TestList_EntityA_SingleHitbox
+        jmp     _TestList_EntityA_MultipleHitboxes
+
+    Next_EntityA:
+        // DP = unknown
+
+        ldy.w   entityA.entityAddress
+
+    NoHitbox:
+        // Y = entityA
+
+        ldx.w   BaseEntity.next,y
+        bne     OuterLoop
+
+
+    lda.w   #0
+    tcd
+
+    rts
 }
-
 
 
 namespace _TestList_EntityA_SingleHitbox {
@@ -348,11 +467,7 @@ namespace _TestList_EntityA_SingleHitbox {
         lda.b   BaseEntity.next
         bne     EntityLoop
 
-    // restore DP
-    lda.w   entityA.entityAddress
-    tcd
-
-    rts
+    jmp     Next_EntityA
 }
 
 // Processes the collision tests where entityA has only one hitbox.
@@ -361,11 +476,14 @@ namespace _TestList_EntityA_SingleHitbox {
 // INPUT: dp = entityA address
 //         Y = first item in entity list (NOT NULL)
 //        entityA values set
-// OUTPUT: DP = entityA address
+// MODIFIES: DP
+// RETURN: Jump to _TestTwoEntityLists.Next_EntityA
 a16()
 i16()
 code()
 function _TestList_EntityA_SingleHitbox {
+    constant Next_EntityA = _TestTwoEntityLists.Next_EntityA
+
     // Current entity only has a single hitbox
     // y = first entity in entityB list
     tya
@@ -419,6 +537,10 @@ function _TestList_EntityA_SingleHitbox {
 
             _ProcessCollision(entityA)
 
+            // Restore DP
+            lda.w   Collision.otherEntity
+            tcd
+
 
     EntityLoop_Continue:
         lda.b   BaseEntity.next
@@ -426,11 +548,7 @@ function _TestList_EntityA_SingleHitbox {
             jmp     EntityLoop
 
 EndEntityLoop:
-    // restore DP
-    lda.w   entityA.entityAddress
-    tcd
-
-    rts
+    jmp     Next_EntityA
 }
 
 
@@ -440,11 +558,14 @@ EndEntityLoop:
 // INPUT:  A = number of hitboxes
 //         Y = first item in entity list (NOT NULL)
 //         entityA values set
-// OUTPUT: DP = entityA address
+// MODIFIES: DP
+// RETURN: Jump to _TestTwoEntityLists.Next_EntityA
 a16()
 i16()
 code()
 function _TestList_EntityA_MultipleHitboxes {
+    constant Next_EntityA = _TestTwoEntityLists.Next_EntityA
+
     sta.w   entityA.hitboxCount
 
     // Current entity only has multiple hitbox
@@ -485,12 +606,7 @@ function _TestList_EntityA_MultipleHitboxes {
         lda.b   BaseEntity.next
         bne     EntityLoop
 
-
-    // Restore DP
-    lda.w   entityA.entityAddress
-    tcd
-
-    rts
+    jmp     Next_EntityA
 
 
 

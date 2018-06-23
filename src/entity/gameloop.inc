@@ -237,14 +237,14 @@ inline _ProcessEnemyList(list, doDeactivateTest) {
             ldx.b   BaseEntity.functionTable
             jsr     (BaseEntityFunctionTable.Process,x)
 
-            // Skip collision/offscreen tests if entity list changes
+            // Skip offscreen tests if entity list changes
             //
             // Still process the animation as the most common list
             // change is to the `npc` or `particle` list so the death
             // animation can be processed.
 
             ldy.w   changeList
-            bne     SkipCollision
+            bne     SkipOffscreenTest
 
             if {doDeactivateTest} == 1 {
                 BranchEntityOutsideInactiveWindow(Deactivate)
@@ -262,9 +262,7 @@ inline _ProcessEnemyList(list, doDeactivateTest) {
                 StillActive:
             }
 
-            MetaSprite.EntityHitbox.ProcessList(playerProjectiles)
-
-        SkipCollision:
+        SkipOffscreenTest:
             jsr     MetaSprite.Animation.Process
         _NEXT()
     }
@@ -293,20 +291,6 @@ macro _ProcessPlayerList() {
             ldx.b   BaseEntity.functionTable
             jsr     (BaseEntityFunctionTable.Process,x)
 
-            // skip collisions/animations if entity list changes
-            //
-            // Still process the animation as the most common list
-            // change is to the `particle` list so the death animation
-            // can be processed.
-
-            ldy.w   changeList
-            bne     SkipCollisions
-
-                MetaSprite.EntityHitbox.ProcessList(bosses)
-                MetaSprite.EntityHitbox.ProcessList(enemies)
-                MetaSprite.EntityHitbox.ProcessList(enemyProjectiles)
-
-        SkipCollisions:
             jsr     MetaSprite.Animation.Process
         _NEXT()
     }
@@ -498,6 +482,10 @@ function ProcessGameLoop {
     _ProcessTryToActivateAgainList()
 
     _ProcessActiveWindow()
+
+
+    MetaSprite.EntityHitbox.TestCollisions(playerProjectiles, enemies, bosses)
+    MetaSprite.EntityHitbox.TestCollisions(players, enemyProjectiles, enemies, bosses)
 
 
     ldy.w   #lists.playerProjectiles
