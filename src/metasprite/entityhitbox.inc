@@ -12,22 +12,26 @@
 namespace MetaSprite {
 namespace EntityHitbox {
 
-// Temporary store for the current offset/size pair from EntityHitbox struct
+// Temporary store for the offset/size pair from EntityHitbox struct
 // Used to convert width/height from uint8 to uint16
 // (3x uint8_t, third byte always 0)
 allocate(_offsetSizePair, wram7e, 3)
 
-namespace currentEntity {
-    // address of the current entity
-    // (word addr, same address as Collision.otherEntity)
+// The current entity that is being tested
+namespace entityA {
+    // address of the entity
+    // (word addr)
     allocateTmpWord(entityAddress)
 
     // address of the entity hitbox
     allocateTmpWord(hitboxAddress)
 
-    // Outer hitbox of current entity
-    // All values are offset by INT_MS8_OFFSET
-    // (int_ms8_word)
+    // number of hitboxes
+    // (only set in when entity has Multiple hitboxes)
+    allocateTmpWord(hitboxCount)
+
+    // Outer hitbox of entity
+    // X/Y values are offset by INT_MS8_OFFSET
     namespace outer {
         allocateTmpWord(xPos)
         allocateTmpWord(yPos)
@@ -36,10 +40,12 @@ namespace currentEntity {
     }
 }
 
-namespace toTestEntity {
+// The entity in the list that is being tested
+namespace entityB {
     allocateTmpWord(entityAddress)
     allocateTmpWord(hitboxAddress)
 
+    // Used for both inner and outer hitbox tests
     namespace aabb {
         allocateTmpWord(xPos)
         allocateTmpWord(yPos)
@@ -47,8 +53,6 @@ namespace toTestEntity {
         allocateTmpWord(height)
     }
 }
-
-allocateTmpWord(tmp_count)
 
 
 
@@ -71,7 +75,7 @@ Skip_{list}:
 // Calculates the outer hitbox (enityhitbox address is known)
 //
 // REQUIRES: 16 bit A, 16 bit Index, DB = 0x7e
-// INPUT: dp = current entity
+// INPUT: dp = entity
 //         X = EntityHitbox address (NOT NULL)
 // KEEP: X, Y
 // BRANCH: to NoHitbox is there is no metasprite entityhitbox
@@ -102,12 +106,12 @@ macro _SetupOuterAabb(aabb) {
 }
 
 
-// Branches to label if there is no collision between
-// the dp entity's outer hitbox and aabb
+// Branches to label if there is no collision between the dp entity's
+// outer hitbox and aabb
 //
 //
 // REQUIRES: 16 bit A, 16 bit Index, DB = 0x7e
-// INPUT: dp = entity to test
+// INPUT: dp = entity
 // INPUT: X = EntityHitbox address
 // KEEP: X, Y
 // BRANCH: to `noCollision` if there is no collision
@@ -292,7 +296,7 @@ a16()
     jsr     (BaseEntityFunctionTable.ProcessCollision,x)
 
 
-    // Restore DP to current Entity
+    // Restore DP
     lda.w   Collision.otherEntity
     tcd
 }
@@ -319,25 +323,25 @@ function _TestList {
     beq     NoHitbox
     tax
 
-    _SetupOuterAabb(currentEntity.outer)
+    _SetupOuterAabb(entityA.outer)
 
 
     // remember current entity
     tdc
-    sta.w   currentEntity.entityAddress
+    sta.w   entityA.entityAddress
 
     // X = EntityHitbox Address
-    stx.w   currentEntity.hitboxAddress
+    stx.w   entityA.hitboxAddress
 
     lda.l   Format.EntityHitbox.count,x
     and.w   #Format.EntityHitbox.COUNT_MASK
-    beq     _TestList_CurrentHasSingleHitbox
-    jmp     _TestList_CurrentHasMultipleHitboxes
+    beq     _TestList_EntityA_SingleHitbox
+    jmp     _TestList_EntityA_MultipleHitboxes
 }
 
 
 
-namespace _TestList_CurrentHasSingleHitbox {
+namespace _TestList_EntityA_SingleHitbox {
     NoEntityOuterCollision:
         // continue loop
 
@@ -345,28 +349,30 @@ namespace _TestList_CurrentHasSingleHitbox {
         bne     EntityLoop
 
     // restore DP
-    lda.w   currentEntity.entityAddress
+    lda.w   entityA.entityAddress
     tcd
 
     rts
 }
 
-// Processes the collision tests where the current entity
-// has only one hitbox.
+// Processes the collision tests where entityA has only one hitbox.
 //
 // REQUIRES: 16 bit A, 16 bit Index, DB = 0x7e
-// INPUT: dp = entity to test
+// INPUT: dp = entityA address
 //         Y = first item in entity list (NOT NULL)
-//        currentEntity values set
+//        entityA values set
+// RETURN: DP = entityA address
 a16()
 i16()
 code()
-function _TestList_CurrentHasSingleHitbox {
+function _TestList_EntityA_SingleHitbox {
     // Current entity only has a single hitbox
-    // y = first entity to test
+    // y = first entity in entityB list
     tya
     EntityLoop:
         tcd
+
+        // DP = entityB address
 
         ldx.b   BaseEntity.MetaSprite.currentFrame
         beq     NoEntityOuterCollision
@@ -375,7 +381,7 @@ function _TestList_CurrentHasSingleHitbox {
         beq     NoEntityOuterCollision
         tax
 
-        _BranchIfNoOuterCollision(currentEntity.outer, NoEntityOuterCollision)
+        _BranchIfNoOuterCollision(entityA.outer, NoEntityOuterCollision)
 
 
         // Outer hitboxes collided
@@ -393,7 +399,7 @@ function _TestList_CurrentHasSingleHitbox {
         InnerLoop:
             // Test inner hitbox matches with single outer
 
-            _BranchOnInnerCollision(currentEntity.outer, InnerCollision)
+            _BranchOnInnerCollision(entityA.outer, InnerCollision)
 
         NoInnerCollision:
             // count is number of inner hitboxes - 1
@@ -409,10 +415,10 @@ function _TestList_CurrentHasSingleHitbox {
 
 
         InnerCollision:
-            // DP = toTest entity
-            // X = toTest inner collision
+            // DP = entityB entity
+            // X = entityB inner collision
 
-            _ProcessCollision(currentEntity)
+            _ProcessCollision(entityA)
 
 
     EntityLoop_Continue:
@@ -422,31 +428,33 @@ function _TestList_CurrentHasSingleHitbox {
 
 EndEntityLoop:
     // restore DP
-    lda.w   currentEntity.entityAddress
+    lda.w   entityA.entityAddress
     tcd
 
     rts
 }
 
 
-// Processes the collision tests where the current entity
-// has multiple hitboxes.
+// Processes the collision tests where entityA has multiple hitboxes.
 //
 // REQUIRES: 16 bit A, 16 bit Index, DB = 0x7e
 // INPUT:  A = number of hitboxes
 //         Y = first item in entity list (NOT NULL)
-//        currentEntity values set
+//         entityA values set
+// RETURN: DP = entityA address
 a16()
 i16()
 code()
-function _TestList_CurrentHasMultipleHitboxes {
-    sta.w   tmp_count
+function _TestList_EntityA_MultipleHitboxes {
+    sta.w   entityA.hitboxCount
 
     // Current entity only has multiple hitbox
-    // y = first entity to test
+    // y = first entity in entityB list
     tya
     EntityLoop:
         tcd
+
+        // DP = entityB
 
         ldx.b   BaseEntity.MetaSprite.currentFrame
         beq     NoEntityOuterCollision
@@ -455,15 +463,15 @@ function _TestList_CurrentHasMultipleHitboxes {
         beq     NoEntityOuterCollision
         tax
 
-        _BranchIfNoOuterCollision(currentEntity.outer, NoEntityOuterCollision)
+        _BranchIfNoOuterCollision(entityA.outer, NoEntityOuterCollision)
 
         // Outer hitboxes collided
         // Determine number of inner hitboxes in the entity being tested
 
-        // X = toTest EntityHitbox Address
+        // X = entityB EntityHitbox Address
         tdc
-        sta.w   toTestEntity.entityAddress
-        stx.w   toTestEntity.hitboxAddress
+        sta.w   entityB.entityAddress
+        stx.w   entityB.hitboxAddress
 
         lda.l   Format.EntityHitbox.count,x
         and.w   #Format.EntityHitbox.COUNT_MASK
@@ -472,7 +480,7 @@ function _TestList_CurrentHasMultipleHitboxes {
 
     InnerTest_Return:
         // restore dp
-        lda.w   toTestEntity.entityAddress
+        lda.w   entityB.entityAddress
         tcd
 
     NoEntityOuterCollision:
@@ -481,35 +489,35 @@ function _TestList_CurrentHasMultipleHitboxes {
 
 
     // restore DP
-    lda.w   currentEntity.entityAddress
+    lda.w   entityA.entityAddress
     tcd
 
     rts
 
 
-// INPUT: dp = toTest entity
-//        tmp_count = number of hitboxes in current entity
-//        currentEntity values set
-//        toTestEntity.entityAddress set
-//        toTestEntity.hitboxAddress set
+// INPUT: DP = entityB address
+//        entityA values set
+//        entityB.entityAddress set
+//        entityB.hitboxAddress set
 // RETURN: InnerTest_Return
 a16()
 i16()
 code()
 function _InnerTest_Multiple_Single {
-    // current entity has mutliple hitboxes
-    // entity being tested has a single hitboxes
+    // entityA has multiple hitboxes
+    // entityB has a single hitbox
 
-    _SetupOuterAabb(toTestEntity.aabb)
+    _SetupOuterAabb(entityB.aabb)
 
-    lda.w   currentEntity.entityAddress
+    lda.w   entityA.entityAddress
     tcd
-    ldy.w   tmp_count
-    ldx.w   currentEntity.hitboxAddress
+    ldy.w   entityA.hitboxCount
+    ldx.w   entityA.hitboxAddress
+
+    // DP = entityA
 
     InnerLoop:
-        // DP = entity to test
-        _BranchOnInnerCollision(toTestEntity.aabb, InnerCollision)
+        _BranchOnInnerCollision(entityB.aabb, InnerCollision)
 
         // count is number of inner hitboxes - 1
         dey
@@ -524,30 +532,29 @@ function _InnerTest_Multiple_Single {
 
 
     InnerCollision:
-        // DP = currentEntity
-        // X = currentEntity inner collision
-        // toTestEntity.entityAddress and toTestEntity.hitboxAddress filled
+        // DP = entityA
+        // X = entityA inner collision
+        // entityB.entityAddress and entityB.hitboxAddress filled
 
-        _ProcessCollision(toTestEntity)
+        _ProcessCollision(entityB)
 
 Return:
     jmp     InnerTest_Return
 }
 
 
-// INPUT: A = number of hitboxes in toTest entity
-// INPUT: dp = toTest entity
-//        tmp_count = number of hitboxes in current entity
-//        currentEntity values set
-//        toTestEntity.entityAddress set
-//        toTestEntity.hitboxAddress set
+// INPUT: A = number of hitboxes in entityB
+//        DP = entityB address
+//        entityA values set
+//        entityB.entityAddress set
+//        entityB.hitboxAddress set
 // RETURN: InnerTest_Return
 a16()
 i16()
 code()
 function _InnerTest_Multiple_Multiple {
-allocateTmpWord(toTest_xPos)
-allocateTmpWord(toTest_yPos)
+allocateTmpWord(entityB_xPos)
+allocateTmpWord(entityB_yPos)
 allocateTmpWord(collisionTableIndex)
 allocateTmpWord(tmp_row)
 
@@ -556,30 +563,31 @@ constant NoCollisions = _InnerTest_Multiple_Single.Return
     assert(Tables.EntityHitbox.MAX_INNER_HITBOXES - 1 == Format.EntityHitbox.COUNT_MASK)
     assert(Tables.EntityHitbox.INNER_OFFSET == Format.EntityHitbox.Inner.size)
 
-    // current entity has mutliple hitboxes
-    // entity being tested has multiple hitboxes
+    // entityA and entityB have multiple hitboxes
 
     ldy.b   BaseEntity.xPos.px
-    sty.w   toTest_xPos
+    sty.w   entityB_xPos
 
     ldy.b   BaseEntity.yPos.px
-    sty.w   toTest_yPos
+    sty.w   entityB_yPos
 
 
-    // A = toTest count
-    // assume toTest is > 1
+    // A = entityB hitbox count
+    // assume entityB is > 1
     assert(Tables.EntityHitbox.CollisionOrderTable.SHIFT == 2)
     asl
     asl
-    ora.w   tmp_count
+    ora.w   entityA.hitboxCount
     asl
     tax
 
     lda.l   Tables.EntityHitbox.CollisionOrderTable - 2 * 4,x
     tay
 
-    lda.w   currentEntity.entityAddress
+    lda.w   entityA.entityAddress
     tcd
+
+    // DP = entityA
 
     InnerLoop:
         tyx
@@ -590,53 +598,53 @@ constant NoCollisions = _InnerTest_Multiple_Single.Return
 
         and.w   #0xff
         clc
-        adc.w   toTestEntity.hitboxAddress
+        adc.w   entityB.hitboxAddress
         tax
 
         lda.l   Format.EntityHitbox.Inner.xOffset,x
         and.w   #0xff
         clc
-        adc.w   toTest_xPos
-        sta.w   toTestEntity.aabb.xPos
+        adc.w   entityB_xPos
+        sta.w   entityB.aabb.xPos
 
         lda.l   Format.EntityHitbox.Inner.width,x
         and.w   #0xff
-        sta.w   toTestEntity.aabb.width
+        sta.w   entityB.aabb.width
 
 
         lda.l   Format.EntityHitbox.Inner.yOffset,x
         and.w   #0xff
         clc
-        adc.w   toTest_yPos
-        sta.w   toTestEntity.aabb.yPos
+        adc.w   entityB_yPos
+        sta.w   entityB.aabb.yPos
 
         lda.l   Format.EntityHitbox.Inner.height,x
         and.w   #0xff
-        sta.w   toTestEntity.aabb.height
+        sta.w   entityB.aabb.height
 
 
         lda.w   tmp_row + 1
         and.w   #0xff
         clc
-        adc.w   currentEntity.hitboxAddress
+        adc.w   entityA.hitboxAddress
         tax
 
-        _BranchOnInnerCollision(toTestEntity.aabb, InnerCollision)
+        _BranchOnInnerCollision(entityB.aabb, InnerCollision)
 
         iny
         iny
         jmp     InnerLoop
 
 InnerCollision:
-    // DP = currentEntity
-    // X = currentEntity inner collision
+    // DP = entityA
+    // X = entityA inner collision
 
-    // calculate toTestEntity.hitboxAddress
+    // calculate entityB hitboxAddress
     lda.w   tmp_row
     and.w   #0xff
     clc
-    adc.w   toTestEntity.hitboxAddress
-    sta.w   toTestEntity.hitboxAddress
+    adc.w   entityB.hitboxAddress
+    sta.w   entityB.hitboxAddress
 
     jmp     _InnerTest_Multiple_Single.InnerCollision
 }
