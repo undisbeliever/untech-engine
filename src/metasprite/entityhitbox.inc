@@ -361,7 +361,7 @@ namespace _TestList_EntityA_SingleHitbox {
 // INPUT: dp = entityA address
 //         Y = first item in entity list (NOT NULL)
 //        entityA values set
-// RETURN: DP = entityA address
+// OUTPUT: DP = entityA address
 a16()
 i16()
 code()
@@ -401,7 +401,6 @@ function _TestList_EntityA_SingleHitbox {
 
             _BranchOnInnerCollision(entityA.outer, InnerCollision)
 
-        NoInnerCollision:
             // count is number of inner hitboxes - 1
             dey
             bmi     EntityLoop_Continue
@@ -441,7 +440,7 @@ EndEntityLoop:
 // INPUT:  A = number of hitboxes
 //         Y = first item in entity list (NOT NULL)
 //         entityA values set
-// RETURN: DP = entityA address
+// OUTPUT: DP = entityA address
 a16()
 i16()
 code()
@@ -463,43 +462,45 @@ function _TestList_EntityA_MultipleHitboxes {
         beq     NoEntityOuterCollision
         tax
 
-        _BranchIfNoOuterCollision(entityA.outer, NoEntityOuterCollision)
+            _BranchIfNoOuterCollision(entityA.outer, NoEntityOuterCollision)
 
-        // Outer hitboxes collided
-        // Determine number of inner hitboxes in the entity being tested
+                // Outer hitboxes collided
+                // Determine number of inner hitboxes in the entity being tested
 
-        // X = entityB EntityHitbox Address
-        tdc
-        sta.w   entityB.entityAddress
-        stx.w   entityB.hitboxAddress
+                // X = entityB EntityHitbox Address
+                tdc
+                sta.w   entityB.entityAddress
+                stx.w   entityB.hitboxAddress
 
-        lda.l   Format.EntityHitbox.count,x
-        and.w   #Format.EntityHitbox.COUNT_MASK
-        beq     _InnerTest_Multiple_Single
-        jmp     _InnerTest_Multiple_Multiple
+                lda.l   Format.EntityHitbox.count,x
+                and.w   #Format.EntityHitbox.COUNT_MASK
+                beq     _InnerTest_Multiple_Single
+                jmp     _InnerTest_Multiple_Multiple
 
-    InnerTest_Return:
-        // restore dp
-        lda.w   entityB.entityAddress
-        tcd
 
+    Continue_EntityLoop:
     NoEntityOuterCollision:
+        // DP = entityB
+
         lda.b   BaseEntity.next
         bne     EntityLoop
 
 
-    // restore DP
+    // Restore DP
     lda.w   entityA.entityAddress
     tcd
 
     rts
 
 
+
 // INPUT: DP = entityB address
 //        entityA values set
 //        entityB.entityAddress set
 //        entityB.hitboxAddress set
-// RETURN: InnerTest_Return
+//
+// RETURN: Jump to InnerCollision if entityA and entityB collided
+//         Jump to NoCollisions if no collisions occurred
 a16()
 i16()
 code()
@@ -521,7 +522,7 @@ function _InnerTest_Multiple_Single {
 
         // count is number of inner hitboxes - 1
         dey
-        bmi     Return
+        bmi     NoCollisions
 
         txa
         clc
@@ -529,18 +530,24 @@ function _InnerTest_Multiple_Single {
         tax
 
         bra     InnerLoop
-
-
-    InnerCollision:
-        // DP = entityA
-        // X = entityA inner collision
-        // entityB.entityAddress and entityB.hitboxAddress filled
-
-        _ProcessCollision(entityB)
-
-Return:
-    jmp     InnerTest_Return
 }
+
+
+// Collision occurred between entityA and entityB
+// DP = entityA
+// X = entityA inner collision
+// entityB.entityAddress and entityB.hitboxAddress filled
+//
+// OUTPUT: DP = entityB
+// RETURN: Jump to Continue_EntityLoop
+InnerCollision:
+    _ProcessCollision(entityB)
+
+NoCollisions:
+    lda.w   entityB.entityAddress
+    tcd
+
+    jmp     Continue_EntityLoop
 
 
 // INPUT: A = number of hitboxes in entityB
@@ -548,7 +555,9 @@ Return:
 //        entityA values set
 //        entityB.entityAddress set
 //        entityB.hitboxAddress set
-// RETURN: InnerTest_Return
+//
+// RETURN: Jump to InnerCollision if entityA and entityB collided
+//         Jump to NoCollisions if no collisions occurred
 a16()
 i16()
 code()
@@ -557,8 +566,6 @@ allocateTmpWord(entityB_xPos)
 allocateTmpWord(entityB_yPos)
 allocateTmpWord(collisionTableIndex)
 allocateTmpWord(tmp_row)
-
-constant NoCollisions = _InnerTest_Multiple_Single.Return
 
     assert(Tables.EntityHitbox.MAX_INNER_HITBOXES - 1 == Format.EntityHitbox.COUNT_MASK)
     assert(Tables.EntityHitbox.INNER_OFFSET == Format.EntityHitbox.Inner.size)
@@ -629,24 +636,26 @@ constant NoCollisions = _InnerTest_Multiple_Single.Return
         adc.w   entityA.hitboxAddress
         tax
 
-        _BranchOnInnerCollision(entityB.aabb, InnerCollision)
+        _BranchOnInnerCollision(entityB.aabb, _InnerCollision)
 
         iny
         iny
         jmp     InnerLoop
 
-InnerCollision:
+
+_InnerCollision:
     // DP = entityA
     // X = entityA inner collision
 
     // calculate entityB hitboxAddress
+
     lda.w   tmp_row
     and.w   #0xff
     clc
     adc.w   entityB.hitboxAddress
     sta.w   entityB.hitboxAddress
 
-    jmp     _InnerTest_Multiple_Single.InnerCollision
+    jmp     InnerCollision
 }
 }
 
