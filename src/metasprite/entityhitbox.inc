@@ -12,15 +12,18 @@
 namespace MetaSprite {
 namespace EntityHitbox {
 
+
 // PUBLIC API
 // ==========
 
 // Preforms a collision tests between two entity lists.
 //
-// REQUIRES: 16 bit A, 16 bit Index, DB = 0x7e, DP = 0
+// REQUIRES: 16 bit A, 16 bit Index, DB = 0x7e
 //
 // PARAM: aList - first entity list
 // PARAM: bList - second entity list
+//
+// MODIFIES: DP
 macro TestCollisions(aList, bList) {
     assert16a()
     assert16i()
@@ -35,10 +38,12 @@ EndIf{#}:
 
 // Preforms a collision test an entity list and multiple entity lists
 //
-// REQUIRES: 16 bit A, 16 bit Index, DB = 0x7e, DP = 0
+// REQUIRES: 16 bit A, 16 bit Index, DB = 0x7e
 //
 // PARAM: aList - first entity list
 // PARAM: bList1 : bListN - entity lists to test collisison with aList
+//
+// MODIFIES: DP
 macro TestCollisions(aList, bList1, bList2) {
     assert16a()
     assert16i()
@@ -149,12 +154,14 @@ namespace entityB {
 
 // Preforms a collision test between two entity lists
 //
-// REQUIRES: 16 bit A, 16 bit Index, DB = 0x7e, DP = 0
+// REQUIRES: 16 bit A, 16 bit Index, DB = 0x7e
 //
 // PARAM: aList - the first entityList
 // PARAM: bList - the second entityList
 // PARAM: isFirst - non-zero if the this is the first test against aList
 // INPUT: A = first entity in aList (MUST NOT BE NULL) (only used if isFirst is true)
+//
+// MODIFIES: DP
 inline _TestTwoEntityLists(aList, bList, evaluate isFirst) {
     assert16a()
     assert16i()
@@ -406,6 +413,8 @@ a16()
 //
 // INPUT: A = first item in listA (NOT NULL)
 // INPUT: Y = first item in listB (NOT NULL)
+//
+// MODIFIES: DP
 a16()
 i16()
 code()
@@ -445,8 +454,8 @@ function _TestTwoEntityLists {
 
         lda.b   BaseEntity.next
         bne     OuterLoop
-        bra     EndOuterLoop
 
+        rts
 
     Next_EntityA:
         // DP = unknown
@@ -455,12 +464,7 @@ function _TestTwoEntityLists {
         lda.w   BaseEntity.next,x
         bne     OuterLoop
 
-
-EndOuterLoop:
-    lda.w   #0
-    tcd
-
-    rts
+        rts
 }
 
 
