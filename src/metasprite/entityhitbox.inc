@@ -25,7 +25,7 @@ macro TestCollisions(aList, bList) {
     assert16a()
     assert16i()
 
-    ldx.w   Entity.lists.{aList}
+    lda.w   Entity.lists.{aList}
     beq     EndIf{#}
 
         MetaSprite.EntityHitbox._TestTwoEntityLists({aList}, {bList}, 1)
@@ -43,7 +43,7 @@ macro TestCollisions(aList, bList1, bList2) {
     assert16a()
     assert16i()
 
-    ldx.w   Entity.lists.{aList}
+    lda.w   Entity.lists.{aList}
     beq     EndIf{#}
 
         MetaSprite.EntityHitbox._TestTwoEntityLists({aList}, {bList1}, 1)
@@ -55,7 +55,7 @@ macro TestCollisions(aList, bList1, bList2, bList3) {
     assert16a()
     assert16i()
 
-    ldx.w   Entity.lists.{aList}
+    lda.w   Entity.lists.{aList}
     beq     EndIf{#}
 
         MetaSprite.EntityHitbox._TestTwoEntityLists({aList}, {bList1}, 1)
@@ -68,7 +68,7 @@ macro TestCollisions(aList, bList1, bList2, bList3, bList4) {
     assert16a()
     assert16i()
 
-    ldx.w   Entity.lists.{aList}
+    lda.w   Entity.lists.{aList}
     beq     EndIf{#}
 
         MetaSprite.EntityHitbox._TestTwoEntityLists({aList}, {bList1}, 1)
@@ -82,7 +82,7 @@ macro TestCollisions(aList, bList1, bList2, bList3, bList4, bList5) {
     assert16a()
     assert16i()
 
-    ldx.w   Entity.lists.{aList}
+    lda.w   Entity.lists.{aList}
     beq     EndIf{#}
 
         MetaSprite.EntityHitbox._TestTwoEntityLists({aList}, {bList1}, 1)
@@ -154,7 +154,7 @@ namespace entityB {
 // PARAM: aList - the first entityList
 // PARAM: bList - the second entityList
 // PARAM: isFirst - non-zero if the this is the first test against aList
-// INPUT: X = first entity in aList (MUST NOT BE NULL) (only used if isFirst is true)
+// INPUT: A = first entity in aList (MUST NOT BE NULL) (only used if isFirst is true)
 inline _TestTwoEntityLists(aList, bList, evaluate isFirst) {
     assert16a()
     assert16i()
@@ -166,7 +166,7 @@ inline _TestTwoEntityLists(aList, bList, evaluate isFirst) {
     ldy.w   Entity.lists.{bList}
     beq     EndIf{#}
         if {isFirst} == 0 {
-            ldx.w   Entity.lists.{aList}
+            lda.w   Entity.lists.{aList}
         }
         jsr     MetaSprite.EntityHitbox._TestTwoEntityLists
     EndIf{#}:
@@ -404,7 +404,7 @@ a16()
 //
 // REQUIRE: 16 bit A, 16 bit Index, DB = 0x7e, DP = 0
 //
-// INPUT: X = first item in listA (NOT NULL)
+// INPUT: A = first item in listA (NOT NULL)
 // INPUT: Y = first item in listB (NOT NULL)
 a16()
 i16()
@@ -414,23 +414,21 @@ function _TestTwoEntityLists {
 
 
     OuterLoop:
-        // X = entityA
+        // A = entityA
 
-        txy
-        // Y = entityA
+        sta.w   entityA.entityAddress
+        tcd
 
-        ldx.w   BaseEntity.MetaSprite.currentFrame,y
+        // DP = entityA
+
+        ldx.b   BaseEntity.MetaSprite.currentFrame
         beq     NoHitbox
 
         lda.l   Format.Frame.entityHitbox,x
         beq     NoHitbox
         tax
 
-        sty.w   entityA.entityAddress
         stx.w   entityA.hitboxAddress
-
-        tya
-        tcd
 
         _SetupOuterAabb(entityA.outer)
 
@@ -441,18 +439,24 @@ function _TestTwoEntityLists {
         beq     _TestList_EntityA_SingleHitbox
         jmp     _TestList_EntityA_MultipleHitboxes
 
+
+    NoHitbox:
+        // DP = entityA
+
+        lda.b   BaseEntity.next
+        bne     OuterLoop
+        bra     EndOuterLoop
+
+
     Next_EntityA:
         // DP = unknown
 
-        ldy.w   entityA.entityAddress
-
-    NoHitbox:
-        // Y = entityA
-
-        ldx.w   BaseEntity.next,y
+        ldx.w   entityA.entityAddress
+        lda.w   BaseEntity.next,x
         bne     OuterLoop
 
 
+EndOuterLoop:
     lda.w   #0
     tcd
 
