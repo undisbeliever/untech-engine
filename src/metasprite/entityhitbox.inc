@@ -121,12 +121,12 @@ namespace entityA {
     allocateTmpWord(hitboxCount)
 
     // Outer hitbox of entity
-    // X/Y values are offset by INT_MS8_OFFSET
+    // all values are offset by INT_MS8_OFFSET
     namespace outer {
-        allocateTmpWord(xPos)
-        allocateTmpWord(yPos)
-        allocateTmpWord(width)
-        allocateTmpWord(height)
+        allocateTmpWord(left)
+        allocateTmpWord(right)
+        allocateTmpWord(top)
+        allocateTmpWord(bottom)
     }
 }
 
@@ -139,11 +139,12 @@ namespace entityB {
     allocateTmpWord(hitboxAddress)
 
     // Used for both inner and outer hitbox tests
+    // all values are offset by INT_MS8_OFFSET
     namespace aabb {
-        allocateTmpWord(xPos)
-        allocateTmpWord(yPos)
-        allocateTmpWord(width)
-        allocateTmpWord(height)
+        allocateTmpWord(left)
+        allocateTmpWord(right)
+        allocateTmpWord(top)
+        allocateTmpWord(bottom)
     }
 }
 
@@ -192,25 +193,29 @@ macro _SetupOuterAabb(aabb) {
     assert16i()
 
     lda.l   Format.EntityHitbox.Outer.xOffset,x
+    sta.w   _offsetSizePair
+
     and.w   #0xff
     clc
     adc.b   BaseEntity.xPos.px
-    sta.w   {aabb}.xPos
+    sta.w   {aabb}.left
 
-    lda.l   Format.EntityHitbox.Outer.width,x
-    and.w   #0xff
-    sta.w   {aabb}.width
+    sec                             // + 1
+    adc.w   _offsetSizePair + 1     // width
+    sta.w   {aabb}.right
 
 
     lda.l   Format.EntityHitbox.Outer.yOffset,x
+    sta.w   _offsetSizePair
+
     and.w   #0xff
     clc
     adc.b   BaseEntity.yPos.px
-    sta.w   {aabb}.yPos
+    sta.w   {aabb}.top
 
-    lda.l   Format.EntityHitbox.Outer.height,x
-    and.w   #0xff
-    sta.w   {aabb}.height
+    sec                             // + 1
+    adc.w   _offsetSizePair + 1     // height
+    sta.w   {aabb}.bottom
 }
 
 
@@ -230,25 +235,23 @@ macro _BranchIfNoOuterCollision(aabb, NoCollision) {
     // x coordinate more likely to miss
 
     namespace {#} {
+        // if left >= aabb.right
+        //    || right <= aabb.left: goto NoCollision
+
         lda.l   Format.EntityHitbox.Outer.xOffset,x
         sta.w   _offsetSizePair
         and.w   #0xff
         clc
         adc.b   BaseEntity.xPos.px
 
-        cmp.w   {aabb}.xPos
-        bcs     XAhead
-            // c clear
-            adc.w   _offsetSizePair + 1     // width
-            cmp.w   {aabb}.xPos
-            bcc     {NoCollision}
-            bra     XMatch
-        XAhead:
-            // c set
-            sbc.w   {aabb}.width
-            cmp.w   {aabb}.xPos
-            bcs     {NoCollision}
-        XMatch:
+        cmp.w   {aabb}.right
+        bcs     {NoCollision}
+
+        // c clear
+        adc.w   _offsetSizePair + 1     // width
+        // A = right - 1
+        cmp.w   {aabb}.left
+        bcc     {NoCollision}
 
 
         lda.l   Format.EntityHitbox.Outer.yOffset,x
@@ -256,20 +259,15 @@ macro _BranchIfNoOuterCollision(aabb, NoCollision) {
         and.w   #0xff
         clc
         adc.b   BaseEntity.yPos.px
-        cmp.w   {aabb}.yPos
-        bcs     YAhead
-            // c clear
-            adc.w   _offsetSizePair + 1     // height
-            cmp.w   {aabb}.yPos
-            bcc     {NoCollision}
-            bra     YMatch
 
-        YAhead:
-            // c set
-            sbc.w   {aabb}.height
-            cmp.w   {aabb}.yPos
-            bcs     {NoCollision}
-        YMatch:
+        cmp.w   {aabb}.bottom
+        bcs     {NoCollision}
+
+        // c clear
+        adc.w   _offsetSizePair + 1     // height
+        // A = bottom - 1
+        cmp.w   {aabb}.top
+        bcc     {NoCollision}
     }
 }
 
@@ -290,25 +288,24 @@ macro _BranchOnInnerCollision(aabb, Collision) {
     // x coordinate more likely to miss
 
     namespace {#} {
+        // if left >= aabb.right
+        //    || right <= aabb.left: goto NoCollision
+
         lda.l   Format.EntityHitbox.Inner.xOffset,x
         sta.w   _offsetSizePair
         and.w   #0xff
         clc
         adc.b   BaseEntity.xPos.px
 
-        cmp.w   {aabb}.xPos
-        bcs     XAhead
-            // c clear
-            adc.w   _offsetSizePair + 1     // width
-            cmp.w   {aabb}.xPos
-            bcc     NoCollision
-            bra     XMatch
-        XAhead:
-            // c set
-            sbc.w   {aabb}.width
-            cmp.w   {aabb}.xPos
-            bcs     NoCollision
-        XMatch:
+        cmp.w   {aabb}.right
+        bcs     NoCollision
+
+        // c clear
+        // Deliberately not one to right
+        adc.w   _offsetSizePair + 1     // width
+        // A = right - 1
+        cmp.w   {aabb}.left
+        bcc     NoCollision
 
 
         lda.l   Format.EntityHitbox.Inner.yOffset,x
@@ -316,19 +313,15 @@ macro _BranchOnInnerCollision(aabb, Collision) {
         and.w   #0xff
         clc
         adc.b   BaseEntity.yPos.px
-        cmp.w   {aabb}.yPos
-        bcs     YAhead
-            // c clear
-            adc.w   _offsetSizePair + 1     // height
-            cmp.w   {aabb}.yPos
-            bcs     {Collision}
-            bra     NoCollision
 
-        YAhead:
-            // c set
-            sbc.w   {aabb}.height
-            cmp.w   {aabb}.yPos
-            bcc     {Collision}
+        cmp.w   {aabb}.bottom
+        bcs     NoCollision
+
+        // c clear
+        adc.w   _offsetSizePair + 1     // height
+        // A = bottom - 1
+        cmp.w   {aabb}.top
+        bcs     {Collision}
 
         NoCollision:
     }
@@ -733,25 +726,27 @@ allocateTmpWord(tmp_row)
         tax
 
         lda.l   Format.EntityHitbox.Inner.xOffset,x
+        sta.w   _offsetSizePair
         and.w   #0xff
         clc
         adc.w   entityB_xPos
-        sta.w   entityB.aabb.xPos
+        sta.w   entityB.aabb.left
 
-        lda.l   Format.EntityHitbox.Inner.width,x
-        and.w   #0xff
-        sta.w   entityB.aabb.width
+        sec                             // + 1
+        adc.w   _offsetSizePair + 1     // width
+        sta.w   entityB.aabb.right
 
 
         lda.l   Format.EntityHitbox.Inner.yOffset,x
+        sta.w   _offsetSizePair
         and.w   #0xff
         clc
         adc.w   entityB_yPos
-        sta.w   entityB.aabb.yPos
+        sta.w   entityB.aabb.top
 
-        lda.l   Format.EntityHitbox.Inner.height,x
-        and.w   #0xff
-        sta.w   entityB.aabb.height
+        sec                             // + 1
+        adc.w   _offsetSizePair + 1     // height
+        sta.w   entityB.aabb.bottom
 
 
         lda.w   tmp_row + 1

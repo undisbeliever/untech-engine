@@ -10,7 +10,7 @@
 
 
 // Data format may be subject to changes
-if MetaSprite.Data.METASPRITE_FORMAT_VERSION != 31 {
+if MetaSprite.Data.METASPRITE_FORMAT_VERSION != 32 {
     error "Invalid UnTech MetaSprite Format"
 }
 
@@ -227,14 +227,18 @@ namespace Format {
             constant COUNT_MASK = 3
 
             // Outer hitbox, checked first
+            //
+            // NOTE: actual size of hitbox is width/height + 1
             namespace Outer {
                 field(xOffset, 1) // int_ms8 format
-                field(width, 1)   // uint8
+                field(width, 1)   // uint8 (offset by 1)
                 field(yOffset, 1) // int_ms8 format
-                field(height, 1)  // uint8
+                field(height, 1)  // uint8 (offset by 1)
             }
 
             // The inner hitboxes, repeated `count + 1` times
+            //
+            // NOTE: actual size of hitbox is width/height + 1
             //
             // All inner hitboxes MUST be inside the outer hitbox.
             namespace Inner {
@@ -243,9 +247,9 @@ namespace Format {
                 field(type, 1)
 
                 field(xOffset, 1) // int_ms8 format
-                field(width, 1)   // uint8
+                field(width, 1)   // uint8 (offset by 1)
                 field(yOffset, 1) // int_ms8 format
-                field(height, 1)  // uint8
+                field(height, 1)  // uint8 (offset by 1)
 
                 constant size = 5
             }
