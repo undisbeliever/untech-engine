@@ -3,7 +3,7 @@
 // Distributed under The MIT License: https://opensource.org/licenses/MIT
 
 createCodeBlock(code,                   0xc08000, 0xc0ffaf)
-createDataBlock(breakIdStrings,         0xc00000, 0xc01fff)
+createDataBlock(breakIdStrings,         0xc00000, 0xc017ff)
 createDataBlock(testTableBlock,         0xc02000, 0xc03fff)
 
 createDataBlock(MS_FrameSetList,        0xc10000, 0xc100ff)
@@ -16,8 +16,12 @@ createDataBlock(MS_FrameData,           0xc11000, 0xc117ff)
 createDataBlock(MS_AnimationData,       0xc11800, 0xc11fff)
 createDataBlock(MS_FrameObjectsData,    0xc12000, 0xc127ff)
 createDataBlock(MS_TileHitboxData,      0xc12800, 0xc12fff)
-createDataBlock(MS_EntityHitboxData,    0xc13000, 0xc137ff)
-createDataBlock(MS_ActionPointsData,    0xc13800, 0xc13fff)
+createDataBlock(MS_ActionPointsData,    0xc13000, 0xc13fff)
+
+// Moving EntityHitbox data to a different data bank then FrameData
+// in order to test the `src/metasprite/entityhitbox.inc` conditionals.
+// (same data bank code is tested by horizontal-shooter)
+createDataBlock(MS_EntityHitboxData,    0xc01800, 0xc01fff)
 
 createDataBlock(MS_PaletteData,         0xc14000, 0xc147ff)
 
