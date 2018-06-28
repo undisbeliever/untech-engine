@@ -44,8 +44,8 @@
   <frame id="frame8" order="3">
     <object size="small" x="-4" y="-4" tile="7"/>
     <entityhitbox type="BODY_ATTACK" x="-3" y="-3" width="3" height="3"/>
-    <entityhitbox type="BODY_WEAK" x="0" y="0" width="3" height="3"/>
+    <entityhitbox type="SHIELD_ATTACK" x="0" y="0" width="3" height="3"/>
     <entityhitbox type="SHIELD" x="-3" y="0" width="3" height="3"/>
-    <entityhitbox type="SHIELD_ATTACK" x="0" y="-3" width="3" height="3"/>
+    <entityhitbox type="BODY_WEAK" x="0" y="-3" width="3" height="3"/>
   </frame>
 </metasprite>
