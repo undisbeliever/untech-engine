@@ -16,19 +16,60 @@ namespace EntityHitbox {
 // PUBLIC API
 // ==========
 
+
+// Start the collision tests
+//
+// You MUST ONLY invoke `MetaSprite.EntityHitbox.TestCollisions`
+// inside the EntityHitbox Begin()-End() block.
+//
+// You MUST invoke `MetaSprite.EntityHitbox.End` to end the block.
+//
+// REQUIRES: 16 bit A, 16 bit Index, DP = 0, DB = EntityHitboxBank
+macro Begin() {
+    if MetaSprite.EntityHitbox.__EH_BLOCK != 0 {
+        error "Cannot invoke MetaSprite.EntityHitbox.Begin() twice"
+    }
+    MetaSprite.EntityHitbox.__EH_BLOCK = 1
+
+    pea     (0x7e << 8) | MetaSprite.EntityHitbox.EntityHitboxBank
+    plb
+}
+
+
+// End the EntityHitbox test
+// Restores the DP/DB registers
+//
+// REQUITES: 16 bit A, 16 bit Index, DP = 0
+// OUTPUT: DB = 0x7e
+macro End() {
+    if MetaSprite.EntityHitbox.__EH_BLOCK == 0 {
+        error "Expected MetaSprite.EntityHitbox.Begin()"
+    }
+    if MetaSprite.EntityHitbox.__EH_BLOCK == 1 {
+        error "Expected at least one MetaSprite.EntityHitbox.TestCollisions()"
+    }
+
+    MetaSprite.EntityHitbox.__EH_BLOCK = 0
+
+    plb
+}
+
+
 // Preforms a collision tests between two entity lists.
 //
-// REQUIRES: 16 bit A, 16 bit Index, DB = 0x7e
+// REQUIRES: 16 bit A, 16 bit Index, DP = 0, DB = EntityHitboxBank
 //
 // PARAM: aList - first entity list
 // PARAM: bList - second entity list
-//
-// MODIFIES: DP
 macro TestCollisions(aList, bList) {
     assert16a()
     assert16i()
 
-    lda.w   Entity.lists.{aList}
+    MetaSprite.EntityHitbox._TestInBlock()
+
+    // ::TODO move entity lists to dp::
+
+    lda.l   Entity.lists.{aList}
     beq     EndIf{#}
 
         MetaSprite.EntityHitbox._TestTwoEntityLists({aList}, {bList}, 1)
@@ -38,17 +79,19 @@ EndIf{#}:
 
 // Preforms a collision test an entity list and multiple entity lists
 //
-// REQUIRES: 16 bit A, 16 bit Index, DB = 0x7e
+// REQUIRES: 16 bit A, 16 bit Index, DP = 0, DB = EntityHitboxBank
 //
 // PARAM: aList - first entity list
 // PARAM: bList1 : bListN - entity lists to test collisison with aList
-//
-// MODIFIES: DP
 macro TestCollisions(aList, bList1, bList2) {
     assert16a()
     assert16i()
 
-    lda.w   Entity.lists.{aList}
+    MetaSprite.EntityHitbox._TestInBlock()
+
+    // ::TODO move entity lists to dp::
+
+    lda.l   Entity.lists.{aList}
     beq     EndIf{#}
 
         MetaSprite.EntityHitbox._TestTwoEntityLists({aList}, {bList1}, 1)
@@ -60,7 +103,9 @@ macro TestCollisions(aList, bList1, bList2, bList3) {
     assert16a()
     assert16i()
 
-    lda.w   Entity.lists.{aList}
+    MetaSprite.EntityHitbox._TestInBlock()
+
+    lda.l   Entity.lists.{aList}
     beq     EndIf{#}
 
         MetaSprite.EntityHitbox._TestTwoEntityLists({aList}, {bList1}, 1)
@@ -73,7 +118,9 @@ macro TestCollisions(aList, bList1, bList2, bList3, bList4) {
     assert16a()
     assert16i()
 
-    lda.w   Entity.lists.{aList}
+    MetaSprite.EntityHitbox._TestInBlock()
+
+    lda.l   Entity.lists.{aList}
     beq     EndIf{#}
 
         MetaSprite.EntityHitbox._TestTwoEntityLists({aList}, {bList1}, 1)
@@ -87,7 +134,9 @@ macro TestCollisions(aList, bList1, bList2, bList3, bList4, bList5) {
     assert16a()
     assert16i()
 
-    lda.w   Entity.lists.{aList}
+    MetaSprite.EntityHitbox._TestInBlock()
+
+    lda.l   Entity.lists.{aList}
     beq     EndIf{#}
 
         MetaSprite.EntityHitbox._TestTwoEntityLists({aList}, {bList1}, 1)
@@ -102,67 +151,89 @@ EndIf{#}:
 // VARIABLES
 // =========
 
+// EntityHitbox Begin()-End() block status
+variable __EH_BLOCK = 0
+
+constant EntityHitboxBank = Data.EntityHitboxOffset >> 16
+
 // Temporary store for the offset/size pair from EntityHitbox struct
 // Used to convert width/height from uint8 to uint16
 // (3x uint8_t, third byte always 0)
-allocate(_offsetSizePair, wram7e, 3)
+allocate(_offsetSizePair, dp, 3)
 
 // The outer loop entity
 namespace entityA {
     // address of the entity
     // (word addr)
-    allocateTmpWord(entityAddress)
+    allocate(entityAddress, dp, 2)
 
     // address of the entity hitbox
-    allocateTmpWord(hitboxAddress)
+    allocate(hitboxAddress, dp, 2)
 
     // number of hitboxes
     // (only set in when entity has Multiple hitboxes)
-    allocateTmpWord(hitboxCount)
+    allocate(hitboxCount, dp, 2)
 
     // Outer hitbox of entity
     // all values are offset by INT_MS8_OFFSET
     namespace outer {
-        allocateTmpWord(left)
-        allocateTmpWord(right)
-        allocateTmpWord(top)
-        allocateTmpWord(bottom)
+        allocate(left, dp, 2)
+        allocate(right, dp, 2)
+        allocate(top, dp, 2)
+        allocate(bottom, dp, 2)
     }
 }
 
 // The inner loop list
-allocateTmpWord(listB)
+allocate(listB, dp, 2)
 
 // The inner loop entity
 namespace entityB {
-    allocateTmpWord(entityAddress)
-    allocateTmpWord(hitboxAddress)
+    allocate(entityAddress, dp, 2)
+    allocate(hitboxAddress, dp, 2)
 
     // Used for both inner and outer hitbox tests
     // all values are offset by INT_MS8_OFFSET
     namespace aabb {
-        allocateTmpWord(left)
-        allocateTmpWord(right)
-        allocateTmpWord(top)
-        allocateTmpWord(bottom)
+        allocate(left, dp, 2)
+        allocate(right, dp, 2)
+        allocate(top, dp, 2)
+        allocate(bottom, dp, 2)
     }
 }
+
+// Temporary Variables
+
+allocate(_count, dp, 2)
+allocate(_collisonOrderPos, dp, 2)
+allocate(_row, dp, 2)
+
+allocate(_entityB_xPos, dp, 2)
+allocate(_entityB_yPos, dp, 2)
+allocate(_collisionTableIndex, dp, 2)
+
 
 
 // PRIVATE API
 // ===========
 
 
+// Tests that we are in a EntityHitbox Begin()-End() block
+inline _TestInBlock() {
+    if MetaSprite.EntityHitbox.__EH_BLOCK == 0 {
+        error "Expected MetaSprite.EntityHitbox.Begin()"
+    }
+    MetaSprite.EntityHitbox.__EH_BLOCK = MetaSprite.EntityHitbox.__EH_BLOCK + 1
+}
+
 // Preforms a collision test between two entity lists
 //
-// REQUIRES: 16 bit A, 16 bit Index, DB = 0x7e
+// REQUIRES: 16 bit A, 16 bit Index, DP = 0, DB = EntityHitboxBank
 //
 // PARAM: aList - the first entityList
 // PARAM: bList - the second entityList
 // PARAM: isFirst - non-zero if the this is the first test against aList
 // INPUT: A = first entity in aList (MUST NOT BE NULL) (only used if isFirst is true)
-//
-// MODIFIES: DP
 inline _TestTwoEntityLists(aList, bList, evaluate isFirst) {
     assert16a()
     assert16i()
@@ -171,11 +242,15 @@ inline _TestTwoEntityLists(aList, bList, evaluate isFirst) {
         error "Cannot preform a collision test between the same list ({aList} and {bList})"
     }
 
-    ldy.w   Entity.lists.{bList}
+    // ::TODO move entity lists to dp::
+
+    lda.l   Entity.lists.{bList}
     beq     EndIf{#}
-        if {isFirst} == 0 {
-            lda.w   Entity.lists.{aList}
-        }
+        tay
+        lda.l   Entity.lists.{aList}
+//        if {isFirst} == 0 {
+//            lda.l   Entity.lists.{aList}
+//        }
         jsr     MetaSprite.EntityHitbox._TestTwoEntityLists
     EndIf{#}:
 }
@@ -183,39 +258,38 @@ inline _TestTwoEntityLists(aList, bList, evaluate isFirst) {
 
 // Calculates the outer hitbox (enityhitbox address is known)
 //
-// REQUIRES: 16 bit A, 16 bit Index, DB = 0x7e
-// INPUT: dp = entity
-//         X = EntityHitbox address (NOT NULL)
-// KEEP: X, Y
+// REQUIRES: 16 bit A, 16 bit Index, DP = 0, DB = EntityHitboxBank
+// INPUT: X = entity
+//        Y = EntityHitbox address (NOT NULL)
 // BRANCH: to NoHitbox is there is no metasprite entityhitbox
 macro _SetupOuterAabb(aabb) {
     assert16a()
     assert16i()
 
-    lda.l   Format.EntityHitbox.Outer.xOffset,x
-    sta.w   _offsetSizePair
+    lda.w   Format.EntityHitbox.Outer.xOffset,y
+    sta.b   _offsetSizePair
 
     and.w   #0xff
     clc
-    adc.b   BaseEntity.xPos.px
-    sta.w   {aabb}.left
+    adc.b   BaseEntity.xPos.px,x
+    sta.b   {aabb}.left
 
     sec                             // + 1
-    adc.w   _offsetSizePair + 1     // width
-    sta.w   {aabb}.right
+    adc.b   _offsetSizePair + 1     // width
+    sta.b   {aabb}.right
 
 
-    lda.l   Format.EntityHitbox.Outer.yOffset,x
-    sta.w   _offsetSizePair
+    lda.w   Format.EntityHitbox.Outer.yOffset,y
+    sta.b   _offsetSizePair
 
     and.w   #0xff
     clc
-    adc.b   BaseEntity.yPos.px
-    sta.w   {aabb}.top
+    adc.b   BaseEntity.yPos.px,x
+    sta.b   {aabb}.top
 
     sec                             // + 1
-    adc.w   _offsetSizePair + 1     // height
-    sta.w   {aabb}.bottom
+    adc.b   _offsetSizePair + 1     // height
+    sta.b   {aabb}.bottom
 }
 
 
@@ -223,9 +297,9 @@ macro _SetupOuterAabb(aabb) {
 // outer hitbox and aabb
 //
 //
-// REQUIRES: 16 bit A, 16 bit Index, DB = 0x7e
-// INPUT: dp = entity
-// INPUT: X = EntityHitbox address
+// REQUIRES: 16 bit A, 16 bit Index, DP = 0, DB = EntityHitboxBank
+// INPUT: X = entity
+//        Y = EntityHitbox address
 // KEEP: X, Y
 // BRANCH: to `noCollision` if there is no collision
 macro _BranchIfNoOuterCollision(aabb, NoCollision) {
@@ -238,35 +312,35 @@ macro _BranchIfNoOuterCollision(aabb, NoCollision) {
         // if left >= aabb.right
         //    || right <= aabb.left: goto NoCollision
 
-        lda.l   Format.EntityHitbox.Outer.xOffset,x
-        sta.w   _offsetSizePair
+        lda.w   Format.EntityHitbox.Outer.xOffset,y
+        sta.b   _offsetSizePair
         and.w   #0xff
         clc
-        adc.b   BaseEntity.xPos.px
+        adc.b   BaseEntity.xPos.px,x
 
-        cmp.w   {aabb}.right
+        cmp.b   {aabb}.right
         bcs     {NoCollision}
 
         // c clear
-        adc.w   _offsetSizePair + 1     // width
+        adc.b   _offsetSizePair + 1     // width
         // A = right - 1
-        cmp.w   {aabb}.left
+        cmp.b   {aabb}.left
         bcc     {NoCollision}
 
 
-        lda.l   Format.EntityHitbox.Outer.yOffset,x
-        sta.w   _offsetSizePair
+        lda.w   Format.EntityHitbox.Outer.yOffset,y
+        sta.b   _offsetSizePair
         and.w   #0xff
         clc
-        adc.b   BaseEntity.yPos.px
+        adc.b   BaseEntity.yPos.px,x
 
-        cmp.w   {aabb}.bottom
+        cmp.b   {aabb}.bottom
         bcs     {NoCollision}
 
         // c clear
-        adc.w   _offsetSizePair + 1     // height
+        adc.b   _offsetSizePair + 1     // height
         // A = bottom - 1
-        cmp.w   {aabb}.top
+        cmp.b   {aabb}.top
         bcc     {NoCollision}
     }
 }
@@ -276,9 +350,9 @@ macro _BranchIfNoOuterCollision(aabb, NoCollision) {
 // between selected inner hitbox and given aabb.
 //
 //
-// REQUIRES: 16 bit A, 16 bit Index, DB = 0x7e
-// INPUT: dp = entity to test
-// INPUT: X = EntityHitbox address + inner collision offset
+// REQUIRES: 16 bit A, 16 bit Index, DP = 0, DB = EntityHitboxBank
+// INPUT: X = entity to test
+//        Y = EntityHitbox address + inner collision offset
 // KEEP: X, Y
 // BRANCH: to `Collision` if there is a collision
 macro _BranchOnInnerCollision(aabb, Collision) {
@@ -291,39 +365,39 @@ macro _BranchOnInnerCollision(aabb, Collision) {
         // if left >= aabb.right
         //    || right <= aabb.left: goto NoCollision
 
-        lda.l   Format.EntityHitbox.Inner.xOffset,x
-        sta.w   _offsetSizePair
+        lda.w   Format.EntityHitbox.Inner.xOffset,y
+        sta.b   _offsetSizePair
         and.w   #0xff
         clc
-        adc.b   BaseEntity.xPos.px
+        adc.b   BaseEntity.xPos.px,x
 
-        cmp.w   {aabb}.right
+        cmp.b   {aabb}.right
         bcs     NoCollision
 
         // c clear
         // Deliberately not one to right
-        adc.w   _offsetSizePair + 1     // width
+        adc.b   _offsetSizePair + 1     // width
         // A = right - 1
-        cmp.w   {aabb}.left
+        cmp.b   {aabb}.left
         bcc     NoCollision
 
 
-        lda.l   Format.EntityHitbox.Inner.yOffset,x
-        sta.w   _offsetSizePair
+        lda.w   Format.EntityHitbox.Inner.yOffset,y
+        sta.b   _offsetSizePair
         and.w   #0xff
         clc
-        adc.b   BaseEntity.yPos.px
+        adc.b   BaseEntity.yPos.px,x
 
-        cmp.w   {aabb}.bottom
+        cmp.b   {aabb}.bottom
         bcs     NoCollision
 
         // c clear
-        adc.w   _offsetSizePair + 1     // height
+        adc.b   _offsetSizePair + 1     // height
         // A = bottom - 1
-        cmp.w   {aabb}.top
+        cmp.b   {aabb}.top
         bcs     {Collision}
 
-        NoCollision:
+    NoCollision:
     }
 }
 
@@ -333,26 +407,36 @@ macro _BranchOnInnerCollision(aabb, Collision) {
 // Calls BaseEntityFunctionTable.ProcessCollision for both entities
 // with the appropriate collisionBits
 //
-// REQUIRES: 16 bit A, 16 bit Index, DB = 0x7e
+// REQUIRES: 16 bit A, 16 bit Index, DP = 0, DB = EntityHitboxBank
 //
-// INPUT: DP = this entity address
-//         X = this inner collision address
+// INPUT:  X = this entity address
+//         Y = this inner collision address
 //         ns = namespace holding the other entity
-// MODIFIES: DP
-// OUTPUT: Collision.otherEntity = original value of DP
+// OUTPUT: Collision.otherEntity = original value of X
 macro _ProcessCollision(ns) {
     assert16a()
     assert16i()
 
     assert(Format.EntityHitboxType._N_BITS == 4)
 
-    lda.l   Format.EntityHitbox.Inner.type,x
+    txa
+    ldx.b   {ns}.hitboxAddress
+    tcd
+    // DP = entity
+    // Y = entity inner hitbox
+    // X = other entity inner hitbox
+
+    lda.w   Format.EntityHitbox.Inner.type,y
     asl
     asl
     asl
     asl
-    ldx.w   {ns}.hitboxAddress
-    ora.l   Format.EntityHitbox.Inner.type,x
+    ora.w   Format.EntityHitbox.Inner.type,x
+
+    pea     (EntityHitboxBank << 8) | 0x7e
+    plb
+    // DB = 0x7e
+
     sta.w   MetaSprite.Collision.bits
 
     ldy.w   {ns}.entityAddress
@@ -397,169 +481,193 @@ a16()
     // A = collision bits
     ldx.b   BaseEntity.functionTable
     jsr     (BaseEntityFunctionTable.ProcessCollision,x)
+
+
+    // Restore DP and DB
+    lda.w   #0
+    tcd
+    // DP = 0
+    plb
+    // DB = EntityHitboxBank
 }
 
 
 // Preforms a collision test between two entity lists
 //
-// REQUIRE: 16 bit A, 16 bit Index, DB = 0x7e, DP = 0
+// REQUIRE: 16 bit A, 16 bit Index, DP = 0, DB = EntityHitboxBank
 //
 // INPUT: A = first item in listA (NOT NULL)
 // INPUT: Y = first item in listB (NOT NULL)
-//
-// MODIFIES: DP
 a16()
 i16()
 code()
 function _TestTwoEntityLists {
-    sty.w   listB
+    sty.b   listB
 
-
+    // A = entityA
     OuterLoop:
-        // A = entityA
+        tay
+        // A & Y = entityA
 
-        sta.w   entityA.entityAddress
-        tcd
-
-        // DP = entityA
-
-        ldx.b   BaseEntity.MetaSprite.currentFrame
+        ldx.b   BaseEntity.MetaSprite.currentFrame,y
         beq     NoHitbox
 
-        lda.l   Format.Frame.entityHitbox,x
-        beq     NoHitbox
-        tax
+        if Data.FrameList >> 16 == EntityHitboxBank {
+            ldy.w   Format.Frame.entityHitbox,x
+            beq     NoHitbox
 
-        stx.w   entityA.hitboxAddress
+            tax
+        } else {
+            lda.l   Format.Frame.entityHitbox,x
+            beq     NoHitbox
+
+            tyx
+            tay
+        }
+
+        // X = entityAddress
+        // Y = hitboxAddress
+
+        stx.b   entityA.entityAddress
+        sty.b   entityA.hitboxAddress
 
         _SetupOuterAabb(entityA.outer)
 
-        ldy.w   listB
+        lda.w   Format.EntityHitbox.count,y
+        ldy.b   listB
 
-        lda.l   Format.EntityHitbox.count,x
+        // Y = listB, A = unmasked count
+
         and.w   #Format.EntityHitbox.COUNT_MASK
         beq     _TestList_EntityA_SingleHitbox
         jmp     _TestList_EntityA_MultipleHitboxes
 
 
     NoHitbox:
-        // DP = entityA
-
-        lda.b   BaseEntity.next
+        // Y = entityA
+        tyx
+        lda.b   BaseEntity.next,x
         bne     OuterLoop
 
         rts
+
 
     Next_EntityA:
-        // DP = unknown
+        // cannot use `lda (entityA.entityAddress)` here as DB cannot access shadow
+        // Doesn't matter as it is only one cycle slower
 
-        ldx.w   entityA.entityAddress
-        lda.w   BaseEntity.next,x
+        ldx.b   entityA.entityAddress
+        lda.b   BaseEntity.next,x
         bne     OuterLoop
 
         rts
 }
 
-
-namespace _TestList_EntityA_SingleHitbox {
-    NoEntityOuterCollision:
-        // continue loop
-
-        lda.b   BaseEntity.next
-        bne     EntityLoop
-
-    jmp     Next_EntityA
-}
 
 // Processes the collision tests where entityA has only one hitbox.
 //
-// REQUIRES: 16 bit A, 16 bit Index, DB = 0x7e
-// INPUT: dp = entityA address
-//         Y = first item in entity list (NOT NULL)
+// REQUIRES: 16 bit A, 16 bit Index, DP = 0, DB = EntityHitboxBank
+// INPUT: Y = first item in entity list (NOT NULL)
 //        entityA values set
-// MODIFIES: DP
 // RETURN: Jump to _TestTwoEntityLists.Next_EntityA
 a16()
 i16()
 code()
-function _TestList_EntityA_SingleHitbox {
+namespace _TestList_EntityA_SingleHitbox {
     constant Next_EntityA = _TestTwoEntityLists.Next_EntityA
 
-    // Current entity only has a single hitbox
-    // y = first entity in entityB list
-    tya
+    NoEntityOuterCollision_Y:
+        // Y = entityB address
+        tyx
+
+    NoEntityOuterCollision_X:
+        // X = entityB address
+
+        ldy.b   BaseEntity.next,x
+        beq     Next_EntityA
+
+START:
     EntityLoop:
-        tcd
+        // Y = entityB address
 
-        // DP = entityB address
+        ldx.b   BaseEntity.MetaSprite.currentFrame,y
+        beq     NoEntityOuterCollision_Y
 
-        ldx.b   BaseEntity.MetaSprite.currentFrame
-        beq     NoEntityOuterCollision
+        if Data.FrameList >> 16 == EntityHitboxBank {
+            lda.w   Format.Frame.entityHitbox,x
+        } else {
+            lda.l   Format.Frame.entityHitbox,x
+        }
+        beq     NoEntityOuterCollision_Y
+        tyx
+        tay
 
-        lda.l   Format.Frame.entityHitbox,x
-        beq     NoEntityOuterCollision
-        tax
+        // X = entity address
+        // Y = hitbox address
 
-        _BranchIfNoOuterCollision(entityA.outer, NoEntityOuterCollision)
+        _BranchIfNoOuterCollision(entityA.outer, NoEntityOuterCollision_X)
 
 
         // Outer hitboxes collided
         // Determine number of inner hitboxes in the entity being tested
 
-        // X = EntityHitbox Address
-        lda.l   Format.EntityHitbox.count,x
+        // Y = EntityHitbox Address
+        lda.w   Format.EntityHitbox.count,y
         and.w   #Format.EntityHitbox.COUNT_MASK
         beq     InnerCollision
 
 
         // entity being tested has multiple hitboxes
+        sta.b   _count
 
-        tay
         InnerLoop:
             // Test inner hitbox matches with single outer
 
             _BranchOnInnerCollision(entityA.outer, InnerCollision)
 
             // count is number of inner hitboxes - 1
-            dey
+            dec.b   _count
             bmi     EntityLoop_Continue
 
-            txa
+            tya
             clc
             adc.w   #Format.EntityHitbox.Inner.size
-            tax
+            tay
 
             bra     InnerLoop
 
 
         InnerCollision:
-            // DP = entityB entity
-            // X = entityB inner collision
+            // X = entityB address
+            // Y = entityB inner collision
 
             _ProcessCollision(entityA)
 
-            // Restore DP
-            lda.w   Collision.otherEntity
-            tcd
+            // entityB stored in Collision.otherEntity
 
+            assert(Collision.otherEntity < 0x100)
 
-    EntityLoop_Continue:
-        lda.b   BaseEntity.next
-        beq     EndEntityLoop
-            jmp     EntityLoop
+            // cannot use `lda (Collision.otherEntity)` here as DB cannot access shadow
+
+            ldx.b   Collision.otherEntity
+
+        EntityLoop_Continue:
+            // X = entityB address
+            ldy.b   BaseEntity.next,x
+            beq     EndEntityLoop
+                jmp     EntityLoop
 
 EndEntityLoop:
     jmp     Next_EntityA
 }
+constant _TestList_EntityA_SingleHitbox = _TestList_EntityA_SingleHitbox.START
 
 
 // Processes the collision tests where entityA has multiple hitboxes.
 //
-// REQUIRES: 16 bit A, 16 bit Index, DB = 0x7e
-// INPUT:  A = number of hitboxes
-//         Y = first item in entity list (NOT NULL)
+// REQUIRES: 16 bit A, 16 bit Index, DP = 0, DB = EntityHitboxBank
+// INPUT:  Y = first item in entity list (NOT NULL)
 //         entityA values set
-// MODIFIES: DP
 // RETURN: Jump to _TestTwoEntityLists.Next_EntityA
 a16()
 i16()
@@ -567,57 +675,71 @@ code()
 function _TestList_EntityA_MultipleHitboxes {
     constant Next_EntityA = _TestTwoEntityLists.Next_EntityA
 
-    sta.w   entityA.hitboxCount
+    // Current entity only has multiple hitboxex
 
-    // Current entity only has multiple hitbox
-    // y = first entity in entityB list
-    tya
+    sta.b   entityA.hitboxCount
+
     EntityLoop:
-        tcd
+        // Y = entityB
 
-        // DP = entityB
+        ldx.b   BaseEntity.MetaSprite.currentFrame,y
+        beq     NoEntityOuterCollision_Y
 
-        ldx.b   BaseEntity.MetaSprite.currentFrame
-        beq     NoEntityOuterCollision
+        if Data.FrameList >> 16 == EntityHitboxBank {
+            lda.w   Format.Frame.entityHitbox,x
+        } else {
+            lda.l   Format.Frame.entityHitbox,x
+        }
+        beq     NoEntityOuterCollision_Y
 
-        lda.l   Format.Frame.entityHitbox,x
-        beq     NoEntityOuterCollision
-        tax
+        tyx
+        tay
 
-            _BranchIfNoOuterCollision(entityA.outer, NoEntityOuterCollision)
+        // X = entityB
+        // Y = entityB hitbox
 
-                // Outer hitboxes collided
-                // Determine number of inner hitboxes in the entity being tested
+        _BranchIfNoOuterCollision(entityA.outer, NoEntityOuterCollision_X)
 
-                // X = entityB EntityHitbox Address
-                tdc
-                sta.w   entityB.entityAddress
-                stx.w   entityB.hitboxAddress
+            // Outer hitboxes collided
+            // Determine number of inner hitboxes in the entity being tested
 
-                lda.l   Format.EntityHitbox.count,x
-                and.w   #Format.EntityHitbox.COUNT_MASK
-                beq     _InnerTest_Multiple_Single
-                jmp     _InnerTest_Multiple_Multiple
+            stx.b   entityB.entityAddress
+            sty.b   entityB.hitboxAddress
+
+            lda.w   Format.EntityHitbox.count,y
+            and.w   #Format.EntityHitbox.COUNT_MASK
+            beq     _InnerTest_Multiple_Single
+            jmp     _InnerTest_Multiple_Multiple
+
+
+    NoEntityOuterCollision_Y:
+        tyx
+
+    NoEntityOuterCollision_X:
+        // X = entityB
+        ldy.b   BaseEntity.next,x
+        bne     EntityLoop
+        jmp     Next_EntityA
 
 
     Continue_EntityLoop:
-    NoEntityOuterCollision:
-        // DP = entityB
+        // cannot use `lda (entityB.entityB)` here as DB cannot access shadow
 
-        lda.b   BaseEntity.next
+        ldx.b   entityB.entityAddress
+        ldy.b   BaseEntity.next,x
         bne     EntityLoop
-
-    jmp     Next_EntityA
-
+        jmp     Next_EntityA
 
 
-// INPUT: DP = entityB address
+
+// INPUT: X = entityB address
+//        Y = entityB hitbox address
 //        entityA values set
 //        entityB.entityAddress set
 //        entityB.hitboxAddress set
 //
 // RETURN: Jump to InnerCollision if entityA and entityB collided
-//         Jump to NoCollisions if no collisions occurred
+//         Jump to Continue_EntityLoop if no collisions occurred
 a16()
 i16()
 code()
@@ -627,48 +749,47 @@ function _InnerTest_Multiple_Single {
 
     _SetupOuterAabb(entityB.aabb)
 
-    lda.w   entityA.entityAddress
-    tcd
-    ldy.w   entityA.hitboxCount
-    ldx.w   entityA.hitboxAddress
+    ldx.b   entityA.entityAddress
+    ldy.b   entityA.hitboxAddress
 
-    // DP = entityA
+    lda.b   entityA.hitboxCount
+    sta.b   _count
 
     InnerLoop:
+        // X = entityA
+        // Y = entityA hitbox
+
         _BranchOnInnerCollision(entityB.aabb, InnerCollision)
 
         // count is number of inner hitboxes - 1
-        dey
-        bmi     NoCollisions
+        dec.b   _count
+        bmi     Continue_EntityLoop
 
-        txa
+        tya
         clc
         adc.w   #Format.EntityHitbox.Inner.size
-        tax
+        tay
 
         bra     InnerLoop
 }
 
 
 // Collision occurred between entityA and entityB
-// DP = entityA
-// X = entityA inner collision
+// X = entityA
+// Y = entityA inner collision
 // entityB.entityAddress and entityB.hitboxAddress filled
 //
-// OUTPUT: DP = entityB
 // RETURN: Jump to Continue_EntityLoop
 InnerCollision:
     _ProcessCollision(entityB)
 
 NoCollisions:
-    lda.w   entityB.entityAddress
-    tcd
-
     jmp     Continue_EntityLoop
 
 
 // INPUT: A = number of hitboxes in entityB
-//        DP = entityB address
+//        X = entityB address
+//        Y = entityB hitbox address
 //        entityA values set
 //        entityB.entityAddress set
 //        entityB.hitboxAddress set
@@ -679,21 +800,17 @@ a16()
 i16()
 code()
 function _InnerTest_Multiple_Multiple {
-allocateTmpWord(entityB_xPos)
-allocateTmpWord(entityB_yPos)
-allocateTmpWord(collisionTableIndex)
-allocateTmpWord(tmp_row)
 
     assert(Tables.EntityHitbox.MAX_INNER_HITBOXES - 1 == Format.EntityHitbox.COUNT_MASK)
     assert(Tables.EntityHitbox.INNER_OFFSET == Format.EntityHitbox.Inner.size)
 
     // entityA and entityB have multiple hitboxes
 
-    ldy.b   BaseEntity.xPos.px
-    sty.w   entityB_xPos
+    ldy.b   BaseEntity.xPos.px,x
+    sty.b   _entityB_xPos
 
-    ldy.b   BaseEntity.yPos.px
-    sty.w   entityB_yPos
+    ldy.b   BaseEntity.yPos.px,x
+    sty.b   _entityB_yPos
 
 
     // A = entityB hitbox count
@@ -701,78 +818,82 @@ allocateTmpWord(tmp_row)
     assert(Tables.EntityHitbox.CollisionOrderTable.SHIFT == 2)
     asl
     asl
-    ora.w   entityA.hitboxCount
+    ora.b   entityA.hitboxCount
     asl
     tax
 
     lda.l   Tables.EntityHitbox.CollisionOrderTable - 2 * 4,x
-    tay
+    tax
 
-    lda.w   entityA.entityAddress
-    tcd
-
-    // DP = entityA
 
     InnerLoop:
-        tyx
+        // X = collisionOrderPos
+
         lda.l   Tables.EntityHitbox.CollisionOrder,x
         bmi     NoCollisions
 
-        sta.w   tmp_row
+        sta.b   _row
+        stx.b   _collisonOrderPos
 
         and.w   #0xff
         clc
-        adc.w   entityB.hitboxAddress
-        tax
+        adc.b   entityB.hitboxAddress
+        tay
 
-        lda.l   Format.EntityHitbox.Inner.xOffset,x
-        sta.w   _offsetSizePair
+        lda.w   Format.EntityHitbox.Inner.xOffset,y
+        sta.b   _offsetSizePair
         and.w   #0xff
         clc
-        adc.w   entityB_xPos
-        sta.w   entityB.aabb.left
+        adc.b   _entityB_xPos
+        sta.b   entityB.aabb.left
 
         sec                             // + 1
-        adc.w   _offsetSizePair + 1     // width
-        sta.w   entityB.aabb.right
+        adc.b   _offsetSizePair + 1     // width
+        sta.b   entityB.aabb.right
 
 
-        lda.l   Format.EntityHitbox.Inner.yOffset,x
-        sta.w   _offsetSizePair
+        lda.w   Format.EntityHitbox.Inner.yOffset,y
+        sta.b   _offsetSizePair
         and.w   #0xff
         clc
-        adc.w   entityB_yPos
-        sta.w   entityB.aabb.top
+        adc.b   _entityB_yPos
+        sta.b   entityB.aabb.top
 
         sec                             // + 1
-        adc.w   _offsetSizePair + 1     // height
-        sta.w   entityB.aabb.bottom
+        adc.b   _offsetSizePair + 1     // height
+        sta.b   entityB.aabb.bottom
 
 
-        lda.w   tmp_row + 1
+        lda.b   _row + 1
         and.w   #0xff
         clc
-        adc.w   entityA.hitboxAddress
-        tax
+        adc.b   entityA.hitboxAddress
+        tay
+
+        ldx.b   entityA.entityAddress
+
+        // X = entityA
+        // Y = entityA hitbox
 
         _BranchOnInnerCollision(entityB.aabb, _InnerCollision)
 
-        iny
-        iny
-        jmp     InnerLoop
+        ldx.b   _collisonOrderPos
+        inx
+        inx
+        bra     InnerLoop
 
 
 _InnerCollision:
-    // DP = entityA
-    // X = entityA inner collision
+    // X = entityA
+    // Y = entityA inner collision
 
     // calculate entityB hitboxAddress
 
-    lda.w   tmp_row
+    lda.b   _row
     and.w   #0xff
     clc
-    adc.w   entityB.hitboxAddress
-    sta.w   entityB.hitboxAddress
+    adc.b   entityB.hitboxAddress
+    sta.b   entityB.hitboxAddress
 
     jmp     InnerCollision
 }

@@ -483,9 +483,13 @@ function ProcessGameLoop {
 
     _ProcessActiveWindow()
 
+    lda.w   #0
+    tcd
 
-    MetaSprite.EntityHitbox.TestCollisions(playerProjectiles, enemies, bosses)
-    MetaSprite.EntityHitbox.TestCollisions(players, enemyProjectiles, enemies, bosses)
+    MetaSprite.EntityHitbox.Begin()
+        MetaSprite.EntityHitbox.TestCollisions(playerProjectiles, enemies, bosses)
+        MetaSprite.EntityHitbox.TestCollisions(players, enemyProjectiles, enemies, bosses)
+    MetaSprite.EntityHitbox.End()
 
 
     ldy.w   #lists.playerProjectiles

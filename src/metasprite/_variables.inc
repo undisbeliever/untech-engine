@@ -105,12 +105,12 @@ namespace MetaSprite {
     namespace Collision {
         // Collision bits
         // See (THIS_* and OTHER_* constants)
-        // (uint8_t, stored as two bytes for speed)
+        // (uint8_t, stored as two bytes for efficiency)
         allocate(bits, wram7e, 2)
 
         // The entity that the object collided with
         // (word addr)
-        allocate(otherEntity, wram7e, 2)
+        allocate(otherEntity, dp, 2)
     }
 
 
