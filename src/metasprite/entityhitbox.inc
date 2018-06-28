@@ -161,6 +161,13 @@ constant EntityHitboxBank = Data.EntityHitboxOffset >> 16
 // (3x uint8_t, third byte always 0)
 allocate(_offsetSizePair, dp, 3)
 
+// Test assumption made by _offsetSizePair optimisation
+assert(Format.EntityHitbox.Outer.xOffset + 1 == Format.EntityHitbox.Outer.width)
+assert(Format.EntityHitbox.Outer.yOffset + 1 == Format.EntityHitbox.Outer.height)
+assert(Format.EntityHitbox.Inner.xOffset + 1 == Format.EntityHitbox.Inner.width)
+assert(Format.EntityHitbox.Inner.yOffset + 1 == Format.EntityHitbox.Inner.height)
+
+
 // The outer loop entity
 namespace entityA {
     // address of the entity
@@ -416,6 +423,9 @@ macro _BranchOnInnerCollision(aabb, Collision) {
 macro _ProcessCollision(ns) {
     assert16a()
     assert16i()
+
+    // Ensure this macro can be used by both single and multiple hitbox data
+    assert(Format.EntityHitbox.singleHitboxType == Format.EntityHitbox.Inner.type)
 
     assert(Format.EntityHitboxType._N_BITS == 4)
 
