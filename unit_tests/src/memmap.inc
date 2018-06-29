@@ -49,6 +49,7 @@ createRamBlock(wram7f,      0x7f0000, 0x7fffff)
 
 // Temporary Variables
 // ===================
+
 allocate(dpTmp0, dp, 2)
 allocate(dpTmp1, dp, 2)
 allocate(dpTmp2, dp, 2)
@@ -69,6 +70,8 @@ allocate(dpTmp16, dp, 2)
 allocate(dpTmp17, dp, 2)
 allocate(dpTmp18, dp, 2)
 allocate(dpTmp19, dp, 2)
+
+constant DP_TMP_COUNT = 20
 
 
 

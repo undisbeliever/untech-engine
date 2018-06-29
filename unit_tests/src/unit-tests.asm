@@ -21,6 +21,7 @@ include "../gen/tables/sine-table.inc"
 include "../../src/untech.inc"
 
 include "includes/test-framework.inc"
+include "includes/utils.inc"
 include "includes/entityloop.inc"
 
 

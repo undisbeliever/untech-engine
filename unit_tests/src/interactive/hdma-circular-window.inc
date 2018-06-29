@@ -129,17 +129,7 @@ a8()
 
         PrintWindowInput()
 
-        // corrupt dpTmp
-        ldx.w   #0xffff
-        stx.b   dpTmp0
-        stx.b   dpTmp1
-        stx.b   dpTmp2
-        stx.b   dpTmp3
-        stx.b   dpTmp4
-        stx.b   dpTmp5
-        stx.b   dpTmp6
-        stx.b   dpTmp7
-
+        jsr     dirtyDpTmp
 
         ldx.b   xPos
         ldy.b   yPos
