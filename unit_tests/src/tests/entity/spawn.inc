@@ -18,7 +18,7 @@ function Spawn {
     lda.w   #0x5678
     sta.w   Entity.Spawn.yPos
 
-    lda.w   Entities.BlankEntity.EntityId_0
+    lda.w   #Entities.BlankEntity.EntityId_0
     ldy.w   #0x1337
     jsr     Entity.Spawn
     bcc     Fail
@@ -71,7 +71,7 @@ constant tmp = Test.tmp
     Loop:
         stx.w   tmp
 
-        lda.w   Entities.BlankEntity.EntityId_0
+        lda.w   #Entities.BlankEntity.EntityId_0
         ldy.w   #5
         jsr     Entity.Spawn
         bcc     Fail
@@ -82,7 +82,7 @@ constant tmp = Test.tmp
 
 
     // Test cannot make new entity
-    lda.w   Entities.BlankEntity.EntityId_0
+    lda.w   #Entities.BlankEntity.EntityId_0
     jsr     Entity.Spawn
     bcs     Fail
 
