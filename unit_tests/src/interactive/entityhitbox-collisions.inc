@@ -86,11 +86,15 @@ a8()
     ldy.w   MetaSprite.Collision.otherEntity
     jsr     Text.Console.PrintHex16Y
 
-    rep     #$20
+    jsr     Text.Console.NewLine
+
+    rep     #$30
 a16()
 i16()
 
-    jmp     Text.Console.NewLine
+    // ensure any dpTmp variables are no used cross a call boundary
+
+    jmp     dirtyDpTmp
 
 
 rodata(rom0)

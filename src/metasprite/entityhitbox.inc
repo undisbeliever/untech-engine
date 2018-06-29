@@ -196,28 +196,30 @@ allocate(listB, dp, 2)
 
 // The inner loop entity
 namespace entityB {
+    // entityAddress must survive a ProcessCollision function call
     allocate(entityAddress, dp, 2)
-    allocate(hitboxAddress, dp, 2)
+
+    constant hitboxAddress      = dpTmp0
 
     // Used for both inner and outer hitbox tests
     // all values are offset by INT_MS8_OFFSET
     namespace aabb {
-        allocate(left, dp, 2)
-        allocate(right, dp, 2)
-        allocate(top, dp, 2)
-        allocate(bottom, dp, 2)
+        constant left           = dpTmp1
+        constant right          = dpTmp2
+        constant top            = dpTmp3
+        constant bottom         = dpTmp4
     }
 }
 
 // Temporary Variables
 
-allocate(_count, dp, 2)
-allocate(_collisonOrderPos, dp, 2)
-allocate(_row, dp, 2)
+constant _count                 = dpTmp5
+constant _collisonOrderPos      = dpTmp6
+constant _row                   = dpTmp7
 
-allocate(_entityB_xPos, dp, 2)
-allocate(_entityB_yPos, dp, 2)
-allocate(_collisionTableIndex, dp, 2)
+constant _entityB_xPos          = dpTmp8
+constant _entityB_yPos          = dpTmp9
+constant _collisionTableIndex   = dpTmp10
 
 
 
