@@ -219,24 +219,53 @@ constant Y_DELTA = 20
 constant N_COLUMNS = 4
 constant Y_BOTTOM = Camera.ORIGIN + Camera.DISPLAY_HEIGHT - 30
 
-constant X_LEFT = Camera.ORIGIN + Camera.DISPLAY_WIDTH / 2 - 10
+constant X_LEFT = Camera.ORIGIN + Camera.DISPLAY_WIDTH / 3 + 20
 constant X_RIGHT = Camera.ORIGIN + Camera.DISPLAY_WIDTH / 2 + 10
+constant X_CENTER = Camera.ORIGIN + Camera.DISPLAY_WIDTH / 2
 
     struct(pc())
+        field(entityId, 2)
         field(xPos, 2)
         field(yPos, 2)
         field(parameter, 2)
     endstruct()
 
-Data:
-    //  xPos,       yPos,                   frameId
-    dw  X_LEFT,     Y_BOTTOM - Y_DELTA * 2,  MSEO.EhCollisionTest_Enemy.Frames.box
-    dw  X_RIGHT,    Y_BOTTOM - Y_DELTA * 3,  MSEO.EhCollisionTest_Enemy.Frames.row1
-    dw  X_RIGHT,    Y_BOTTOM - Y_DELTA * 2,  MSEO.EhCollisionTest_Enemy.Frames.row2
-    dw  X_RIGHT,    Y_BOTTOM - Y_DELTA * 1,  MSEO.EhCollisionTest_Enemy.Frames.row3
-    dw  X_RIGHT,    Y_BOTTOM - Y_DELTA * 0,  MSEO.EhCollisionTest_Enemy.Frames.row4
+evaluate EN_ID = Entity.ListId.ENEMY
 
-    constant N_ENEMIES = (pc() - Data) / size
+constant PLAYER = PlayerEntity.ENTITY_ID
+constant ENEMY  = EnemyEntity.ENTITY_ID
+constant BLANK  = EntityTest.Entities.BlankEntity.EntityId_{EN_ID}
+
+Data:
+    //  entity, xPos,           yPos,                       frameId
+
+    dw  PLAYER, X_CENTER,       Y_BOTTOM - Y_DELTA * 2,     0
+
+    dw  BLANK,  X_CENTER,       Y_BOTTOM - Y_DELTA * 2,     0
+    dw  BLANK,  X_CENTER,       Y_BOTTOM - Y_DELTA * 2,     0
+    dw  BLANK,  X_CENTER,       Y_BOTTOM - Y_DELTA * 2,     0
+
+    dw  ENEMY,  X_LEFT,         Y_BOTTOM - Y_DELTA * 2,     MSEO.EhCollisionTest_Enemy.Frames.box
+    dw  ENEMY,  X_RIGHT,        Y_BOTTOM - Y_DELTA * 3,     MSEO.EhCollisionTest_Enemy.Frames.row1
+    dw  ENEMY,  X_RIGHT,        Y_BOTTOM - Y_DELTA * 2,     MSEO.EhCollisionTest_Enemy.Frames.row2
+    dw  ENEMY,  X_RIGHT,        Y_BOTTOM - Y_DELTA * 1,     MSEO.EhCollisionTest_Enemy.Frames.row3
+    dw  ENEMY,  X_RIGHT,        Y_BOTTOM - Y_DELTA * 0,     MSEO.EhCollisionTest_Enemy.Frames.row4
+
+    dw  BLANK,  X_CENTER,       Y_BOTTOM - Y_DELTA * 2,     0
+    dw  BLANK,  X_CENTER,       Y_BOTTOM - Y_DELTA * 2,     0
+    dw  BLANK,  X_CENTER,       Y_BOTTOM - Y_DELTA * 2,     0
+
+    dw  ENEMY,  X_LEFT  + 9,    Y_BOTTOM - Y_DELTA * 2 + 7, MSEO.EhCollisionTest_Enemy.Frames.box
+    dw  ENEMY,  X_RIGHT + 9,    Y_BOTTOM - Y_DELTA * 3 + 7, MSEO.EhCollisionTest_Enemy.Frames.row1
+    dw  ENEMY,  X_RIGHT + 9,    Y_BOTTOM - Y_DELTA * 2 + 7, MSEO.EhCollisionTest_Enemy.Frames.row2
+    dw  ENEMY,  X_RIGHT + 9,    Y_BOTTOM - Y_DELTA * 1 + 7, MSEO.EhCollisionTest_Enemy.Frames.row3
+    dw  ENEMY,  X_RIGHT + 9,    Y_BOTTOM - Y_DELTA * 0 + 7, MSEO.EhCollisionTest_Enemy.Frames.row4
+
+    dw  BLANK,  X_CENTER,       Y_BOTTOM - Y_DELTA * 2,     0
+    dw  BLANK,  X_CENTER,       Y_BOTTOM - Y_DELTA * 2,     0
+    dw  BLANK,  X_CENTER,       Y_BOTTOM - Y_DELTA * 2,     0
+
+constant N_ENEMIES = (pc() - Data) / size
 }
 
 
@@ -252,18 +281,6 @@ constant tmp_index = Test.tmp
 
     // Load the entities
 
-    lda.w   #Camera.ORIGIN + Camera.DISPLAY_WIDTH / 2
-    sta.w   Entity.Spawn.xPos
-
-    lda.w   #Camera.ORIGIN + Camera.DISPLAY_HEIGHT * 2 / 3
-    sta.w   Entity.Spawn.yPos
-
-    lda.w   #PlayerEntity.ENTITY_ID
-
-    jsr     Entity.Spawn
-    bcc     Fail
-
-
     ldx.w   #0
     SpawnEnemyLoop:
         stx.w   tmp_index
@@ -277,7 +294,7 @@ constant tmp_index = Test.tmp
         lda.l   EnemyTable.parameter,x
         tay
 
-        lda.w   #EnemyEntity.ENTITY_ID
+        lda.l   EnemyTable.entityId,x
 
         jsr     Entity.Spawn
         bcc     Fail
