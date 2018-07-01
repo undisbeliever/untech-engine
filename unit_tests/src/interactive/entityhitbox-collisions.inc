@@ -10,6 +10,9 @@ namespace EntityHitboxCollisionsTest {
 //  * MetaSprite EntityHitbox Collisions
 
 
+constant _waitCount                   = Test.tmp
+
+
 namespace PlayerEntity {
     buildFunctionTable(BaseEntityFunctionTable, PlayerEntity)
     Entity.useDefaultRenderer()
@@ -316,11 +319,19 @@ constant tmp_index = Test.tmp
         Text.Console.SetCursor(0, 2)
         Text.Console.PrintConstString("Use D-Pad to move Player\nSelect changes hitbox type")
 
+        // Using hex as it is constant time
+        Text.Console.SetCursor(Text.Console.TEXT_WIDTH - 5, 5)
+        ldy.w   _waitCount
+        jsr     Text.Console.PrintHex16Y
+
         Text.Console.SetCursor(0, 7)
 
         jsr     EntityLoop.ProcessFrame
 
-        jsr     WaitFrame
+        jsr     dirtyDpTmp
+
+        jsr     WaitFrame_Count
+        sty.w   _waitCount
 
         lda.l   JOY1
         and.w   #JOY.buttons
