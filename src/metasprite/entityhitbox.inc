@@ -201,6 +201,12 @@ namespace entityB {
 
     constant hitboxAddress      = dpTmp0
 
+    // Entity position
+    // (uint16 * 2)
+    // Is not used in all collision tests
+    constant xPos               = dpTmp11
+    constant yPos               = dpTmp12
+
     // Used for both inner and outer hitbox tests
     // all values are offset by INT_MS8_OFFSET
     namespace aabb {
@@ -355,8 +361,8 @@ macro _BranchIfNoOuterCollision(aabb, NoCollision) {
 }
 
 
-// Branches to `Collision` label if there is a collision
-// between selected inner hitbox and given aabb.
+// Branches to `Collision` label if there is a collision between the
+// selected inner hitbox for a given entity and given aabb.
 //
 //
 // REQUIRES: 16 bit A, 16 bit Index, DP = 0, DB = EntityHitboxBank
@@ -364,7 +370,7 @@ macro _BranchIfNoOuterCollision(aabb, NoCollision) {
 //        Y = EntityHitbox address + inner collision offset
 // KEEP: X, Y
 // BRANCH: to `Collision` if there is a collision
-macro _BranchOnInnerCollision(aabb, Collision) {
+macro _BranchOnInnerCollision_Entity(aabb, Collision) {
     assert16a()
     assert16i()
 
@@ -396,6 +402,63 @@ macro _BranchOnInnerCollision(aabb, Collision) {
         and.w   #0xff
         clc
         adc.b   BaseEntity.yPos.px,x
+
+        cmp.b   {aabb}.bottom
+        bcs     NoCollision
+
+        // c clear
+        adc.b   _offsetSizePair + 1     // height
+        // A = bottom - 1
+        cmp.b   {aabb}.top
+        bcs     {Collision}
+
+    NoCollision:
+    }
+}
+
+
+// Branches to `Collision` label if there is a collision between the
+// selected inner hitbox at a given position and given aabb.
+//
+//
+// REQUIRES: 16 bit A, 16 bit Index, DP = 0, DB = EntityHitboxBank
+// INPUT: Y = EntityHitbox address + inner collision offset
+// KEEP: X, Y
+// PARAM: aabb - the aabb to compare against
+// PARAM: ens - the entity namespace containing the position
+// BRANCH: to `Collision` if there is a collision
+macro _BranchOnInnerCollision_Position(aabb, ens, Collision) {
+    assert16a()
+    assert16i()
+
+    // x coordinate more likely to miss
+
+    namespace {#} {
+        // if left >= aabb.right
+        //    || right <= aabb.left: goto NoCollision
+
+        lda.w   Format.EntityHitbox.Inner.xOffset,y
+        sta.b   _offsetSizePair
+        and.w   #0xff
+        clc
+        adc.b   {ens}.xPos
+
+        cmp.b   {aabb}.right
+        bcs     NoCollision
+
+        // c clear
+        // Deliberately not one to right
+        adc.b   _offsetSizePair + 1     // width
+        // A = right - 1
+        cmp.b   {aabb}.left
+        bcc     NoCollision
+
+
+        lda.w   Format.EntityHitbox.Inner.yOffset,y
+        sta.b   _offsetSizePair
+        and.w   #0xff
+        clc
+        adc.b   {ens}.yPos
 
         cmp.b   {aabb}.bottom
         bcs     NoCollision
@@ -630,15 +693,30 @@ START:
 
 
         // entity being tested has multiple hitboxes
+
+        // This block costs 34 cycles but saves 32/46/60 cycles in InnerLoop
+        stx.b   entityB.entityAddress
         sta.b   _count
+
+        lda.b   BaseEntity.xPos.px,x
+        sta.b   entityB.xPos
+
+        lda.b   BaseEntity.yPos.px,x
+        sta.b   entityB.yPos
+
+        ldx.b   _count
+
 
         InnerLoop:
             // Test inner hitbox matches with single outer
 
-            _BranchOnInnerCollision(entityA.outer, InnerCollision)
+            // X = count remaining
+            // Y = hitbox address + inner offset
+
+            _BranchOnInnerCollision_Position(entityA.outer, entityB, InnerCollision_NoX)
 
             // count is number of inner hitboxes - 1
-            dec.b   _count
+            dex
             bmi     EntityLoop_Continue
 
             tya
@@ -648,6 +726,9 @@ START:
 
             bra     InnerLoop
 
+
+        InnerCollision_NoX:
+            ldx.b   entityB.entityAddress
 
         InnerCollision:
             // X = entityB address
@@ -664,7 +745,7 @@ START:
             ldx.b   Collision.otherEntity
 
         EntityLoop_Continue:
-            // X = entityB address
+            ldx.b   entityB.entityAddress
             ldy.b   BaseEntity.next,x
             beq     EndEntityLoop
                 jmp     EntityLoop
@@ -771,7 +852,7 @@ function _InnerTest_Multiple_Single {
         // X = entityA
         // Y = entityA hitbox
 
-        _BranchOnInnerCollision(entityB.aabb, InnerCollision)
+        _BranchOnInnerCollision_Entity(entityB.aabb, InnerCollision)
 
         // count is number of inner hitboxes - 1
         dec.b   _count
@@ -887,7 +968,7 @@ function _InnerTest_Multiple_Multiple {
         // X = entityA
         // Y = entityA hitbox
 
-        _BranchOnInnerCollision(entityB.aabb, _InnerCollision)
+        _BranchOnInnerCollision_Entity(entityB.aabb, _InnerCollision)
 
         ldx.b   _collisonOrderPos
         inx
