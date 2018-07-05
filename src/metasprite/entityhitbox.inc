@@ -924,7 +924,7 @@ function _InnerTest_Multiple_Multiple {
 
 
     // A = entityB hitbox count
-    // assume entityB is > 1
+    // assumes both hitbox counts are >= 1
     assert(Tables.EntityHitbox.CollisionOrderTable.SHIFT == 2)
     asl
     asl
@@ -935,12 +935,13 @@ function _InnerTest_Multiple_Multiple {
     lda.l   Tables.EntityHitbox.CollisionOrderTable - 2 * 4,x
     tax
 
+    // Assumes first item in CollisionOrder is always valid
+
+    lda.l   Tables.EntityHitbox.CollisionOrder,x
 
     InnerLoop:
+        // A = CollisionOrder row
         // X = collisionOrderPos
-
-        lda.l   Tables.EntityHitbox.CollisionOrder,x
-        bmi     NoCollisions
 
         sta.b   _row
         stx.b   _collisonOrderPos
@@ -964,7 +965,11 @@ function _InnerTest_Multiple_Multiple {
         ldx.b   _collisonOrderPos
         inx
         inx
-        bra     InnerLoop
+
+        lda.l   Tables.EntityHitbox.CollisionOrder,x
+        bpl     InnerLoop
+
+    jmp     NoCollisions
 
 
 _InnerCollision:
