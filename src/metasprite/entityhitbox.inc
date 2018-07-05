@@ -216,10 +216,12 @@ namespace entityB {
 constant _count                 = dpTmp5
 constant _collisonOrderPos      = dpTmp6
 constant _row                   = dpTmp7
+constant _collisionTableIndex   = dpTmp8
 
-constant _entityB_xPos          = dpTmp8
-constant _entityB_yPos          = dpTmp9
-constant _collisionTableIndex   = dpTmp10
+constant _entityA_xPos          = dpTmp9
+constant _entityA_yPos          = dpTmp10
+constant _entityB_xPos          = dpTmp11
+constant _entityB_yPos          = dpTmp12
 
 
 
@@ -404,6 +406,93 @@ macro _BranchOnInnerCollision(aabb, Collision) {
         adc.b   _offsetSizePair + 1     // height
         // A = bottom - 1
         cmp.b   {aabb}.top
+        bcs     {Collision}
+
+    NoCollision:
+    }
+}
+
+
+// Tests for a collision between two inner hitboxes,
+//
+// REQUIRES: 16 bit A, 16 bit Index, DP = 0, DB = EntityHitboxBank
+// INPUT: Y = entityA hitbox + inner offset
+//        X = entityB hitbox + inner offset
+//        _entityA_xPos, _entityA_yPos = entity A position
+//        _entityB_xPos, _entityB_yPos = entity B position
+// KEEP: X, Y
+// OUTPUT: entityB.aabb = entityB inner hitbox (if collision occurred)
+// BRANCH: to `Collision` if there is a collision
+macro _BranchOnInnerInnerCollision(Collision) {
+    assert16a()
+    assert16i()
+
+    // x coordinate more likely to miss
+
+    namespace {#} {
+        // Fill entityB.aabb X axis
+
+        lda.w   Format.EntityHitbox.Inner.xOffset,x
+        sta.b   _offsetSizePair
+        and.w   #0xff
+        clc
+        adc.b   _entityB_xPos
+        sta.b   entityB.aabb.left
+
+        sec                             // + 1
+        adc.b   _offsetSizePair + 1     // width
+        sta.b   entityB.aabb.right
+
+
+        // if left >= aabb.right
+        //    || right <= aabb.left: goto NoCollision
+
+        lda.w   Format.EntityHitbox.Inner.xOffset,y
+        sta.b   _offsetSizePair
+        and.w   #0xff
+        clc
+        adc.b   _entityA_xPos
+
+        cmp.b   entityB.aabb.right
+        bcs     NoCollision
+
+        // c clear
+        // Deliberately not one to right
+        adc.b   _offsetSizePair + 1     // width
+        // A = entityA right - 1
+        cmp.b   entityB.aabb.left
+        bcc     NoCollision
+
+
+        // Fill entityB.aabb Y axis
+
+        lda.w   Format.EntityHitbox.Inner.yOffset,x
+        sta.b   _offsetSizePair
+        and.w   #0xff
+        clc
+        adc.b   _entityB_yPos
+        sta.b   entityB.aabb.top
+
+        sec                             // + 1
+        adc.b   _offsetSizePair + 1     // height
+        sta.b   entityB.aabb.bottom
+
+
+        // Test y axis
+
+        lda.w   Format.EntityHitbox.Inner.yOffset,y
+        sta.b   _offsetSizePair
+        and.w   #0xff
+        clc
+        adc.b   _entityA_yPos
+
+        cmp.b   entityB.aabb.bottom
+        bcs     NoCollision
+
+        // c clear
+        adc.b   _offsetSizePair + 1     // height
+        // A = entityA bottom - 1
+        cmp.b   entityB.aabb.top
         bcs     {Collision}
 
     NoCollision:
@@ -825,6 +914,15 @@ function _InnerTest_Multiple_Multiple {
     sty.b   _entityB_yPos
 
 
+    ldx.b   entityA.entityAddress
+
+    ldy.b   BaseEntity.xPos.px,x
+    sty.b   _entityA_xPos
+
+    ldy.b   BaseEntity.yPos.px,x
+    sty.b   _entityA_yPos
+
+
     // A = entityB hitbox count
     // assume entityB is > 1
     assert(Tables.EntityHitbox.CollisionOrderTable.SHIFT == 2)
@@ -850,31 +948,7 @@ function _InnerTest_Multiple_Multiple {
         and.w   #0xff
         clc
         adc.b   entityB.hitboxAddress
-        tay
-
-        lda.w   Format.EntityHitbox.Inner.xOffset,y
-        sta.b   _offsetSizePair
-        and.w   #0xff
-        clc
-        adc.b   _entityB_xPos
-        sta.b   entityB.aabb.left
-
-        sec                             // + 1
-        adc.b   _offsetSizePair + 1     // width
-        sta.b   entityB.aabb.right
-
-
-        lda.w   Format.EntityHitbox.Inner.yOffset,y
-        sta.b   _offsetSizePair
-        and.w   #0xff
-        clc
-        adc.b   _entityB_yPos
-        sta.b   entityB.aabb.top
-
-        sec                             // + 1
-        adc.b   _offsetSizePair + 1     // height
-        sta.b   entityB.aabb.bottom
-
+        tax
 
         lda.b   _row + 1
         and.w   #0xff
@@ -882,12 +956,10 @@ function _InnerTest_Multiple_Multiple {
         adc.b   entityA.hitboxAddress
         tay
 
-        ldx.b   entityA.entityAddress
-
-        // X = entityA
         // Y = entityA hitbox
+        // X = entityB hitbox
 
-        _BranchOnInnerCollision(entityB.aabb, _InnerCollision)
+        _BranchOnInnerInnerCollision(_InnerCollision)
 
         ldx.b   _collisonOrderPos
         inx
@@ -896,8 +968,8 @@ function _InnerTest_Multiple_Multiple {
 
 
 _InnerCollision:
-    // X = entityA
     // Y = entityA inner collision
+    ldx.b   entityA.entityAddress
 
     // calculate entityB hitboxAddress
 
