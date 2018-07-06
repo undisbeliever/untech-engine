@@ -32,8 +32,8 @@ EntityPoolEmpty:
 //
 // INPUT: A - Entity Id
 //        Y - entity parameter (passed to entity init function)
-//        Create.xPos - entity x Position (word)
-//        Create.yPos - entity y Position (word)
+//        Entity.Spawn.xPos - entity x Position (uint16)
+//        Entity.Spawn.yPos - entity y Position (uint16)
 //
 // OUTPUT: Y - address of new entity
 //         C - set if entity created successfully
