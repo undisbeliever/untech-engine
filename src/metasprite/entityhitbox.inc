@@ -721,45 +721,46 @@ START:
         // entity being tested has multiple hitboxes
         sta.b   _count
 
+
+        bra     InnerLoop_FIRST
+
+
         InnerLoop:
+            // increment inner hitbox
+            tya
+            clc
+            adc.w   #Format.EntityHitbox.Inner.size
+            tay
+
+        InnerLoop_FIRST:
             // Test inner hitbox matches with single outer
 
             _BranchOnInnerCollision(entityA.outer, InnerCollision)
 
             // count is number of inner hitboxes - 1
             dec.b   _count
-            bmi     EntityLoop_Continue
-
-            tya
-            clc
-            adc.w   #Format.EntityHitbox.Inner.size
-            tay
-
-            bra     InnerLoop
+            bpl     InnerLoop
 
 
-        InnerCollision:
-            // X = entityB address
-            // Y = entityB inner collision
+    EntityLoop_Continue:
+        // X = entityB address
+        ldy.b   BaseEntity.next,x
+        bne     EntityLoop
 
-            _ProcessCollision(entityA)
+        jmp     Next_EntityA
 
-            // entityB stored in Collision.otherEntity
 
-            assert(Collision.otherEntity < 0x100)
+    InnerCollision:
+        // X = entityB address
+        // Y = entityB inner collision
 
-            // cannot use `lda (Collision.otherEntity)` here as DB cannot access shadow
+        _ProcessCollision(entityA)
 
-            ldx.b   Collision.otherEntity
+        // entityB stored in Collision.otherEntity
 
-        EntityLoop_Continue:
-            // X = entityB address
-            ldy.b   BaseEntity.next,x
-            beq     EndEntityLoop
-                jmp     EntityLoop
-
-EndEntityLoop:
-    jmp     Next_EntityA
+        assert(Collision.otherEntity < 0x100)
+        ldx.b   Collision.otherEntity
+        bra     EntityLoop_Continue
 }
 constant _TestList_EntityA_SingleHitbox = _TestList_EntityA_SingleHitbox.START
 
@@ -856,7 +857,18 @@ function _InnerTest_Multiple_Single {
     lda.b   entityA.hitboxCount
     sta.b   _count
 
+
+    bra     InnerLoop_FIRST
+
+
     InnerLoop:
+        // increment inner hitbox
+        tya
+        clc
+        adc.w   #Format.EntityHitbox.Inner.size
+        tay
+
+    InnerLoop_FIRST:
         // X = entityA
         // Y = entityA hitbox
 
@@ -864,14 +876,9 @@ function _InnerTest_Multiple_Single {
 
         // count is number of inner hitboxes - 1
         dec.b   _count
-        bmi     Continue_EntityLoop
+        bpl     InnerLoop
 
-        tya
-        clc
-        adc.w   #Format.EntityHitbox.Inner.size
-        tay
-
-        bra     InnerLoop
+    bra     Continue_EntityLoop
 }
 
 
