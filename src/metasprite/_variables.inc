@@ -111,6 +111,11 @@ namespace MetaSprite {
         // The entity that the object collided with
         // (word addr)
         allocate(otherEntity, dp, 2)
+
+        // The centre position of the collision
+        // (2x uint16)
+        allocate(xPos, dp, 2)
+        allocate(yPos, dp, 2)
     }
 
 

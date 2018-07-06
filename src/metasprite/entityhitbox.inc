@@ -158,10 +158,12 @@ constant EntityHitboxBank = Data.EntityHitboxOffset >> 16
 
 // Temporary store for the offset/size pair from EntityHitbox struct
 // Used to convert width/height from uint8 to uint16
-// (3x uint8_t, third byte always 0)
-allocate(_offsetSizePair, dp, 3)
+// Also used to store the last hitbox read by the test collision code
+// (2x 3x uint8_t, third byte always 0)
+allocate(_xPosWidthPair, dp, 3)
+allocate(_yPosHeightPair, dp, 3)
 
-// Test assumption made by _offsetSizePair optimisation
+// Test assumption made by _xPosWidthPair/_yPosHeightPair optimisation
 assert(Format.EntityHitbox.Outer.xOffset + 1 == Format.EntityHitbox.Outer.width)
 assert(Format.EntityHitbox.Outer.yOffset + 1 == Format.EntityHitbox.Outer.height)
 assert(Format.EntityHitbox.Inner.xOffset + 1 == Format.EntityHitbox.Inner.width)
@@ -223,6 +225,8 @@ constant _entityA_yPos          = dpTmp10
 constant _entityB_xPos          = dpTmp11
 constant _entityB_yPos          = dpTmp12
 
+constant _tmp                   = dpTmp13
+
 
 
 // PRIVATE API
@@ -272,13 +276,14 @@ inline _TestTwoEntityLists(aList, bList, evaluate isFirst) {
 // REQUIRES: 16 bit A, 16 bit Index, DP = 0, DB = EntityHitboxBank
 // INPUT: X = entity
 //        Y = EntityHitbox address (NOT NULL)
+// OUTPUT: _xPosWidthPair/_yPosHeightPair = the outer hitbox data
 // BRANCH: to NoHitbox is there is no metasprite entityhitbox
 macro _SetupOuterAabb(aabb) {
     assert16a()
     assert16i()
 
     lda.w   Format.EntityHitbox.Outer.xOffset,y
-    sta.b   _offsetSizePair
+    sta.b   _xPosWidthPair
 
     and.w   #0xff
     clc
@@ -286,12 +291,12 @@ macro _SetupOuterAabb(aabb) {
     sta.b   {aabb}.left
 
     sec                             // + 1
-    adc.b   _offsetSizePair + 1     // width
+    adc.b   _xPosWidthPair + 1      // width
     sta.b   {aabb}.right
 
 
     lda.w   Format.EntityHitbox.Outer.yOffset,y
-    sta.b   _offsetSizePair
+    sta.b   _yPosHeightPair
 
     and.w   #0xff
     clc
@@ -299,7 +304,7 @@ macro _SetupOuterAabb(aabb) {
     sta.b   {aabb}.top
 
     sec                             // + 1
-    adc.b   _offsetSizePair + 1     // height
+    adc.b   _yPosHeightPair + 1     // height
     sta.b   {aabb}.bottom
 }
 
@@ -311,6 +316,7 @@ macro _SetupOuterAabb(aabb) {
 // REQUIRES: 16 bit A, 16 bit Index, DP = 0, DB = EntityHitboxBank
 // INPUT: X = entity
 //        Y = EntityHitbox address
+// OUTPUT: _xPosWidthPair/_yPosHeightPair = the outer hitbox data (if collision occurred)
 // KEEP: X, Y
 // BRANCH: to `noCollision` if there is no collision
 macro _BranchIfNoOuterCollision(aabb, NoCollision) {
@@ -324,7 +330,7 @@ macro _BranchIfNoOuterCollision(aabb, NoCollision) {
         //    || right <= aabb.left: goto NoCollision
 
         lda.w   Format.EntityHitbox.Outer.xOffset,y
-        sta.b   _offsetSizePair
+        sta.b   _xPosWidthPair
         and.w   #0xff
         clc
         adc.b   BaseEntity.xPos.px,x
@@ -333,14 +339,14 @@ macro _BranchIfNoOuterCollision(aabb, NoCollision) {
         bcs     {NoCollision}
 
         // c clear
-        adc.b   _offsetSizePair + 1     // width
+        adc.b   _xPosWidthPair + 1      // width
         // A = right - 1
         cmp.b   {aabb}.left
         bcc     {NoCollision}
 
 
         lda.w   Format.EntityHitbox.Outer.yOffset,y
-        sta.b   _offsetSizePair
+        sta.b   _yPosHeightPair
         and.w   #0xff
         clc
         adc.b   BaseEntity.yPos.px,x
@@ -349,7 +355,7 @@ macro _BranchIfNoOuterCollision(aabb, NoCollision) {
         bcs     {NoCollision}
 
         // c clear
-        adc.b   _offsetSizePair + 1     // height
+        adc.b   _yPosHeightPair + 1     // height
         // A = bottom - 1
         cmp.b   {aabb}.top
         bcc     {NoCollision}
@@ -364,6 +370,7 @@ macro _BranchIfNoOuterCollision(aabb, NoCollision) {
 // REQUIRES: 16 bit A, 16 bit Index, DP = 0, DB = EntityHitboxBank
 // INPUT: X = entity to test
 //        Y = EntityHitbox address + inner collision offset
+// OUTPUT: _xPosWidthPair/_yPosHeightPair = the inner hitbox data (if collision occurred)
 // KEEP: X, Y
 // BRANCH: to `Collision` if there is a collision
 macro _BranchOnInnerCollision(aabb, Collision) {
@@ -377,7 +384,7 @@ macro _BranchOnInnerCollision(aabb, Collision) {
         //    || right <= aabb.left: goto NoCollision
 
         lda.w   Format.EntityHitbox.Inner.xOffset,y
-        sta.b   _offsetSizePair
+        sta.b   _xPosWidthPair
         and.w   #0xff
         clc
         adc.b   BaseEntity.xPos.px,x
@@ -387,14 +394,14 @@ macro _BranchOnInnerCollision(aabb, Collision) {
 
         // c clear
         // Deliberately not one to right
-        adc.b   _offsetSizePair + 1     // width
+        adc.b   _xPosWidthPair + 1      // width
         // A = right - 1
         cmp.b   {aabb}.left
         bcc     NoCollision
 
 
         lda.w   Format.EntityHitbox.Inner.yOffset,y
-        sta.b   _offsetSizePair
+        sta.b   _yPosHeightPair
         and.w   #0xff
         clc
         adc.b   BaseEntity.yPos.px,x
@@ -403,7 +410,7 @@ macro _BranchOnInnerCollision(aabb, Collision) {
         bcs     NoCollision
 
         // c clear
-        adc.b   _offsetSizePair + 1     // height
+        adc.b   _yPosHeightPair + 1     // height
         // A = bottom - 1
         cmp.b   {aabb}.top
         bcs     {Collision}
@@ -422,6 +429,7 @@ macro _BranchOnInnerCollision(aabb, Collision) {
 //        _entityB_xPos, _entityB_yPos = entity B position
 // KEEP: X, Y
 // OUTPUT: entityB.aabb = entityB inner hitbox (if collision occurred)
+// OUTPUT: _xPosWidthPair/_yPosHeightPair = entityA inner hitbox data (if collision occurred)
 // BRANCH: to `Collision` if there is a collision
 macro _BranchOnInnerInnerCollision(Collision) {
     assert16a()
@@ -433,14 +441,14 @@ macro _BranchOnInnerInnerCollision(Collision) {
         // Fill entityB.aabb X axis
 
         lda.w   Format.EntityHitbox.Inner.xOffset,x
-        sta.b   _offsetSizePair
+        sta.b   _xPosWidthPair
         and.w   #0xff
         clc
         adc.b   _entityB_xPos
         sta.b   entityB.aabb.left
 
         sec                             // + 1
-        adc.b   _offsetSizePair + 1     // width
+        adc.b   _xPosWidthPair + 1      // width
         sta.b   entityB.aabb.right
 
 
@@ -448,7 +456,7 @@ macro _BranchOnInnerInnerCollision(Collision) {
         //    || right <= aabb.left: goto NoCollision
 
         lda.w   Format.EntityHitbox.Inner.xOffset,y
-        sta.b   _offsetSizePair
+        sta.b   _xPosWidthPair
         and.w   #0xff
         clc
         adc.b   _entityA_xPos
@@ -458,7 +466,7 @@ macro _BranchOnInnerInnerCollision(Collision) {
 
         // c clear
         // Deliberately not one to right
-        adc.b   _offsetSizePair + 1     // width
+        adc.b   _xPosWidthPair + 1      // width
         // A = entityA right - 1
         cmp.b   entityB.aabb.left
         bcc     NoCollision
@@ -467,21 +475,21 @@ macro _BranchOnInnerInnerCollision(Collision) {
         // Fill entityB.aabb Y axis
 
         lda.w   Format.EntityHitbox.Inner.yOffset,x
-        sta.b   _offsetSizePair
+        sta.b   _yPosHeightPair
         and.w   #0xff
         clc
         adc.b   _entityB_yPos
         sta.b   entityB.aabb.top
 
         sec                             // + 1
-        adc.b   _offsetSizePair + 1     // height
+        adc.b   _yPosHeightPair + 1     // height
         sta.b   entityB.aabb.bottom
 
 
         // Test y axis
 
         lda.w   Format.EntityHitbox.Inner.yOffset,y
-        sta.b   _offsetSizePair
+        sta.b   _yPosHeightPair
         and.w   #0xff
         clc
         adc.b   _entityA_yPos
@@ -490,13 +498,70 @@ macro _BranchOnInnerInnerCollision(Collision) {
         bcs     NoCollision
 
         // c clear
-        adc.b   _offsetSizePair + 1     // height
+        adc.b   _yPosHeightPair + 1     // height
         // A = entityA bottom - 1
         cmp.b   entityB.aabb.top
         bcs     {Collision}
 
     NoCollision:
     }
+}
+
+
+// Calculates the centre of the collision, storing it in `MetaSprite.Collision`
+//
+// REQUIRES: 16 bit A, 16 bit Index, DP = 0, DB = any
+//
+// INPUT: aabb = hitbox tested against
+// INPUT: _xPosWidthPair/_yPosHeightPair = inner hitbox data
+// OUTPUT: MetaSprite.Collision.xPos, MetaSprite.Collision.yPos
+// KEEP: X/Y
+macro _CalculateCollisionCentre(aabb) {
+    assert16a()
+    assert16i()
+
+    __CalculateCollisionCentreAxis(xPos, _xPosWidthPair, {aabb}.left, {aabb}.right)
+    __CalculateCollisionCentreAxis(yPos, _yPosHeightPair, {aabb}.top, {aabb}.bottom)
+}
+
+inline __CalculateCollisionCentreAxis(axis, offsetSizePair, a1, a2) {
+    assert16a()
+    assert16i()
+
+    assert(MetaSprite.Collision.{axis} < 0x100)
+
+    // b1 = offset + entity.{axis}
+    // b2 = b1 + size + 1
+    // axis = avg(max(a1, b1), min(a2, b2)) - INT_MS8_OFFSET
+
+    lda.b   {offsetSizePair}
+    and.w   #0x00ff
+    clc
+    adc.b   BaseEntity.{axis}.px,x
+    sta.b   _tmp
+
+    cmp.b   {a1}
+    bcs     _Max{#}
+        lda.b   {a1}
+        sec
+_Max{#}:
+    sta.b   MetaSprite.Collision.{axis}
+
+    // c set                        // + 1
+    lda.b   _tmp
+    adc.b   {offsetSizePair} + 1    // width/height
+    cmp.b   {a2}
+    bcc     _Min{#}
+        lda.b   {a2}
+        clc
+_Min{#}:
+
+    // c clear
+    adc.b   MetaSprite.Collision.{axis}
+    ror
+    sec
+    sbc.w   #INT_MS8_OFFSET
+    sta.b   MetaSprite.Collision.{axis}
 }
 
 
@@ -754,13 +819,15 @@ START:
         // X = entityB address
         // Y = entityB inner collision
 
+        _CalculateCollisionCentre(entityA.outer)
+
         _ProcessCollision(entityA)
 
         // entityB stored in Collision.otherEntity
 
         assert(Collision.otherEntity < 0x100)
         ldx.b   Collision.otherEntity
-        bra     EntityLoop_Continue
+        jmp     EntityLoop_Continue
 }
 constant _TestList_EntityA_SingleHitbox = _TestList_EntityA_SingleHitbox.START
 
@@ -889,6 +956,9 @@ function _InnerTest_Multiple_Single {
 //
 // RETURN: Jump to Continue_EntityLoop
 InnerCollision:
+
+    _CalculateCollisionCentre(entityB.aabb)
+
     _ProcessCollision(entityB)
 
     jmp     Continue_EntityLoop

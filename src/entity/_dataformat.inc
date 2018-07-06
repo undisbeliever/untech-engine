@@ -130,6 +130,8 @@ namespace BaseEntityFunctionTable {
         //         Y: otherEntity address
         //         Metasprite.Collision.bits: collision bits (MUST NOT BE MODIFIED)
         //         Metasprite.Collision.otherEntity: the entity collided with (MUST NOT BE MODIFIED)
+        //         Metasprite.Collision.xPos: the x-coordinate of the collision centre
+        //         Metasprite.Collision.yPos: the y-coordinate of the collision centre
         // Collision bits format: (this hitboxType << 4) | other hitboxType
         field(ProcessCollision, 2)
     endstruct()

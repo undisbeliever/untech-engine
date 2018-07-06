@@ -136,6 +136,23 @@ namespace PlayerEntity {
     a16()
     i16()
     code()
+    ProcessCollision: {
+        jsr     PrintProcessCollisionArgs
+
+        // Spawn the CollisionCentreEntity
+        lda.w   MetaSprite.Collision.xPos
+        sta.w   Entity.Spawn.xPos
+
+        lda.w   MetaSprite.Collision.yPos
+        sta.w   Entity.Spawn.yPos
+
+        lda.w   #CollisionCentreEntity.ENTITY_ID
+        jmp     Entity.Spawn
+    }
+
+    a16()
+    i16()
+    code()
     Process: {
         lda.w   Controller.Joy1.current
         bit.w   #JOY.left
@@ -171,8 +188,6 @@ namespace PlayerEntity {
 
         rts
     }
-
-    constant ProcessCollision = PrintProcessCollisionArgs
 
 
     rodata(EN_RomData)
@@ -223,6 +238,64 @@ namespace EnemyEntity {
         dw  FunctionTable
         db  Entity.ListId.ENEMY         // initial List
         dw  MSFS.EhCollisionTest_Enemy  // frameSetId
+        db  0                           // defaultPalette
+
+    rodata(EN_EntityList)
+    constant ENTITY_ID = (pc() - Entity.Data.EntityList) / 2
+        dw  RomData
+}
+
+
+
+// Shows the cursor sprite at the centre of the collision
+// Deletes itself on the next frame
+namespace CollisionCentreEntity {
+    buildFunctionTable(BaseEntityFunctionTable, CollisionCentreEntity)
+    Entity.useDefaultRenderer()
+
+    namespace EntityStruct {
+        childstruct(BaseEntity)
+            field(framesLeft, 2)
+        endstruct()
+    }
+
+    a16()
+    i16()
+    code()
+    function Init {
+        lda.w   #1
+        sta.b   EntityStruct.framesLeft
+
+        lda.w   #0
+        jmp     MetaSprite.SetFrame
+    }
+
+    a16()
+    i16()
+    code()
+    Destructor:
+    ProcessCollision:
+    function Null {
+        rts
+    }
+
+    a16()
+    i16()
+    code()
+    function Process {
+        dec.b   EntityStruct.framesLeft
+        bpl     +
+            lda.w   #Entity.lists.toDelete
+            sta.w   Entity.changeList
+        +
+        rts
+    }
+
+    rodata(EN_RomData)
+    RomData:
+        dw  FunctionTable
+        db  Entity.ListId.PARTICLE      // initial List
+        dw  MSFS.EhCollisionTest_Centre // frameSetId
         db  0                           // defaultPalette
 
     rodata(EN_EntityList)
