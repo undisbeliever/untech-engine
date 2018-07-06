@@ -891,7 +891,6 @@ function _InnerTest_Multiple_Single {
 InnerCollision:
     _ProcessCollision(entityB)
 
-NoCollisions:
     jmp     Continue_EntityLoop
 
 
@@ -903,7 +902,7 @@ NoCollisions:
 //        entityB.hitboxAddress set
 //
 // RETURN: Jump to InnerCollision if entityA and entityB collided
-//         Jump to NoCollisions if no collisions occurred
+//         Jump to Continue_EntityLoop if no collisions occurred
 a16()
 i16()
 code()
@@ -976,7 +975,7 @@ function _InnerTest_Multiple_Multiple {
         lda.l   Tables.EntityHitbox.CollisionOrder,x
         bpl     InnerLoop
 
-    jmp     NoCollisions
+    jmp     Continue_EntityLoop
 
 
 _InnerCollision:
