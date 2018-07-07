@@ -24,8 +24,11 @@ namespace EntityHitbox {
 //
 // You MUST invoke `MetaSprite.EntityHitbox.End` to end the block.
 //
-// REQUIRES: 16 bit A, 16 bit Index, DP = 0, DB = EntityHitboxBank
+// REQUIRES: 16 bit A, 16 bit Index, DP = 0, DB = 0x7e
 macro Begin() {
+    assert16a()
+    assert16i()
+
     if MetaSprite.EntityHitbox.__EH_BLOCK != 0 {
         error "Cannot invoke MetaSprite.EntityHitbox.Begin() twice"
     }
@@ -33,6 +36,10 @@ macro Begin() {
 
     pea     (0x7e << 8) | MetaSprite.EntityHitbox.EntityHitboxBank
     plb
+
+    // Ensure the third byte of the offset/size pair is zero
+    stz.b   MetaSprite.EntityHitbox._xPosWidthPair + 1
+    stz.b   MetaSprite.EntityHitbox._yPosHeightPair + 1
 }
 
 
