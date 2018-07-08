@@ -129,7 +129,7 @@ a8()
 
         PrintWindowInput()
 
-        jsr     dirtyDpTmp
+        jsr     DirtyDpTmp
 
         ldx.b   xPos
         ldy.b   yPos

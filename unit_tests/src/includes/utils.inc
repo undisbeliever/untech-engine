@@ -54,7 +54,7 @@ Return:
 //
 // REQUIRES: none
 code()
-function dirtyDpTmp {
+function DirtyDpTmp {
     php
     phd
 

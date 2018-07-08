@@ -106,7 +106,7 @@ i16()
     // Tests that the dpTmp variables used by EntityHitbox subsystem
     // are not used across a call boundary.
 
-    jmp     dirtyDpTmp
+    jmp     DirtyDpTmp
 
 
 rodata(rom0)
@@ -476,7 +476,7 @@ function Test {
 
         jsr     EntityLoop.ProcessFrame
 
-        jsr     dirtyDpTmp
+        jsr     DirtyDpTmp
 
         // test ProcessCollision arguments still Ok
         lda.w   _processCollisionArgumentsOk
