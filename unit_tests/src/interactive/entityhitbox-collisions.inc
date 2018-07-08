@@ -17,6 +17,7 @@ namespace InteractiveTests {
 // Tests:
 //  * EntityLoop
 //  * MetaSprite EntityHitbox Collisions
+//  * Entity.SpawnAtMetaSpriteCollisionCentre
 namespace EntityHitboxCollisionsTest {
 
 constant _waitCount                   = Test.tmp
@@ -166,14 +167,8 @@ namespace PlayerEntity {
         jsr     PrintProcessCollisionArgs
 
         // Spawn the CollisionCentreEntity
-        lda.w   MetaSprite.Collision.xPos
-        sta.w   Entity.Spawn.xPos
-
-        lda.w   MetaSprite.Collision.yPos
-        sta.w   Entity.Spawn.yPos
-
         lda.w   #CollisionCentreEntity.ENTITY_ID
-        jmp     Entity.Spawn
+        jmp     Entity.SpawnAtMetaSpriteCollisionCentre
     }
 
 
