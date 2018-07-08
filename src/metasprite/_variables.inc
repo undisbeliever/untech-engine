@@ -102,6 +102,22 @@ namespace MetaSprite {
         allocateTmpWord(yPos)
     }
 
+    namespace Collision {
+        // Collision bits
+        // See (THIS_* and OTHER_* constants)
+        // (uint8_t, stored as two bytes for efficiency)
+        allocate(bits, wram7e, 2)
+
+        // The entity that the object collided with
+        // (word addr)
+        allocate(otherEntity, dp, 2)
+
+        // The centre position of the collision
+        // (2x uint16)
+        allocate(xPos, dp, 2)
+        allocate(yPos, dp, 2)
+    }
+
 
     namespace Vram {
         constant VRAM_TILE_SLOTS = 16

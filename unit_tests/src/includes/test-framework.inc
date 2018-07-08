@@ -19,9 +19,10 @@ constant TESTING_COLOR = 0x7fff
 constant SUCCESS_COLOR = 22 << Palette.green.shift
 constant FAILURE_COLOR = 20 << Palette.red.shift
 
-allocate(dpTmp, dp, 32)
+constant TMP_SIZE = 32
+allocate(dpTmp, dp, TMP_SIZE)
 
-allocate(tmp, shadow, 32)
+allocate(tmp, shadow, TMP_SIZE)
 
 
 // TABLE LOCATIONS
@@ -127,13 +128,29 @@ i16()
 
         Warnings.Reset_a16()
 
+        lda.w   #0
+        tcd
+
+        // corrupt tmp values
+
+        jsr     DirtyDpTmp
+
+        ldx.w   #TMP_SIZE - 2
+        -
+            dec
+            sta.b   Test.dpTmp,x
+            dec
+            sta.w   Test.tmp,x
+
+            dex
+            dex
+            bpl     -
+
+        // do test
 
         lda.w   testId
         asl
         tax
-
-        lda.w   #0
-        tcd
 
         php
         phb
@@ -196,7 +213,9 @@ i16()
         sta.w   testId
 
         cmp.w   #N_TESTS
-        bcc     Loop
+        bcs     +
+            jmp     Loop
+    +
 
 
 AllTestsPassed:

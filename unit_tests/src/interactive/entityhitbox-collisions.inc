@@ -3,11 +3,118 @@
 // Distributed under The MIT License: https://opensource.org/licenses/MIT
 
 namespace InteractiveTests {
-namespace EntityHitboxCollisionsTest {
 
+// EntityHitbox Interactive Collisions Test.
+//
+// Displays a single player entity and multiple enemy entities on screen.
+// The player entity is moveable with the D-PAD, and entity type can be
+// changed with SELECT.
+//
+// When two entities collide the arguments sent to entity's ProcessCollision
+// routine are displayed on screen and a particle is spawned at the collision
+// centre.
+//
 // Tests:
 //  * EntityLoop
 //  * MetaSprite EntityHitbox Collisions
+//  * Entity.SpawnAtMetaSpriteCollisionCentre
+namespace EntityHitboxCollisionsTest {
+
+constant _waitCount                   = Test.tmp
+constant _tmp_index                   = Test.tmp + 2
+constant _collisionBits               = Test.tmp + 4
+constant _processCollisionArgumentsOk = Test.tmp + 6
+
+
+// Prints the ProcessCollision arguments to screen.
+//
+// Also Tests that A/Y are set correctly, sets `_processCollisionArgumentsOk`
+// to zero if they do not match.
+//
+// REQUIRES: 16 bit A, 16 bit Index, DB = 0x7e
+// DP = entity
+// A = MetaSprite.Collision.bits
+// Y = MetaSprite.Collision.otherEntity
+a16()
+i16()
+code()
+function PrintProcessCollisionArgs {
+constant tmpString = Text.tmpString
+
+    sep     #$20
+a8()
+    cmp.w   MetaSprite.Collision.bits
+    bne     _ArgumentsFail
+
+    rep     #$30
+a16()
+i16()
+    cpy.w   MetaSprite.Collision.otherEntity
+    beq     +
+_ArgumentsFail:
+        rep     #$30
+        stz.w   _processCollisionArgumentsOk
+    +
+
+    tdc
+    jsr     Text.Console.PrintHex16A
+
+
+    Text.Console.PrintConstString(" ")
+
+    sep     #$20
+a8()
+    lda.w    MetaSprite.Collision.bits
+    sta.w   _collisionBits
+
+    jsr     Text.Console.PrintHex8A
+
+
+    // Convert _collisionBits to a human readable string
+    lda.b   #Text.Font.SPACE
+    sta.w   tmpString
+    sta.w   tmpString + 8 + 1
+    stz.w   tmpString + 8 + 2
+
+    ldx.w   #7
+    Loop:
+        lsr.w   _collisionBits
+        bcc     +
+            lda.l   BitsString,x
+            bra     ++
+        +
+            lda.b   #Text.Font.MINUS
+        +
+        sta.w   tmpString + 1,x
+        dex
+        bpl     Loop
+
+    lda.b   #tmpString >> 16
+    ldx.w   #tmpString
+    jsr     Text.Console.PrintString
+
+    ldy.w   MetaSprite.Collision.otherEntity
+    jsr     Text.Console.PrintHex16Y
+
+    jsr     Text.Console.NewLine
+
+    rep     #$30
+a16()
+i16()
+
+    // Corrupt all dpTmp variables.
+    //
+    // Tests that the dpTmp variables used by EntityHitbox subsystem
+    // are not used across a call boundary.
+
+    jmp     DirtyDpTmp
+
+
+rodata(rom0)
+BitsString:
+    db      "WSABwsab"
+}
+
 
 
 namespace PlayerEntity {
@@ -22,6 +129,9 @@ namespace PlayerEntity {
         endstruct()
     }
 
+
+    // REQUIRES: 16 bit A, 16 bit Index, DB = 0x7e
+    // INPUT: DP = entity
     a16()
     i16()
     code()
@@ -32,18 +142,44 @@ namespace PlayerEntity {
         jmp     MetaSprite.SetFrame
     }
 
+
+    // REQUIRES: 16 bit A, 16 bit Index, DB = 0x7e
+    // INPUT: DP = entity
     a16()
     i16()
     code()
-    Destructor: {
+    function Destructor {
         Text.Console.PrintConstString("Player.Destructor\n")
         rts
     }
 
+
+    // Print the Move the entity's position with D-PAD, change the entity type on SELECT.
+    //
+    // REQUIRES: 16 bit A, 16 bit Index, DB = 0x7e
+    // INPUT: DP = entity
+    // INPUT:  A = MetaSprite.Collision.bits
+    // INPUT:  A = MetaSprite.Collision.bits
     a16()
     i16()
     code()
-    Process: {
+    function ProcessCollision {
+        jsr     PrintProcessCollisionArgs
+
+        // Spawn the CollisionCentreEntity
+        lda.w   #CollisionCentreEntity.ENTITY_ID
+        jmp     Entity.SpawnAtMetaSpriteCollisionCentre
+    }
+
+
+    // Move the entity's position with the D-PAD, change the entity type on SELECT.
+    //
+    // REQUIRES: 16 bit A, 16 bit Index, DB = 0x7e
+    // INPUT: DP = entity
+    a16()
+    i16()
+    code()
+    function Process {
         lda.w   Controller.Joy1.current
         bit.w   #JOY.left
         beq     +
@@ -79,46 +215,6 @@ namespace PlayerEntity {
         rts
     }
 
-    function CalculateAttackValue {
-        bcc     +
-            Text.Console.PrintConstString("P.CalculateAttackValue (s)\n")
-            rts
-        +
-            Text.Console.PrintConstString("P.CalculateAttackValue (n)\n")
-            rts
-    }
-
-    a16()
-    i16()
-    code()
-    function TakeDamageFromEntity {
-        bcc     +
-            Text.Console.PrintConstString("P.TakeDamageFromEntity (wk)\n")
-            rts
-        +
-            Text.Console.PrintConstString("P.TakeDamageFromEntity (n)\n")
-            rts
-        rts
-    }
-
-    function BlockWithShield {
-        bcc     +
-            Text.Console.PrintConstString("P.BlockWithShield (attack)\n")
-            rts
-        +
-            Text.Console.PrintConstString("P.BlockWithShield (body)\n")
-            rts
-    }
-
-    function CollideWithBody {
-        Text.Console.PrintConstString("P.CollideWithBody\n")
-        rts
-    }
-
-    function CollideWithShield {
-        Text.Console.PrintConstString("P.CollideWithShield\n")
-        rts
-    }
 
     rodata(EN_RomData)
     RomData:
@@ -133,11 +229,14 @@ namespace PlayerEntity {
 }
 
 
+
 namespace EnemyEntity {
     buildFunctionTable(BaseEntityFunctionTable, EnemyEntity)
     Entity.useDefaultRenderer()
 
-    // IN: A = frameId
+    // REQUIRES: 16 bit A, 16 bit Index, DB = 0x7e
+    // INPUT: DP = entity
+    //         A = frameId
     a16()
     i16()
     code()
@@ -145,6 +244,9 @@ namespace EnemyEntity {
         jmp     MetaSprite.SetFrame
     }
 
+
+    // REQUIRES: 16 bit A, 16 bit Index, DB = 0x7e
+    // INPUT: DP = entity
     a16()
     i16()
     code()
@@ -153,6 +255,9 @@ namespace EnemyEntity {
         rts
     }
 
+
+    // REQUIRES: 16 bit A, 16 bit Index, DB = 0x7e
+    // INPUT: DP = entity
     a16()
     i16()
     code()
@@ -160,46 +265,9 @@ namespace EnemyEntity {
         rts
     }
 
-    function CalculateAttackValue {
-        bcc     +
-            Text.Console.PrintConstString("E.CalculateAttackValue (s)\n")
-            rts
-        +
-            Text.Console.PrintConstString("E.CalculateAttackValue (n)\n")
-            rts
-    }
 
-    a16()
-    i16()
-    code()
-    function TakeDamageFromEntity {
-        bcc     +
-            Text.Console.PrintConstString("E.TakeDamageFromEntity (wk)\n")
-            rts
-        +
-            Text.Console.PrintConstString("E.TakeDamageFromEntity (n)\n")
-            rts
-        rts
-    }
+    constant ProcessCollision = PrintProcessCollisionArgs
 
-    function BlockWithShield {
-        bcc     +
-            Text.Console.PrintConstString("E.BlockWithShield (attack)\n")
-            rts
-        +
-            Text.Console.PrintConstString("E.BlockWithShield (body)\n")
-            rts
-    }
-
-    function CollideWithBody {
-        Text.Console.PrintConstString("E.CollideWithBody\n")
-        rts
-    }
-
-    function CollideWithShield {
-        Text.Console.PrintConstString("E.CollideWithShield\n")
-        rts
-    }
 
     rodata(EN_RomData)
     RomData:
@@ -213,60 +281,155 @@ namespace EnemyEntity {
         dw  RomData
 }
 
+
+
+// Shows the cursor sprite at the centre of the collision
+// Deletes itself on the next frame
+namespace CollisionCentreEntity {
+    buildFunctionTable(BaseEntityFunctionTable, CollisionCentreEntity)
+    Entity.useDefaultRenderer()
+
+    namespace EntityStruct {
+        childstruct(BaseEntity)
+            field(framesLeft, 2)
+        endstruct()
+    }
+
+
+    // REQUIRES: 16 bit A, 16 bit Index, DB = 0x7e
+    // INPUT: DP = entity
+    a16()
+    i16()
+    code()
+    function Init {
+        lda.w   #1
+        sta.b   EntityStruct.framesLeft
+
+        lda.w   #0
+        jmp     MetaSprite.SetFrame
+    }
+
+
+    // REQUIRES: 16 bit A, 16 bit Index, DB = 0x7e
+    // INPUT: DP = entity
+    a16()
+    i16()
+    code()
+    Destructor:
+    ProcessCollision:
+    function Null {
+        rts
+    }
+
+
+    // Moves the entity to the toDelete list after `framesLeft` frames.
+    //
+    // REQUIRES: 16 bit A, 16 bit Index, DB = 0x7e
+    // INPUT: DP = entity
+    a16()
+    i16()
+    code()
+    function Process {
+        dec.b   EntityStruct.framesLeft
+        bpl     +
+            lda.w   #Entity.lists.toDelete
+            sta.w   Entity.changeList
+        +
+        rts
+    }
+
+    rodata(EN_RomData)
+    RomData:
+        dw  FunctionTable
+        db  Entity.ListId.PARTICLE      // initial List
+        dw  MSFS.EhCollisionTest_Centre // frameSetId
+        db  0                           // defaultPalette
+
+    rodata(EN_EntityList)
+    constant ENTITY_ID = (pc() - Entity.Data.EntityList) / 2
+        dw  RomData
+}
+
+
+
 rodata(rom0)
 namespace EnemyTable {
 constant Y_DELTA = 20
 constant N_COLUMNS = 4
 constant Y_BOTTOM = Camera.ORIGIN + Camera.DISPLAY_HEIGHT - 30
 
-constant X_LEFT = Camera.ORIGIN + Camera.DISPLAY_WIDTH / 2 - 10
+constant X_LEFT = Camera.ORIGIN + Camera.DISPLAY_WIDTH / 3 + 20
 constant X_RIGHT = Camera.ORIGIN + Camera.DISPLAY_WIDTH / 2 + 10
+constant X_CENTER = Camera.ORIGIN + Camera.DISPLAY_WIDTH / 2
 
     struct(pc())
+        field(entityId, 2)
         field(xPos, 2)
         field(yPos, 2)
         field(parameter, 2)
     endstruct()
 
-Data:
-    //  xPos,       yPos,                   frameId
-    dw  X_LEFT,     Y_BOTTOM - Y_DELTA * 2,  MSEO.EhCollisionTest_Enemy.Frames.box
-    dw  X_RIGHT,    Y_BOTTOM - Y_DELTA * 3,  MSEO.EhCollisionTest_Enemy.Frames.row1
-    dw  X_RIGHT,    Y_BOTTOM - Y_DELTA * 2,  MSEO.EhCollisionTest_Enemy.Frames.row2
-    dw  X_RIGHT,    Y_BOTTOM - Y_DELTA * 1,  MSEO.EhCollisionTest_Enemy.Frames.row3
-    dw  X_RIGHT,    Y_BOTTOM - Y_DELTA * 0,  MSEO.EhCollisionTest_Enemy.Frames.row4
+evaluate EN_ID = Entity.ListId.ENEMY
 
-    constant N_ENEMIES = (pc() - Data) / size
+constant PLAYER = PlayerEntity.ENTITY_ID
+constant ENEMY  = EnemyEntity.ENTITY_ID
+constant BLANK  = EntityTest.Entities.BlankEntity.EntityId_{EN_ID}
+
+
+Data:
+    //  entity, xPos,           yPos,                       frameId
+
+    dw  PLAYER, X_CENTER,       Y_BOTTOM - Y_DELTA * 2,     0
+
+    dw  BLANK,  X_CENTER,       Y_BOTTOM - Y_DELTA * 2,     0
+    dw  BLANK,  X_CENTER,       Y_BOTTOM - Y_DELTA * 2,     0
+    dw  BLANK,  X_CENTER,       Y_BOTTOM - Y_DELTA * 2,     0
+
+    dw  ENEMY,  X_LEFT,         Y_BOTTOM - Y_DELTA * 2,     MSEO.EhCollisionTest_Enemy.Frames.box
+    dw  ENEMY,  X_RIGHT,        Y_BOTTOM - Y_DELTA * 3,     MSEO.EhCollisionTest_Enemy.Frames.row1
+    dw  ENEMY,  X_RIGHT,        Y_BOTTOM - Y_DELTA * 2,     MSEO.EhCollisionTest_Enemy.Frames.row2
+    dw  ENEMY,  X_RIGHT,        Y_BOTTOM - Y_DELTA * 1,     MSEO.EhCollisionTest_Enemy.Frames.row3
+    dw  ENEMY,  X_RIGHT,        Y_BOTTOM - Y_DELTA * 0,     MSEO.EhCollisionTest_Enemy.Frames.row4
+
+    dw  BLANK,  X_CENTER,       Y_BOTTOM - Y_DELTA * 2,     0
+    dw  BLANK,  X_CENTER,       Y_BOTTOM - Y_DELTA * 2,     0
+    dw  BLANK,  X_CENTER,       Y_BOTTOM - Y_DELTA * 2,     0
+
+    dw  ENEMY,  X_LEFT  + 9,    Y_BOTTOM - Y_DELTA * 2 + 7, MSEO.EhCollisionTest_Enemy.Frames.box
+    dw  ENEMY,  X_RIGHT + 9,    Y_BOTTOM - Y_DELTA * 3 + 7, MSEO.EhCollisionTest_Enemy.Frames.row1
+    dw  ENEMY,  X_RIGHT + 9,    Y_BOTTOM - Y_DELTA * 2 + 7, MSEO.EhCollisionTest_Enemy.Frames.row2
+    dw  ENEMY,  X_RIGHT + 9,    Y_BOTTOM - Y_DELTA * 1 + 7, MSEO.EhCollisionTest_Enemy.Frames.row3
+    dw  ENEMY,  X_RIGHT + 9,    Y_BOTTOM - Y_DELTA * 0 + 7, MSEO.EhCollisionTest_Enemy.Frames.row4
+
+    dw  BLANK,  X_CENTER,       Y_BOTTOM - Y_DELTA * 2,     0
+    dw  BLANK,  X_CENTER,       Y_BOTTOM - Y_DELTA * 2,     0
+    dw  BLANK,  X_CENTER,       Y_BOTTOM - Y_DELTA * 2,     0
+
+constant N_ENEMIES = (pc() - Data) / size
 }
 
 
-// The Test
+
+// EntityHitbox Interactive test.
+//
+// REQUIRES: 16 bit A, 16 bit Index, DP = 0 DB = 0x7e
 a16()
 i16()
 code()
 Test.add("EntityHitbox Collisions Tst")
 function Test {
-constant tmp_index = Test.tmp
+
+    lda.w   #0xffff
+    sta.w   _processCollisionArgumentsOk
+
 
     jsr     EntityLoop.Init
 
     // Load the entities
 
-    lda.w   #Camera.ORIGIN + Camera.DISPLAY_WIDTH / 2
-    sta.w   Entity.Spawn.xPos
-
-    lda.w   #Camera.ORIGIN + Camera.DISPLAY_HEIGHT * 2 / 3
-    sta.w   Entity.Spawn.yPos
-
-    lda.w   #PlayerEntity.ENTITY_ID
-
-    jsr     Entity.Spawn
-    bcc     Fail
-
-
     ldx.w   #0
     SpawnEnemyLoop:
-        stx.w   tmp_index
+        stx.w   _tmp_index
 
         lda.l   EnemyTable.xPos,x
         sta.w   Entity.Spawn.xPos
@@ -277,12 +440,12 @@ constant tmp_index = Test.tmp
         lda.l   EnemyTable.parameter,x
         tay
 
-        lda.w   #EnemyEntity.ENTITY_ID
+        lda.l   EnemyTable.entityId,x
 
         jsr     Entity.Spawn
         bcc     Fail
 
-        lda.w   tmp_index
+        lda.w   _tmp_index
         clc
         adc.w   #EnemyTable.size
         tax
@@ -299,11 +462,23 @@ constant tmp_index = Test.tmp
         Text.Console.SetCursor(0, 2)
         Text.Console.PrintConstString("Use D-Pad to move Player\nSelect changes hitbox type")
 
+        // Using hex as it is constant time
+        Text.Console.SetCursor(Text.Console.TEXT_WIDTH - 5, 5)
+        ldy.w   _waitCount
+        jsr     Text.Console.PrintHex16Y
+
         Text.Console.SetCursor(0, 7)
 
         jsr     EntityLoop.ProcessFrame
 
-        jsr     WaitFrame
+        jsr     DirtyDpTmp
+
+        // test ProcessCollision arguments still Ok
+        lda.w   _processCollisionArgumentsOk
+        beq     Fail
+
+        jsr     WaitFrame_Count
+        sty.w   _waitCount
 
         lda.l   JOY1
         and.w   #JOY.buttons

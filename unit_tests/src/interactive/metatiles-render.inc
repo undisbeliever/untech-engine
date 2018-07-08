@@ -64,11 +64,7 @@ namespace MapCursorEntity {
     i16()
     code()
     Destructor:
-    TakeDamageFromEntity:
-    CollideWithBody:
-    CollideWithShield:
-    BlockWithShield:
-    CalculateAttackValue:
+    ProcessCollision:
     function Null {
         rts
     }

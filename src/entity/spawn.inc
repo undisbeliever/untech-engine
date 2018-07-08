@@ -198,6 +198,28 @@ code()
 }
 
 
+
+// Spawns a given entity at the MetaSprite Collision Centre.
+//
+// REQUIRES: 16 bit A, 16 bit Index, DB = 0x7e
+//
+// INPUT: A - Entity Id
+//        Y - entity parameter (passed to entity init function)
+//
+// OUTPUT: Y - address of new entity
+//         C - set if entity created successfully
+function SpawnAtMetaSpriteCollisionCentre {
+    ldx.w   MetaSprite.Collision.xPos
+    stx.w   Entity.Spawn.xPos
+
+    ldx.w   MetaSprite.Collision.yPos
+    stx.w   Entity.Spawn.yPos
+
+    jmp     Entity.Spawn
+}
+
+
+
 // Spawns a given entity on a given ActionPoint type
 //
 // This routine may spawn multiple entities.

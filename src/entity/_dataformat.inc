@@ -121,54 +121,19 @@ namespace BaseEntityFunctionTable {
         field(Render, 2)
 
 
-        // Return the entity's attack value
+        // Process a collision between this entity and an other entity.
         //
         // REGS: 16 bit A, 16 bit Index, DB = 0x7e
+        //
         // INPUT: dp: entity
-        //         Y: entity attacking
-        //         C: set if the attacker is a ShieldAttack hitbox
-        // OUTPUT: A: attack value
-        field(CalculateAttackValue, 2)
-
-        // Called when the entity's body hitbox collides with an attack
-        // hitbox.
-        //
-        // This function is expected to reduce enemy HP after factoring
-        // in defence / I-frames.
-        //
-        // REGS: 16 bit A, 16 bit Index, DB = 0x7e
-        // INPUT: dp: entity
-        //         A: attack value (opponent's CalculateAttackValue)
-        //         Y: entity collided with
-        //         C: set if entity hit weak point
-        field(TakeDamageFromEntity, 2)
-
-        // Called when the entity's shield hitbox collides with a
-        // body/attack hitbox.
-        //
-        // REGS: 16 bit A, 16 bit Index, DB = 0x7e
-        // INPUT: dp: entity
-        //         Y: entity collided with
-        //         C: set if collide with an attack
-        //
-        // NOTE: C will not be set if a shield collides with a SHEILD_ATTACK hitbox
-        field(BlockWithShield, 2)
-
-        // Called when the entity's body hitbox collides with a body
-        // hitbox.
-        //
-        // REGS: 16 bit A, 16 bit Index, DB = 0x7e
-        // INPUT: dp: entity
-        //         Y: entity collided with
-        field(CollideWithBody, 2)
-
-        // Called when the entity's body hitbox collides with a shield
-        // hitbox.
-        //
-        // REGS: 16 bit A, 16 bit Index, DB = 0x7e
-        // INPUT: dp: entity
-        //         Y: entity collided with
-        field(CollideWithShield, 2)
+        //         A: collision bits
+        //         Y: otherEntity address
+        //         Metasprite.Collision.bits: collision bits (MUST NOT BE MODIFIED)
+        //         Metasprite.Collision.otherEntity: the entity collided with (MUST NOT BE MODIFIED)
+        //         Metasprite.Collision.xPos: the x-coordinate of the collision centre
+        //         Metasprite.Collision.yPos: the y-coordinate of the collision centre
+        // Collision bits format: (this hitboxType << 4) | other hitboxType
+        field(ProcessCollision, 2)
     endstruct()
 }
 

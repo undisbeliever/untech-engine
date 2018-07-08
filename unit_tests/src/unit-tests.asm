@@ -21,6 +21,7 @@ include "../gen/tables/sine-table.inc"
 include "../../src/untech.inc"
 
 include "includes/test-framework.inc"
+include "includes/utils.inc"
 include "includes/entityloop.inc"
 
 
@@ -63,10 +64,10 @@ include "tests/text/string.inc"
 
 include "tests/util/lz4.inc"
 
+include "interactive/entityhitbox-collisions.inc"
 include "interactive/metatiles-render.inc"
 include "interactive/entity-metasprite.inc"
 include "interactive/entity-actionpointspawner.inc"
-include "interactive/entityhitbox-collisions.inc"
 include "interactive/hdma-circular-window.inc"
 include "interactive/hdma-horizontal-trapezium-window.inc"
 include "interactive/hdma-rotated-triangular-window.inc"

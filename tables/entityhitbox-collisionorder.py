@@ -14,14 +14,16 @@ Entity Hithox collision order table generator.
 MAX_INNER_HITBOXES = 4
 LIST_SHIFT = 2
 
+INNER_OFFSET = 5
+
 def main():
     pos = 0
     matches = dict()
 
     def printAddress(a, b):
         nonlocal pos
-        aOffset = 7 * a
-        bOffset = 7 * b
+        aOffset = INNER_OFFSET * a
+        bOffset = INNER_OFFSET * b
         print("\tdb ", aOffset, ", ", bOffset, sep="")
         pos += 2
 
@@ -33,6 +35,7 @@ def main():
 
     print("namespace Tables {")
     print("namespace EntityHitbox {")
+    print("constant INNER_OFFSET =", INNER_OFFSET)
     print("constant MAX_INNER_HITBOXES =", MAX_INNER_HITBOXES)
 
     print("rodata(rom0)")

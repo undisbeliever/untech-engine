@@ -10,7 +10,7 @@
 
 
 // Data format may be subject to changes
-if MetaSprite.Data.METASPRITE_FORMAT_VERSION != 28 {
+if MetaSprite.Data.METASPRITE_FORMAT_VERSION != 32 {
     error "Invalid UnTech MetaSprite Format"
 }
 
@@ -227,53 +227,51 @@ namespace Format {
             constant COUNT_MASK = 3
 
             // Outer hitbox, checked first
+            //
+            // NOTE: actual size of hitbox is width/height + 1
             namespace Outer {
                 field(xOffset, 1) // int_ms8 format
+                field(width, 1)   // uint8 (offset by 1)
                 field(yOffset, 1) // int_ms8 format
-                field(width, 2) // uint16
-                field(height, 2) // uint16
+                field(height, 1)  // uint8 (offset by 1)
             }
 
             // The inner hitboxes, repeated `count + 1` times
             //
+            // NOTE: actual size of hitbox is width/height + 1
+            //
             // All inner hitboxes MUST be inside the outer hitbox.
             namespace Inner {
                 // type of hitbox
-                // (EntityHitboxType uint8 value)
+                // (EntityHitboxType 4 bit bitfield, upper nibble MUST BE 0)
                 field(type, 1)
 
                 field(xOffset, 1) // int_ms8 format
+                field(width, 1)   // uint8 (offset by 1)
                 field(yOffset, 1) // int_ms8 format
-                field(width, 2) // uint16
-                field(height, 2) // uint16
+                field(height, 1)  // uint8 (offset by 1)
 
-                constant size = 7
+                constant size = 5
             }
 
             // The type of a single hitbox
             //
             // Only set if count == 0
+            // (EntityHitboxType 4 bit bitfield, upper nibble MUST BE 0)
             constant singleHitboxType = Inner.type
         endstruct()
     }
 
-    // The entity hitbox type
-    // See entity collision code for collision table
+    // The entity hitbox type bitfield
+    //
+    // Upper bits MUST BE 0
     namespace EntityHitboxType {
-        createEnum(0, 2)
+        constant WEAK   = 0x08
+        constant SHIELD = 0x04
+        constant ATTACK = 0x02
+        constant BODY   = 0x01
 
-        enum(BODY)
-        enum(BODY_WEAK)
-        enum(BODY_ATTACK)   // can be hurt by attack types
-        enum(SHIELD)
-        enum(SHIELD_ATTACK)
-        enum(ATTACK)        // will phase through other attack hitboxes
-
-        constant _TABLE_SHIFT = 3
-        constant _MASK = (1 << (_TABLE_SHIFT + 1)) - 2
-        constant _TABLE_MASK = _MASK << _TABLE_SHIFT | _MASK
-
-        assert({__ENUM__.current} <= 2 << _TABLE_SHIFT)
+        constant _N_BITS = 4
     }
 
 
@@ -371,6 +369,21 @@ namespace Format {
 }
 
 }
+
+// Global bitmasks for collisions
+constant THIS_WEAK   = MetaSprite.Format.EntityHitboxType.WEAK   << MetaSprite.Format.EntityHitboxType._N_BITS
+constant THIS_SHIELD = MetaSprite.Format.EntityHitboxType.SHIELD << MetaSprite.Format.EntityHitboxType._N_BITS
+constant THIS_ATTACK = MetaSprite.Format.EntityHitboxType.ATTACK << MetaSprite.Format.EntityHitboxType._N_BITS
+constant THIS_BODY   = MetaSprite.Format.EntityHitboxType.BODY   << MetaSprite.Format.EntityHitboxType._N_BITS
+
+constant OTHER_WEAK   = MetaSprite.Format.EntityHitboxType.WEAK
+constant OTHER_SHIELD = MetaSprite.Format.EntityHitboxType.SHIELD
+constant OTHER_ATTACK = MetaSprite.Format.EntityHitboxType.ATTACK
+constant OTHER_BODY   = MetaSprite.Format.EntityHitboxType.BODY
+
+// THIS_WEAK and THIS_SHIELD can be tested with the bit instruction
+assert(THIS_WEAK == 0x80)
+assert(THIS_SHIELD == 0x40)
 
 // vim: ft=bass-65816 ts=4 sw=4 et:
 

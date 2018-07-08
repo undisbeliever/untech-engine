@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF_8"?>
+<!DOCTYPE untech>
+<metasprite id="EhCollisionTest_Centre" tilesettype="ONE_TILE_FIXED" exportorder="OneFrame">
+  <smalltileset>
+    gAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=
+  </smalltileset>
+  <palette>
+    /3/gAwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=
+  </palette>
+  <frame id="frame" order="3">
+    <object size="small" x="0" y="0" tile="0"/>
+  </frame>
+</metasprite>
