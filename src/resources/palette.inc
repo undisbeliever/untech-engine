@@ -26,6 +26,7 @@ i16()
 code()
 function LoadPalette {
 constant _ptr = LZ4.ptr
+assertZeroPage(_ptr)
 assert(Format.PaletteHeader.size == 3)
 
     cmp.w   #Resources.PaletteList.count

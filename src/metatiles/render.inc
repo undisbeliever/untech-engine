@@ -346,6 +346,9 @@ macro _DrawHorizontalBuffer() {
     // prevent ptr under-run
     assert(map.data > 2)
 
+    assertZeroPage(_mapPtr)
+    assertZeroPage(_mapPtrRend)
+
     //  mapPtrRend = mapPtr
     //  mapPtr += METATILE_DISPLAY_WIDTH * 2 bytes
     //
@@ -441,6 +444,9 @@ macro _DrawVerticalBuffer() {
     assert(horizontalBuffer.buffer.size == 64 * 2 * 2)
     // prevent ptr under-run (max value of map.bytesPerRow is 512)
     assert(map.data > 512)
+
+    assertZeroPage(_mapPtr)
+    assertZeroPage(_mapPtrRend)
 
     //  mapPtrRend = mapPtr
     //  mapPtr += map.bytesPerDisplayHeight

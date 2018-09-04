@@ -158,6 +158,12 @@ constant _lengthTmp = _tmp1
 constant _token = _tmp2
 constant _matchStart = _tmp3
 
+assertZeroPage(ptr)
+assertZeroPage(outputBufferEnd)
+assertZeroPage(_tmp1)
+assertZeroPage(_tmp2)
+assertZeroPage(_tmp3)
+
 
     php
     phb

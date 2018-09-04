@@ -25,5 +25,14 @@ macro assertPowerOfTwo(evaluate test) {
     }
 }
 
+// Asserts that a variable is inside zero page
+// Breaks assembly if variable is not zero page
+macro assertZeroPage(var) {
+    evaluate addr = {var}
+    if {addr} >= 0x100 && ({addr} < 0x7e0000 || {addr} >= 0x7e0100) {
+        error "{var} is not inside zero page"
+    }
+}
+
 // vim: ft=bass-65816 ts=4 sw=4 et:
 

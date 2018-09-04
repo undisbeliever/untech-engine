@@ -32,6 +32,7 @@ constant _ptr = LZ4.ptr
 constant _staticTilesSize = dpTmp0
 constant _staticTilesPtr = dpTmp1
 
+assertZeroPage(_ptr)
 assert(Format.AnimatedTilesetHeader.size == 4)
 assert(decompressionBuffer + decompressionBuffer.size == animationBuffer)
 
