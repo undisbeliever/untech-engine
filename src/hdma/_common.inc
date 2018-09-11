@@ -70,6 +70,7 @@ macro VBlank() {
 
         ldx.b   #Hdma.buffer1 >> 16
         stx.b   A1B7
+        stx.b   DASB7
 
         ldx.b   #HDMAEN.dma7
         stx.w   HDMAEN
