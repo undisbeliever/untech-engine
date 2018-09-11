@@ -215,7 +215,8 @@ a8()
 a16()
 
     Loop:
-        jsr     WaitFrame
+        jsr     WaitFrame_Print
+
         Controller.UpdateControllerState()
 
         UpdateVariables()
