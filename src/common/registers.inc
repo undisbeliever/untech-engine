@@ -1573,14 +1573,14 @@ constant DAS7H = 0x4376
 //(read, write, any)
 //
 // Used with HDMA only, combined with `DAS0` to form the effective address.
-constant DAS0B = 0x4307
-constant DAS1B = 0x4317
-constant DAS2B = 0x4327
-constant DAS3B = 0x4337
-constant DAS4B = 0x4347
-constant DAS5B = 0x4357
-constant DAS6B = 0x4367
-constant DAS7B = 0x4377
+constant DASB0 = 0x4307
+constant DASB1 = 0x4317
+constant DASB2 = 0x4327
+constant DASB3 = 0x4337
+constant DASB4 = 0x4347
+constant DASB5 = 0x4357
+constant DASB6 = 0x4367
+constant DASB7 = 0x4377
 
 
 
