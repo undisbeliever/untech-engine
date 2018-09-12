@@ -85,6 +85,7 @@ assert(noLineWindow >> 16 == buffer1 >> 16)
 assert(noLineWindow >> 16 == buffer2 >> 16)
 
 
+
 namespace SetupWindowBuffer {
 NotVisible:
     //  iTable[0] = 1
@@ -109,7 +110,16 @@ NotVisible:
 
 // Setup and initialize a continuous HDMA window buffer.
 //
-// NOTE: This routine does not enable the buffer.
+// The window buffer is `2 * nLines` bytes in size in the following
+// format:
+//      * odd indexes = the left window setting
+//      * even indexes = the right window setting
+//
+// This routine will create, but not enable, a HDMA Indirect table which
+// maps to the window buffer. This buffer is stored after the window
+// buffer so you MUST NOT overrun it.
+//
+// NOTE: The HDMA table is not enabled.
 //       You must call `FinalizeBuffer` to enable the buffer during the
 //       next VBlank, even if there is nothing on screen.
 //
@@ -235,6 +245,8 @@ a16()
         cmp.w   #Camera.DISPLAY_HEIGHT
         bcs     NotVisible
 
+        // Add to vertical skip to HDMA Indirect table
+
         cmp.w   #0x7f + 1
         bcc     +
             // c set
@@ -279,6 +291,8 @@ a16()
     // A = nLines
     // X = hdmaBuffer
     // Y = indirect table offset
+
+    // Build HDMA Indirect table pointing to a single continuous window buffer
 
     cmp.w   #0x7f + 1
     bcc     +
@@ -444,10 +458,7 @@ a16()
 
 // Draws a single line to a single side of the HDMA window buffer.
 //
-// The HDMA window buffer MUST:
-//  * contain both the left and right window registers
-//
-// ASSUMES: buffer is the one created by `SetupWindowBuffer` call
+// NOTE: buffer MUST BE the one created by the `SetupWindowBuffer` call.
 //
 // REQUIRES: 16 bit A, 16 bit Index, DB = 0x7e, DP = 0
 //
@@ -620,7 +631,7 @@ _DrawSteepLine_Followthrough:
 }
 
 
-// Draw a steep Line (dx2 < dy2) to the HDMA Buffer
+// Draw a steep Line (dx2 < dy2) to the HDMA window buffer.
 //
 // INTERNAL: called by DrawLine
 // REQUIRES: 16 bit A, 16 bit Index, DB = 0x7e, DP = 0
@@ -830,7 +841,7 @@ a8()
 
 
 
-// Draw a shallow (dx2 >= dy2) Line to the HDMA Buffer
+// Draw a shallow (dx2 >= dy2) Line to the HDMA window buffer.
 //
 // INTERNAL: called by DrawLine
 // REQUIRES: 16 bit A, 16 bit Index, DB = 0x7e, DP = 0
