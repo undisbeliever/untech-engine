@@ -33,8 +33,8 @@ code()
 function HorizontalTrapeziumWindow {
 // trapezium coordinates
 // (6 * sint16)
-constant yPos =         _WindowLine.SetupWindowBuffer.yPos
-constant height =       _WindowLine.SetupWindowBuffer.height
+constant yPos =         _WindowBuffer.SetupWindowBuffer.yPos
+constant height =       _WindowBuffer.SetupWindowBuffer.height
 constant topLeft =      dpTmp0
 constant topRight =     dpTmp1
 constant bottomLeft =   dpTmp2
@@ -42,46 +42,46 @@ constant bottomRight =  dpTmp3
 
 constant _bufferPos =   dpTmp4
 
-assert(_bufferPos < _WindowLine.LAST_DP_TMP)
+assert(_bufferPos < _WindowBuffer.LAST_DP_TMP)
 
-constant _skip = _WindowLine.skip
-constant _nLines = _WindowLine.nLines
+constant _skip = _WindowBuffer.skip
+constant _nLines = _WindowBuffer.nLines
 
     //  bufferPos, skip, nLines = SetupWindowBuffer(height, yPos)
     //
-    //  x = _WindowLine.DrawLine(topLeft, bottomLeft, height, skip, nLines, buffer)
-    //  x = _WindowLine.DrawLine(topRight, bottomRight, height, skip, nLines, buffer + 1)
+    //  x = _WindowBuffer.DrawLine(topLeft, bottomLeft, height, skip, nLines, buffer)
+    //  x = _WindowBuffer.DrawLine(topRight, bottomRight, height, skip, nLines, buffer + 1)
     //  finalize(x - 1)
 
-    jsr     _WindowLine.SetupWindowBuffer
+    jsr     _WindowBuffer.SetupWindowBuffer
     bcc     NotVisible
 
     stx.b   _bufferPos
 
-    // line height is shadowed by _WindowLine.SetupWindowBuffer.height
+    // line height is shadowed by _WindowBuffer.SetupWindowBuffer.height
 
     lda.b   topLeft
-    sta.b   _WindowLine.DrawLine.x0
+    sta.b   _WindowBuffer.DrawLine.x0
     lda.b   bottomLeft
-    sta.b   _WindowLine.DrawLine.x1
+    sta.b   _WindowBuffer.DrawLine.x1
     ldy.b   _skip
     lda.b   _nLines
     // X = bufferPos
-    jsr     _WindowLine.DrawLine
+    jsr     _WindowBuffer.DrawLine
 
     lda.b   topRight
-    sta.b   _WindowLine.DrawLine.x0
+    sta.b   _WindowBuffer.DrawLine.x0
     lda.b   bottomRight
-    sta.b   _WindowLine.DrawLine.x1
+    sta.b   _WindowBuffer.DrawLine.x1
     ldy.b   _skip
     lda.b   _nLines
     ldx.b   _bufferPos
     inx
-    jsr     _WindowLine.DrawLine
+    jsr     _WindowBuffer.DrawLine
     dex
 
 NotVisible:
-    jmp     _WindowLine.FinalizeBuffer
+    jmp     _WindowBuffer.FinalizeBuffer
 }
 
 }

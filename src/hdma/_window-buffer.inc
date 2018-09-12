@@ -1,12 +1,17 @@
-// hdma/_window-line.inc
-// =====================
+// hdma/_window-buffer.inc
+// =======================
 //
-// HDMA Window Line drawing algorithm.
+// The `_WindowBuffer` module provides a framework to create HDMA
+// effects that change the positions of Screen Window 0 over a given
+// range of scanlines.
 //
-// This code is based on Bresenham's line drawing algorithm
+// To help create lighting/beam effects a `DrawLine` routine has been
+// provided, which is based on Bresenham's line drawing algorithm.
+//
 //
 // NOTE: This code uses dpTmp8 to dpTmp19 to store state. Ensure that all
 // calling code does not use these variables.
+//
 //
 // This file is part of the UnTech Game Engine.
 // Copyright (c) 2016 - 2017, Marcus Rowe <undisbeliever@gmail.com>.
@@ -14,7 +19,7 @@
 
 
 namespace Hdma {
-namespace _WindowLine {
+namespace _WindowBuffer {
 
 // Current HDMA window buffer
 //   First `_HdmaIndirectTableOffset` bytes = window settings buffer
