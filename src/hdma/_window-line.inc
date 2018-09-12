@@ -643,7 +643,13 @@ function _DrawSteepLine {
     //      err -= dy2
     //
     //    SetXPos:
-    //      xClipped = bound(xPos, 0, 255)
+    //      xClipped = xPos
+    //      if xClipped < 0:
+    //          xClipped = 0
+    //          if sx < 0: goto EarlyExit
+    //      else if xClipped > 255:
+    //          xClipped = 255
+    //          if sx > 0: goto EarlyExit
     //
     //      repeat h times:
     //          if buffer >= bufferLast: goto EndLoop
@@ -706,11 +712,18 @@ function _DrawSteepLine {
             lda.b   _xPos
             bpl     +
                 lda.w   #0
-                bra     ++
+                if {sx} < 0 {
+                    bra     EarlyExit
+                } else {
+                    bra     ++
+                }
             +
                 cmp.w   #256
                 bcc     +
                     lda.w   #255
+                    if {sx} > 0 {
+                        bra     EarlyExit
+                    }
             +
 
             sep     #$20
@@ -772,7 +785,44 @@ a8()
     rep     #$30
 a16()
     rts
+
+
+// xClipped is outside the screen and will never re-enter it.
+//
+// A = xClipped
+// X = buffer address
+a16()
+i16()
+EarlyExit:
+    //  while buffer < bufferLast:
+    //      *buffer = xClipped
+    //      buffer += 2
+    //
+    //  *buffer = xClipped
+    //  buffer += 2
+    //
+    //  return buffer
+
+    sep     #$20
+a8()
+    cpx.b   _bufferLast
+    bcs     +
+    -
+        sta.w   0,x
+        inx
+        inx
+        cpx.b   _bufferLast
+        bcc     -
+    +
+
+    sta.w   0,x
+    inx
+    inx
+
+    rep     #$30
+    rts
 }
+
 
 
 // Draw a shallow (dx2 >= dy2) Line to the HDMA Buffer
@@ -786,12 +836,23 @@ a16()
 i16()
 code()
 function _DrawShallowLine {
+
+constant EarlyExit = _DrawSteepLine.EarlyExit
+
     //  sx = x1 >= xPos ? 1 : -1
     //
     //  while True:
     //      if buffer >= bufferLast: goto EndLoop
     //
-    //      *buffer = bound(xPos, 0, 255)
+    //      xClipped = xPos
+    //      if xClipped < 0:
+    //          xClipped = 0
+    //          if sx < 0: goto EarlyExit
+    //      else if xClipped > 255:
+    //          xClipped = 255
+    //          if sx > 0: goto EarlyExit
+    //
+    //      *buffer = xClipped
     //      buffer += 2
     //
     //      err += dx2
@@ -839,11 +900,18 @@ function _DrawShallowLine {
             lda.b   _xPos
             bpl     +
                 lda.w   #0
-                bra     ++
+                if {sx} < 0 {
+                    bra     EarlyExit
+                } else {
+                    bra     ++
+                }
             +
                 cmp.w   #256
                 bcc     +
                     lda.w   #255
+                    if {sx} > 0 {
+                        bra     EarlyExit
+                    }
             +
 
             sep     #$20
