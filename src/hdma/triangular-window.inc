@@ -42,12 +42,12 @@ constant y2 = dpTmp5
 
 constant _tmp = dpTmp6
 
-assert(_tmp < _WindowLine.LAST_DP_TMP)
+assert(_tmp < _WindowBuffer.LAST_DP_TMP)
 
 allocateTmpWord(_bufferPos)
 
-constant _skip = _WindowLine.skip
-constant _nLines = _WindowLine.nLines
+constant _skip = _WindowBuffer.skip
+constant _nLines = _WindowBuffer.nLines
 
     // Sort the triangle so p0 <= p1 <= p2
     //  if y1 < y0 { swap(y1, y0), swap(x1, x0) }
@@ -103,12 +103,12 @@ constant _nLines = _WindowLine.nLines
     sec
     sbc.w   y0
     inc
-    sta.w   _WindowLine.SetupWindowBuffer.height
+    sta.w   _WindowBuffer.SetupWindowBuffer.height
 
     lda.b   y0
-    sta.b   _WindowLine.SetupWindowBuffer.yPos
+    sta.b   _WindowBuffer.SetupWindowBuffer.yPos
 
-    jsr     _WindowLine.SetupWindowBuffer
+    jsr     _WindowBuffer.SetupWindowBuffer
     bcc     NotVisible
 
     stx.w   _bufferPos
@@ -116,7 +116,7 @@ constant _nLines = _WindowLine.nLines
 
     // Determine if the longest line is on the left or right
     //
-    //  xm = _WindowLine.CalcLineXpos(x0, x2, y2 - y0 + 1, y1 - y0 + 1)
+    //  xm = _WindowBuffer.CalcLineXpos(x0, x2, y2 - y0 + 1, y1 - y0 + 1)
     //
     //  if xm >= x1:
     //      bufferPosLong = bufferPos + 1
@@ -126,9 +126,9 @@ constant _nLines = _WindowLine.nLines
     //      bufferPosShort = bufferPos + 1
 
     lda.b   x0
-    sta.b   _WindowLine.DrawLine.x0
+    sta.b   _WindowBuffer.DrawLine.x0
     lda.b   x2
-    sta.b   _WindowLine.DrawLine.x1
+    sta.b   _WindowBuffer.DrawLine.x1
 
     // height set above
 
@@ -137,7 +137,7 @@ constant _nLines = _WindowLine.nLines
     sbc.b   y0
     inc
     tay
-    jsr     _WindowLine.CalcLineXpos
+    jsr     _WindowBuffer.CalcLineXpos
 
     ldx.w   _bufferPos
     txy
@@ -154,13 +154,13 @@ constant _nLines = _WindowLine.nLines
     phy
 
     // Draw long line
-    //  _WindowLine.DrawLine(x0, x2, y2 - y0 + 1, skip, nLines, bufferPosLong)
+    //  _WindowBuffer.DrawLine(x0, x2, y2 - y0 + 1, skip, nLines, bufferPosLong)
 
     // X = bufferPosLong
     // x0, x1, height set above
     ldy.b   _skip
     lda.b   _nLines
-    jsr     _WindowLine.DrawLine
+    jsr     _WindowBuffer.DrawLine
 
     plx
 
@@ -171,7 +171,7 @@ constant _nLines = _WindowLine.nLines
     //  height = y1 - y0 + 1
     //  nl = height - skip
     //  if nl > 0:
-    //      x = _WindowLine.DrawLine(x0, x1, height, skip, nl, x)
+    //      x = _WindowBuffer.DrawLine(x0, x1, height, skip, nl, x)
     //  else:
     //      nl = 0
     //
@@ -180,7 +180,7 @@ constant _nLines = _WindowLine.nLines
     //      s = skip - height
     //      if s > 0:
     //          s = 0
-    //      _WindowLine.DrawLine(x1, x2, y2 - y1 + 1, s, nl, x)
+    //      _WindowBuffer.DrawLine(x1, x2, y2 - y1 + 1, s, nl, x)
 
     // X = bufferPosShort
 
@@ -188,7 +188,7 @@ constant _nLines = _WindowLine.nLines
     sec
     sbc.b   y0
     inc
-    sta.b   _WindowLine.DrawLine.height
+    sta.b   _WindowBuffer.DrawLine.height
     sec
     sbc.b   _skip
     bcc     SkipTopShortLine
@@ -196,12 +196,12 @@ constant _nLines = _WindowLine.nLines
 
         // a = number of lines to draw
         ldy.b   x0
-        sty.b   _WindowLine.DrawLine.x0
+        sty.b   _WindowBuffer.DrawLine.x0
         ldy.b   x1
-        sty.b   _WindowLine.DrawLine.x1
+        sty.b   _WindowBuffer.DrawLine.x1
 
         ldy.b   _skip
-        jsr     _WindowLine.DrawLine
+        jsr     _WindowBuffer.DrawLine
 
         bra     EndTopShortLine
 
@@ -219,7 +219,7 @@ EndTopShortLine:
 
         lda.b   _skip
         sec
-        sbc.b   _WindowLine.DrawLine.height
+        sbc.b   _WindowBuffer.DrawLine.height
         bpl     +
             lda.w   #0
         +
@@ -229,15 +229,15 @@ EndTopShortLine:
         sec
         sbc.b   y1
         inc
-        sta.b   _WindowLine.DrawLine.height
+        sta.b   _WindowBuffer.DrawLine.height
 
         lda.b   x1
-        sta.b   _WindowLine.DrawLine.x0
+        sta.b   _WindowBuffer.DrawLine.x0
         lda.b   x2
-        sta.b   _WindowLine.DrawLine.x1
+        sta.b   _WindowBuffer.DrawLine.x1
 
         lda.b   _tmp
-        jsr     _WindowLine.DrawLine
+        jsr     _WindowBuffer.DrawLine
 
 SkipBottomShortLine:
 
@@ -255,7 +255,7 @@ SkipBottomShortLine:
 
 
 NotVisible:
-    jmp     _WindowLine.FinalizeBuffer
+    jmp     _WindowBuffer.FinalizeBuffer
 }
 
 

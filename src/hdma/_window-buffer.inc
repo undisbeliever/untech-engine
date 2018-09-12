@@ -1,12 +1,17 @@
-// hdma/_window-line.inc
-// =====================
+// hdma/_window-buffer.inc
+// =======================
 //
-// HDMA Window Line drawing algorithm.
+// The `_WindowBuffer` module provides a framework to create HDMA
+// effects that change the positions of Screen Window 0 over a given
+// range of scanlines.
 //
-// This code is based on Bresenham's line drawing algorithm
+// To help create lighting/beam effects a `DrawLine` routine has been
+// provided, which is based on Bresenham's line drawing algorithm.
 //
-// NOTE: This code uses dpTmp7 to dpTmp19 to store state. Ensure that all
+//
+// NOTE: This code uses dpTmp8 to dpTmp19 to store state. Ensure that all
 // calling code does not use these variables.
+//
 //
 // This file is part of the UnTech Game Engine.
 // Copyright (c) 2016 - 2017, Marcus Rowe <undisbeliever@gmail.com>.
@@ -14,65 +19,109 @@
 
 
 namespace Hdma {
-namespace _WindowLine {
+namespace _WindowBuffer {
 
-// Current HDMA buffer
+// Current HDMA window buffer
+//   First `_HdmaIndirectTableOffset` bytes = window settings buffer
+//      odd indexes = left window settings
+//      even indexes = right window settings
+//
+//   Rest of buffer = HDMA Indirect Table
+//
 // (word ptr - dp)
 constant _hdmaBuffer = dpTmp19
 
-// Address of the second HDMA count byte in the buffer
-// (word ptr - dp)
-constant _bufferSecondCount = dpTmp18
+// Offset (in bytes) between the window buffer the HDMA Indirect Table
+constant _HdmaIndirectTableOffset = (Camera.DISPLAY_HEIGHT + 2) * 2
 
 // Number of lines from the top of the window to skip (offscreen)
 // (uint16 - dp)
-constant skip = dpTmp17
+constant skip = dpTmp18
 
 // Number of visible lines in the window
 // This value is always <= 244.
 // (uint16 - dp)
-constant nLines = dpTmp16
+constant nLines = dpTmp17
 
 
 
 // current x coordinate of the line
 // (sint16 - dp)
-constant _xPos = dpTmp15
+constant _xPos = dpTmp16
 
 // final x coordinate of the line
 // (sint16 - dp)
-constant _x1 = dpTmp14
+constant _x1 = dpTmp15
 
 // Height of the line or window
 // (uint16 - dp)
-constant _height = dpTmp13
+constant _height = dpTmp14
 
 // Parameters for Bresenham's line drawing algorithm
 // (3 x uint16 - dp)
-constant _dx2 = dpTmp12
-constant _dy2 = dpTmp11
-constant _err = dpTmp10
+constant _dx2 = dpTmp13
+constant _dy2 = dpTmp12
+constant _err = dpTmp11
 
 // The last scanline of the current DrawLine call
 // (uint16 - dp)
-constant _lastScanline = dpTmp9
+constant _lastScanline = dpTmp10
 
 // Address in the buffer of the last scanline of the current line
 // (word ptr - dp)
-constant _bufferLast = dpTmp8
+constant _bufferLast = dpTmp9
 
-// Address of the next break in the line drawing loop
-// (word ptr - dp)
-constant _bufferTest = dpTmp7
+// Temporary variable
+// (word)
+constant _tmp = dpTmp8
 
-constant LAST_DP_TMP = dpTmp7
+constant LAST_DP_TMP = dpTmp8
 
+
+// Window settings when no line is drawn
+// (word, bank 0x7e)
+allocate(noLineWindow, wram7e, 2)
+assert(noLineWindow >> 16 == buffer1 >> 16)
+assert(noLineWindow >> 16 == buffer2 >> 16)
+
+
+
+namespace SetupWindowBuffer {
+NotVisible:
+    //  iTable[0] = 1
+    //  iTable[1 + 2] = noLineWindow
+    //  iTable[4] = 0
+    //
+    //  return hdmaBuffer, false
+
+    // X = hdmaBuffer
+
+    lda.w   #1
+    sta.w   _HdmaIndirectTableOffset + 0,x
+    lda.w   #noLineWindow
+    sta.w   _HdmaIndirectTableOffset + 1,x
+    lda.w   #0
+    sta.w   _HdmaIndirectTableOffset + 3,x
+
+    clc
+    rts
+}
 
 
 // Setup and initialize a continuous HDMA window buffer.
 //
-// NOTE: This routine does not terminate the buffer, you must call
-//       `FinalizeBuffer` even if there is nothing on screen.
+// The window buffer is `2 * nLines` bytes in size in the following
+// format:
+//      * odd indexes = the left window setting
+//      * even indexes = the right window setting
+//
+// This routine will create, but not enable, a HDMA Indirect table which
+// maps to the window buffer. This buffer is stored after the window
+// buffer so you MUST NOT overrun it.
+//
+// NOTE: The HDMA table is not enabled.
+//       You must call `FinalizeBuffer` to enable the buffer during the
+//       next VBlank, even if there is nothing on screen.
 //
 // REQUIRES: 16 bit A, 16 bit Index, DB = 0x7e, DP = 0
 //
@@ -80,7 +129,7 @@ constant LAST_DP_TMP = dpTmp7
 //        SetupWindowBuffer.yPos - topmost position of the window
 //
 // OUTPUT: carry set if window visible on screen
-//         X - buffer after count byte
+//         X - HDMA window buffer
 //         nLines - number of lines to draw
 //         skip - number of lines to skip when drawing the window
 //         DrawLine.height = height
@@ -90,44 +139,91 @@ a16()
 i16()
 code()
 function SetupWindowBuffer {
-assert(BUFFER_SIZE >= 256 * 2 + 3)
+assert(BUFFER_SIZE > _HdmaIndirectTableOffset + 20)
 
 constant height = _height
 constant yPos = _lastScanline   // reuse variable, not used in setup
 
     //  hdmaBuffer = GetBuffer()
-    //  buffer = hdmaBuffer
     //
-    //  bufferSecondCount = buffer + 127 * 2
+    //  iTable = hdmaBuffer + _HdmaIndirectTableOffset
+    //
+    //  // store no empty line window offsets
+    //  noLineWindow[0] = 0xff
+    //  noLineWindow[1] = 0
+    //
+    //  if nLines > Camera.DISPLAY_HEIGHT:
+    //      nLines = Camera.DISPLAY_HEIGHT
     //
     //  if yPos < 0:
     //      skip = -yPos
-    //      if skip > height: goto NotVisible
+    //      if skip > height:
+    //          goto NotVisible
     //  else:
     //      skip = 0
-    //      if yPos > DISPLAY_HEIGHT: goto NotVisible
+    //
+    //      if yPos > DISPLAY_HEIGHT:
+    //          goto NotVisible
     //
     //      if yPos != 0:
-    //          if yPos > 0x7f
-    //              buffer[0] = yPos - 0x7f
-    //              buffer[1] = 0xff
-    //              buffer[2] = 0
-    //              buffer[3] = 0x7f
-    //              buffer[4] = 0xff
-    //              buffer[5] = 0
-    //              buffer += 6
-    //          buffer[0] = yPos
-    //          buffer[1] = 0xff
-    //          buffer[2] = 0
-    //          buffer += 3
+    //          ySkip = yPos
+    //          if ySkip > 0x7f
+    //              iTable[0] = ySkip - 0x7f
+    //              iTable[1 + 2] = noLineWindow
+    //              iTable += 3
+    //              ySkip = 0x7f
+    //
+    //          iTable[0] = ySkip
+    //          iTable[1 + 2] = noLineWindow
+    //          iTable += 3
+    //
+    //
+    //  if height + yPos >= DISPLAY_HEIGHT:
+    //      nLines = DISPLAY_HEIGHT - yPos - skip
+    //  else:
+    //      nLines = height - skip
+    //
+    //
+    //  if nLines > 0x7f:
+    //      iTable[0] = 0xff
+    //      iTable[1 + 2] = hdmaBuffer
+    //      iTable[3] = nLines + 1 // == (nLines - 0x7f) | 0x80
+    //      iTable[4 + 5] = hdmaBuffer + 0x7f * 2
+    //      iTable += 6
+    //  else:
+    //      iTable[0] = nLines | 0x80
+    //      iTable[1 + 2] = hdmaBuffer
+    //      iTable += 3
+    //
+    //  iTable[0] = 1
+    //  iTable[1 + 2] = noLineWindow
+    //  iTable[4] = 0
+    //
+    //  return hdmaBuffer, true
+    //
 
     sep     #$20
 a8()
     jsr     GetBuffer
     rep     #$20
 a16()
-    txy
     stx.b   _hdmaBuffer
+    txy
+
+    lda.w   #0x00ff
+    sta.w   noLineWindow
+
+
+    lda.b   nLines
+    cmp.w   #Camera.DISPLAY_HEIGHT + 1
+    bcc     +
+        lda.w   #Camera.DISPLAY_HEIGHT
+    +
+
+
+    // X = hdmaBuffer
+    // Y = indirect table offset
+    // KEEP: X/Y
 
     lda.b   yPos
     bpl     TopLineInsideScreen
@@ -149,32 +245,31 @@ a16()
         cmp.w   #Camera.DISPLAY_HEIGHT
         bcs     NotVisible
 
+        // Add to vertical skip to HDMA Indirect table
+
         cmp.w   #0x7f + 1
         bcc     +
-            sec
+            // c set
             sbc.w   #0x7f
-            sta.w   0,x
-            lda.w   #0xff
-            sta.w   1,x
-            inx
-            inx
-            inx
+            sta.w   _HdmaIndirectTableOffset + 0,y
+            lda.w   #noLineWindow
+            sta.w   _HdmaIndirectTableOffset + 1,y
+            iny
+            iny
+            iny
 
             lda.w   #0x7f
         +
-        sta.w   0,x
-        lda.w   #0xff
-        sta.w   1,x
-        inx
-        inx
-        inx
+        sta.w   _HdmaIndirectTableOffset + 0,y
+        lda.w   #noLineWindow
+        sta.w   _HdmaIndirectTableOffset + 1,y
+        iny
+        iny
+        iny
     End_TopVisibleIf:
 
 
-    //  if height + yPos >= DISPLAY_HEIGHT:
-    //      nLines = DISPLAY_HEIGHT - yPos - skip
-    //  else:
-    //      nLines = height - skip
+    // height test
 
     lda.b   height
     clc
@@ -193,73 +288,74 @@ a16()
     sta.b   nLines
 
 
-    // Setup HDMA count bytes
+    // A = nLines
+    // X = hdmaBuffer
+    // Y = indirect table offset
 
-    //  if (nLines) > 0x7f:
-    //      buffer[127 * 2 + 1] = nLines + 1
-    //      buffer[0] = 0x80 | 0x7f
-    //  else:
-    //      buffer[0] = 0x80 | nLines
-    //
-    //  buffer++
+    // Build HDMA Indirect table pointing to a single continuous window buffer
 
     cmp.w   #0x7f + 1
     bcc     +
         inc
-        sta.w   127 * 2 + 1,x
+        sta.w   _HdmaIndirectTableOffset + 3,y
 
-        lda.w   #0x7f
+        lda.w   #0xff
+        sta.w   _HdmaIndirectTableOffset + 0,y
+
+        txa
+        sta.w   _HdmaIndirectTableOffset + 1,y
+        clc
+        adc.w   #0x7f * 2
+        sta.w   _HdmaIndirectTableOffset + 4,y
+
+        iny
+        iny
+        iny
+
+        bra     ++
     +
-    ora.w   #0x80
-    sta.w   0,x
-    inx
+        // else nLines <= 0x7f
+        ora.w   #0x80
+        sta.w   _HdmaIndirectTableOffset + 0,y
+        txa
+        sta.w   _HdmaIndirectTableOffset + 1,y
+    +
 
-    txa
-    clc
-    adc.w   #127 * 2
-    sta.b   _bufferSecondCount
+    lda.w   #1
+    sta.w   _HdmaIndirectTableOffset + 3,y
+    lda.w   #noLineWindow
+    sta.w   _HdmaIndirectTableOffset + 4,y
+    lda.w   #0
+    sta.w   _HdmaIndirectTableOffset + 6,y
 
     sec
-    rts
-
-NotVisible:
-    clc
     rts
 }
 
 
-// Finalize and enable the continuous HDMA window buffer
+// Finalize and enable the HDMA buffer on the next VBlank.
 //
 // REQUIRES: 16 bit A, 16 bit Index, DB = 0x7e, DP = 0
 //
-// INPUT: X = the end of the hdma buffer
 a16()
 i16()
 code()
 function FinalizeBuffer {
-    // Add terminator to HDMA buffer
-
-    lda.w   #0xff01
-    sta.w   0,x
-    stz.w   2,x
-
     // Setup HDMA Channel
 
-    ldx.w   _hdmaBuffer
-    sep     #$20
-a8()
-    stx.w   ChannelSettings.tableAddr
+    lda.w   _hdmaBuffer
+    clc
+    adc.w   #_HdmaIndirectTableOffset
+    sta.w   ChannelSettings.tableAddr
 
     assert(ChannelSettings.dmap + 1 == ChannelSettings.register)
 
-    ldx.w   #DMAP.direction.toPpu | DMAP.addressing.absolute | DMAP.transfer.two | (WH0 << 8)
-    stx.w   ChannelSettings.dmap
+    lda.w   #DMAP.direction.toPpu | DMAP.addressing.indirect | DMAP.transfer.two | (WH0 << 8)
+    sta.w   ChannelSettings.dmap
 
-    lda.b   #1
-    sta.w   ChannelSettings.enabled
+    lda.w   #1
+    tsb.w   ChannelSettings.enabled
 
-    rep     #$30
-a16()
     rts
 }
 
@@ -362,13 +458,7 @@ a16()
 
 // Draws a single line to a single side of the HDMA window buffer.
 //
-// The HDMA window buffer MUST:
-//  * contain both the left and right window registers
-//  * be in continuous mode
-//
-// This routine will skip over the second HDMA count byte.
-//
-// ASSUMES: buffer is the one created by `SetupWindowBuffer` call
+// NOTE: buffer MUST BE the one created by the `SetupWindowBuffer` call.
 //
 // REQUIRES: 16 bit A, 16 bit Index, DB = 0x7e, DP = 0
 //
@@ -377,9 +467,9 @@ a16()
 //        DrawLine.height - height of the line
 //        Y - number of scanlines to skip
 //        A - number of scanlines to draw
-//        X - address of the HDMA buffer
+//        X - address of the HDMA window buffer
 //
-// OUTPUT: X - address of the HDMA buffer after final scanline
+// OUTPUT: X - address of the HDMA window buffer after final scanline
 //
 // KEEP: height is not modified by this routine
 //
@@ -405,8 +495,6 @@ constant height = _height
     //
     //  lastScanline = nScanlines
     //  bufferLast = buffer + (nScanlines - 1) * 2
-    //  if bufferLast >= bufferSecondCount:
-    //      bufferLast++
     //
     //  dy2 = height * 2
     //  dx2 = abs(x1 - x0) * 2
@@ -415,7 +503,7 @@ constant height = _height
     //  if err < height:
     //      err = height
     //
-    //  if skip > 0:
+    //  if skip != 0:
     //      lastScanline += skip
     //      err += dx2 * skip
     //
@@ -427,11 +515,6 @@ constant height = _height
     //        xPos += div
     //    else:
     //        xPos -= div
-    //
-    //  if buffer < bufferSecondCount and bufferSecondCount < bufferLast:
-    //      bufferTest = bufferSecondCount
-    //  else:
-    //      bufferTest = bufferLast
     //
     //  if dx2 >= dy2:
     //      return _DrawShallowLine()
@@ -447,10 +530,6 @@ constant height = _height
     txa
     clc
     adc.b   _bufferLast
-    cmp.b   _bufferSecondCount
-    bcc     +
-        inc
-    +
     sta.b   _bufferLast
 
     lda.b   _height
@@ -481,8 +560,7 @@ constant height = _height
         clc
         adc.b   _lastScanline
         sta.b   _lastScanline
-
-        stx.b   _bufferTest
+        stx.b   _tmp
 
         sep     #$20
     a8()
@@ -497,7 +575,7 @@ constant height = _height
         adc.b   _err
         sta.b   _err
 
-        ldx.b   _bufferTest
+        ldx.b   _tmp
     +
 
 
@@ -543,17 +621,6 @@ constant height = _height
     SkipDy2Division:
 
 
-    cpx.b   _bufferSecondCount
-    bcs     +
-        lda.b   _bufferSecondCount
-        cmp.b   _bufferLast
-        bcc     ++
-    +
-        lda.b   _bufferLast
-    +
-    sta.b   _bufferTest
-
-
     lda.b   _dx2
     cmp.b   _dy2
     bcc     +
@@ -564,13 +631,13 @@ _DrawSteepLine_Followthrough:
 }
 
 
-// Draw a steep Line (dx2 < dy2) to the HDMA Buffer
+// Draw a steep Line (dx2 < dy2) to the HDMA window buffer.
 //
 // INTERNAL: called by DrawLine
 // REQUIRES: 16 bit A, 16 bit Index, DB = 0x7e, DP = 0
 //
-// INPUT: X - address of the HDMA buffer
-// OUTPUT: X - address of the HDMA buffer after final scanline
+// INPUT: X - address of the HDMA window buffer
+// OUTPUT: X - address of the HDMA window buffer after final scanline
 a16()
 i16()
 code()
@@ -592,16 +659,16 @@ function _DrawSteepLine {
     //      err -= dy2
     //
     //    SetXPos:
-    //      xClipped = bound(xPos, 0, 255)
+    //      xClipped = xPos
+    //      if xClipped < 0:
+    //          xClipped = 0
+    //          if sx < 0: goto EarlyExit
+    //      else if xClipped > 255:
+    //          xClipped = 255
+    //          if sx > 0: goto EarlyExit
     //
     //      repeat h times:
-    //          if buffer >= bufferTest:
-    //              if buffer >= bufferLast:
-    //                  goto EndLoop
-    //              else:
-    //                  buffer++
-    //                  if buffer >= bufferLast: goto EndLoop
-    //                  bufferTest = bufferLast
+    //          if buffer >= bufferLast: goto EndLoop
     //
     //          *buffer = xClipped
     //          buffer += 2
@@ -613,9 +680,8 @@ function _DrawSteepLine {
     //  if lastScanline == height:
     //      xClipped = bound(x1, 0, 255)
     //
-    //  repeat 2 times:
-    //      buffer++
-    //      if buffer == bufferSecondCount: buffer++
+    //  *buffer = xClipped
+    //  buffer += 2
     //
     //  return buffer
 
@@ -662,19 +728,25 @@ function _DrawSteepLine {
             lda.b   _xPos
             bpl     +
                 lda.w   #0
-                bra     ++
+                if {sx} < 0 {
+                    bra     EarlyExit
+                } else {
+                    bra     ++
+                }
             +
                 cmp.w   #256
                 bcc     +
                     lda.w   #255
+                    if {sx} > 0 {
+                        bra     EarlyExit
+                    }
             +
 
             sep     #$20
         a8()
             -
-                cpx.b   _bufferTest
-                bcs     {l}TestBufferPos
-            {l}ContinueLoop:
+                cpx.b   _bufferLast
+                bcs     EndLoop
 
                 sta.w   0,x
                 inx
@@ -690,24 +762,6 @@ function _DrawSteepLine {
             lda.b   _err
 
             bra     {l}Loop
-
-
-    {l}TestBufferPos:
-    a8()
-        cpx.b   _bufferLast
-        bcs     EndLoop
-
-        // skip over second count byte
-        inx
-        cpx.b   _bufferLast
-        bcs     EndLoop
-
-        phx
-        ldx.b   _bufferLast
-        stx.b   _bufferTest
-        plx
-
-        bra     {l}ContinueLoop
     }
 
 
@@ -719,6 +773,7 @@ function _DrawSteepLine {
     NegativeSlope:
     a16()
         _ProcessSx(-1)
+
 
     EndLoop:
 a8()
@@ -741,45 +796,79 @@ a8()
 
     sta.w   0,x
     inx
-    cpx.b   _bufferSecondCount
-    bne     +
-        inx
-    +
     inx
-    cpx.b   _bufferSecondCount
-    bne     +
-        inx
-    +
 
     rep     #$30
 a16()
     rts
+
+
+// xClipped is outside the screen and will never re-enter it.
+//
+// A = xClipped
+// X = buffer address
+a16()
+i16()
+EarlyExit:
+    //  while buffer < bufferLast:
+    //      *buffer = xClipped
+    //      buffer += 2
+    //
+    //  *buffer = xClipped
+    //  buffer += 2
+    //
+    //  return buffer
+
+    sep     #$20
+a8()
+    cpx.b   _bufferLast
+    bcs     +
+    -
+        sta.w   0,x
+        inx
+        inx
+        cpx.b   _bufferLast
+        bcc     -
+    +
+
+    sta.w   0,x
+    inx
+    inx
+
+    rep     #$30
+    rts
 }
 
 
-// Draw a shallow (dx2 >= dy2) Line to the HDMA Buffer
+
+// Draw a shallow (dx2 >= dy2) Line to the HDMA window buffer.
 //
 // INTERNAL: called by DrawLine
 // REQUIRES: 16 bit A, 16 bit Index, DB = 0x7e, DP = 0
 //
-// INPUT: X - address of the HDMA buffer
-// OUTPUT: X - address of the HDMA buffer after final scanline
+// INPUT: X - address of the HDMA window buffer
+// OUTPUT: X - address of the HDMA window buffer after final scanline
 a16()
 i16()
 code()
 function _DrawShallowLine {
+
+constant EarlyExit = _DrawSteepLine.EarlyExit
+
     //  sx = x1 >= xPos ? 1 : -1
     //
     //  while True:
-    //      if buffer >= bufferTest:
-    //          if buffer >= bufferLast:
-    //              goto EndLoop
-    //          else:
-    //              buffer++
-    //              if buffer >= bufferLast: goto EndLoop
-    //              bufferTest = bufferLast
+    //      if buffer >= bufferLast: goto EndLoop
     //
-    //      *buffer = bound(xPos, 0, 255)
+    //      xClipped = xPos
+    //      if xClipped < 0:
+    //          xClipped = 0
+    //          if sx < 0: goto EarlyExit
+    //      else if xClipped > 255:
+    //          xClipped = 255
+    //          if sx > 0: goto EarlyExit
+    //
+    //      *buffer = xClipped
     //      buffer += 2
     //
     //      err += dx2
@@ -796,9 +885,7 @@ function _DrawShallowLine {
     //  else:
     //      *buffer = bound(xPos, 0, 255)
     //
-    //  repeat 2 times:
-    //      buffer++
-    //      if buffer == bufferSecondCount: buffer++
+    //  buffer += 2;
     //
     //  return buffer
 
@@ -822,19 +909,25 @@ function _DrawShallowLine {
             // Y = err
             // X = bufferPos
 
-            cpx.b   _bufferTest
-            bcs     {l}TestBufferPos
-        {l}ContinueLoop:
+            cpx.b   _bufferLast
+            bcs     EndLoop
 
             // clip xPos to between 0 and 255
             lda.b   _xPos
             bpl     +
                 lda.w   #0
-                bra     ++
+                if {sx} < 0 {
+                    bra     EarlyExit
+                } else {
+                    bra     ++
+                }
             +
                 cmp.w   #256
                 bcc     +
                     lda.w   #255
+                    if {sx} > 0 {
+                        bra     EarlyExit
+                    }
             +
 
             sep     #$20
@@ -865,24 +958,6 @@ function _DrawShallowLine {
             tay
 
             bra     {l}Loop
-
-
-    {l}TestBufferPos:
-    a8()
-        cpx.b   _bufferLast
-        bcs     EndLoop
-
-        // skip over second count byte
-        inx
-        cpx.b   _bufferLast
-        bcs     EndLoop
-
-        phx
-        ldx.b   _bufferLast
-        stx.b   _bufferTest
-        plx
-
-        bra     {l}ContinueLoop
     }
 
 
@@ -894,6 +969,7 @@ function _DrawShallowLine {
     NegativeSlope:
     a16()
         _ProcessSx(-1)
+
 
     EndLoop:
 a16()
@@ -920,15 +996,7 @@ a16()
 a8()
     sta.w   0,x
     inx
-    cpx.b   _bufferSecondCount
-    bne     +
-        inx
-    +
     inx
-    cpx.b   _bufferSecondCount
-    bne     +
-        inx
-    +
 
     rep     #$30
 a16()

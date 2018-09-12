@@ -50,6 +50,23 @@ Return:
 }
 
 
+// Wait until the start of the next frame, printing the number
+// of loops waited on the top-right of the screen.
+//
+// REQUIRES: DB access shadow
+//
+// RETURN: Y = number of loops waited
+code()
+function WaitFrame_Print {
+    Text.Console.SetCursor(Text.Console.TEXT_WIDTH - 5, 0)
+
+    // Using hex as it is constant time
+
+    jsr     WaitFrame_Count
+    jmp     Text.Console.PrintHex16Y
+}
+
+
 // Dirties all the dpTmp variables
 //
 // REQUIRES: none

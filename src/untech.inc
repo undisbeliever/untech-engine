@@ -36,7 +36,7 @@ include "camera/_variables.inc"
 
 
 include "hdma/circular-window.inc"
-include "hdma/_window-line.inc"
+include "hdma/_window-buffer.inc"
 include "hdma/horizontal-trapezium-window.inc"
 include "hdma/triangular-window.inc"
 include "hdma/_common.inc"

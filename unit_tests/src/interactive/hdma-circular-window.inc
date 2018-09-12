@@ -139,7 +139,7 @@ a8()
 
         rep     #$30
     a16()
-        jsr     WaitFrame
+        jsr     WaitFrame_Print
 
 
         lda.l   JOY1
