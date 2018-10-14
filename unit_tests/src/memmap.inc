@@ -51,34 +51,6 @@ createRamBlock(wram7f,      0x7f0000, 0x7fffff)
 
 
 
-// Temporary Variables
-// ===================
-
-allocate(dpTmp0, dp, 2)
-allocate(dpTmp1, dp, 2)
-allocate(dpTmp2, dp, 2)
-allocate(dpTmp3, dp, 2)
-allocate(dpTmp4, dp, 2)
-allocate(dpTmp5, dp, 2)
-allocate(dpTmp6, dp, 2)
-allocate(dpTmp7, dp, 2)
-allocate(dpTmp8, dp, 2)
-allocate(dpTmp9, dp, 2)
-allocate(dpTmp10, dp, 2)
-allocate(dpTmp11, dp, 2)
-allocate(dpTmp12, dp, 2)
-allocate(dpTmp13, dp, 2)
-allocate(dpTmp14, dp, 2)
-allocate(dpTmp15, dp, 2)
-allocate(dpTmp16, dp, 2)
-allocate(dpTmp17, dp, 2)
-allocate(dpTmp18, dp, 2)
-allocate(dpTmp19, dp, 2)
-
-constant DP_TMP_COUNT = 20
-
-
-
 // Entity Layout
 // =============
 namespace Entity {

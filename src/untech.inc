@@ -5,6 +5,8 @@
 
 architecture wdc65816-strict
 
+include "util/_dptmp.inc"
+
 include "errors/break.inc"
 include "errors/warnings.inc"
 

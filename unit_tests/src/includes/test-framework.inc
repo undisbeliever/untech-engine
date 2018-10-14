@@ -133,7 +133,7 @@ i16()
 
         // corrupt tmp values
 
-        jsr     DirtyDpTmp
+        jsr     _DirtyDpTmp
 
         ldx.w   #TMP_SIZE - 2
         -
