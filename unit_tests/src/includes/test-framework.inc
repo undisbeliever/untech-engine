@@ -131,9 +131,9 @@ i16()
         lda.w   #0
         tcd
 
-        // corrupt tmp values
+        // corrupt utDpTmp values
 
-        jsr     _DirtyDpTmp
+        jsr     _DirtyUtDpTmp
 
         ldx.w   #TMP_SIZE - 2
         -

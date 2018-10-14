@@ -9,7 +9,7 @@
 // provided, which is based on Bresenham's line drawing algorithm.
 //
 //
-// NOTE: This code uses dpTmp8 to dpTmp19 to store state. Ensure that all
+// NOTE: This code uses utDpTmp8 to utDpTmp19 to store state. Ensure that all
 // calling code does not use these variables.
 //
 //
@@ -29,53 +29,53 @@ namespace _WindowBuffer {
 //   Rest of buffer = HDMA Indirect Table
 //
 // (word ptr - dp)
-constant _hdmaBuffer = dpTmp19
+constant _hdmaBuffer = utDpTmp19
 
 // Offset (in bytes) between the window buffer the HDMA Indirect Table
 constant _HdmaIndirectTableOffset = (Camera.DISPLAY_HEIGHT + 2) * 2
 
 // Number of lines from the top of the window to skip (offscreen)
 // (uint16 - dp)
-constant skip = dpTmp18
+constant skip = utDpTmp18
 
 // Number of visible lines in the window
 // This value is always <= 244.
 // (uint16 - dp)
-constant nLines = dpTmp17
+constant nLines = utDpTmp17
 
 
 
 // current x coordinate of the line
 // (sint16 - dp)
-constant _xPos = dpTmp16
+constant _xPos = utDpTmp16
 
 // final x coordinate of the line
 // (sint16 - dp)
-constant _x1 = dpTmp15
+constant _x1 = utDpTmp15
 
 // Height of the line or window
 // (uint16 - dp)
-constant _height = dpTmp14
+constant _height = utDpTmp14
 
 // Parameters for Bresenham's line drawing algorithm
 // (3 x uint16 - dp)
-constant _dx2 = dpTmp13
-constant _dy2 = dpTmp12
-constant _err = dpTmp11
+constant _dx2 = utDpTmp13
+constant _dy2 = utDpTmp12
+constant _err = utDpTmp11
 
 // The last scanline of the current DrawLine call
 // (uint16 - dp)
-constant _lastScanline = dpTmp10
+constant _lastScanline = utDpTmp10
 
 // Address in the buffer of the last scanline of the current line
 // (word ptr - dp)
-constant _bufferLast = dpTmp9
+constant _bufferLast = utDpTmp9
 
 // Temporary variable
 // (word)
-constant _tmp = dpTmp8
+constant _tmp = utDpTmp8
 
-constant LAST_DP_TMP = dpTmp8
+constant LAST_DP_TMP = utDpTmp8
 
 
 // Window settings when no line is drawn

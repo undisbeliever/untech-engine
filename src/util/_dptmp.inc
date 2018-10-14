@@ -1,26 +1,37 @@
 // util/_dptmp.inc
 // ===============
 //
-// Direct Page Temporary Variables.
+// UnTech Engine Direct Page Temporary Variables.
+//
+// These variables may be used by the system to store state that crosses
+// call boundaries and MUST NOT BE USED by the subproject.
+//
+// It is expected that the subproject create its own set of direct page
+// temporary variables in order to ensure that the utDpTmp variables are
+// not accidentally overwritten.
+//
 //
 // This file is part of the UnTech Game Engine.
 // Copyright (c) 2016 - 2017, Marcus Rowe <undisbeliever@gmail.com>.
 // Distributed under The MIT License: https://opensource.org/licenses/MIT
 
 
-constant DP_TMP_COUNT = 20
+constant UT_DP_TMP_COUNT = 20
 evaluate _n = 0
-while {_n} < DP_TMP_COUNT {
-    allocate(dpTmp{_n}, dp, 2)
+while {_n} < UT_DP_TMP_COUNT {
+    // UnTech Engine Direct Page Temporary variable.
+    // MUST NOT BE USED by the subproject.
+    // (dp word)
+    allocate(utDpTmp{_n}, dp, 2)
     evaluate _n = {_n} + 1
 }
 
 
-// Dirties all the dpTmp variables
+// Dirties all the utDpTmp variables
 //
 // REQUIRES: none
 code()
-function _DirtyDpTmp {
+function _DirtyUtDpTmp {
     php
     phd
 
@@ -36,10 +47,10 @@ a16()
     eor.l   JOY2
     eor.w   #0xffff
 
-    ldx.w   #DP_TMP_COUNT * 2 - 2
+    ldx.w   #UT_DP_TMP_COUNT * 2 - 2
     -
         dec
-        sta.b   dpTmp0,x
+        sta.b   utDpTmp0,x
 
         dex
         dex

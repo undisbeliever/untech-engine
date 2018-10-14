@@ -550,8 +550,8 @@ a16()
 i16()
 code()
 function Update {
-constant _mapPtr = dpTmp0
-constant _mapPtrRend = dpTmp2
+constant _mapPtr = utDpTmp0
+constant _mapPtrRend = utDpTmp2
 
     //  xOffset = Camera.xPos - verticalBuffer.cursorXpos
     //

@@ -57,7 +57,7 @@ function Init {
 //
 // ASSUMES: xOrigin >= 0 and xOrigin < 255
 //
-// REQUIRES: 8 bit A, 16 bit Index, DB = 0x7e, DP = 0, unused dpTmp variables
+// REQUIRES: 8 bit A, 16 bit Index, DB = 0x7e, DP = 0, unused utDpTmp variables
 a8()
 i16()
 code()
@@ -65,17 +65,17 @@ function DrawCircle {
 
 assert(BUFFER_SIZE >= (255 * 2 + 3) * 3 + 1)
 
-constant _xOrigin = dpTmp0
-constant _yOrigin = dpTmp1
-constant _radius = dpTmp2
+constant _xOrigin = utDpTmp0
+constant _yOrigin = utDpTmp1
+constant _radius = utDpTmp2
 
-constant _hdmaBuffer = dpTmp3
-constant _hdmaCenterRow = dpTmp4
+constant _hdmaBuffer = utDpTmp3
+constant _hdmaCenterRow = utDpTmp4
 
-constant _linesLeft = dpTmp5
+constant _linesLeft = utDpTmp5
 
-constant _j = dpTmp6
-constant _d = dpTmp7
+constant _j = utDpTmp6
+constant _d = utDpTmp7
 
 
 // The HdmaTable is offset by two rows as:

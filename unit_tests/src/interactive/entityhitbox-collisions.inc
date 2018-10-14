@@ -102,12 +102,12 @@ a8()
 a16()
 i16()
 
-    // Corrupt all dpTmp variables.
+    // Corrupt all utDpTmp variables.
     //
-    // Tests that the dpTmp variables used by EntityHitbox subsystem
+    // Tests that the utDpTmp variables used by EntityHitbox subsystem
     // are not used across a call boundary.
 
-    jmp     _DirtyDpTmp
+    jmp     _DirtyUtDpTmp
 
 
 rodata(rom0)
@@ -471,7 +471,7 @@ function Test {
 
         jsr     EntityLoop.ProcessFrame
 
-        jsr     _DirtyDpTmp
+        jsr     _DirtyUtDpTmp
 
         // test ProcessCollision arguments still Ok
         lda.w   _processCollisionArgumentsOk

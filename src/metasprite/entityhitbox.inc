@@ -228,32 +228,32 @@ namespace entityB {
 
     // address of the entity hitbox
     // (word addr)
-    constant hitboxAddress      = dpTmp0
+    constant hitboxAddress      = utDpTmp0
 
     // Used for both inner and outer hitbox tests
     // all values are offset by INT_MS8_OFFSET
     // (4x uint16)
     namespace aabb {
-        constant left           = dpTmp1
-        constant right          = dpTmp2
-        constant top            = dpTmp3
-        constant bottom         = dpTmp4
+        constant left           = utDpTmp1
+        constant right          = utDpTmp2
+        constant top            = utDpTmp3
+        constant bottom         = utDpTmp4
     }
 }
 
 // Temporary Variables
 
-constant _count                 = dpTmp5
-constant _collisonOrderPos      = dpTmp6
-constant _row                   = dpTmp7
-constant _collisionTableIndex   = dpTmp8
+constant _count                 = utDpTmp5
+constant _collisonOrderPos      = utDpTmp6
+constant _row                   = utDpTmp7
+constant _collisionTableIndex   = utDpTmp8
 
-constant _entityA_xPos          = dpTmp9
-constant _entityA_yPos          = dpTmp10
-constant _entityB_xPos          = dpTmp11
-constant _entityB_yPos          = dpTmp12
+constant _entityA_xPos          = utDpTmp9
+constant _entityA_yPos          = utDpTmp10
+constant _entityB_xPos          = utDpTmp11
+constant _entityB_yPos          = utDpTmp12
 
-constant _tmp                   = dpTmp13
+constant _tmp                   = utDpTmp13
 
 
 
