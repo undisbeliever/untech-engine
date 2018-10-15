@@ -107,7 +107,7 @@ End:
 }
 
 
-// Render a specific frame in a fixed tileset Entity.
+// Render an entity with a given frame at a given screen position.
 //
 // ASSUMES: Entity has a frameSet
 //          Entity has the frame's tileset loaded in VRAM
@@ -123,7 +123,7 @@ End:
 a16()
 i16()
 code()
-function RenderEntityFrame {
+function RenderEntityFrameAndPos {
     assert(pc() == RenderEntity.End)
 
 allocateTmpWord(nObjectsLeft)
