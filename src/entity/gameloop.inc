@@ -413,25 +413,20 @@ macro _ProcessActiveWindow() {
     function ProcessActiveWindow {
         lda.w   Camera.xPos
         and.w   #TEST_ACTIVE_WINDOW_MASK
-        cmp.w   prevActiveWindowX
-        bne     XChanged
         tax
 
         lda.w   Camera.yPos
         and.w   #TEST_ACTIVE_WINDOW_MASK
+
+        cpx.w   prevActiveWindowX
+        bne     XChanged
+
         cmp.w   prevActiveWindowY
-        bne     YChanged
+        beq     SkipTests
 
-        bra     SkipTests
-
-            XChanged:
-                tax
-                lda.w   Camera.yPos
-                and.w   #~3
-
-            YChanged:
-                stx.w   prevActiveWindowX
-                sta.w   prevActiveWindowY
+        XChanged:
+            stx.w   prevActiveWindowX
+            sta.w   prevActiveWindowY
 
 
             _LOOP(lists.deactivated)
