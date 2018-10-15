@@ -75,11 +75,11 @@ Return:
 //
 // ASSUMES: Entity has a frameSet
 //          Entity has a tileset and palette loaded into the PPU
+//          Camera is active
 //          Screen is `SCREEN_HEIGHT` pixels tall
 //
 // INPUT: DP: Entity
-//        xPos: entity xPos - INT_MS8_OFFSET
-//        yPos: entity yPos - INT_MS8_OFFSET
+//        Camera.xPos/Camera.yPos : Camera position
 a16()
 i16()
 code()
@@ -88,6 +88,20 @@ constant Return = InitLoop.Return
 
     ldx.b   BaseEntity.MetaSprite.currentFrame
     beq     Return
+
+    lda.b   BaseEntity.xPos.px
+    sec
+    sbc.w   #INT_MS8_OFFSET
+    sec
+    sbc.w   Camera.xPos
+    sta.w   MetaSprite.Render.xPos
+
+    lda.b   BaseEntity.yPos.px
+    sec
+    sbc.w   #INT_MS8_OFFSET
+    sec
+    sbc.w   Camera.yPos
+    sta.w   MetaSprite.Render.yPos
 
 End:
 }

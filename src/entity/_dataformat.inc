@@ -116,8 +116,6 @@ namespace BaseEntityFunctionTable {
         //
         // REGS: 16 bit A, 16 bit Index, DB = $7e
         // INPUT: dp: entity
-        //        MetaSprite.Render.xPos: entity xPos - INT_MS8_OFFSET
-        //        MetaSprite.Render.yPos: entity yPos - INT_MS8_OFFSET
         field(Render, 2)
 
 
