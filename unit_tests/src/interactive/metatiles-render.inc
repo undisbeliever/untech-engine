@@ -216,7 +216,7 @@ namespace MapCursorEntity {
                 +
 
     SkipSetCell:
-        rts
+        jmp     Entity.GotoNextEntity
     }
 
 

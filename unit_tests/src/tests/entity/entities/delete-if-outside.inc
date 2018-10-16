@@ -5,9 +5,9 @@
 namespace EntityTest {
 namespace Entities {
 
-namespace ChangeToParticleEntity {
+namespace DeleteIfOutsideEntity {
 
-    buildFunctionTable(BaseEntityFunctionTable, ChangeToParticleEntity)
+    buildFunctionTable(BaseEntityFunctionTable, DeleteIfOutsideEntity)
     Entity.useDefaultRenderer()
 
 // IN: A = parameter
@@ -33,10 +33,7 @@ a16()
 i16()
 code()
 function Process {
-    // change to particle list
-
-    ldy.w   #Entity.lists.particles
-    jmp     Entity.ChangeEntityListYAndGotoNextEntity
+    jmp     Entity.DeleteIfOutsideAndGotoNextEntity
 }
 
 
@@ -63,4 +60,3 @@ code()
 }
 
 // vim: ft=bass-65816 ts=4 sw=4 et:
-

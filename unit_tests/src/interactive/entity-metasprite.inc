@@ -106,7 +106,8 @@ namespace ShowAllFramesEntity {
                 sta.b   EntityStruct.frameCount
         EndIf:
     a16()
-        rts
+
+        jmp     Entity.GotoNextEntity
     }
 
 

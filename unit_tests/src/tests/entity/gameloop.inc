@@ -298,7 +298,7 @@ constant tmp_listId = Test.tmp + 2
     // Spawn 4 entities at different point on the screen
     assert(Entity.N_ENTITIES >= Entity.lists.N_LISTS * 4)
 
-    lda.w   #Entities.BlankEntity.EntityId_0
+    lda.w   #OldBehaviourTestEntities.firstId
     Loop:
         sta.w   tmp_listId
 
@@ -316,7 +316,7 @@ constant tmp_listId = Test.tmp + 2
 
         lda.w   tmp_listId
         inc
-        cmp.w   #Entities.BlankEntity.EntityId_0 + Entity.lists.N_LISTS
+        cmp.w   #OldBehaviourTestEntities.firstId + Entity.lists.N_LISTS
         bcc     Loop
 
 
@@ -380,6 +380,19 @@ function SpawnEntity_XY {
     sty.w   Entity.Spawn.yPos
     lda.w   tmp_listId
     jmp     Entity.Spawn
+}
+
+namespace OldBehaviourTestEntities {
+    assert(Entity.lists.N_LISTS == 6)
+
+    rodata(EN_EntityList)
+    constant firstId = (pc() - Entity.Data.EntityList) / 2
+        dw  Entities.BlankEntity.RomData0               // player list
+        dw  Entities.BlankEntity.RomData1               // boss list
+        dw  Entities.DeactivateIfOutsideEntity.RomData2 // enemy list
+        dw  Entities.DeactivateIfOutsideEntity.RomData3 // npc list
+        dw  Entities.DeactivateIfOutsideEntity.RomData4 // platform list
+        dw  Entities.BlankEntity.RomData5               // particle list
 }
 
 rodata(rom0)

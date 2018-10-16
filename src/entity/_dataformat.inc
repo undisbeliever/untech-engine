@@ -92,21 +92,19 @@ namespace BaseEntityFunctionTable {
         // INPUT: dp: entity
         field(Destructor, 2)
 
-        // Process 1 frame of the entity loop
+        // Process one frame of the entity loop
         //
+        // This routine MUST NOT invoke RTS.
+        // Instead this routine MUST JUMP to the `Entity.GotoNextEntity`
+        // routine.
+        //
+        // The untech-engine provides a number of routines that change the
+        // entity's state and eventually jump to `GotoNextEntity`. These
+        // routines have been tagged with `@EndEntityProcess`
         //
         // REGS: 16 bit A, 16 bit Index, DB = $7e
         // INPUT: dp: entity
-        //        `Entity.currentList` (const) current list being processed
-        //
-        // OPTIONAL OUTPUT:
-        //   * set `Entity.changeList` to address of entity loop
-        //     to change the entity list.
-        //
-        // After this function is called:
-        //   * MetaSprite.Animation.Process is called
-        //   * if `Entity.changeList` is set, the list this entity belongs
-        //     to will change
+        // RETURN: Entity.GotoNextEntity or a `@EndEntityProcess` tagged routine.
         field(Process, 2)
 
 

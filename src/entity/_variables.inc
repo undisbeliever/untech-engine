@@ -91,33 +91,30 @@ namespace Entity {
         //  - will be destructed and move to free list at the end of frame
         allocate(toDelete, wram7e, 2)
 
+
         // Player projectiles
-        //  - will be deleted when moved outside active window
+        //  - collides with: enemies, bosses
         allocate(playerProjectiles, wram7e, 2)
 
         // Enemy projectiles
-        //  - will be deleted when moved outside active window
+        //  - collides with: players
         allocate(enemyProjectiles, wram7e, 2)
 
 
         // Player entity and allies
         //  - collides with: enemies, bosses, enemyProjectiles
-        //  - will never be deactivated
         allocate(players, wram7e, 2)
 
         // Bosses
         //  - collides with: playerProjectiles
-        //  - will never be deactivated
         allocate(bosses, wram7e, 2)
 
         // Enemies
         //  - collides with: playerProjectiles
-        //  - deactivated when moved outside active window
         allocate(enemies, wram7e, 2)
 
         // NPCs
         //  - no entity collisions
-        //  - deactivated when moved outside active window
         allocate(npcs, wram7e, 2)
 
         // Platforms
@@ -131,7 +128,6 @@ namespace Entity {
 
         // Particles
         //  - no entity collisions
-        //  - will never be deactivated
         allocate(particles, wram7e, 2)
 
 
@@ -152,19 +148,6 @@ namespace Entity {
 
         assert({__ENUM__.current} == lists.N_LISTS * 2)
     }
-
-
-    // Current list address being processed
-    allocateTmpWord(currentList)
-
-    // Change the list of the entity after processing it
-    //
-    // If 0 then no list change occurs
-    //
-    // (word address of list)
-    allocateTmpWord(changeList)
-
-
 
 
     // Active window size (beyond camera display)

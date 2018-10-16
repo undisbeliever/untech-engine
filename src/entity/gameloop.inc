@@ -7,10 +7,15 @@
 //   * Process all active entities' Process routine
 //   * Entity Collision detection
 //   * Animate all active entities
-//   * Deactivate entities that are outside the active window
 //   * Activate entities that enter the active window
 //   * Activate entities in the `Entity.tryToActivateAgain` list
 //   * Delete all entities in the `Entity.toDelete` list
+//
+//
+// The design of the entity loop and the `@EndEntityProcess` routines
+// were inspired by cosmicchipsocket's Superfeather SNES Game Engine[1].
+//
+// [1]: https://gitlab.com/cosmicchipsocket/superfeather
 //
 //
 // This file is part of the UnTech Game Engine.
@@ -18,309 +23,122 @@
 // Distributed under The MIT License: https://opensource.org/licenses/MIT
 
 
+RegisterBreakId(NO_FUNCTION_POINTER)
+RegisterBreakId(INVALID_PROCESS_ENTITY_RETURN)
+RegisterBreakId(STACK_SMASHED)
+
+
 namespace Entity {
 
-// ENTITY ITERATION MACROS
-// =======================
 
 // Previous entity being processed
+// Used in TryToActivateAgain, ProcessActiveWindow and the entity loop.
 // (word address)
-allocateTmpWord(previousEntity)
+allocateTmpWord(_previousEntity)
 
-inline _LOOP(list) {
+
+// Address of the current entity list that is being processed
+// Only using during the entity loop
+// (word address)
+allocateTmpWord(_currentList)
+
+
+// Change the list of the current entity.
+//
+// ASSUMES: The system is in the middle of an entity loop.
+// ASSUMES: The given list if not the currently looping list
+//
+// REQUIRES: 16 bit A, 16 bit Index, DB = 0x7e
+//
+// PARAM: the entity list to move the entity to
+//
+// INPUT: DP = The current entity being processed
+//        _previousEntity = The address of the previous entity.
+//                          If there is no previous entity, then
+//                          `_previousEntity` is the address of the
+//                          current entity list.
+// OUTPUT: A = The address of the next entity of the original entity
+//         z set if the current entity has no next entity
+//               (ie, there is no more entities in the current list)
+//
+// NOTE: You MUST NOT set the `_previousEntity` variable after invoking
+// this macro.
+macro __ChangeEntityList(list) {
     assert16a()
     assert16i()
 
-    evaluate _LOOP_LIST = {list}
-
-    // this allows previousEntity variable to work on first item
+    // This allows me to skip the _previousEntity test.
+    // (As long as _previousEntity is the entity list address when there is
+    // this entity is the first one in the list)
     assert(BaseEntity.next == 0)
 
-    lda.w   {list}
-    beq     EndLoop
+    // _previousEntity->next = dp->next
+    // dp->next = *newList
+    // *newList = this
+    //
+    // return _previousEntity->next
 
-    ldy.w   #{list}
-    sty.w   currentList
-    sty.w   previousEntity
+    ldx.w   _previousEntity
 
-    stz.w   changeList
+    lda.b   BaseEntity.next
+    sta.w   BaseEntity.next,x
+    tax
 
-    Loop:
-        tcd
+    lda.w   Entity.lists.{list}
+    sta.b   BaseEntity.next
+
+    tdc
+    sta.w   Entity.lists.{list}
+
+    txa
 }
 
-inline _LOOP_Y() {
+
+// Change the list of the current entity.
+//
+// ASSUMES: The system is in the middle of an entity loop.
+// ASSUMES: The given list if not the currently looping list
+//
+// REQUIRES: 16 bit A, 16 bit Index, DB = 0x7e
+//
+// INPUT: DP = The current entity being processed
+//        Y = The address of the new entity list.
+//        _previousEntity = The address of the previous entity.
+//                          If there is no previous entity, then
+//                          `_previousEntity` is the address of the
+//                          current entity list.
+// OUTPUT: A = The address of the next entity of the original entity
+//         z set if the current entity has no next entity
+//               (ie, there is no more entities in the current list)
+//
+// NOTE: You MUST NOT set the `_previousEntity` variable after invoking
+// this macro.
+macro __ChangeEntityList_Y() {
     assert16a()
     assert16i()
 
-    evaluate _LOOP_LIST = -1
-
-    // this allows previousEntity variable to work on first item
     assert(BaseEntity.next == 0)
+
+    // _previousEntity->next = dp->next
+    // dp->next = *newList
+    // *newList = this
+    //
+    // return _previousEntity->next
+
+    ldx.w   _previousEntity
+
+    lda.b   BaseEntity.next
+    sta.w   BaseEntity.next,x
+    tax
 
     lda.w   0,y
-    beq     EndLoop
+    sta.b   BaseEntity.next
 
-    sty.w   currentList
-    sty.w   previousEntity
+    tdc
+    sta.w   0,y
 
-    stz.w   changeList
-
-    Loop:
-        tcd
+    txa
 }
-
-inline _NEXT() {
-    assert16a()
-    assert16i()
-
-        ldy.w   changeList
-        bne     ChangeEntityList
-            // Continue loop as normal
-        _GotoNext:
-        Continue:
-            tdc
-            sta.w   previousEntity
-            lda.b   BaseEntity.next
-
-            bne     Loop
-            bra     EndLoop
-
-        ChangeEntityList:
-            // Change the list the entity is in THEN return
-            // Y = list to change to (NOT NULL)
-
-            // don't reorder list if unnecessary
-            if {_LOOP_LIST} == -1 {
-                cpy.w   currentList
-                beq     _GotoNext
-            } else {
-                cpy.w   #{_LOOP_LIST}
-                beq     _GotoNext
-            }
-
-        ChangeEntityList_SkipTest:
-            // previousEntity->next = dp->next
-            // dp->next = *changeList
-            // *changeList = this
-            //
-            // changeList = NULL
-            //
-            // next = previousEntity->next
-
-            ldx.w   previousEntity
-
-            lda.b   BaseEntity.next
-            sta.w   BaseEntity.next,x
-
-            lda.w   0,y
-            sta.b   BaseEntity.next
-
-            tdc
-            sta.w   0,y
-
-            stz.w   changeList
-
-            lda.w   BaseEntity.next,x
-            bne     Loop
-EndLoop:
-}
-
-
-// PROCESS ENTITY LISTS
-// ====================
-
-// Processes a list of entities with no collisions,
-// entities that move outside the inactive window will be
-// deactivated.
-//
-// REQUIRES: 16 bit A, 16 bit Index, DB = 0x7e
-//
-// INPUT: Y - address of list (MUST NOT be the deactivated list)
-// MODIFIES: DP
-a16()
-i16()
-code()
-function _ProcessEntityList_DeactivateOffscreen {
-    _LOOP_Y()
-        ldx.b   BaseEntity.functionTable
-        jsr     (BaseEntityFunctionTable.Process,x)
-
-        // Skip Offscreen tests and animation if entity list changes.
-        //
-        // This is to prevent glitches/unnecessary processing.
-        // Animation frame skips that occur if entity turns into a
-        // particle should not be noticeable
-
-        ldy.w   changeList
-        bne     ChangeEntityList
-
-        BranchEntityOutsideInactiveWindow(Deactivate)
-        bra     StillActive
-
-        Deactivate:
-            // deactivate entity
-            jsr     MetaSprite.Deactivate
-
-            ldy.w   currentList
-            sta.b   BaseEntity._ft_currentList
-
-            ldy.w   #lists.deactivated
-            bra     ChangeEntityList_SkipTest
-
-        StillActive:
-            jsr     MetaSprite.Animation.Process
-    _NEXT()
-
-    rts
-}
-
-// Processes a list of entities with no collisions,
-// entities that move outside the inactive window will be
-// deleted.
-//
-// REQUIRES: 16 bit A, 16 bit Index, DB = 0x7e
-//
-// INPUT: Y - address of list (MUST NOT be the toDelete list)
-// MODIFIES: DP
-a16()
-i16()
-code()
-function _ProcessEntityList_DeleteOffscreen {
-    _LOOP_Y()
-        ldx.b   BaseEntity.functionTable
-        jsr     (BaseEntityFunctionTable.Process,x)
-
-        // Skip Offscreen tests and animation if entity list changes.
-        //
-        // This is to prevent glitches/unnecessary processing.
-        // Animation frame skips that occur if entity turns into a
-        // particle should not be noticeable
-
-        ldy.w   changeList
-        bne     ChangeEntityList
-
-        BranchEntityOutsideInactiveWindow(Delete)
-        bra     StillActive
-
-        Delete:
-            ldy.w   #lists.toDelete
-            bra     ChangeEntityList_SkipTest
-
-        StillActive:
-            jsr     MetaSprite.Animation.Process
-    _NEXT()
-
-    rts
-}
-
-
-// Process the enemy/boss list.
-//
-// For each entity in the list:
-//   - Executes entity's Process routine
-//   - Deactivates the entity if moved outside the active window.
-//   - Tests for collisions between entity and player projectiles.
-//
-// PARAM: list - the name of the list to execute
-// PARAM: doDeactivateTest - if true then the entity
-//        is deactivated if outside the inactive window.
-//
-// REQUIRES: 16 bit A, 16 bit Index, DB = 0x7e
-// MODIFIES: DP
-inline _ProcessEnemyList(list, doDeactivateTest) {
-    assert16a()
-    assert16i()
-
-    function {list} {
-        _LOOP(lists.{list})
-            ldx.b   BaseEntity.functionTable
-            jsr     (BaseEntityFunctionTable.Process,x)
-
-            // Skip offscreen tests if entity list changes
-            //
-            // Still process the animation as the most common list
-            // change is to the `npc` or `particle` list so the death
-            // animation can be processed.
-
-            ldy.w   changeList
-            bne     SkipOffscreenTest
-
-            if {doDeactivateTest} == 1 {
-                BranchEntityOutsideInactiveWindow(Deactivate)
-                bra     StillActive
-
-                Deactivate:
-                    jsr     MetaSprite.Deactivate
-
-                    ldy.w   #lists.{list}
-                    sta.b   BaseEntity._ft_currentList
-
-                    ldy.w   #lists.deactivated
-                    bra     ChangeEntityList_SkipTest
-
-                StillActive:
-            }
-
-        SkipOffscreenTest:
-            jsr     MetaSprite.Animation.Process
-        _NEXT()
-    }
-}
-
-
-
-// Process the player entity list.
-//
-// For each entity in the list:
-//   - Executes entity's Process routine
-//   - Tests for collisions between the entity and:
-//      * bosses
-//      * enemies
-//      * enemy projectiles
-//
-// REQUIRES: 16 bit A, 16 bit Index, DB = 0x7e
-//
-// MODIFIES: DP
-macro _ProcessPlayerList() {
-    assert16a()
-    assert16i()
-
-    function players {
-        _LOOP(lists.players)
-            ldx.b   BaseEntity.functionTable
-            jsr     (BaseEntityFunctionTable.Process,x)
-
-            jsr     MetaSprite.Animation.Process
-        _NEXT()
-    }
-}
-
-
-
-// Process the particle list
-//
-// REQUIRES: 16 bit A, 16 bit Index, DB = 0x7e
-//
-// MODIFIES: DP
-macro _ProcessParticleList() {
-    assert16a()
-    assert16i()
-
-    function particles {
-        _LOOP(lists.particles)
-            ldx.b   BaseEntity.functionTable
-            jsr     (BaseEntityFunctionTable.Process,x)
-
-            // skip animation if entity list changes
-            ldy.w   changeList
-            bne     ChangeEntityList
-
-            jsr     MetaSprite.Animation.Process
-        _NEXT()
-    }
-}
-
 
 
 // Processes the tryToActivateAgain entity list
@@ -331,65 +149,55 @@ macro _ProcessParticleList() {
 // REQUIRES: 16 bit A, 16 bit Index, DB = 0x7e
 //
 // MODIFIES: DP
-macro _ProcessTryToActivateAgainList() {
+inline _ProcessTryToActivateAgainList() {
     assert16a()
     assert16i()
 
-    function TryToActivateAgain {
+    function ProcessTryToActivateAgainList {
         lda.w   lists.tryToActivateAgain
         beq     EndLoop
 
-        // this allows previousEntity variable to work on first item
+        // this allows _previousEntity variable to work on first item
         assert(BaseEntity.next == 0)
 
         ldy.w   #lists.tryToActivateAgain
-        sty.w   previousEntity
+        sty.w   _previousEntity
 
         Loop:
             tcd
 
             jsr     MetaSprite.Activate
-            bcc     Continue
+            bcs     ActivatedSuccessfully
 
-            // MetaSprite.Activate was successful.
-            // move to the designated list.
+                // Entity is still not active
+                // goto next entity
 
-            // list = BaseEntity._ft_currentList
-            // previousEntity->next = dp->next
-            // dp->next = *list
-            // *list = this
-            // next = previousEntity->next
+                tdc
+                sta.w   _previousEntity
+                lda.b   BaseEntity.next
 
-            ldx.w   previousEntity
+                bne     Loop
+                bra     EndLoop
 
-            lda.b   BaseEntity.next
-            sta.w   BaseEntity.next,x
 
-            ldy.b   BaseEntity._ft_currentList
-            lda.w   0,y
-            sta.b   BaseEntity.next
+            ActivatedSuccessfully:
+                // Entity is now Active
+                //  get list to move entity to
+                //  restore functionPtr
+                //  move entity to correct list
 
-            tdc
-            sta.w   0,y
+                ldy.b   BaseEntity._ft_currentList
 
-            ldy.w   BaseEntity.next,x
+                ldx.b   BaseEntity.romPtr
+                lda.l   BaseEntityData.functionTable,x
+                sta.b   BaseEntity.functionTable
 
-            // restore entity functionPtr
-            ldx.b   BaseEntity.romPtr
-            lda.l   BaseEntityData.functionTable,x
-            sta.b   BaseEntity.functionTable
+                __ChangeEntityList_Y()
+                // A = next entity address
+                // z set if there are no more entities in the current list
+                // MUST NOT CHANGE _previousEntity as the entity is no longer in the tryToActivateAgain list
 
-            tya
-            bne     Loop
-            bra     EndLoop
-
-        Continue:
-            // could not activate, goto next entity
-            tdc
-            sta.w   previousEntity
-            lda.b   BaseEntity.next
-
-            bne     Loop
+                bne     Loop
 
     EndLoop:
     }
@@ -406,7 +214,7 @@ macro _ProcessTryToActivateAgainList() {
 // REQUIRES: 16 bit A, 16 bit Index, DB = 0x7e
 //
 // MODIFIES: DP
-macro _ProcessActiveWindow() {
+inline _ProcessActiveWindow() {
     assert16a()
     assert16i()
 
@@ -429,36 +237,170 @@ macro _ProcessActiveWindow() {
             sta.w   prevActiveWindowY
 
 
-            _LOOP(lists.deactivated)
+            lda.w   lists.deactivated
+            beq     EndLoop
+
+            ldy.w   #lists.deactivated
+            sty.w   _previousEntity
+
+            Loop:
+                tcd
+
                 BranchEntityOutsideActiveWindow(Continue)
 
                     // entity is now inside active window
-                    // try to activate if possible
+                    // try to activate it
                     jsr     MetaSprite.Activate
-                    bcc     CouldNotActivate
+                    bcs     ActivatedSuccessfully
 
-                    // Entity is Active
-                    //  get list to move entity to
-                    //  restore functionPtr
-                    //  move entity to correct list
+                        // Could not activate the entity.
+                        // Try again in the next frame.
+                        ldy.w   #lists.tryToActivateAgain
+                        bra     _ChangeEntityList
 
-                    ldy.b   BaseEntity._ft_currentList
 
-                    ldx.b   BaseEntity.romPtr
-                    lda.l   BaseEntityData.functionTable,x
-                    sta.b   BaseEntity.functionTable
+                    ActivatedSuccessfully:
 
-                    bra     ChangeEntityList_SkipTest
+                        // Entity is Active
+                        //  get list to move entity to
+                        //  restore functionPtr
+                        //  move entity to correct list
 
-            CouldNotActivate:
-                    // try again in next frame
+                        ldy.b   BaseEntity._ft_currentList
 
-                    ldy.w   #lists.tryToActivateAgain
-                    bra     ChangeEntityList_SkipTest
-            _NEXT()
+                        ldx.b   BaseEntity.romPtr
+                        lda.l   BaseEntityData.functionTable,x
+                        sta.b   BaseEntity.functionTable
+
+                    _ChangeEntityList:
+                        __ChangeEntityList_Y()
+                        // A = next entity address
+                        // z set if there are no more entities in the current list
+                        // MUST NOT CHANGE _previousEntity as the entity is no longer in the deactivated list
+
+                        bne     Loop
+                        bra     EndLoop
+
+
+            Continue:
+                // goto next entity
+
+                tdc
+                sta.w   _previousEntity
+                lda.b   BaseEntity.next
+
+                bne     Loop
+
+    EndLoop:
     SkipTests:
     }
 }
+
+
+// Process an entity list
+//
+// REQUIRES: 16 bit A, 16 bit Index, DB = 0x7e
+//
+// PARAM: list: the name of the entity list to process
+//
+// MODIFIES: DP
+macro _ProcessEntityList(list) {
+    assert16a()
+    assert16i()
+
+    lda.w   Entity.lists.{list}
+    beq     _{list}_Empty
+        ldy.w   #Entity.lists.{list}
+        jsr     __ProcessEntityList
+
+_{list}_Empty:
+}
+
+// Process an entity list.
+//
+// ASSUMES: The list is not empty
+//
+// REQUIRES: 16 bit A, 16 bit Index, DB = 0x7e
+// INPUT: A = address of the first entity (NOT NULL)
+//        Y = address of the entity list (NOT NULL)
+//
+// MODIFIES: DP
+function __ProcessEntityList {
+
+    sty.w   _currentList
+    sty.w   _previousEntity
+
+    tcd
+    ldx.b   BaseEntity.functionTable
+    beq     NoFunctionPointer
+    jsr     (BaseEntityFunctionTable.Process,x)
+AfterJSR:
+
+    // Using JSR above so the engine can panic when an entity's Process
+    // routine exits using an RTS instruction.
+
+    // Get Process routine that failed, make it easier to find the invalid entity.
+    ldx.b   BaseEntity.functionTable
+    lda.l   BaseEntityFunctionTable.Process,x
+
+    // X = entity function table
+    // A = entity process routine
+
+    break(INVALID_PROCESS_ENTITY_RETURN)
+
+NoFunctionPointer:
+    break(NO_FUNCTION_POINTER)
+}
+
+// Goto and process to the next entity.
+//
+// NOTE: If the entity list has changed by using `__ChangeEntityList` or
+// `__ChangeEntityList_Y` then you MUST IMMEDIATELY ENTER this routine
+// via the `GotoNextEntity.EntityListChanged` label.
+//
+// REQUITES: 16 bit A, 16 bit Index, DB = 0x7e
+// INPUT: dp = current entity
+//
+// RETURN: invokes RTS or BRK
+inline __GotoNextEntity() {
+    assert16a()
+    assert16i()
+
+    tdc
+    sta.w   _previousEntity
+
+    lda.b   BaseEntity.next
+
+// A = next entity
+// z = next entity exists
+EntityListChanged:
+    beq     NoMoreEntities
+
+        tcd
+        ldx.b   BaseEntity.functionTable
+        beq     NoFunctionPointer
+        jmp     (BaseEntityFunctionTable.Process,x)
+
+
+NoMoreEntities:
+    // Verify the stack is unchanged.
+    // This should never happen, but I decided to test for it anyway.
+
+    plx
+    cpx.w   #__ProcessEntityList.AfterJSR - 1
+    bne     StackSmashed
+
+    rts
+
+
+// Should replace with in DeleteAndGotoNextEntity release build
+NoFunctionPointer:
+    break(NO_FUNCTION_POINTER)
+
+StackSmashed:
+    break(STACK_SMASHED)
+}
+
 
 // PUBLIC API
 // ==========
@@ -487,24 +429,17 @@ function ProcessGameLoop {
     MetaSprite.EntityHitbox.End()
 
 
-    ldy.w   #lists.playerProjectiles
-    jsr     _ProcessEntityList_DeleteOffscreen
+    _ProcessEntityList(playerProjectiles)
+    _ProcessEntityList(enemyProjectiles)
 
-    ldy.w   #lists.enemyProjectiles
-    jsr     _ProcessEntityList_DeleteOffscreen
+    _ProcessEntityList(platforms)
+    _ProcessEntityList(enemies)
+    _ProcessEntityList(bosses)
+    _ProcessEntityList(npcs)
 
-    ldy.w   #lists.platforms
-    jsr     _ProcessEntityList_DeactivateOffscreen
+    _ProcessEntityList(players)
 
-    _ProcessEnemyList(enemies, 1)
-    _ProcessEnemyList(bosses, 0)
-
-    _ProcessPlayerList()
-
-    ldy.w   #lists.npcs
-    jsr     _ProcessEntityList_DeactivateOffscreen
-
-    _ProcessParticleList()
+    _ProcessEntityList(particles)
 
 
     _DeleteAllInList(toDelete)
@@ -514,6 +449,158 @@ function ProcessGameLoop {
     tcd
 
     rts
+}
+
+
+
+// Delete the current entity and then process the next entity.
+//
+// MUST ONLY BE CALLED in the Entity's Process routine
+//
+// REQUIRES: 16 bit A, 16 bit Index, DB = 0x7e
+// INPUT: dp = current entity
+//
+// RETURN: GotoNextEntity
+//
+// @EndEntityProcess
+a16()
+i16()
+code()
+function DeleteAndGotoNextEntity {
+
+    jsr     MetaSprite.Deactivate
+
+    // ::TODO call delete code here::
+
+    ldy.w   #Entity.lists.toDelete
+
+// ChangeEntityListYAndGotoNextEntity
+FallThrough:
+}
+
+
+// Change the entity's list and then process the next entity.
+//
+// REQUITES: 16 bit A, 16 bit Index, DB = 0x7e
+// INPUT: dp = current entity
+//         Y = address of the new list
+//
+// RETURN: GotoNextEntity
+//
+// @EndEntityProcess
+a16()
+i16()
+code()
+function ChangeEntityListYAndGotoNextEntity {
+    assert(pc() == DeleteAndGotoNextEntity.FallThrough)
+
+    cpy.w   _currentList
+    beq     GotoNextEntity
+
+    __ChangeEntityList_Y()
+    // MUST JUMP directly to `GotoNextEntity.EntityListChanged` IMMEDIATELY AFTER a __ChangeEntityList_Y() call
+
+    bra     GotoNextEntity.EntityListChanged
+}
+
+
+// Deactivate the current entity and then process the next entity.
+//
+// MUST ONLY BE CALLED in the Entity's Process routine
+//
+// REQUIRES: 16 bit A, 16 bit Index, DB = 0x7e
+// INPUT: dp = current entity
+//
+// RETURN: GotoNextEntity
+//
+// @EndEntityProcess
+a16()
+i16()
+code()
+function DeactivateAndGotoNextEntity {
+
+    jsr     MetaSprite.Deactivate
+
+    ldy.w   _currentList
+    sta.b   BaseEntity._ft_currentList
+
+    __ChangeEntityList(deactivated)
+    // MUST JUMP directly to `GotoNextEntity.EntityListChanged` IMMEDIATELY AFTER a __ChangeEntityList() call
+
+    bra     GotoNextEntity.EntityListChanged
+}
+
+
+
+// Test if the current entity is outside the inactive window.
+// If it is delete it, otherwise call GotoNextEntity.
+//
+// MUST ONLY BE CALLED in the Entity's Process routine
+//
+// REQUIRES: 16 bit A, 16 bit Index, DB = 0x7e
+// INPUT: dp = current entity
+//
+// RETURN: DeleteAndGotoNextEntity or DrawAndGotoNextEntity
+//
+// @EndEntityProcess
+a16()
+i16()
+code()
+function DeleteIfOutsideAndGotoNextEntity {
+    BranchEntityOutsideInactiveWindow(DeleteAndGotoNextEntity)
+
+    bra     GotoNextEntity
+}
+
+
+
+// Test if the current entity is outside the inactive window.
+// If it is deactivate it, otherwise call GotoNextEntity.
+//
+// MUST ONLY BE CALLED in the Entity's Process routine
+//
+// REQUIRES: 16 bit A, 16 bit Index, DB = 0x7e
+// INPUT: dp = current entity
+//
+// RETURN: DeactivateAndGotoNextEntity or DrawAndGotoNextEntity
+//
+// @EndEntityProcess
+a16()
+i16()
+code()
+function DeactivateIfOutsideAndGotoNextEntity {
+    BranchEntityOutsideInactiveWindow(DeactivateAndGotoNextEntity)
+
+// GotoNextEntity
+FallThrough:
+}
+
+
+
+// Goto and process the next entity in the list.
+//
+// MUST ONLY BE CALLED in the Entity's Process routine
+//
+// INTERNAL NOTE: If the entity list has changed by using
+// `__ChangeEntityList` or `__ChangeEntityList_Y` then you MUST
+// IMMEDIATELY ENTER this routine via the `EntityListChanged` label.
+//
+// REQUIRES: 16 bit A, 16 bit Index, DB = 0x7e
+// INPUT: dp = current entity
+//
+// RETURN: next entity's Process routine or exits the entity loop
+//
+// @EndEntityProcess
+a16()
+i16()
+code()
+function GotoNextEntity {
+    assert(pc() == DeactivateIfOutsideAndGotoNextEntity.FallThrough)
+
+    // Keep old behaviour (for now)
+    jsr     MetaSprite.Animation.Process
+
+    __GotoNextEntity()
 }
 
 }

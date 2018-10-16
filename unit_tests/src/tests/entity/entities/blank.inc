@@ -39,7 +39,7 @@ a16()
 i16()
 code()
 function Process {
-    rts
+    jmp     Entity.GotoNextEntity
 }
 
 

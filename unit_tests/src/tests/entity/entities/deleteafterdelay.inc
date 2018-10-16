@@ -42,11 +42,10 @@ code()
 function Process {
     dec.b   EntityStruct.frames
     bne     +
-        lda.w   #Entity.lists.toDelete
-        sta.w   Entity.changeList
+        jmp     Entity.DeleteAndGotoNextEntity
     +
 
-    rts
+    jmp     Entity.GotoNextEntity
 }
 
 

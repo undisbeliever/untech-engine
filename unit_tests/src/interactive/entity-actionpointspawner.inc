@@ -150,7 +150,7 @@ namespace ProjectileEntity {
         _addVelocity(x)
         _addVelocity(y)
 
-        rts
+        jmp     Entity.GotoNextEntity
     }
 
     rodata(EN_RomData)
@@ -260,7 +260,7 @@ namespace SpawnerEntity {
     SkipSpawn:
         sta.b   EntityStruct.frameDelay
 
-        rts
+        jmp     Entity.GotoNextEntity
     }
 
 

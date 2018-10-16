@@ -212,7 +212,7 @@ namespace PlayerEntity {
 
         EndIf:
 
-        rts
+        jmp     Entity.GotoNextEntity
     }
 
 
@@ -262,7 +262,8 @@ namespace EnemyEntity {
     i16()
     code()
     function Process {
-        rts
+
+        jmp     Entity.GotoNextEntity
     }
 
 
@@ -332,10 +333,10 @@ namespace CollisionCentreEntity {
     function Process {
         dec.b   EntityStruct.framesLeft
         bpl     +
-            lda.w   #Entity.lists.toDelete
-            sta.w   Entity.changeList
+            jmp     Entity.DeleteAndGotoNextEntity
         +
-        rts
+
+        jmp     Entity.GotoNextEntity
     }
 
     rodata(EN_RomData)
