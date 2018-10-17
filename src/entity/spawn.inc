@@ -143,19 +143,20 @@ allocateTmpWord(yPos)
                 bra     EndIf
 
             MoveToDeleteList:
-                // invalid list id, move to delete list
-                ldy.w   #lists.toDelete
-                bra     InsertIntoInactiveList
+                // invalid list id, delete it and move it back to the free list
+                jsr     __EntityDestructor
+                ldy.w   #lists.free
+                bra     InsertIntoEntityList
 
             CouldNotActivate:
                 ldy.w   #lists.tryToActivateAgain
-                bra     InsertIntoInactiveList
+                bra     InsertIntoEntityList
 
             IsInactive:
                 ldy.w   #lists.deactivated
 
-            InsertIntoInactiveList:
-                // Insert into deactivated list, remembering the list
+            InsertIntoEntityList:
+                // Insert into the given list, remembering the list
                 // address for when it is reactivated
 
                 // x = list index

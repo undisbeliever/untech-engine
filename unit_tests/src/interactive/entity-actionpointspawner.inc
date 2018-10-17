@@ -337,6 +337,9 @@ i16()
 code()
 Test.add("Spawn At Action Point Test")
 function Test {
+    Text.Console.SetCursor(0, 4)
+    Text.Console.PrintConstString("Also tests:\n  DeleteAndGotoNextEntity")
+
     jsr     EntityLoop.Init
 
     // Load the entity

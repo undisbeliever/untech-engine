@@ -84,13 +84,6 @@ namespace Entity {
         // from the entity's `romPtr`
         allocate(tryToActivateAgain, wram7e, 2)
 
-        // Entities that are to be deleted
-        //  - not processed
-        //  - no collisions
-        //  - not displayed on screen
-        //  - will be destructed and move to free list at the end of frame
-        allocate(toDelete, wram7e, 2)
-
 
         // Player projectiles
         //  - collides with: enemies, bosses

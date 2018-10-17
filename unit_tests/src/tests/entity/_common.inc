@@ -132,12 +132,6 @@ allocateTmpWord(tmp_count)
     }
 
 
-    Entity.CountEntitiesInList(toDelete)
-    clc
-    adc.w   tmp_count
-    sta.w   tmp_count
-
-
     jsr     _FreeListLength
     clc
     adc.w   tmp_count

@@ -11,6 +11,23 @@
 
 namespace Entity {
 
+
+// Entity Destructor
+//
+// Frees the entity's MetaSprites, calls the entity Destructor routine.
+//
+// NOTE: This routine does not move the entity to the free list.
+// That is the responsibility of the calling code.
+//
+// REQUITES: 16 bit A, 16 bit Index, DB = 0x7E
+// INPUT: DP = Entity address
+function __EntityDestructor {
+    MetaSprite.EntityDestructor()
+
+    ldx.b   BaseEntity.functionTable
+    jmp     (BaseEntityFunctionTable.Destructor,x)
+}
+
 // Deletes all of the entities in the given list
 //
 // Entities in this list will be destructed and have their resources
@@ -30,10 +47,7 @@ inline _DeleteAllInList(listId) {
         Loop:
             tcd
 
-            MetaSprite.EntityDestructor()
-
-            ldx.b   BaseEntity.functionTable
-            jsr     (BaseEntityFunctionTable.Destructor,x)
+            jsr     __EntityDestructor
 
             lda.b   BaseEntity.next
             bne     Loop
@@ -72,7 +86,7 @@ function DeleteDeactivatedEntities {
     Loop:
         tcd
 
-        MetaSprite.EntityDestructor()
+        jsr     __EntityDestructor
 
         // BaseEntity.functionPtr is invalid, retrieve it from romPtr
 

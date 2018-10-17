@@ -442,9 +442,6 @@ function ProcessGameLoop {
     _ProcessEntityList(particles)
 
 
-    _DeleteAllInList(toDelete)
-
-
     lda.w   #0
     tcd
 
@@ -468,11 +465,9 @@ i16()
 code()
 function DeleteAndGotoNextEntity {
 
-    jsr     MetaSprite.Deactivate
+    jsr     __EntityDestructor
 
-    // ::TODO call delete code here::
-
-    ldy.w   #Entity.lists.toDelete
+    ldy.w   #Entity.lists.free
 
 // ChangeEntityListYAndGotoNextEntity
 FallThrough:
