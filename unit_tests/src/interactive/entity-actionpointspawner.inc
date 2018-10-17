@@ -10,7 +10,7 @@ namespace ActionPointSpawnerTest {
 //  * Entity.SpawnPlayerProjectileFromActionPoint
 //  * Entity.SpawnEnemyProjectileFromActionPoint
 //  * Entity.SpawnAtActionPoint
-//  * Entity.DeleteOffscreenEntities
+//  * Entity.DeleteIfOutsideAndGotoNextEntity
 //  * Entity.CountEntitiesInList
 //  * ENTITY_POOL_EMPTY warning
 
@@ -117,11 +117,6 @@ namespace ProjectileEntity {
     code()
     Destructor:
     ProcessCollision:
-    TakeDamageFromEntity:
-    CollideWithBody:
-    CollideWithShield:
-    BlockWithShield:
-    CalculateAttackValue:
     function Null {
         rts
     }
@@ -150,7 +145,7 @@ namespace ProjectileEntity {
         _addVelocity(x)
         _addVelocity(y)
 
-        jmp     Entity.GotoNextEntity
+        jmp     Entity.DeleteIfOutsideAndGotoNextEntity
     }
 
     rodata(EN_RomData)
@@ -363,7 +358,6 @@ function Test {
 
     GameLoop:
         jsr     EntityLoop.ProcessFrame
-        jsr     Entity.DeleteDeactivatedEntities
 
         PrintListSizes()
 
