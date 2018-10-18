@@ -10,8 +10,8 @@ a16()
 i16()
 code()
 function _FreeListLength {
-    ldx.w   #Entity.lists.free
-    jmp     Entity.CountEntitiesInList
+    ldx.w   #Entity.lists._FREE_INDEX
+    jmp     Entity._CountEntitiesInListIndexX
 }
 
 // OUT: A = number of entities in deactivated list
@@ -20,8 +20,8 @@ a16()
 i16()
 code()
 function _DeactivatedListLength {
-    ldx.w   #Entity.lists.deactivated
-    jmp     Entity.CountEntitiesInList
+    ldx.w   #Entity.lists._DEACTIVATED_INDEX
+    jmp     Entity._CountEntitiesInListIndexX
 }
 
 // OUT: A = number of entities in the tryToActivateAgain list
@@ -30,9 +30,10 @@ a16()
 i16()
 code()
 function _TryToActivateAgainListLength {
-    ldx.w   #Entity.lists.tryToActivateAgain
-    jmp     Entity.CountEntitiesInList
+    ldx.w   #Entity.lists._TRY_TO_ACTIVATE_AGAIN_INDEX
+    jmp     Entity._CountEntitiesInListIndexX
 }
+
 
 // OUT: A = number of entities in player list
 // MODIFIES: DP
@@ -40,23 +41,8 @@ a16()
 i16()
 code()
 function _FirstListLength {
-    ldx.w   #Entity.lists.FIRST
-    jmp     Entity.CountEntitiesInList
-}
-
-// IN: Y = list id
-// OUT: A = number of entities in player list
-// MODIFIES: DP
-a16()
-i16()
-code()
-function _ListLength_Y {
-    tya
-    asl
-    clc
-    adc.w   #Entity.lists.FIRST
-    tax
-    jmp     Entity.CountEntitiesInList
+    ldx.w   #0
+    jmp     Entity._CountEntitiesInListIndexX
 }
 
 
@@ -159,12 +145,12 @@ function _TestListLengthTable {
 allocateTmpWord(tmp_index)
 allocateTmpWord(tmp_listId)
 
-    ldy.w   #0
+    lda.w   #0
     ListSizeLoop:
         stx.w   tmp_index
-        sty.w   tmp_listId
+        sta.w   tmp_listId
 
-        jsr     _ListLength_Y
+        jsr     Entity.CountEntitiesInList
 
         ldx.w   tmp_index
         cmp.l   Table,x
@@ -173,9 +159,9 @@ allocateTmpWord(tmp_listId)
         inx
         inx
 
-        ldy.w   tmp_listId
-        iny
-        cpy.w   #Entity.lists.N_LISTS
+        lda.w   tmp_listId
+        inc
+        cmp.w   #Entity.lists.N_LISTS
         bcc     ListSizeLoop
 
     sec

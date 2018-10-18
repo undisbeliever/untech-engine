@@ -222,17 +222,18 @@ constant tmp = Test.tmp
         bne     Fail
 
         // Test each list has no entities in them (not active)
-        ldy.w   #0
+        lda.w   #0
         ListLoop:
-            phy
-                jsr     _ListLength_Y
+            pha
+                jsr     Entity.CountEntitiesInList
             ply
 
             cmp.w   #0
             bne     Fail
 
-            iny
-            cpy.w   #Entity.lists.N_LISTS
+            tya
+            inc
+            cmp.w   #Entity.lists.N_LISTS
             bcc     ListLoop
 
         jsr     _TestEntityListsValid
@@ -251,17 +252,18 @@ constant tmp = Test.tmp
         bne     Fail
 
         // Test each list has no entities in them (not active)
-        ldy.w   #0
+        lda.w   #0
         Loop:
-            phy
-                jsr     _ListLength_Y
+            pha
+                jsr     Entity.CountEntitiesInList
             ply
 
             cmp.w   #1
             bne     Fail
 
-            iny
-            cpy.w   #Entity.lists.N_LISTS
+            tya
+            inc
+            cmp.w   #Entity.lists.N_LISTS
             bcc     Loop
 
         jsr     _TestEntityListsValid

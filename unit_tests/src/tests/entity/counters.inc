@@ -126,11 +126,7 @@ function CountEntitiesInList {
     jsr     _SetupCounterTest
     bcc     Fail
 
-    Entity.CountEntitiesInList(deactivated)
-    cmp.w   #_SetupCounterTest.N_DEACTIVATED_ENTITIES
-    bne     Fail
-
-    ldx.w   #Entity.lists.enemies
+    lda.w   #Entity.ListId.ENEMY
     jsr     Entity.CountEntitiesInList
     cmp.w   #_SetupCounterTest.N_ACTIVE_ENEMIES
     bne     Fail

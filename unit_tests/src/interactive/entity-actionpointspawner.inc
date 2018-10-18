@@ -179,7 +179,8 @@ namespace SpawnerEntity {
             field(spawnPoint, 2)
             field(spawnRoutine, 2)
 
-            field(freeListCount, 2)
+            // used to test if an entity spawned or not
+            field(_freeListValue, 2)
         endstruct()
     }
 
@@ -217,8 +218,8 @@ namespace SpawnerEntity {
         dec
         bpl     SkipSpawn
 
-            Entity.CountEntitiesInList(free)
-            sta.b   EntityStruct.freeListCount
+            lda.w   Entity.lists.free
+            sta.b   EntityStruct._freeListValue
 
 
             lda.b   EntityStruct.spawnPoint
@@ -228,8 +229,8 @@ namespace SpawnerEntity {
             jsr     (SpawnRoutineTable,x)
 
 
-            Entity.CountEntitiesInList(free)
-            cmp.b   EntityStruct.freeListCount
+            lda.w   Entity.lists.free
+            cmp.b   EntityStruct._freeListValue
             beq     NoEntitySpawned
 
                 lda.b   EntityStruct.spawnPoint
@@ -316,17 +317,17 @@ macro PrintListSizes() {
     Text.Console.SetCursor(0, 20)
     Text.Console.PrintConstString("\nPlayer Projectiles: ")
 
-    Entity.CountEntitiesInList(playerProjectiles)
+    Entity.CountEntitiesInList(PLAYER_PROJECTILE)
     jsr     Text.Console.PrintU16A
 
     Text.Console.PrintConstString("\nEnemy Projectiles:  ")
 
-    Entity.CountEntitiesInList(enemyProjectiles)
+    Entity.CountEntitiesInList(ENEMY_PROJECTILE)
     jsr     Text.Console.PrintU16A
 
     Text.Console.PrintConstString("\nNPC Entities:       ")
 
-    Entity.CountEntitiesInList(npcs)
+    Entity.CountEntitiesInList(NPC)
     jsr     Text.Console.PrintU16A
 }
 

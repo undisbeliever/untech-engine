@@ -96,13 +96,13 @@ EndLoop:
 //
 // REQUIRES: 16 bit A, 16 bit Index, DB = 0x7e
 //
-// INPUT: X = list Id
+// PARAM: listName = the entity list name
 // OUTPUT: A = number of entities in enemy list
-macro CountEntitiesInList(listId) {
+macro CountEntitiesInList(listName) {
     assert16a()
     assert16i()
 
-    ldx.w   #Entity.lists.{listId}
+    lda.w   #Entity.ListId.{listName}
     jsr     Entity.CountEntitiesInList
 }
 
@@ -112,14 +112,21 @@ macro CountEntitiesInList(listId) {
 //
 // REQUIRES: 16 bit A, 16 bit Index, DB = 0x7e
 //
-// INPUT: X = address of list
+// INPUT: A = entity list Id
 // OUTPUT: A = number of entities in enemy list
 a16()
 i16()
 code()
 function CountEntitiesInList {
+    cmp.w   #lists.N_LISTS
+    bcs     InvalidEntityListId
+
+    asl
+    tax
+
+_ListIndexX:
     lda.w   #0
-    ldy.w   0,x
+    ldy.w   lists.FIRST,x
     beq     EndLoop
 
     Loop:
@@ -130,7 +137,21 @@ function CountEntitiesInList {
 
 EndLoop:
     rts
+
+InvalidEntityListId:
+    break(INVALID_ENTITY_LIST_ID)
 }
+
+
+// Counts the number of entities in the given list index.
+//
+// NOTE: This routine does not test that the list index is valid.
+//
+// REQUIRES: 16 bit A, 16 bit Index, DB = 0x7e
+//
+// INPUT: X = entity list index
+// OUTPUT: A = number of entities in enemy list
+constant _CountEntitiesInListIndexX = CountEntitiesInList._ListIndexX
 
 }
 

@@ -139,6 +139,7 @@ namespace Entity {
 
         // Unallocated Entities
         allocate(free, wram7e, 2)
+        constant _FREE_INDEX = free - FIRST
     }
 
     // Entity list Id used for the BaseEntityData struct
