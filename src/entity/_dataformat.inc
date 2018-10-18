@@ -49,8 +49,8 @@ namespace BaseEntityData {
 
         // Initial list to store the entity in
         // (see Entity.ListId enum)
-        // (byte index)
-        field(initialList, 1)
+        // (byte)
+        field(initialListId, 1)
 
         // MS FrameSet Id
         // (word)

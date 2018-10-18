@@ -69,7 +69,7 @@ SpawnList: {
     dw  {B}1, {C}1, {C}1, {B}1, {B}1    // boss
     dw  {B}2, {C}2, {B}2, {C}2, {B}2    // enemy
     dw  {B}3, {B}3, {B}3, {C}3, {C}3    // npc
-    dw  {C}4, {C}4, {C}4, {C}4, {C}4    // playform
+    dw  {C}4, {C}4, {C}4, {C}4, {C}4    // platform
     dw  {B}5, {B}5, {B}5, {B}5, {B}5    // particle
 
     constant SpawnList.size = pc() - SpawnList
@@ -83,6 +83,8 @@ ExpectedSizes: {
     dw  3                   // npc
     dw  0                   // platform
     dw  (6 * 5) - (3 * 4)   // particle
+    dw  0                   // playerprojectiles
+    dw  0                   // enemyprojectiles
 
     constant ExpectedSizes.size = pc() - ExpectedSizes
     assert(ExpectedSizes.size / 2 == Entity.lists.N_LISTS)
@@ -383,7 +385,7 @@ function SpawnEntity_XY {
 }
 
 namespace OldBehaviourTestEntities {
-    assert(Entity.lists.N_LISTS == 6)
+    assert(Entity.lists.N_LISTS == 8)
 
     rodata(EN_EntityList)
     constant firstId = (pc() - Entity.Data.EntityList) / 2
@@ -393,6 +395,8 @@ namespace OldBehaviourTestEntities {
         dw  Entities.DeactivateIfOutsideEntity.RomData3 // npc list
         dw  Entities.DeactivateIfOutsideEntity.RomData4 // platform list
         dw  Entities.BlankEntity.RomData5               // particle list
+        dw  Entities.DeleteIfOutsideEntity.RomData6     // playerProjectile list
+        dw  Entities.DeleteIfOutsideEntity.RomData7     // enemyProjectile list
 }
 
 rodata(rom0)
@@ -403,6 +407,8 @@ InitialExpectedSizes: {
     dw  1   // npc
     dw  1   // platform
     dw  4   // particle
+    dw  1   // player projectile
+    dw  1   // enemy projectile
 
     assert((pc() - InitialExpectedSizes) / 2 == Entity.lists.N_LISTS)
 }
@@ -417,6 +423,8 @@ MoveCameraTable: {
         dw  {e} // npc
         dw  {e} // platform
         dw  4   // particle
+        dw  0   // player projectile
+        dw  0   // enemy projectile
     }
 
     _row(0x1000, 0x2000, 1)

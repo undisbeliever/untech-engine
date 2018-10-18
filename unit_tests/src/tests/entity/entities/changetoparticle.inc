@@ -35,8 +35,8 @@ code()
 function Process {
     // change to particle list
 
-    ldy.w   #Entity.lists.particles
-    jmp     Entity.ChangeEntityListYAndGotoNextEntity
+    lda.w   #Entity.ListId.PARTICLE
+    jmp     Entity.ChangeEntityListIdAndGotoNextEntity
 }
 
 
@@ -45,7 +45,7 @@ while {n} < Entity.lists.N_LISTS {
     rodata(EN_RomData)
     RomData{n}:
         dw  FunctionTable
-        db  {n} * 2         // initial List
+        db  {n}             // initialListId
         dw  0               // frameSetId
         db  0               // defaultPalette
 

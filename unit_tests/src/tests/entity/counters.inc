@@ -15,7 +15,7 @@ function _SetupCounterTest {
     constant N_BLANK_ENTITIES = 4
     constant N_DEACTIVATED_ENTITIES = 5
 
-    assert(Entity.ListId.ENEMY == 2 * 2)
+    assert(Entity.ListId.ENEMY == 2)
     constant BLANK_ENTITY_ID = Entities.BlankEntity.EntityId_2
     constant DELETE_DELAY_ENTITY_ID = Entities.DeleteAfterDelayEntity.EntityId_2
 

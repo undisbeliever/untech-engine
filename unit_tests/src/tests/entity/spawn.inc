@@ -261,8 +261,10 @@ namespace ExpectedSizes {
     dw  2   // npc
     dw  2   // platform
     dw  6   // particle
+    dw  6   // player projectile
+    dw  6   // enemy projectile
 
-    constant ALIVE = 6 * 3 + 2 * 3
+    constant ALIVE = 6 * 5 + 2 * 3
     constant DEACTIVATED = 4 * 3
     constant FREE = Entity.N_ENTITIES - ALIVE - DEACTIVATED
 

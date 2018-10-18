@@ -37,12 +37,6 @@ namespace Entity {
 allocateTmpWord(_previousEntity)
 
 
-// Address of the current entity list that is being processed
-// Only using during the entity loop
-// (word address)
-allocateTmpWord(_currentList)
-
-
 // Change the list of the current entity.
 //
 // ASSUMES: The system is in the middle of an entity loop.
@@ -102,7 +96,7 @@ macro __ChangeEntityList(list) {
 // REQUIRES: 16 bit A, 16 bit Index, DB = 0x7e
 //
 // INPUT: DP = The current entity being processed
-//        Y = The address of the new entity list.
+//        Y = list Index (listId * 2, MUST NOT BE THE CURRENT LIST INDEX)
 //        _previousEntity = The address of the previous entity.
 //                          If there is no previous entity, then
 //                          `_previousEntity` is the address of the
@@ -120,8 +114,8 @@ macro __ChangeEntityList_Y() {
     assert(BaseEntity.next == 0)
 
     // _previousEntity->next = dp->next
-    // dp->next = *newList
-    // *newList = this
+    // dp->next = lists[listId]
+    // lists[listId] = this
     //
     // return _previousEntity->next
 
@@ -131,11 +125,11 @@ macro __ChangeEntityList_Y() {
     sta.w   BaseEntity.next,x
     tax
 
-    lda.w   0,y
+    lda.w   lists.FIRST,y
     sta.b   BaseEntity.next
 
     tdc
-    sta.w   0,y
+    sta.w   lists.FIRST,y
 
     txa
 }
@@ -180,17 +174,22 @@ inline _ProcessTryToActivateAgainList() {
                 bra     EndLoop
 
 
+            InvalidEntityId:
+                // This should not happen
+                break(INVALID_ENTITY_LIST_ID)
+
+
             ActivatedSuccessfully:
                 // Entity is now Active
-                //  get list to move entity to
-                //  restore functionPtr
-                //  move entity to correct list
+                //  move entity to current list
 
-                ldy.b   BaseEntity._ft_currentList
+                lda.b   BaseEntity.listId
+                and.w   #0xff
+                cmp.w   #lists.N_LISTS
+                bcs     InvalidEntityId
 
-                ldx.b   BaseEntity.romPtr
-                lda.l   BaseEntityData.functionTable,x
-                sta.b   BaseEntity.functionTable
+                asl
+                tay
 
                 __ChangeEntityList_Y()
                 // A = next entity address
@@ -255,24 +254,28 @@ inline _ProcessActiveWindow() {
 
                         // Could not activate the entity.
                         // Try again in the next frame.
-                        ldy.w   #lists.tryToActivateAgain
-                        bra     _ChangeEntityList
+                        ldy.w   #lists._TRY_TO_ACTIVATE_AGAIN_INDEX
+                        bra     _ChangeEntityList_Y
+
+
+                    InvalidEntityId:
+                        // This should not happen
+                        break(INVALID_ENTITY_LIST_ID)
 
 
                     ActivatedSuccessfully:
+                        // Entity is now Active
+                        //  move entity to current list
 
-                        // Entity is Active
-                        //  get list to move entity to
-                        //  restore functionPtr
-                        //  move entity to correct list
+                        lda.b   BaseEntity.listId
+                        and.w   #0xff
+                        cmp.w   #lists.N_LISTS
+                        bcs     InvalidEntityId
 
-                        ldy.b   BaseEntity._ft_currentList
+                        asl
+                        tay
 
-                        ldx.b   BaseEntity.romPtr
-                        lda.l   BaseEntityData.functionTable,x
-                        sta.b   BaseEntity.functionTable
-
-                    _ChangeEntityList:
+                    _ChangeEntityList_Y:
                         __ChangeEntityList_Y()
                         // A = next entity address
                         // z set if there are no more entities in the current list
@@ -327,7 +330,6 @@ _{list}_Empty:
 // MODIFIES: DP
 function __ProcessEntityList {
 
-    sty.w   _currentList
     sty.w   _previousEntity
 
     tcd
@@ -467,35 +469,58 @@ function DeleteAndGotoNextEntity {
 
     jsr     __EntityDestructor
 
-    ldy.w   #Entity.lists.free
-
-// ChangeEntityListYAndGotoNextEntity
-FallThrough:
+    __ChangeEntityList(free)
+    // MUST JUMP directly to `GotoNextEntity.EntityListChanged` IMMEDIATELY AFTER a __ChangeEntityList() call
+    bra     GotoNextEntity.EntityListChanged
 }
 
 
 // Change the entity's list and then process the next entity.
 //
-// REQUITES: 16 bit A, 16 bit Index, DB = 0x7e
+// REQUITES: DB = 0x7e
 // INPUT: dp = current entity
-//         Y = address of the new list
+//         A = entity List Id
 //
 // RETURN: GotoNextEntity
 //
 // @EndEntityProcess
+au()
+iu()
+code()
+function ChangeEntityListIdAndGotoNextEntity {
+    sep     #$30
+a8()
+i8()
+    cmp.b   BaseEntity.listId
+    beq     ListIdUnchanged
+
+    cmp.b   #lists.N_LISTS
+    bcs     InvalidEntityId
+
+    sta.b   BaseEntity.listId
+
+    assert(lists.N_LISTS < 128)
+    asl
+    tay
+
+    rep     #$30
 a16()
 i16()
-code()
-function ChangeEntityListYAndGotoNextEntity {
-    assert(pc() == DeleteAndGotoNextEntity.FallThrough)
-
-    cpy.w   _currentList
-    beq     GotoNextEntity
-
     __ChangeEntityList_Y()
     // MUST JUMP directly to `GotoNextEntity.EntityListChanged` IMMEDIATELY AFTER a __ChangeEntityList_Y() call
 
     bra     GotoNextEntity.EntityListChanged
+
+a8()
+i8()
+ListIdUnchanged:
+    rep     #$30
+a16()
+i16()
+    bra     GotoNextEntity
+
+InvalidEntityId:
+    break(INVALID_ENTITY_LIST_ID)
 }
 
 
@@ -515,9 +540,6 @@ code()
 function DeactivateAndGotoNextEntity {
 
     jsr     MetaSprite.Deactivate
-
-    ldy.w   _currentList
-    sta.b   BaseEntity._ft_currentList
 
     __ChangeEntityList(deactivated)
     // MUST JUMP directly to `GotoNextEntity.EntityListChanged` IMMEDIATELY AFTER a __ChangeEntityList() call

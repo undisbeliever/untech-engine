@@ -92,6 +92,8 @@ allocateTmpWord(yPos)
         stz.b   BaseEntity.yVecl
         stz.b   BaseEntity.yVecl + 2
 
+        lda.l   BaseEntityData.initialListId,x
+        sta.b   BaseEntity.listId
 
         lda.l   BaseEntityData.defaultPalette,x
         tay
@@ -114,60 +116,52 @@ allocateTmpWord(yPos)
             //   OR entity is inside active window
 
             // get initial list index
-            ldx.b   BaseEntity.romPtr
-            lda.l   BaseEntityData.initialList,x
-            and.w   #0xfe
-            cmp.w   #lists.N_LISTS * 2
+            lda.b   BaseEntity.listId
+            and.w   #0xff
+            cmp.w   #lists.N_LISTS
             bcs     InvalidEntityListId
 
             tax
-            lda.l   EntityAlwaysActiveList,x
-            bne     IsActive
+        a16()
+            lda.l   EntityAlwaysActiveList - 1,x
+            bmi     IsActive
 
             BranchEntityOutsideActiveWindow(IsInactive)
 
             IsActive:
                 // entity is activate.
-                // Insert into its active list
+                // Activate and insert into the entity list
 
-                phx
-                    jsr     MetaSprite.Activate
-                plx
+                jsr     MetaSprite.Activate
                 bcc     CouldNotActivate
 
-                // x = list index
+                lda.b   BaseEntity.listId
+                and.w   #0xff
+                asl
+                tax
+
+                bra     MoveToListX
+
+
+            InvalidEntityListId:
+                break(INVALID_ENTITY_LIST_ID)
+
+            CouldNotActivate:
+                ldx.w   #lists._TRY_TO_ACTIVATE_AGAIN_INDEX
+                bra     MoveToListX
+
+            IsInactive:
+                ldx.w   #lists._DEACTIVATED_INDEX
+
+            MoveToListX:
+                // Insert the entity into the given list Id index
+
                 lda.w   lists.FIRST,x
                 sta.b   BaseEntity.next
                 tdc
                 sta.w   lists.FIRST,x
 
                 bra     EndIf
-
-            InvalidEntityListId:
-                break(INVALID_ENTITY_LIST_ID)
-
-            CouldNotActivate:
-                ldy.w   #lists.tryToActivateAgain
-                bra     InsertIntoEntityList
-
-            IsInactive:
-                ldy.w   #lists.deactivated
-
-            InsertIntoEntityList:
-                // Insert into the given list, remembering the list
-                // address for when it is reactivated
-
-                // x = list index
-                // y = deactivated list address
-                txa
-                clc
-                adc.w   #lists.FIRST
-                sta.b   BaseEntity._ft_currentList
-
-                lda.w   0,y
-                sta.b   BaseEntity.next
-                tdc
-                sta.w   0,y
 
             EndIf:
 
@@ -180,17 +174,19 @@ allocateTmpWord(yPos)
     rts
 
 rodata(rom0)
-// one if the entity list is always active
-// zero if entity list can be deactivated
+// a negative number if the entity list is always active
+// a positive number if entity list can be deactivated
 EntityAlwaysActiveList: {
-    dw  1       // players
-    dw  1       // bosses
-    dw  0       // enemies
-    dw  0       // npcs
-    dw  0       // platforms
-    dw  1       // particles
+    db  0xff    // players
+    db  0xff    // bosses
+    db  0       // enemies
+    db  0       // npcs
+    db  0       // platforms
+    db  0xff    // particles
+    db  0xff    // playerProjectiles
+    db  0xff    // enemyProjectiles
 
-    assert((pc() - EntityAlwaysActiveList) == lists.N_LISTS * 2)
+    assert((pc() - EntityAlwaysActiveList) == lists.N_LISTS)
 }
 
 code()
@@ -328,7 +324,7 @@ a16()
 i16()
 code()
 function SpawnEnemyProjectileFromActionPoint {
-    ldx.w   #lists.enemyProjectiles
+    ldx.w   #ListId.ENEMY_PROJECTILE
     bra     _SpawnProjectileFromActionPoint
 }
 
@@ -350,7 +346,7 @@ a16()
 i16()
 code()
 function SpawnPlayerProjectileFromActionPoint {
-    ldx.w   #lists.playerProjectiles
+    ldx.w   #ListId.PLAYER_PROJECTILE
 _fallthrough:
 }
 
@@ -360,12 +356,12 @@ _fallthrough:
 // INPUT: DP = entity
 //        Y = projectile Id
 //        A = type to match
-//        X = projectile list address
+//        X = list Id (ListId.PLAYER_PROJECTILE or ListId.ENEMY_PROJECTILE)
 a16()
 i16()
 code()
 function _SpawnProjectileFromActionPoint {
-allocateTmpWord(tmp_listAddr)
+allocateTmpWord(tmp_listId)
 allocateTmpWord(tmp_compare)
 allocateTmpWord(tmp_projectileDataPtr)
 allocateTmpWord(tmp_entityDoingSpawning)
@@ -378,7 +374,7 @@ allocateTmpWord(tmp_entityDoingSpawning)
     +
 
     sta.w   tmp_compare
-    stx.w   tmp_listAddr
+    stx.w   tmp_listId
 
     ldx.b   BaseEntity.MetaSprite.currentFrame
     beq     Return
@@ -447,6 +443,10 @@ SpawnProjectile:
         lda.b   BaseEntity.next
         sta.w   Entity.lists.free
 
+        // save entity listId
+        lda.w   tmp_listId
+        sta.b   BaseEntity.listId
+
         // calculate entity location
         ldy.w   tmp_entityDoingSpawning
 
@@ -494,18 +494,31 @@ SpawnProjectile:
         // Assume projectiles always activate, even if it causes glitches.
         jsr     MetaSprite.Activate
 
-        // insert projectile into projectiles list
-        ldx.w   tmp_listAddr
-        lda.w   0,x
+
+        // Insert projectile into the entity list
+
+        lda.b   BaseEntity.listId
+        and.w   #0xff
+        cmp.w   #Entity.lists.N_LISTS
+        beq     InvalidEntityListId
+
+        asl
+        tax
+
+        lda.w   lists.FIRST,x
         sta.b   BaseEntity.next
         tdc
-        sta.w   0,x
+        sta.w   lists.FIRST,x
 
         ldx.w   MetaSprite.ActionPoint.address
 
         sep     #$20
     a8()
         jmp     Continue
+
+
+InvalidEntityListId:
+    break(INVALID_ENTITY_LIST_ID)
 }
 
 }

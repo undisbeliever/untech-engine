@@ -54,9 +54,17 @@ function Init {
 
 
     // clear the other lists
-    ldx.w   #lists.LAST - lists.deactivated
+    // free list is the last one
+
+    // Ensure free list is the last one
+    assert(lists.deactivated < lists.free)
+    assert(lists.tryToActivateAgain < lists.free)
+    assert(lists.LAST < lists.free)
+
+    lda.w   lists.free
+    ldx.w   #lists.free - lists.FIRST - 2
     -
-        stz.w   lists.deactivated,x
+        stz.w   lists.FIRST,x
         dex
         dex
         bpl     -

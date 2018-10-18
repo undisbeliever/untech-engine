@@ -34,14 +34,22 @@ namespace BaseEntity {
         // (word addr)
         field(functionTable, 2)
 
-        // If entity is in deactivated list, `functionTable` is reused as the
-        // address of the entity list to move into when reactivated.
-        // (word addr - union with functionTable)
-        constant _ft_currentList = functionTable
-
         // pointer to the ROM data used by the entity code
         // (word addr)
         field(romPtr, 2)
+
+        // Entity List Id for the current entity
+        //
+        // Set to `BaseEntityData.initialListId` before entity's
+        // `BaseEntityFunctionTable.Init` call.  The entity is ONLY ALLOWED to
+        // modify the `listId` variable in the entity's `Init` method.
+        //
+        // This variable MUST NOT BE MODIFIED after the `Init` method returns.
+        // To change the `listId` after construction use the
+        // `ChangeEntityListIdAndGotoNextEntity` routine.
+        //
+        // (byte)
+        field(listId, 1)
 
         MetaSprite.EntityData()
 
@@ -63,37 +71,6 @@ namespace Entity {
     // A linked list of entity types
     // (word addr)
     namespace lists {
-        // Unallocated Entities
-        allocate(free, wram7e, 2)
-
-        // Deactivated entities
-        //  - will not be processed
-        //  - will be reactivated when the camera moves the entity inside
-        //  active window
-        //
-        // NOTE: The engine will reuse the variable `BaseEntity.functionTable`
-        // to store the original list id.  The functionTable will be retrieved
-        // from the entity's `romPtr`
-        allocate(deactivated, wram7e, 2)
-
-        // Entities that could not be activated in this frame
-        //  - Gameloop will try and reactivate them on next frame
-        //
-        // NOTE: The engine will reuse the variable `BaseEntity.functionTable`
-        // to store the original list id.  The functionTable will be retrieved
-        // from the entity's `romPtr`
-        allocate(tryToActivateAgain, wram7e, 2)
-
-
-        // Player projectiles
-        //  - collides with: enemies, bosses
-        allocate(playerProjectiles, wram7e, 2)
-
-        // Enemy projectiles
-        //  - collides with: players
-        allocate(enemyProjectiles, wram7e, 2)
-
-
         // Player entity and allies
         //  - collides with: enemies, bosses, enemyProjectiles
         allocate(players, wram7e, 2)
@@ -123,23 +100,60 @@ namespace Entity {
         //  - no entity collisions
         allocate(particles, wram7e, 2)
 
+        // Player projectiles
+        //  - collides with: enemies, bosses
+        allocate(playerProjectiles, wram7e, 2)
+
+        // Enemy projectiles
+        //  - collides with: players
+        allocate(enemyProjectiles, wram7e, 2)
+
 
     constant FIRST = players
-    constant LAST = particles
+    constant LAST = enemyProjectiles
     constant N_LISTS = (LAST - FIRST) / 2 + 1
+
+        // Special lists
+        // =============
+        // These lists MUST NOT BE accessed by the subproject
+
+        // Deactivated entities
+        //  - will not be processed
+        //  - will be reactivated when the camera moves the entity inside
+        //  active window
+        //
+        // NOTE: The engine will reuse the variable `BaseEntity.functionTable`
+        // to store the original list id.  The functionTable will be retrieved
+        // from the entity's `romPtr`
+        allocate(deactivated, wram7e, 2)
+        constant _DEACTIVATED_INDEX = deactivated - FIRST
+
+        // Entities that could not be activated in this frame
+        //  - Gameloop will try and reactivate them on next frame
+        //
+        // NOTE: The engine will reuse the variable `BaseEntity.functionTable`
+        // to store the original list id.  The functionTable will be retrieved
+        // from the entity's `romPtr`
+        allocate(tryToActivateAgain, wram7e, 2)
+        constant _TRY_TO_ACTIVATE_AGAIN_INDEX = tryToActivateAgain - FIRST
+
+        // Unallocated Entities
+        allocate(free, wram7e, 2)
     }
 
     // Entity list Id used for the BaseEntityData struct
     namespace ListId {
-        createEnum(0, 2)
+        createEnum()
             enum(PLAYER)
             enum(BOSS)
             enum(ENEMY)
             enum(NPC)
             enum(PLATFORM)
             enum(PARTICLE)
+            enum(PLAYER_PROJECTILE)
+            enum(ENEMY_PROJECTILE)
 
-        assert({__ENUM__.current} == lists.N_LISTS * 2)
+        assert({__ENUM__.current} == lists.N_LISTS)
     }
 
 
