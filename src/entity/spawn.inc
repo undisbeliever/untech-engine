@@ -10,6 +10,7 @@
 
 
 RegisterBreakId(INVALID_ENTITY_ID)
+RegisterBreakId(INVALID_ENTITY_LIST_ID)
 RegisterBreakId(INVALID_PROJECTILE_ID)
 Warnings.Register(ENTITY_POOL_EMPTY, 31, 0, 31)
 
@@ -117,7 +118,7 @@ allocateTmpWord(yPos)
             lda.l   BaseEntityData.initialList,x
             and.w   #0xfe
             cmp.w   #lists.N_LISTS * 2
-            bcs     MoveToDeleteList
+            bcs     InvalidEntityListId
 
             tax
             lda.l   EntityAlwaysActiveList,x
@@ -142,11 +143,8 @@ allocateTmpWord(yPos)
 
                 bra     EndIf
 
-            MoveToDeleteList:
-                // invalid list id, delete it and move it back to the free list
-                jsr     __EntityDestructor
-                ldy.w   #lists.free
-                bra     InsertIntoEntityList
+            InvalidEntityListId:
+                break(INVALID_ENTITY_LIST_ID)
 
             CouldNotActivate:
                 ldy.w   #lists.tryToActivateAgain
