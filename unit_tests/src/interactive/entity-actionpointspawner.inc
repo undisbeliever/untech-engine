@@ -151,9 +151,9 @@ namespace ProjectileEntity {
     rodata(EN_RomData)
     RomData:
         dw  FunctionTable
-        db  Entity.ListId.NPC   // initial List
-        dw  MSFS.Projectile     // frameSetId
+        db  Entity.ListId.NPC   // initialListId
         db  0                   // defaultPalette
+        dw  MSFS.Projectile     // frameSetId
 
     rodata(EN_ProjectileList)
     constant PROJECTILE_ID = (pc() - Entity.Data.ProjectileList) / 2
@@ -297,9 +297,9 @@ namespace SpawnerEntity {
     rodata(EN_RomData)
     RomData:
         dw  FunctionTable
-        db  Entity.ListId.BOSS      // initial List
-        dw  MSFS.ActionPointSpawner // frameSetId
+        db  Entity.ListId.BOSS      // initialListId
         db  0                       // defaultPalette
+        dw  MSFS.ActionPointSpawner // frameSetId
 
     rodata(EN_EntityList)
     constant ENTITY_ID = (pc() - Entity.Data.EntityList) / 2

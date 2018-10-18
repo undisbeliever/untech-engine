@@ -56,8 +56,8 @@ while {n} < Entity.lists.N_LISTS {
     RomData{n}:
         dw  FunctionTable
         db  {n}             // initialListId
-        dw  0               // frameSetId
         db  0               // defaultPalette
+        dw  0               // frameSetId
 
     rodata(EN_EntityList)
     constant EntityId_{n} = (pc() - Entity.Data.EntityList) / 2

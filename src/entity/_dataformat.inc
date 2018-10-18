@@ -52,13 +52,13 @@ namespace BaseEntityData {
         // (byte)
         field(initialListId, 1)
 
-        // MS FrameSet Id
-        // (word)
-        field(frameSetId, 2)
-
         // Initial palette of the entity
         // (byte)
         field(defaultPalette, 1)
+
+        // MS FrameSet Id
+        // (word)
+        field(frameSetId, 2)
     endstruct()
 }
 

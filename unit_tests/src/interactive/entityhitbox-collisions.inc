@@ -219,9 +219,9 @@ namespace PlayerEntity {
     rodata(EN_RomData)
     RomData:
         dw  FunctionTable
-        db  Entity.ListId.PLAYER        // initial List
-        dw  MSFS.EhCollisionTest_Player // frameSetId
+        db  Entity.ListId.PLAYER        // initialListId
         db  0                           // defaultPalette
+        dw  MSFS.EhCollisionTest_Player // frameSetId
 
     rodata(EN_EntityList)
     constant ENTITY_ID = (pc() - Entity.Data.EntityList) / 2
@@ -273,9 +273,9 @@ namespace EnemyEntity {
     rodata(EN_RomData)
     RomData:
         dw  FunctionTable
-        db  Entity.ListId.ENEMY         // initial List
-        dw  MSFS.EhCollisionTest_Enemy  // frameSetId
+        db  Entity.ListId.ENEMY         // initialListId
         db  0                           // defaultPalette
+        dw  MSFS.EhCollisionTest_Enemy  // frameSetId
 
     rodata(EN_EntityList)
     constant ENTITY_ID = (pc() - Entity.Data.EntityList) / 2
@@ -342,9 +342,9 @@ namespace CollisionCentreEntity {
     rodata(EN_RomData)
     RomData:
         dw  FunctionTable
-        db  Entity.ListId.PARTICLE      // initial List
-        dw  MSFS.EhCollisionTest_Centre // frameSetId
+        db  Entity.ListId.PARTICLE      // initialListId
         db  0                           // defaultPalette
+        dw  MSFS.EhCollisionTest_Centre // frameSetId
 
     rodata(EN_EntityList)
     constant ENTITY_ID = (pc() - Entity.Data.EntityList) / 2

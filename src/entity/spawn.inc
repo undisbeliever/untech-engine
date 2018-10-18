@@ -95,7 +95,8 @@ allocateTmpWord(yPos)
         lda.l   BaseEntityData.initialListId,x
         sta.b   BaseEntity.listId
 
-        lda.l   BaseEntityData.defaultPalette,x
+        assert(BaseEntityData.initialListId + 1 == BaseEntityData.defaultPalette)
+        xba
         tay
         lda.l   BaseEntityData.frameSetId,x
 

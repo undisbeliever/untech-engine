@@ -115,9 +115,9 @@ namespace ShowAllFramesEntity {
         rodata(EN_RomData)
         RomData_{name}:
             dw  FunctionTable
-            db  Entity.ListId.PLAYER    // initial List
-            dw  MSFS.{name}             // frameSetId
+            db  Entity.ListId.PLAYER    // initialListId
             db  0                       // defaultPalette
+            dw  MSFS.{name}             // frameSetId
 
         rodata(EN_EntityList)
         constant {name}_entityId = (pc() - Entity.Data.EntityList) / 2
