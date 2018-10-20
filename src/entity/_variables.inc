@@ -121,19 +121,11 @@ namespace Entity {
         //  - will not be processed
         //  - will be reactivated when the camera moves the entity inside
         //  active window
-        //
-        // NOTE: The engine will reuse the variable `BaseEntity.functionTable`
-        // to store the original list id.  The functionTable will be retrieved
-        // from the entity's `romPtr`
         allocate(deactivated, wram7e, 2)
         constant _DEACTIVATED_INDEX = deactivated - FIRST
 
         // Entities that could not be activated in this frame
         //  - Gameloop will try and reactivate them on next frame
-        //
-        // NOTE: The engine will reuse the variable `BaseEntity.functionTable`
-        // to store the original list id.  The functionTable will be retrieved
-        // from the entity's `romPtr`
         allocate(tryToActivateAgain, wram7e, 2)
         constant _TRY_TO_ACTIVATE_AGAIN_INDEX = tryToActivateAgain - FIRST
 
