@@ -441,6 +441,173 @@ MoveCameraTable: {
 }
 }
 
+
+
+// Tests that an entity can spawn a new entity and change its entity
+// list at the same time.
+a16()
+i16()
+code()
+Test.add("GameLoop (Spawn And Change List)")
+function GameLoop_SpawnAndChangeList {
+constant _loopsLeft = Test.dpTmp + 0
+
+    jsr     Entity.Init
+
+    lda.w   #0x1000
+    sta.w   Entity.Spawn.xPos
+    sta.w   Entity.Spawn.yPos
+
+    ldy.w   #Entity.lists.N_LISTS - 1
+    SpawnLoop:
+        phy
+            // Y = listId to spawn entity in
+            lda.w   #SpawnAndChangeListTestEntity.EntityId
+
+            jsr     Entity.Spawn
+            bcc     Fail
+        ply
+        dey
+        bpl     SpawnLoop
+
+    jsr     _FreeListLength
+    cmp.w   #Entity.N_ENTITIES - Entity.lists.N_LISTS
+    bne     Fail
+
+
+    lda.w   #20
+    sta.b   _loopsLeft
+
+    Loop:
+        jsr     Entity.ProcessGameLoop
+
+        jsr     _TestEntityListsValid
+        bcc     Fail
+
+        dec.b   _loopsLeft
+        bne     Loop
+
+
+    jmp     _TestEntityListsValid
+
+
+Fail:
+    clc
+    rts
+
+
+namespace SpawnAndChangeListTestEntity {
+    buildFunctionTable(BaseEntityFunctionTable, SpawnAndChangeListTestEntity)
+    Entity.useDefaultRenderer()
+
+    constant DELETE_DELAY = 2
+
+
+    // IN: A = entity parameter = entity list id
+    a16()
+    i16()
+    code()
+    function Init {
+        sep     #$20
+    a8()
+        sta.b   BaseEntity.listId
+
+        rep     #$30
+    a16()
+        rts
+    }
+
+
+    a16()
+    i16()
+    code()
+    function Process {
+        // This entity spawns 3 entities:
+        //  * DeleteAfterDelayEntity with listId = listId
+        //  * DeleteAfterDelayEntity with lidtId = listId - 1
+        //  * DeleteAfterDelayEntity with listId = listId + 1
+        //
+        // then changes its entity list to the previous list.
+
+        lda.b   BaseEntity.listId
+        and.w   #0xff
+        jsr     SpawnDeleteEntity
+
+
+        lda.b   BaseEntity.listId
+        and.w   #0xff
+        dec
+        jsr     SpawnDeleteEntity
+
+
+        lda.b   BaseEntity.listId
+        and.w   #0xff
+        inc
+        jsr     SpawnDeleteEntity
+
+
+        lda.b   BaseEntity.listId
+        and.w   #0xff
+        dec
+        bpl     +
+            lda.w   #Entity.lists.N_LISTS - 1
+        +
+        jmp     Entity.ChangeEntityListIdAndGotoNextEntity
+    }
+
+
+    // IN: A = listId to spawn DeleteAfterDelayEntity in.
+    a16()
+    i16()
+    code()
+    function SpawnDeleteEntity {
+        // ensure entity is spawned
+        ldx.w   Camera.xPos
+        stx.w   Entity.Spawn.xPos
+        ldx.w   Camera.yPos
+        stx.w   Entity.Spawn.yPos
+
+        // wrap list id if necessary
+        tay
+        bpl     +
+            // A < 0
+            lda.w   #Entity.lists.N_LISTS - 1
+        +
+        cmp.w   #Entity.lists.N_LISTS
+        bcc     +
+            lda.w   #0
+        +
+
+        clc
+        adc.w   #Entities.DeleteAfterDelayEntity.EntityId_0
+        ldy.w   #DELETE_DELAY
+        jmp     Entity.Spawn
+    }
+
+
+    a16()
+    i16()
+    code()
+    Destructor:
+    ProcessCollision:
+    function NULL {
+        rts
+    }
+
+
+    rodata(EN_RomData)
+    RomData:
+        dw  FunctionTable
+        db  0               // initialListId
+        db  0               // defaultPalette
+        dw  0               // frameSetId
+
+    rodata(EN_EntityList)
+    constant EntityId = (pc() - Entity.Data.EntityList) / 2
+        dw  RomData
+}
+}
+
 }
 
 // vim: ft=bass-65816 ts=4 sw=4 et:
