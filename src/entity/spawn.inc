@@ -3,6 +3,10 @@
 //
 // Entity Spawning Routines.
 //
+// NOTE: Newly spawned entities are not immediately activated or added to their
+// entity list when spawned.  Instead the newly spawned entity will be
+// activated and moved to its entity list at the start of the next frame.
+//
 //
 // This file is part of the UnTech Game Engine.
 // Copyright (c) 2016 - 2017, Marcus Rowe <undisbeliever@gmail.com>.
@@ -125,44 +129,36 @@ allocateTmpWord(yPos)
             tax
         a16()
             lda.l   EntityAlwaysActiveList - 1,x
-            bmi     IsActive
+            bmi     SkipActiveWindowTest
 
             BranchEntityOutsideActiveWindow(IsInactive)
 
-            IsActive:
-                // entity is activate.
-                // Activate and insert into the entity list
+            SkipActiveWindowTest:
+                // We cannot move the entity into its entity list while
+                // the entity-loop is running.
+                // Instead we move it to the `tryToActivateAgain` list,
+                // where it will be activated and moved to the correct
+                // entity list at the start of the next frame.
 
-                jsr     MetaSprite.Activate
-                bcc     CouldNotActivate
+                lda.w   lists.tryToActivateAgain
+                sta.b   BaseEntity.next
+                tdc
+                sta.w   lists.tryToActivateAgain
 
-                lda.b   BaseEntity.listId
-                and.w   #0xff
-                asl
-                tax
-
-                bra     MoveToListX
+                bra     EndIf
 
 
             InvalidEntityListId:
                 break(INVALID_ENTITY_LIST_ID)
 
-            CouldNotActivate:
-                ldx.w   #lists._TRY_TO_ACTIVATE_AGAIN_INDEX
-                bra     MoveToListX
 
             IsInactive:
-                ldx.w   #lists._DEACTIVATED_INDEX
+                // Insert the entity into the deactivated list
 
-            MoveToListX:
-                // Insert the entity into the given list Id index
-
-                lda.w   lists.FIRST,x
+                lda.w   lists.deactivated
                 sta.b   BaseEntity.next
                 tdc
-                sta.w   lists.FIRST,x
-
-                bra     EndIf
+                sta.w   lists.deactivated
 
             EndIf:
 
@@ -492,24 +488,16 @@ SpawnProjectile:
         lda.w   tmp_entityDoingSpawning
         jsr     (BaseEntityFunctionTable.Init,x)
 
-        // Assume projectiles always activate, even if it causes glitches.
-        jsr     MetaSprite.Activate
+        // We cannot move the entity into its entity list while the
+        // entity-loop is running.
+        // Instead we move it to the `tryToActivateAgain` list, where it
+        // will be activated and moved to the correct entity list at the
+        // start of the next frame.
 
-
-        // Insert projectile into the entity list
-
-        lda.b   BaseEntity.listId
-        and.w   #0xff
-        cmp.w   #Entity.lists.N_LISTS
-        beq     InvalidEntityListId
-
-        asl
-        tax
-
-        lda.w   lists.FIRST,x
+        lda.w   lists.tryToActivateAgain
         sta.b   BaseEntity.next
         tdc
-        sta.w   lists.FIRST,x
+        sta.w   lists.tryToActivateAgain
 
         ldx.w   MetaSprite.ActionPoint.address
 

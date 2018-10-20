@@ -124,8 +124,13 @@ namespace Entity {
         allocate(deactivated, wram7e, 2)
         constant _DEACTIVATED_INDEX = deactivated - FIRST
 
-        // Entities that could not be activated in this frame
-        //  - Gameloop will try and reactivate them on next frame
+        // List of entities that are to be activated at the start of the
+        // next frame.
+        //
+        // This list contains either:
+        //  A) Entities that could not be activated in the previous
+        //  frame, and
+        //  B) Newly spawned active entities.
         allocate(tryToActivateAgain, wram7e, 2)
         constant _TRY_TO_ACTIVATE_AGAIN_INDEX = tryToActivateAgain - FIRST
 
