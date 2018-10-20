@@ -4,8 +4,8 @@
 
 namespace EntityTest {
 
+// REQUIRES: 16 bit A, 16 bit Index, DB = 0x7e
 // OUT: A = number of entities in free list
-// MODIFIES: DP
 a16()
 i16()
 code()
@@ -14,8 +14,8 @@ function _FreeListLength {
     jmp     Entity._CountEntitiesInListIndexX
 }
 
+// REQUIRES: 16 bit A, 16 bit Index, DB = 0x7e
 // OUT: A = number of entities in deactivated list
-// MODIFIES: DP
 a16()
 i16()
 code()
@@ -24,8 +24,8 @@ function _DeactivatedListLength {
     jmp     Entity._CountEntitiesInListIndexX
 }
 
+// REQUIRES: 16 bit A, 16 bit Index, DB = 0x7e
 // OUT: A = number of entities in the tryToActivateAgain list
-// MODIFIES: DP
 a16()
 i16()
 code()
@@ -35,8 +35,8 @@ function _TryToActivateAgainListLength {
 }
 
 
+// REQUIRES: 16 bit A, 16 bit Index, DB = 0x7e
 // OUT: A = number of entities in player list
-// MODIFIES: DP
 a16()
 i16()
 code()
@@ -51,8 +51,10 @@ function _FirstListLength {
 //  * deactivated lists have no metasprite data
 //  * active lists have metasprite data
 //  * total number of entities in all lists == Entity.N_ENTITIES
+//
+// REQUIRES: 16 bit A, 16 bit Index, DP = 0, DB = 0x7e
+//
 // OUT: C set if entity list OK
-// MODIFIES: DP
 a16()
 i16()
 code()
@@ -118,6 +120,10 @@ allocateTmpWord(tmp_count)
     }
 
 
+    // restore DP
+    lda.w   #0
+    tcd
+
     jsr     _FreeListLength
     clc
     adc.w   tmp_count
@@ -135,9 +141,11 @@ Fail:
 
 // Tests the entity list lengths against a
 // list table.
+//
+// REQUIRES: 16 bit A, 16 bit Index, DP = 0, DB = 0x7e
+//
 // IN: X - address of list table (list of words, in rom0 data block)
 // OUT: C set if entity list == table
-// MODIFIES: DP
 a16()
 i16()
 code()
