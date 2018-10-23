@@ -28,8 +28,8 @@ Fail:
 a16()
 i16()
 code()
-Test.add("Entities.ClearTryToActivateAgainList")
-function ClearTryToActivateAgainList {
+Test.add("Entities.ClearActivateNextFrameList")
+function ClearActivateNextFrameList {
 constant tmp = Test.tmp
 
     jsr     Entity.Init
@@ -59,12 +59,12 @@ constant tmp = Test.tmp
         bcc     Loop
 
 
-    jsr     _TryToActivateAgainListLength
+    jsr     _ActivateNextFrameListLength
     cmp.w   #Entity.lists.N_LISTS
     bne     Fail
 
 
-    jsr     Entity.ClearTryToActivateAgainList
+    jsr     Entity.ClearActivateNextFrameList
 
 
     jsr     _FreeListLength

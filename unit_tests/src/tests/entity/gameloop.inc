@@ -186,8 +186,8 @@ Fail:
 a16()
 i16()
 code()
-Test.add("Entity.GameLoop.TryToActivateAgain")
-function GameLoop_TryToActivateAgain {
+Test.add("Entity.GameLoop.ActivateNextFrame")
+function GameLoop_ActivateNextFrame {
 constant tmp = Test.tmp
 
     jsr     Entity.Init
@@ -217,7 +217,7 @@ constant tmp = Test.tmp
             bcc     Loop
 
 
-        jsr     _TryToActivateAgainListLength
+        jsr     _ActivateNextFrameListLength
         cmp.w   #Entity.lists.N_LISTS
         bne     Fail
 
@@ -247,7 +247,7 @@ constant tmp = Test.tmp
 
         jsr     Entity.ProcessGameLoop
 
-        jsr     _TryToActivateAgainListLength
+        jsr     _ActivateNextFrameListLength
         cmp.w   #0
         bne     Fail
 

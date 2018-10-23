@@ -58,7 +58,7 @@ function Init {
 
     // Ensure free list is the last one
     assert(lists.deactivated < lists.free)
-    assert(lists.tryToActivateAgain < lists.free)
+    assert(lists.activateNextFrame < lists.free)
     assert(lists.LAST < lists.free)
 
     lda.w   lists.free
@@ -74,7 +74,7 @@ function Init {
 
 
 
-// Clear the TryToActivateAgain entity list
+// Clear the activateNextFrame entity list
 //
 // Should be called at the start of each level
 //
@@ -82,8 +82,8 @@ function Init {
 a16()
 i16()
 code()
-function ClearTryToActivateAgainList {
-    lda.w   lists.tryToActivateAgain
+function ClearActivateNextFrameList {
+    lda.w   lists.activateNextFrame
     beq     Return
 
     Loop:
@@ -98,15 +98,15 @@ function ClearTryToActivateAgainList {
         bne     Loop
 
 
-    // Move the tryToActivateAgain list into the free list
+    // Move the activateNextFrame list into the free list
 
     lda.w   lists.free
     sta.b   BaseEntity.next
 
-    lda.w   lists.tryToActivateAgain
+    lda.w   lists.activateNextFrame
     sta.w   lists.free
 
-    stz.w   lists.tryToActivateAgain
+    stz.w   lists.activateNextFrame
 
 
     lda.w   #0

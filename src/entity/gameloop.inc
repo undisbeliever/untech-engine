@@ -7,8 +7,8 @@
 //   * Process all active entities' Process routine
 //   * Entity Collision detection
 //   * Animate all active entities
+//   * Activate entities in the `Entity.activateNextFrame` list
 //   * Activate entities that enter the active window
-//   * Activate entities in the `Entity.tryToActivateAgain` list
 //   * Delete all entities in the `Entity.toDelete` list
 //
 //
@@ -32,7 +32,7 @@ namespace Entity {
 
 
 // Previous entity being processed
-// Used in TryToActivateAgain, ProcessActiveWindow and the entity loop.
+// Used in _ProcessActivateNextFrameList, _ProcessActiveWindow and the entity loop.
 // (word address)
 allocateTmpWord(_previousEntity)
 
@@ -135,7 +135,7 @@ macro __ChangeEntityList_Y() {
 }
 
 
-// Processes the tryToActivateAgain entity list
+// Processes the activateNextFrame entity list
 //
 // For each entity in the list it will try to reactivate the entity and
 // if it succeeds move it into its designated entity list.
@@ -143,18 +143,18 @@ macro __ChangeEntityList_Y() {
 // REQUIRES: 16 bit A, 16 bit Index, DB = 0x7e
 //
 // MODIFIES: DP
-inline _ProcessTryToActivateAgainList() {
+inline _ProcessActivateNextFrameList() {
     assert16a()
     assert16i()
 
-    function ProcessTryToActivateAgainList {
-        lda.w   lists.tryToActivateAgain
+    function ProcessActivateNextFrameList {
+        lda.w   lists.activateNextFrame
         beq     EndLoop
 
         // this allows _previousEntity variable to work on first item
         assert(BaseEntity.next == 0)
 
-        ldy.w   #lists.tryToActivateAgain
+        ldy.w   #lists.activateNextFrame
         sty.w   _previousEntity
 
         Loop:
@@ -194,7 +194,7 @@ inline _ProcessTryToActivateAgainList() {
                 __ChangeEntityList_Y()
                 // A = next entity address
                 // z set if there are no more entities in the current list
-                // MUST NOT CHANGE _previousEntity as the entity is no longer in the tryToActivateAgain list
+                // MUST NOT CHANGE _previousEntity as the entity is no longer in the activateNextFrame list
 
                 bne     Loop
 
@@ -254,7 +254,7 @@ inline _ProcessActiveWindow() {
 
                         // Could not activate the entity.
                         // Try again in the next frame.
-                        ldy.w   #lists._TRY_TO_ACTIVATE_AGAIN_INDEX
+                        ldy.w   #lists._ACTIVATE_NEXT_FRAME_INDEX
                         bra     _ChangeEntityList_Y
 
 
@@ -418,7 +418,7 @@ code()
 function ProcessGameLoop {
     jsr     _UpdateActiveWindows
 
-    _ProcessTryToActivateAgainList()
+    _ProcessActivateNextFrameList()
 
     _ProcessActiveWindow()
 

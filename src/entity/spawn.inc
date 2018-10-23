@@ -136,14 +136,14 @@ allocateTmpWord(yPos)
             SkipActiveWindowTest:
                 // We cannot move the entity into its entity list while
                 // the entity-loop is running.
-                // Instead we move it to the `tryToActivateAgain` list,
+                // Instead we move it to the `activateNextFrame` list,
                 // where it will be activated and moved to the correct
                 // entity list at the start of the next frame.
 
-                lda.w   lists.tryToActivateAgain
+                lda.w   lists.activateNextFrame
                 sta.b   BaseEntity.next
                 tdc
-                sta.w   lists.tryToActivateAgain
+                sta.w   lists.activateNextFrame
 
                 bra     EndIf
 
@@ -490,14 +490,14 @@ SpawnProjectile:
 
         // We cannot move the entity into its entity list while the
         // entity-loop is running.
-        // Instead we move it to the `tryToActivateAgain` list, where it
+        // Instead we move it to the `activateNextFrame` list, where it
         // will be activated and moved to the correct entity list at the
         // start of the next frame.
 
-        lda.w   lists.tryToActivateAgain
+        lda.w   lists.activateNextFrame
         sta.b   BaseEntity.next
         tdc
-        sta.w   lists.tryToActivateAgain
+        sta.w   lists.activateNextFrame
 
         ldx.w   MetaSprite.ActionPoint.address
 

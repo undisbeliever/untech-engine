@@ -13,7 +13,7 @@ namespace Entity {
 
 // Counts the number of enemies of a specific Id
 //
-// This routine will also search the deactivated and tryToActivateAgain entity
+// This routine will also search the deactivated and activateNextFrame entity
 // lists.
 //
 // This routine SHOULD ONLY be called on entities that will not change its
@@ -39,7 +39,7 @@ allocateTmpWord(tmp_count)
     jsr     _TestList
     ldx.w   Entity.lists.deactivated
     jsr     _TestList
-    ldx.w   Entity.lists.tryToActivateAgain
+    ldx.w   Entity.lists.activateNextFrame
     jsr     _TestList
 
     lda.w   tmp_count

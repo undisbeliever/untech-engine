@@ -131,8 +131,8 @@ namespace Entity {
         //  A) Entities that could not be activated in the previous
         //  frame, and
         //  B) Newly spawned active entities.
-        allocate(tryToActivateAgain, wram7e, 2)
-        constant _TRY_TO_ACTIVATE_AGAIN_INDEX = tryToActivateAgain - FIRST
+        allocate(activateNextFrame, wram7e, 2)
+        constant _ACTIVATE_NEXT_FRAME_INDEX = activateNextFrame - FIRST
 
         // Unallocated Entities
         allocate(free, wram7e, 2)

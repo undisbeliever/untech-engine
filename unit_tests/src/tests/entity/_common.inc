@@ -25,12 +25,12 @@ function _DeactivatedListLength {
 }
 
 // REQUIRES: 16 bit A, 16 bit Index, DB = 0x7e
-// OUT: A = number of entities in the tryToActivateAgain list
+// OUT: A = number of entities in the activateNextFrame list
 a16()
 i16()
 code()
-function _TryToActivateAgainListLength {
-    ldx.w   #Entity.lists._TRY_TO_ACTIVATE_AGAIN_INDEX
+function _ActivateNextFrameListLength {
+    ldx.w   #Entity.lists._ACTIVATE_NEXT_FRAME_INDEX
     jmp     Entity._CountEntitiesInListIndexX
 }
 
@@ -87,7 +87,7 @@ allocateTmpWord(tmp_count)
     }
 
     _TestDeactivated(deactivated)
-    _TestDeactivated(tryToActivateAgain)
+    _TestDeactivated(activateNextFrame)
 
 
     // test all other entities are active
