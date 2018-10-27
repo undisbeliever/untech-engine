@@ -11,10 +11,13 @@ namespace DeleteIfOutsideEntity {
     Entity.useDefaultRenderer()
 
 // IN: A = parameter
+// OUT: C set = always activate entity
 a16()
 i16()
 code()
 function Init {
+    // always activate
+    sec
     rts
 }
 

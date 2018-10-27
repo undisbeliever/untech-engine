@@ -75,12 +75,19 @@ namespace BaseEntityFunctionTable {
         //    * MetaSprite frameSet and palette initialized
         //
         // After this function is called
-        //    * Entity will be activated if inside the active window
+        //    * Entity will be moved into the `activateNextFrame` entity
+        //      list if carry set or the entity is inside the active window.
+        //
+        // NOTE: If the entity is spawned by `SpawnEnemyProjectileFromActionPoint`
+        //       or `SpawnPlayerProjectileFromActionPoint` then it will always
+        //       be activated, regardless of the Init routine output.
         //
         // REGS: 16 bit A, 16 bit Index, DB = $7e
         // INPUT: dp: entity
         //         A: parameter
         //         n: set if parameter is 0
+        // OUTPUT: carry: set: the entity will be activated on the next frame
+        //                clear: the entity will be activated if it is inside the active window.
         field(Init, 2)
 
         // Entity destructor routine

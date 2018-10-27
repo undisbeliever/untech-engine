@@ -29,6 +29,7 @@ namespace ProjectileEntity {
         endstruct()
     }
 
+    // OUT: C set = always activate entity
     a16()
     i16()
     code()
@@ -109,7 +110,11 @@ namespace ProjectileEntity {
 
 
         lda.w   #0
-        jmp     MetaSprite.SetFrame
+        jsr     MetaSprite.SetFrame
+
+        // always activate
+        sec
+        rts
     }
 
     a16()
@@ -184,6 +189,7 @@ namespace SpawnerEntity {
         endstruct()
     }
 
+    // OUT: C set = always activate entity
     a16()
     i16()
     code()
@@ -193,7 +199,11 @@ namespace SpawnerEntity {
         stz.b   EntityStruct.spawnRoutine
 
         lda.w   #0
-        jmp     MetaSprite.SetFrame
+        jsr     MetaSprite.SetFrame
+
+        // always activate
+        sec
+        rts
     }
 
     a16()

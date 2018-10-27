@@ -194,29 +194,42 @@ Fail:
 }
 
 
+// For the first {N_LISTS_TESTED} lists, spawn
+//   * 2 onscreen BlankEntity
+//   * 2 onscreen DeactivateIfOutsideEntity
+//   * 4 offscreen BlankEntity
+//   * 4 offscreen DeactivateIfOutsideEntity
 a16()
 i16()
 code()
 Test.add("Entity.Spawn (Offscreen)")
 function Spawn_Offscreen {
+
 constant tmp_listId = Test.tmp
 
 constant ONSCREEN = 0x1080
 
+constant ACTIVE_PER_LIST = 8
+constant DEACTIVATED_PER_LIST = 4
+
+// There are not enough entities to do this test on all the entity lists.
+// Therefore we are only preforming this test on as many lists as we can while
+// still leaving some free.
+evaluate N_LISTS_TESTED = (Entity.N_ENTITIES - 2) / (ACTIVE_PER_LIST + DEACTIVATED_PER_LIST)
+assert({N_LISTS_TESTED} > 3)
+if {N_LISTS_TESTED} > Entity.lists.N_LISTS {
+    evaluate N_LISTS_TESTED = Entity.lists.N_LISTS
+}
+
     jsr     Entity.Init
 
-    // spawn 2 entities on-screen and 4 entities off-screen per entity list
-
-    assert(Entity.N_ENTITIES >= Entity.lists.N_LISTS * 6)
-
-    lda.w   #Entities.BlankEntity.EntityId_0
+    lda.w   #{N_LISTS_TESTED} - 1
+    sta.w   tmp_listId
     Loop:
-        sta.w   tmp_listId
-
         macro spawn(xPos, yPos) {
             ldx.w   #{xPos}
             ldy.w   #{yPos}
-            jsr     SpawnEntity_XY
+            jsr     SpawnEntities_XY
             bcc     Fail
         }
 
@@ -227,16 +240,13 @@ constant ONSCREEN = 0x1080
         spawn(ONSCREEN - 0x200, ONSCREEN)
         spawn(ONSCREEN, ONSCREEN - 0x200)
 
-        lda.w   tmp_listId
-        inc
-        cmp.w   #Entities.BlankEntity.EntityId_0 + Entity.lists.N_LISTS
-        bcc     Loop
+        dec.w   tmp_listId
+        bpl     Loop
 
     // Must process the game loop to move the new entities into their entity lists
     jsr     Entity.ProcessGameLoop
 
     // Verify list sizes
-
     jsr     _FreeListLength
     cmp.w   #ExpectedSizes.FREE
     bne     Fail
@@ -257,29 +267,43 @@ Fail:
     clc
     rts
 
-function SpawnEntity_XY {
+function SpawnEntities_XY {
     stx.w   Entity.Spawn.xPos
     sty.w   Entity.Spawn.yPos
+
     lda.w   tmp_listId
-    jmp     Entity.Spawn
+    clc
+    adc.w   #Entities.BlankEntity.EntityId_0
+    jsr     Entity.Spawn
+    bcc     Return
+
+    lda.w   tmp_listId
+    clc
+    adc.w   #Entities.DeactivateIfOutsideEntity.EntityId_0
+    jsr     Entity.Spawn
+
+Return:
+    rts
 }
 
 rodata(rom0)
 ExpectedSizes:
 namespace ExpectedSizes {
-// NOTE: projectiles are always spawned, even if offscreen
-    dw  6   // player
-    dw  6   // boss
-    dw  2   // enemy
-    dw  2   // npc
-    dw  2   // platform
-    dw  6   // particle
-    dw  6   // player projectile
-    dw  6   // enemy projectile
+    evaluate n = 0
+    while {n} < Entity.lists.N_LISTS {
+        if {n} < {N_LISTS_TESTED} {
+            dw  ACTIVE_PER_LIST
+        } else {
+            dw  0
+        }
+        evaluate n = {n} + 1
+    }
 
-    constant ALIVE = 6 * 5 + 2 * 3
-    constant DEACTIVATED = 4 * 3
-    constant FREE = Entity.N_ENTITIES - ALIVE - DEACTIVATED
+    constant ACTIVE = ACTIVE_PER_LIST * {N_LISTS_TESTED}
+    constant DEACTIVATED = DEACTIVATED_PER_LIST * {N_LISTS_TESTED}
+
+    constant FREE = Entity.N_ENTITIES - ACTIVE - DEACTIVATED
+    assert(FREE > 0)
 
     constant size = pc() - ExpectedSizes
     assert(size / 2 == Entity.lists.N_LISTS)

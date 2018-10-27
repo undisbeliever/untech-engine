@@ -112,24 +112,11 @@ allocateTmpWord(yPos)
         pla
         jsr     (BaseEntityFunctionTable.Init,x)
 
+        // entity is active if, either
+        //   A. The Init function returns carry set, or
+        //   B. entity is inside active window
 
-        // Insert entity into the appropriate list
-
-        namespace ActiveTest {
-            // entity is active if:
-            //   entity list only contains active entities
-            //   OR entity is inside active window
-
-            // get initial list index
-            lda.b   BaseEntity.listId
-            and.w   #0xff
-            cmp.w   #lists.N_LISTS
-            bcs     InvalidEntityListId
-
-            tax
-        a16()
-            lda.l   EntityAlwaysActiveList - 1,x
-            bmi     SkipActiveWindowTest
+        bcs     SkipActiveWindowTest
 
             BranchEntityOutsideActiveWindow(IsInactive)
 
@@ -162,31 +149,12 @@ allocateTmpWord(yPos)
 
             EndIf:
 
-            // A = DP
-        }
+        // A = DP
         tay
     pld
 
     sec
     rts
-
-rodata(rom0)
-// a negative number if the entity list is always active
-// a positive number if entity list can be deactivated
-EntityAlwaysActiveList: {
-    db  0xff    // players
-    db  0xff    // bosses
-    db  0       // enemies
-    db  0       // npcs
-    db  0       // platforms
-    db  0xff    // particles
-    db  0xff    // playerProjectiles
-    db  0xff    // enemyProjectiles
-
-    assert((pc() - EntityAlwaysActiveList) == lists.N_LISTS)
-}
-
-code()
 }
 
 
@@ -308,8 +276,8 @@ Return:
 // When entities are spawned the value `MetaSprite.ActionPoint.address`
 // will be set to the address of the current Action Point.
 //
-// Will assume that the MetaSprite will always activate, will ignore
-// out of VRAM/CGRAM errors and glitch out.
+// This routine will always activate the entity, regardless of the output of
+// the entity's Init routine.
 //
 // REQUIRES: 16 bit A, 16 bit Index, DB = 0x7e
 // MUST NOT BE CALLED IN ENTITY CONSTRUCTOR
@@ -330,8 +298,8 @@ function SpawnEnemyProjectileFromActionPoint {
 // When entities are spawned the value `MetaSprite.ActionPoint.address`
 // will be set to the address of the current Action Point.
 //
-// Will assume that the MetaSprite will always activate, will ignore
-// out of VRAM/CGRAM errors and glitch out.
+// This routine will always activate the entity, regardless of the output of
+// the entity's Init routine.
 //
 // REQUIRES: 16 bit A, 16 bit Index, DB = 0x7e
 // MUST NOT BE CALLED IN ENTITY CONSTRUCTOR

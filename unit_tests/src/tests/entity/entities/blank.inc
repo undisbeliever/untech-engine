@@ -13,6 +13,7 @@ namespace BlankEntity {
 allocateTmpWord(parameterSum)
 
 // IN: A = parameter
+// OUT: C set = always activate entity
 a16()
 i16()
 code()
@@ -21,6 +22,8 @@ function Init {
     adc.w   parameterSum
     sta.w   parameterSum
 
+    // always activate
+    sec
     rts
 }
 

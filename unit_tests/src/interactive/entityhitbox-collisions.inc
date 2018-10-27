@@ -132,6 +132,7 @@ namespace PlayerEntity {
 
     // REQUIRES: 16 bit A, 16 bit Index, DB = 0x7e
     // INPUT: DP = entity
+    // OUTPUT: C set = always activate entity
     a16()
     i16()
     code()
@@ -139,7 +140,11 @@ namespace PlayerEntity {
         stz.b   EntityStruct.selectedFrame
 
         lda.w   #0
-        jmp     MetaSprite.SetFrame
+        jsr     MetaSprite.SetFrame
+
+        // always activate
+        sec
+        rts
     }
 
 
@@ -237,11 +242,16 @@ namespace EnemyEntity {
     // REQUIRES: 16 bit A, 16 bit Index, DB = 0x7e
     // INPUT: DP = entity
     //         A = frameId
+    // OUTPUT: C set = always activate entity
     a16()
     i16()
     code()
     function Init {
-        jmp     MetaSprite.SetFrame
+        jsr     MetaSprite.SetFrame
+
+        // always activate
+        sec
+        rts
     }
 
 
@@ -299,6 +309,7 @@ namespace CollisionCentreEntity {
 
     // REQUIRES: 16 bit A, 16 bit Index, DB = 0x7e
     // INPUT: DP = entity
+    // OUTPUT: C set = always activate entity
     a16()
     i16()
     code()
@@ -307,7 +318,11 @@ namespace CollisionCentreEntity {
         sta.b   EntityStruct.framesLeft
 
         lda.w   #0
-        jmp     MetaSprite.SetFrame
+        jsr     MetaSprite.SetFrame
+
+        // always activate
+        sec
+        rts
     }
 
 

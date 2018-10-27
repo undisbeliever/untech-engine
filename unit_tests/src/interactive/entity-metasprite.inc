@@ -20,6 +20,7 @@ namespace ShowAllFramesEntity {
     }
 
     // IN: A = parameter (frameDelay)
+    // OUT: C set = always activate entity
     a16()
     i16()
     code()
@@ -33,6 +34,8 @@ namespace ShowAllFramesEntity {
 
         stz.b   EntityStruct.paletteId
 
+        // always activate
+        sec
         rts
     }
 

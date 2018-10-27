@@ -17,11 +17,15 @@ namespace DeleteAfterDelayEntity {
     }
 
 // IN: A = parameter
+// OUT: C set = always activate entity
 a16()
 i16()
 code()
 function Init {
     sta.b   EntityStruct.frames
+
+    // always activate
+    sec
     rts
 }
 

@@ -11,10 +11,13 @@ namespace DeactivateIfOutsideEntity {
     Entity.useDefaultRenderer()
 
 // IN: A = parameter
+// OUT: C set = always activate entity
 a16()
 i16()
 code()
 function Init {
+    // only activate if inside active window
+    clc
     rts
 }
 

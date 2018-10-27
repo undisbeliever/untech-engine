@@ -49,12 +49,17 @@ namespace MapCursorEntity {
 
     // REQUIRES: 16 bit A, 16 bit Index, DB = 0x7e
     // INPUT: DP = entity
+    // OUTPUT: C set = always activate entity
     a16()
     i16()
     code()
     function Init {
         lda.w   #0
-        jmp     MetaSprite.SetFrame
+        jsr     MetaSprite.SetFrame
+
+        // always activate
+        sec
+        rts
     }
 
 

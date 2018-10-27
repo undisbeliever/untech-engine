@@ -8,16 +8,26 @@ a16()
 i16()
 code()
 function _SetupCounterTest {
-    // Spawns 3 enemies on-screen, 5 off-screen
-    // Four of the entities are BlankEntity
+    // Spawns 8 entities.
+    //    * 2 onscreen DeactivateIfOutsideEntity
+    //    * 1 onscreen DeleteAfterDelayEntity
+    //    * 2 offscreen DeactivateIfOutsideEntity
+    //    * 3 offscreen DeleteAfterDelayEntity
 
-    constant N_ACTIVE_ENEMIES = 3
-    constant N_BLANK_ENTITIES = 4
-    constant N_DEACTIVATED_ENTITIES = 5
+    constant N_ONSCREEN_DIO_ENTITIES = 2
+    constant N_ONSCREEN_DAD_ENTITIES = 1
+
+    constant N_OFFSCREEN_DIO_ENTITIES = 2
+    constant N_OFFSCREEN_DAD_ENTITIES = 3
+
+    constant N_DIO_ENTITIES = N_ONSCREEN_DIO_ENTITIES + N_OFFSCREEN_DIO_ENTITIES
+    constant N_DAD_ENTITIES = N_ONSCREEN_DAD_ENTITIES + N_OFFSCREEN_DAD_ENTITIES
+
+    constant N_ACTIVE_ENEMIES = N_ONSCREEN_DIO_ENTITIES + N_DAD_ENTITIES
 
     assert(Entity.ListId.ENEMY == 2)
-    constant BLANK_ENTITY_ID = Entities.BlankEntity.EntityId_2
-    constant DELETE_DELAY_ENTITY_ID = Entities.DeleteAfterDelayEntity.EntityId_2
+    constant DIO_ENTITY_ID = Entities.DeactivateIfOutsideEntity.EntityId_2
+    constant DAD_ENTITY_ID = Entities.DeleteAfterDelayEntity.EntityId_2
 
     jsr     Entity.Init
     bcc     Fail
@@ -28,15 +38,15 @@ function _SetupCounterTest {
     sta.w   Camera.xPos
     sta.w   Camera.yPos
 
-    lda.w   #BLANK_ENTITY_ID
+    lda.w   #DIO_ENTITY_ID
     jsr     Entity.Spawn
     bcc     Fail
 
-    lda.w   #DELETE_DELAY_ENTITY_ID
+    lda.w   #DAD_ENTITY_ID
     jsr     Entity.Spawn
     bcc     Fail
 
-    lda.w   #BLANK_ENTITY_ID
+    lda.w   #DIO_ENTITY_ID
     jsr     Entity.Spawn
     bcc     Fail
 
@@ -46,23 +56,23 @@ function _SetupCounterTest {
     sta.w   Entity.Spawn.xPos
     sta.w   Entity.Spawn.yPos
 
-    lda.w   #BLANK_ENTITY_ID
+    lda.w   #DIO_ENTITY_ID
     jsr     Entity.Spawn
     bcc     Fail
 
-    lda.w   #BLANK_ENTITY_ID
+    lda.w   #DIO_ENTITY_ID
     jsr     Entity.Spawn
     bcc     Fail
 
-    lda.w   #DELETE_DELAY_ENTITY_ID
+    lda.w   #DAD_ENTITY_ID
     jsr     Entity.Spawn
     bcc     Fail
 
-    lda.w   #DELETE_DELAY_ENTITY_ID
+    lda.w   #DAD_ENTITY_ID
     jsr     Entity.Spawn
     bcc     Fail
 
-    lda.w   #DELETE_DELAY_ENTITY_ID
+    lda.w   #DAD_ENTITY_ID
     jsr     Entity.Spawn
     bcc     Fail
 
@@ -85,9 +95,9 @@ function CountEnemiesWithId {
     jsr     _SetupCounterTest
     bcc     Fail
 
-    lda.w   #_SetupCounterTest.BLANK_ENTITY_ID
+    lda.w   #_SetupCounterTest.DIO_ENTITY_ID
     jsr     Entity.CountEnemiesWithId
-    cmp.w   #_SetupCounterTest.N_BLANK_ENTITIES
+    cmp.w   #_SetupCounterTest.N_DIO_ENTITIES
     bne     Fail
 
     sec

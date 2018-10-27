@@ -504,6 +504,7 @@ namespace SpawnAndChangeListTestEntity {
 
 
     // IN: A = entity parameter = entity list id
+    // OUT: C set = always activate entity
     a16()
     i16()
     code()
@@ -514,6 +515,9 @@ namespace SpawnAndChangeListTestEntity {
 
         rep     #$30
     a16()
+
+        // always activate
+        sec
         rts
     }
 
