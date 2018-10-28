@@ -17,7 +17,6 @@ namespace ActionPointSpawnerTest {
 
 namespace ProjectileEntity {
     buildFunctionTable(BaseEntityFunctionTable, ProjectileEntity)
-    Entity.useDefaultRenderer()
 
     // Slow speed to exhaust entity pool.
     constant VELOCITY = 0x8000
@@ -150,7 +149,7 @@ namespace ProjectileEntity {
         _addVelocity(x)
         _addVelocity(y)
 
-        jmp     Entity.DeleteIfOutsideAndGotoNextEntity
+        jmp     Entity.DeleteIfOutsideOrDrawAndGotoNextEntity
     }
 
     rodata(EN_RomData)
@@ -173,7 +172,6 @@ namespace ProjectileEntity {
 
 namespace SpawnerEntity {
     buildFunctionTable(BaseEntityFunctionTable, SpawnerEntity)
-    Entity.useDefaultRenderer()
 
     constant FRAME_DELAY = 5
     constant N_SPAWN_POINTS = 8
@@ -266,7 +264,7 @@ namespace SpawnerEntity {
     SkipSpawn:
         sta.b   EntityStruct.frameDelay
 
-        jmp     Entity.GotoNextEntity
+        jmp     Entity.DrawAndGotoNextEntity
     }
 
 

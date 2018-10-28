@@ -84,7 +84,6 @@ include "entity/allocation.inc"
 include "entity/counters.inc"
 include "entity/deallocation.inc"
 include "entity/gameloop.inc"
-include "entity/render.inc"
 include "entity/spawn.inc"
 
 // vim: ft=bass-65816 ts=4 sw=4 et:

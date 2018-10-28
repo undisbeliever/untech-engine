@@ -8,7 +8,6 @@ namespace Entities {
 namespace ChangeToParticleEntity {
 
     buildFunctionTable(BaseEntityFunctionTable, ChangeToParticleEntity)
-    Entity.useDefaultRenderer()
 
 // IN: A = parameter
 // OUT: C set = always activate entity

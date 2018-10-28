@@ -8,7 +8,6 @@ namespace Entities {
 namespace DeactivateIfOutsideEntity {
 
     buildFunctionTable(BaseEntityFunctionTable, DeactivateIfOutsideEntity)
-    Entity.useDefaultRenderer()
 
 // IN: A = parameter
 // OUT: C set = always activate entity

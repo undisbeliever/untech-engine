@@ -8,7 +8,6 @@ namespace Entities {
 namespace DeleteIfOutsideEntity {
 
     buildFunctionTable(BaseEntityFunctionTable, DeleteIfOutsideEntity)
-    Entity.useDefaultRenderer()
 
 // IN: A = parameter
 // OUT: C set = always activate entity

@@ -7,7 +7,6 @@ namespace MetaSpriteInteractiveTest {
 
 namespace ShowAllFramesEntity {
     buildFunctionTable(BaseEntityFunctionTable, ShowAllFramesEntity)
-    Entity.useDefaultRenderer()
 
     namespace EntityStruct {
         childstruct(BaseEntity)
@@ -110,7 +109,7 @@ namespace ShowAllFramesEntity {
         EndIf:
     a16()
 
-        jmp     Entity.GotoNextEntity
+        jmp     Entity.DrawAndGotoNextEntity
     }
 
 

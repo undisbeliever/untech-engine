@@ -38,7 +38,6 @@ constant CAMERA_START_Y = MIN_CAMERA_Y + (MAX_CAMERA_Y - MIN_CAMERA_Y) / 2 + 13
 
 namespace MapCursorEntity {
     buildFunctionTable(BaseEntityFunctionTable, MapCursorEntity)
-    Entity.useDefaultRenderer()
 
     namespace EntityStruct {
         childstruct(BaseEntity)
@@ -221,7 +220,7 @@ namespace MapCursorEntity {
                 +
 
     SkipSetCell:
-        jmp     Entity.GotoNextEntity
+        jmp     Entity.DrawAndGotoNextEntity
     }
 
 
@@ -480,7 +479,6 @@ a16()
 
         rep     #$30
     a16()
-        jsr     Entity.RenderLoop
         jsr     MetaSprite.Render.EndLoop
 
 

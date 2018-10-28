@@ -119,7 +119,6 @@ BitsString:
 
 namespace PlayerEntity {
     buildFunctionTable(BaseEntityFunctionTable, PlayerEntity)
-    Entity.useDefaultRenderer()
 
     constant N_FRAMES = 8
 
@@ -217,7 +216,7 @@ namespace PlayerEntity {
 
         EndIf:
 
-        jmp     Entity.GotoNextEntity
+        jmp     Entity.DrawAndGotoNextEntity
     }
 
 
@@ -237,7 +236,6 @@ namespace PlayerEntity {
 
 namespace EnemyEntity {
     buildFunctionTable(BaseEntityFunctionTable, EnemyEntity)
-    Entity.useDefaultRenderer()
 
     // REQUIRES: 16 bit A, 16 bit Index, DB = 0x7e
     // INPUT: DP = entity
@@ -273,7 +271,7 @@ namespace EnemyEntity {
     code()
     function Process {
 
-        jmp     Entity.GotoNextEntity
+        jmp     Entity.DrawAndGotoNextEntity
     }
 
 
@@ -298,7 +296,6 @@ namespace EnemyEntity {
 // Deletes itself on the next frame
 namespace CollisionCentreEntity {
     buildFunctionTable(BaseEntityFunctionTable, CollisionCentreEntity)
-    Entity.useDefaultRenderer()
 
     namespace EntityStruct {
         childstruct(BaseEntity)
@@ -351,7 +348,7 @@ namespace CollisionCentreEntity {
             jmp     Entity.DeleteAndGotoNextEntity
         +
 
-        jmp     Entity.GotoNextEntity
+        jmp     Entity.DrawAndGotoNextEntity
     }
 
     rodata(EN_RomData)

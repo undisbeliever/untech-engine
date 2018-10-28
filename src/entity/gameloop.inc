@@ -471,8 +471,205 @@ function DeleteAndGotoNextEntity {
 
     __ChangeEntityList(free)
     // MUST JUMP directly to `GotoNextEntity.EntityListChanged` IMMEDIATELY AFTER a __ChangeEntityList() call
+    jmp     GotoNextEntity.EntityListChanged
+}
+
+
+
+// Deactivate the current entity and then process the next entity.
+//
+// MUST ONLY BE CALLED in the Entity's Process routine
+//
+// REQUIRES: 16 bit A, 16 bit Index, DB = 0x7e
+// INPUT: dp = current entity
+//
+// RETURN: GotoNextEntity
+//
+// @EndEntityProcess
+a16()
+i16()
+code()
+function DeactivateAndGotoNextEntity {
+
+    jsr     MetaSprite.Deactivate
+
+    __ChangeEntityList(deactivated)
+    // MUST JUMP directly to `GotoNextEntity.EntityListChanged` IMMEDIATELY AFTER a __ChangeEntityList() call
+
     bra     GotoNextEntity.EntityListChanged
 }
+
+
+
+// Test if the current entity is outside the inactive window.
+// If it is delete it, otherwise jump to GotoNextEntity.
+//
+// MUST ONLY BE CALLED in the Entity's Process routine
+//
+// REQUIRES: 16 bit A, 16 bit Index, DB = 0x7e
+// INPUT: dp = current entity
+//
+// RETURN: DeleteAndGotoNextEntity or GotoNextEntity
+//
+// @EndEntityProcess
+a16()
+i16()
+code()
+function DeleteIfOutsideAndGotoNextEntity {
+    BranchEntityOutsideInactiveWindow(DeleteAndGotoNextEntity)
+
+    bra     GotoNextEntity
+}
+
+
+
+// Test if the current entity is outside the inactive window.
+// If it is deactivate it, otherwise jump to GotoNextEntity.
+//
+// MUST ONLY BE CALLED in the Entity's Process routine
+//
+// REQUIRES: 16 bit A, 16 bit Index, DB = 0x7e
+// INPUT: dp = current entity
+//
+// RETURN: DeactivateAndGotoNextEntity or GotoNextEntity
+//
+// @EndEntityProcess
+a16()
+i16()
+code()
+function DeactivateIfOutsideAndGotoNextEntity {
+    BranchEntityOutsideInactiveWindow(DeactivateAndGotoNextEntity)
+
+    bra     GotoNextEntity
+}
+
+
+
+// Test if the current entity is outside the inactive window.
+// If it is delete it, otherwise jump to DrawAndGotoNextEntity.
+//
+// MUST ONLY BE CALLED in the Entity's Process routine
+//
+// REQUIRES: 16 bit A, 16 bit Index, DB = 0x7e
+// INPUT: dp = current entity
+//
+// RETURN: DeleteAndGotoNextEntity or DrawAndGotoNextEntity
+//
+// @EndEntityProcess
+a16()
+i16()
+code()
+function DeleteIfOutsideOrDrawAndGotoNextEntity {
+    BranchEntityOutsideInactiveWindow(DeleteAndGotoNextEntity)
+
+    bra     DrawAndGotoNextEntity
+}
+
+
+
+// Test if the current entity is outside the inactive window.
+// If it is deactivate it, otherwise jump to DrawAndGotoNextEntity.
+//
+// MUST ONLY BE CALLED in the Entity's Process routine
+//
+// REQUIRES: 16 bit A, 16 bit Index, DB = 0x7e
+// INPUT: dp = current entity
+//
+// RETURN: DeactivateAndGotoNextEntity or DrawAndGotoNextEntity
+//
+// @EndEntityProcess
+a16()
+i16()
+code()
+function DeactivateIfOutsideOrDrawAndGotoNextEntity {
+    BranchEntityOutsideInactiveWindow(DeactivateAndGotoNextEntity)
+
+// DrawAndGotoNextEntity
+FallThrough:
+}
+
+
+
+// Process MetaSprite Animations, draws Entity MetaSprites,
+// then goto and process the next entity in the list.
+//
+// MUST ONLY BE CALLED in the Entity's Process routine
+//
+// REQUIRES: 16 bit A, 16 bit Index, DB = 0x7e
+// INPUT: dp = current entity
+//
+// RETURN: GotoNextEntity
+//
+// @EndEntityProcess
+a16()
+i16()
+code()
+function DrawAndGotoNextEntity {
+    assert(pc() == DeactivateIfOutsideOrDrawAndGotoNextEntity.FallThrough)
+
+    jsr     MetaSprite.Animation.Process
+
+    jsr     MetaSprite.Render.RenderEntity
+
+// GotoNextEntity
+FallThrough:
+}
+
+
+
+// Goto and process the next entity in the list.
+//
+// MUST ONLY BE CALLED in the Entity's Process routine
+//
+// INTERNAL NOTE: If the entity list has changed by using
+// `__ChangeEntityList` or `__ChangeEntityList_Y` then you MUST
+// IMMEDIATELY ENTER this routine via the `EntityListChanged` label.
+//
+// REQUIRES: 16 bit A, 16 bit Index, DB = 0x7e
+// INPUT: dp = current entity
+//
+// RETURN: next entity's Process routine or exits the entity loop
+//
+// @EndEntityProcess
+a16()
+i16()
+code()
+function GotoNextEntity {
+    assert(pc() == DrawAndGotoNextEntity.FallThrough)
+
+    __GotoNextEntity()
+}
+
+
+
+// Processes the MetaSprite Animation, draws entity MetaSprites,
+// change the entity's list and then process the next entity.
+//
+// REQUITES: DB = 0x7e
+// INPUT: dp = current entity
+//         A = entity List Id
+//
+// RETURN: GotoNextEntity
+//
+// @EndEntityProcess
+au()
+iu()
+code()
+function DrawAndChangeEntityListIdAndGotoNextEntity {
+    rep     #$30
+a16()
+i16()
+    pha
+
+    jsr     MetaSprite.Animation.Process
+    jsr     MetaSprite.Render.RenderEntity
+
+    pla
+
+// ChangeEntityListIdAndGotoNextEntity
+FallThrough:
+}
+
 
 
 // Change the entity's list and then process the next entity.
@@ -488,6 +685,8 @@ au()
 iu()
 code()
 function ChangeEntityListIdAndGotoNextEntity {
+    assert(pc() == DrawAndChangeEntityListIdAndGotoNextEntity.FallThrough)
+
     sep     #$30
 a8()
 i8()
@@ -521,103 +720,6 @@ i16()
 
 InvalidEntityId:
     break(INVALID_ENTITY_LIST_ID)
-}
-
-
-// Deactivate the current entity and then process the next entity.
-//
-// MUST ONLY BE CALLED in the Entity's Process routine
-//
-// REQUIRES: 16 bit A, 16 bit Index, DB = 0x7e
-// INPUT: dp = current entity
-//
-// RETURN: GotoNextEntity
-//
-// @EndEntityProcess
-a16()
-i16()
-code()
-function DeactivateAndGotoNextEntity {
-
-    jsr     MetaSprite.Deactivate
-
-    __ChangeEntityList(deactivated)
-    // MUST JUMP directly to `GotoNextEntity.EntityListChanged` IMMEDIATELY AFTER a __ChangeEntityList() call
-
-    bra     GotoNextEntity.EntityListChanged
-}
-
-
-
-// Test if the current entity is outside the inactive window.
-// If it is delete it, otherwise call GotoNextEntity.
-//
-// MUST ONLY BE CALLED in the Entity's Process routine
-//
-// REQUIRES: 16 bit A, 16 bit Index, DB = 0x7e
-// INPUT: dp = current entity
-//
-// RETURN: DeleteAndGotoNextEntity or DrawAndGotoNextEntity
-//
-// @EndEntityProcess
-a16()
-i16()
-code()
-function DeleteIfOutsideAndGotoNextEntity {
-    BranchEntityOutsideInactiveWindow(DeleteAndGotoNextEntity)
-
-    bra     GotoNextEntity
-}
-
-
-
-// Test if the current entity is outside the inactive window.
-// If it is deactivate it, otherwise call GotoNextEntity.
-//
-// MUST ONLY BE CALLED in the Entity's Process routine
-//
-// REQUIRES: 16 bit A, 16 bit Index, DB = 0x7e
-// INPUT: dp = current entity
-//
-// RETURN: DeactivateAndGotoNextEntity or DrawAndGotoNextEntity
-//
-// @EndEntityProcess
-a16()
-i16()
-code()
-function DeactivateIfOutsideAndGotoNextEntity {
-    BranchEntityOutsideInactiveWindow(DeactivateAndGotoNextEntity)
-
-// GotoNextEntity
-FallThrough:
-}
-
-
-
-// Goto and process the next entity in the list.
-//
-// MUST ONLY BE CALLED in the Entity's Process routine
-//
-// INTERNAL NOTE: If the entity list has changed by using
-// `__ChangeEntityList` or `__ChangeEntityList_Y` then you MUST
-// IMMEDIATELY ENTER this routine via the `EntityListChanged` label.
-//
-// REQUIRES: 16 bit A, 16 bit Index, DB = 0x7e
-// INPUT: dp = current entity
-//
-// RETURN: next entity's Process routine or exits the entity loop
-//
-// @EndEntityProcess
-a16()
-i16()
-code()
-function GotoNextEntity {
-    assert(pc() == DeactivateIfOutsideAndGotoNextEntity.FallThrough)
-
-    // Keep old behaviour (for now)
-    jsr     MetaSprite.Animation.Process
-
-    __GotoNextEntity()
 }
 
 }

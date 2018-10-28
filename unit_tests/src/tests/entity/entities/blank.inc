@@ -8,7 +8,6 @@ namespace Entities {
 namespace BlankEntity {
 
     buildFunctionTable(BaseEntityFunctionTable, BlankEntity)
-    Entity.useDefaultRenderer()
 
 allocateTmpWord(parameterSum)
 

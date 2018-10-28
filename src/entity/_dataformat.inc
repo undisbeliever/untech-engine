@@ -30,11 +30,6 @@ namespace Data {
     code()
 }
 
-// Uses the default renderer in the function table
-inline useDefaultRenderer() {
-    constant Render = MetaSprite.Render.RenderEntity
-}
-
 }
 
 // Read only data used by the entity.
@@ -99,7 +94,7 @@ namespace BaseEntityFunctionTable {
         // INPUT: dp: entity
         field(Destructor, 2)
 
-        // Process one frame of the entity loop
+        // Process one frame of the entity loop.
         //
         // This routine MUST NOT invoke RTS.
         // Instead this routine MUST JUMP to the `Entity.GotoNextEntity`
@@ -109,19 +104,14 @@ namespace BaseEntityFunctionTable {
         // entity's state and eventually jump to `GotoNextEntity`. These
         // routines have been tagged with `@EndEntityProcess`
         //
+        // This routine is responsible for rendering the entity, it is
+        // recommended you use one of the `*DrawAndGotoNextEntity`
+        // @EndEntityProcess routines to do so.
+        //
         // REGS: 16 bit A, 16 bit Index, DB = $7e
         // INPUT: dp: entity
         // RETURN: Entity.GotoNextEntity or a `@EndEntityProcess` tagged routine.
         field(Process, 2)
-
-
-        // Render entity to screen
-        //
-        // Should point to `MetaSprite.Render.RenderEntity` by default
-        //
-        // REGS: 16 bit A, 16 bit Index, DB = $7e
-        // INPUT: dp: entity
-        field(Render, 2)
 
 
         // Process a collision between this entity and an other entity.

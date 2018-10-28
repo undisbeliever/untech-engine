@@ -498,7 +498,6 @@ Fail:
 
 namespace SpawnAndChangeListTestEntity {
     buildFunctionTable(BaseEntityFunctionTable, SpawnAndChangeListTestEntity)
-    Entity.useDefaultRenderer()
 
     constant DELETE_DELAY = 2
 

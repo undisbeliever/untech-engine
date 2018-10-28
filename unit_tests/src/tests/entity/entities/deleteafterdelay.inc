@@ -8,7 +8,6 @@ namespace Entities {
 namespace DeleteAfterDelayEntity {
 
     buildFunctionTable(BaseEntityFunctionTable, DeleteAfterDelayEntity)
-    Entity.useDefaultRenderer()
 
     namespace EntityStruct {
         childstruct(BaseEntity)

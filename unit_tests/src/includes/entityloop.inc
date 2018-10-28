@@ -102,7 +102,6 @@ function ProcessFrame {
     jsr     MetaSprite.Render.InitLoop
 
     jsr     Entity.ProcessGameLoop
-    jsr     Entity.RenderLoop
 
     jmp     MetaSprite.Render.EndLoop
 }
