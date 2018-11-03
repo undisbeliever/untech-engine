@@ -537,6 +537,9 @@ function DeactivateAndGotoNextEntity {
 
     jsr     MetaSprite.Deactivate
 
+    ldx.b   BaseEntity.functionTable
+    jsr     (BaseEntityFunctionTable.Deactivated,x)
+
     __ChangeEntityList(deactivated)
     // MUST JUMP directly to `GotoNextEntity.EntityListChanged` IMMEDIATELY AFTER a __ChangeEntityList() call
 

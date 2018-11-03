@@ -33,6 +33,7 @@ a16()
 i16()
 code()
 Destructor:
+Deactivated:
 ProcessCollision:
 function Null {
     rts

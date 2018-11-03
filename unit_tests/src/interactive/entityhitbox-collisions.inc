@@ -158,6 +158,17 @@ namespace PlayerEntity {
     }
 
 
+    // REQUIRES: 16 bit A, 16 bit Index, DB = 0x7e
+    // INPUT: DP = entity
+    a16()
+    i16()
+    code()
+    function Deactivated {
+        Text.Console.PrintConstString("Player.Deactivated\n")
+        rts
+    }
+
+
     // Print the Move the entity's position with D-PAD, change the entity type on SELECT.
     //
     // REQUIRES: 16 bit A, 16 bit Index, DB = 0x7e
@@ -269,6 +280,17 @@ namespace EnemyEntity {
     a16()
     i16()
     code()
+    function Deactivated {
+        Text.Console.PrintConstString("E.Deactivated\n")
+        rts
+    }
+
+
+    // REQUIRES: 16 bit A, 16 bit Index, DB = 0x7e
+    // INPUT: DP = entity
+    a16()
+    i16()
+    code()
     function Process {
 
         jmp     Entity.DrawAndGotoNextEntity
@@ -329,6 +351,7 @@ namespace CollisionCentreEntity {
     i16()
     code()
     Destructor:
+    Deactivated:
     ProcessCollision:
     function Null {
         rts

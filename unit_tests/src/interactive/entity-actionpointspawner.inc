@@ -120,6 +120,7 @@ namespace ProjectileEntity {
     i16()
     code()
     Destructor:
+    Deactivated:
     ProcessCollision:
     function Null {
         rts
@@ -208,6 +209,7 @@ namespace SpawnerEntity {
     i16()
     code()
     Destructor:
+    Deactivated:
     ProcessCollision:
     function Null {
         rts

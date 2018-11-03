@@ -94,6 +94,23 @@ namespace BaseEntityFunctionTable {
         // INPUT: dp: entity
         field(Destructor, 2)
 
+        // Entity deactivated callback routine
+        //
+        // This function is called after the entity's MetaSprites have
+        // been deactivated.
+        //
+        // The deactivated routine should reset the entity's state so
+        // increase consistency when the player backtracks and
+        // reactivates the entity.
+        //
+        // There is no "Activated" entity function.  If the developer
+        // wishes to know when the entity is reactivated then they can
+        // add a deactivated entity state/flag to the process routine.
+        //
+        // REGS: 16 bit A, 16 bit Index, DB = $7e
+        // INPUT: dp: entity
+        field(Deactivated, 2)
+
         // Process one frame of the entity loop.
         //
         // This routine MUST NOT invoke RTS.
