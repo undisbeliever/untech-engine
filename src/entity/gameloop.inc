@@ -476,6 +476,50 @@ function DeleteAndGotoNextEntity {
 
 
 
+// Test if the current entity is outside the inactive window.
+// If it is delete it, otherwise jump to GotoNextEntity.
+//
+// MUST ONLY BE CALLED in the Entity's Process routine
+//
+// REQUIRES: 16 bit A, 16 bit Index, DB = 0x7e
+// INPUT: dp = current entity
+//
+// RETURN: DeleteAndGotoNextEntity or GotoNextEntity
+//
+// @EndEntityProcess
+a16()
+i16()
+code()
+function DeleteIfOutsideAndGotoNextEntity {
+    BranchEntityOutsideInactiveWindow(DeleteAndGotoNextEntity)
+
+    bra     GotoNextEntity
+}
+
+
+
+// Test if the current entity is outside the inactive window.
+// If it is delete it, otherwise jump to DrawAndGotoNextEntity.
+//
+// MUST ONLY BE CALLED in the Entity's Process routine
+//
+// REQUIRES: 16 bit A, 16 bit Index, DB = 0x7e
+// INPUT: dp = current entity
+//
+// RETURN: DeleteAndGotoNextEntity or DrawAndGotoNextEntity
+//
+// @EndEntityProcess
+a16()
+i16()
+code()
+function DeleteIfOutsideOrDrawAndGotoNextEntity {
+    BranchEntityOutsideInactiveWindow(DeleteAndGotoNextEntity)
+
+    bra     DrawAndGotoNextEntity
+}
+
+
+
 // Deactivate the current entity and then process the next entity.
 //
 // MUST ONLY BE CALLED in the Entity's Process routine
@@ -502,28 +546,6 @@ function DeactivateAndGotoNextEntity {
 
 
 // Test if the current entity is outside the inactive window.
-// If it is delete it, otherwise jump to GotoNextEntity.
-//
-// MUST ONLY BE CALLED in the Entity's Process routine
-//
-// REQUIRES: 16 bit A, 16 bit Index, DB = 0x7e
-// INPUT: dp = current entity
-//
-// RETURN: DeleteAndGotoNextEntity or GotoNextEntity
-//
-// @EndEntityProcess
-a16()
-i16()
-code()
-function DeleteIfOutsideAndGotoNextEntity {
-    BranchEntityOutsideInactiveWindow(DeleteAndGotoNextEntity)
-
-    bra     GotoNextEntity
-}
-
-
-
-// Test if the current entity is outside the inactive window.
 // If it is deactivate it, otherwise jump to GotoNextEntity.
 //
 // MUST ONLY BE CALLED in the Entity's Process routine
@@ -541,28 +563,6 @@ function DeactivateIfOutsideAndGotoNextEntity {
     BranchEntityOutsideInactiveWindow(DeactivateAndGotoNextEntity)
 
     bra     GotoNextEntity
-}
-
-
-
-// Test if the current entity is outside the inactive window.
-// If it is delete it, otherwise jump to DrawAndGotoNextEntity.
-//
-// MUST ONLY BE CALLED in the Entity's Process routine
-//
-// REQUIRES: 16 bit A, 16 bit Index, DB = 0x7e
-// INPUT: dp = current entity
-//
-// RETURN: DeleteAndGotoNextEntity or DrawAndGotoNextEntity
-//
-// @EndEntityProcess
-a16()
-i16()
-code()
-function DeleteIfOutsideOrDrawAndGotoNextEntity {
-    BranchEntityOutsideInactiveWindow(DeleteAndGotoNextEntity)
-
-    bra     DrawAndGotoNextEntity
 }
 
 
