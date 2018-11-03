@@ -289,6 +289,10 @@ Fail:
 
 
 
+// Tests:
+//   * Entity.DeactivateIfOutsideAndGotoNextEntity
+//   * Entity._ProcessActiveWindow
+//   * BaseEntityFunctionTable.Deactivated called successfully
 a16()
 i16()
 code()
@@ -332,13 +336,17 @@ constant tmp_listId = Test.tmp + 2
     bcc     Fail
 
     jsr     _TestEntityListsValid
-    bcc     Fail
+    bcs     +
+    Fail:
+        clc
+        rts
+    +
 
 
     // Test move camera
     // Only test NPCs and Entities
     // (as they are the ones that deactivate)
-    function TestMoveCamera {
+    namespace TestMoveCamera {
         ldx.w   #0
         Loop:
             stx.w   tmp_index
@@ -349,13 +357,30 @@ constant tmp_listId = Test.tmp + 2
             lda.l   MoveCameraTable + 2,x
             sta.w   Camera.yPos
 
+
+            stz.w   Entities.DeactivateIfOutsideEntity.activatedCount
+            stz.w   Entities.DeactivateIfOutsideEntity.deactivatedCount
+
             jsr     Entity.ProcessGameLoop
 
 
+            // test activatedCount and deactivatedCount
+            ldx.w   tmp_index
+
+            lda.w   Entities.DeactivateIfOutsideEntity.activatedCount
+            cmp.l   MoveCameraTable + 4,x
+            bne     Fail
+
+            lda.w   Entities.DeactivateIfOutsideEntity.deactivatedCount
+            cmp.l   MoveCameraTable + 6,x
+            bne     Fail
+
+
             // Test list lengths
-            lda.w   tmp_index
+            // X = tmp_index
+            txa
             clc
-            adc.w   #MoveCameraTable + 4
+            adc.w   #MoveCameraTable + 8
             tax
             jsr     _TestListLengthTable
             bcc     Fail
@@ -374,10 +399,6 @@ constant tmp_listId = Test.tmp + 2
     }
 
     jmp     _TestEntityListsValid
-
-Fail:
-    clc
-    rts
 
 function SpawnEntity_XY {
     stx.w   Entity.Spawn.xPos
@@ -417,8 +438,11 @@ InitialExpectedSizes: {
 
 rodata(rom0)
 MoveCameraTable: {
-    macro _row(xPos, yPos, e) {
+    macro _row(xPos, yPos, e, activated, deactivated) {
         dw  {xPos}, {yPos}
+        dw  {activated} * 3
+        dw  {deactivated} * 3
+
         dw  4   // player
         dw  4   // boss
         dw  {e} // enemy
@@ -429,14 +453,15 @@ MoveCameraTable: {
         dw  0   // enemy projectile
     }
 
-    _row(0x1000, 0x2000, 1)
-    _row(0x2000, 0x2000, 0)
-    _row(0x2000, 0x1000, 1)
-    _row(0x2000, 0x1010, 2)
-    _row(0x2000, 0x1000, 2) // Still inside inactive window
-    _row(0x3000, 0x3000, 0)
+    //   xPos    yPos    count  activated   deactivated
+    _row(0x1000, 0x2000, 1,     1,          1)
+    _row(0x2000, 0x2000, 0,     0,          1)
+    _row(0x2000, 0x1000, 1,     1,          0)
+    _row(0x2000, 0x1010, 2,     1,          0)
+    _row(0x2000, 0x1000, 2,     0,          0)
+    _row(0x3000, 0x3000, 0,     0,          2)
 
-    constant MoveCameraTable.rowSize = (2 + Entity.lists.N_LISTS) * 2
+    constant MoveCameraTable.rowSize = (4 + Entity.lists.N_LISTS) * 2
     constant MoveCameraTable.size = pc() - MoveCameraTable
 }
 }
