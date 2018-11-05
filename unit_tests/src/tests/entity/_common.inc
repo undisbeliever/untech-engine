@@ -130,6 +130,8 @@ allocateTmpWord(tmp_count)
     cmp.w   #Entity.N_ENTITIES
     bne     Fail
 
+    jsr     Entity.ValidateEntityLists
+
     sec
     rts
 

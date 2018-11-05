@@ -43,6 +43,8 @@ function Init {
         sta.w   BaseEntity.next,x
         stz.w   BaseEntity.functionTable,x
 
+        stz.b   BaseEntity.MetaSprite.status,x
+
         tax
 
         clc
@@ -51,6 +53,8 @@ function Init {
         bcc     Loop
 
     stz.w   BaseEntity.next + entityPool + ENTITY_SIZE * (N_ENTITIES - 1)
+    stz.w   BaseEntity.functionTable + entityPool + ENTITY_SIZE * (N_ENTITIES - 1)
+    stz.w   BaseEntity.MetaSprite.status + entityPool + ENTITY_SIZE * (N_ENTITIES - 1)
 
 
     // clear the other lists
