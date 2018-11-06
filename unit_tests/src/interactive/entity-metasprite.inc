@@ -179,6 +179,8 @@ constant tmp_index = Test.tmp
 
     jsr     EntityLoop.Init
 
+    jsr     EnableDisplay_Full
+
 
     // Load the entities
     // -----------------

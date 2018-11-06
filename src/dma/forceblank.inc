@@ -32,6 +32,31 @@ macro AssertForceBlank() {
 }
 
 
+// Dirties a block of Work RAM, replacing every byte in the block with `0xba`.
+//
+// This macro requires force blank to prevent the HDMA/DMA crash on S-CPU
+// version 1.
+//
+// The byte `0xba` was chosen because it is easily recognizable and has bit 7
+// set.
+//
+// DMA: Uses DMA channel 0
+// REQUIRES: 8 bit A, 16 bit Index, DB access registers
+// REQUIRES: screen blank
+macro DirtyWram(evaluate addr, evaluate size) {
+    assert8a()
+    assert16i()
+
+    evaluate bank = {addr} >> 16
+    assert({bank} == 0 || {bank} == 0x7e || {bank} == 0x7f)
+
+    ldx.w   #{addr}
+    lda.b   #{bank}
+    ldy.w   #{size}
+    jsr     Dma.ForceBlank.DirtyWram
+}
+
+
 // Transfers a block of memory to VRAM
 // DMA: Uses DMA channel 0
 // REQUIRES: 8 bit A, 16 bit Index, DB access registers
@@ -84,6 +109,53 @@ macro ToVramH(addr, size) {
 macro ToVramH(addr) {
     Dma.ForceBlank.ToVramH({addr}, {addr}.size)
 }
+
+
+
+// Dirties a block of Work RAM, replacing every byte in the block with `0xba`.
+//
+// This macro requires force blank to prevent the HDMA/DMA crash on S-CPU
+// version 1.
+//
+// The byte `0xba` was chosen because it is easily recognizable and has bit 7
+// set.
+//
+// DMA: Uses DMA channel 0
+// REQUIRES: 8 bit A, 16 bit Index, DB access registers
+// REQUIRES: screen blank
+//
+// INPUT: A:X - wram address
+// INPUT: Y - size (in bytes)
+a8()
+i16()
+code()
+function DirtyWram {
+    stx.w   WMADDL
+    sta.w   WMADDH
+
+    sty.w   DAS0
+
+    ldy.w   #DMAP.direction.toPpu | DMAP.fixed | DMAP.transfer.one | (WMDATA << 8)
+    sty.w   DMAP0       // also sets BBAD0
+
+    ldx.w   #BaByte
+    stx.w   A1T0
+    lda.b   #BaByte >> 16
+    sta.w   A1B0
+
+    AssertForceBlank()
+
+    lda.b   #MDMAEN.dma0
+    sta.w   MDMAEN
+
+    rts
+
+
+rodata(rom0)
+BaByte:
+    db  0xba
+}
+
 
 
 // Clears a block of VRAM

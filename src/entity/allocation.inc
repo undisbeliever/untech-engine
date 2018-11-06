@@ -21,14 +21,36 @@ namespace Entity {
 //   * Camera module
 //
 // REQUIRES: 16 bit A, 16 bit Index, DB = $7E
+// MODIFIES: Sets ForceBlank
 a16()
 i16()
 code()
 function Init {
+    sep     #$20
+a8()
+    pea     (0x7e << 8) | REGISTER_DB
+    plb
+    // DB = REGISTER_DB
+
+    jsr     ForceBlank
+
+    // Dirty all entity memory
+    Dma.ForceBlank.DirtyWram(entityPool, ENTITY_SIZE * N_ENTITIES)
+
+    plb
+    // DB = 0x7e
+
+    rep     #$30
+a16()
+
     jsr     Dma.Init
     jsr     MetaSprite.Init
     jsr     Camera.Init
     jsr     _UpdateActiveWindows
+
+
+    lda.w   #0
+    tcd
 
     // create and chain the free linked list
 
@@ -40,9 +62,9 @@ function Init {
     lda.w   #entityPool + ENTITY_SIZE
 
     Loop:
-        sta.w   BaseEntity.next,x
-        stz.w   BaseEntity.functionTable,x
+        sta.b   BaseEntity.next,x
 
+        stz.b   BaseEntity.functionTable,x
         stz.b   BaseEntity.MetaSprite.status,x
 
         tax

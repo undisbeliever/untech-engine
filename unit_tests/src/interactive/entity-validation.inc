@@ -23,6 +23,8 @@ macro _Init() {
 
     jsr     EntityTest._SetupCounterTest
     bcc     Fail
+
+    jsr     EnableDisplay_Full
 }
 
 

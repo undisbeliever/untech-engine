@@ -461,6 +461,9 @@ function Test {
 
     jsr     EntityLoop.Init
 
+    jsr     EnableDisplay_Full
+
+
     // Load the entities
 
     ldx.w   #0

@@ -353,6 +353,9 @@ function Test {
 
     jsr     EntityLoop.Init
 
+    jsr     EnableDisplay_Full
+
+
     // Load the entity
 
     lda.w   #Camera.ORIGIN + Camera.DISPLAY_WIDTH / 2
