@@ -82,6 +82,68 @@ Fail:
     rts
 }
 
+
+// Tests that the ObjPalette buffer is only transferred when
+// `Dma.ObjPalette.MarkDirty` is invoked.
+//
+// There used to be a bug that would transfer the ObjPalette
+// buffer on every frame, but it has been fixed.
+a16()
+i16()
+code()
+Test.add("Dma.ObjPalette.MarkDirty (not called)")
+function MarkDirty_NotCalled {
+    // No need to invoke Dma.Init as it was already called by the
+    // previous test.
+
+    // Assumes that either the previous test or the Reset code
+    // has set colours 127-255 of CGRAM to black or 0x1f1f (yellow)
+
+    sep     #$20
+a8()
+
+    jsr     WaitFrame
+
+    // Fill the entirety of the buffer with 0x7f
+    lda.w   #0x7f7f
+    ldx.w   #Dma.ObjPalette.buffer.size - 2
+    -
+        sta.w   Dma.ObjPalette.buffer,x
+        dex
+        dex
+        bpl     -
+
+
+    jsr     WaitFrame
+
+    // verify that colors 128 - 255 of CGRAM are not 0x7f7f
+
+    jsr     ForceBlank
+
+
+    lda.b   #128
+    sta.l   CGADD
+
+    ldx.w   #128 * 2
+    -
+        lda.l   CGDATAREAD
+        and.b   #0x7f       // filter out open bus
+        cmp.b   #0x7f
+        beq     Fail
+
+        dex
+        bne     -
+
+    jsr     Test.ResetPpuState
+
+    sec
+    rts
+
+Fail:
+    clc
+    rts
+}
+
 }
 }
 
