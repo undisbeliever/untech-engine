@@ -17,7 +17,9 @@ namespace ObjPalette {
 constant buffer.size = 128 * 2
 allocate(buffer, wram7e, buffer.size)
 
-allocateTmpWord(dirty)
+// If non zero then the buffer will be transferred to CGRAM on the next VBlank.
+// (shadow word)
+allocate(dirty, shadow, 2)
 
 
 // Initialize the tables/variables
