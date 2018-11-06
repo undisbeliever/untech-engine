@@ -71,6 +71,10 @@ macro _InitEntity() {
 i8()
     sty.b   BaseEntity.MetaSprite.palette
 
+    // Clear OBJ attribute bytes
+    stz.b   BaseEntity.MetaSprite.blockOneCharAttrOffset + 1
+    stz.b   BaseEntity.MetaSprite.blockTwoCharAttrOffset + 1
+
     // Disable animation
     ldx.b   #0xff
     stx.b   BaseEntity.MetaSprite.Animation.id
