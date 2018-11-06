@@ -26,16 +26,11 @@ allocate(uploadPaletteOnZero, shadow, 1)
 //
 // REQUIRES: 16 bit A, DB access shadow
 macro _Init() {
-    assert16a()
+    assert8a()
 
-    sep     #$20
-a8()
     lda.b   #1
     sta.w   Dma.Resources.uploadAnimatedTilesetOnZero
     sta.w   Dma.Resources.uploadPaletteOnZero
-
-    rep     #$20
-a16()
 }
 
 

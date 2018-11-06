@@ -24,8 +24,7 @@ allocate(dirty, shadow, 2)
 
 // Initialize the tables/variables
 macro _Init() {
-    assert16a()
-    assert16i()
+    assert8a()
 
     stz.w   Dma.ObjPalette.dirty
 }
