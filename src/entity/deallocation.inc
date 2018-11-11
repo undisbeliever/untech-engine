@@ -16,6 +16,9 @@ namespace Entity {
 //
 // Frees the entity's MetaSprites, calls the entity Destructor routine.
 //
+// if `NO_CLEAR_ENTITY_MEMORY` is not defined the system will override the
+// memory used by the entity to `0xdeaddeaddead...`.
+//
 // NOTE: This routine does not move the entity to the free list.
 // That is the responsibility of the calling code.
 //
@@ -25,7 +28,26 @@ function __EntityDestructor {
     MetaSprite.EntityDestructor()
 
     ldx.b   BaseEntity.functionTable
-    jmp     (BaseEntityFunctionTable.Destructor,x)
+    jsr     (BaseEntityFunctionTable.Destructor,x)
+
+
+    if !{defined NO_CLEAR_ENTITY_MEMORY} {
+        // Clear entity memory with 0xdead when deleted
+
+        assert(BaseEntity.next == 0)
+        assert(ENTITY_SIZE % 2 == 0)
+
+        lda.w   #0xdead
+        evaluate n = 2
+        while {n} < ENTITY_SIZE {
+            if {n} != BaseEntity.MetaSprite.status & ~1 {
+                sta.b   {n}
+            }
+            evaluate n = {n} + 2
+        }
+    }
+
+    rts
 }
 
 // Deletes all of the entities in the given list
