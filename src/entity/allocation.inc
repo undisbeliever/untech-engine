@@ -102,47 +102,6 @@ a16()
     rts
 }
 
-
-
-// Clear the activateNextFrame entity list
-//
-// Should be called at the start of each level
-//
-// REQUIRES: 16 bit A, 16 bit Index, DB = 0x7e, DP = 0
-a16()
-i16()
-code()
-function ClearActivateNextFrameList {
-    lda.w   lists.activateNextFrame
-    beq     Return
-
-    Loop:
-        tcd
-
-        jsr     __EntityDestructor
-
-        lda.b   BaseEntity.next
-        bne     Loop
-
-
-    // Move the activateNextFrame list into the free list
-
-    lda.w   lists.free
-    sta.b   BaseEntity.next
-
-    lda.w   lists.activateNextFrame
-    sta.w   lists.free
-
-    stz.w   lists.activateNextFrame
-
-
-    lda.w   #0
-    tcd
-
-Return:
-    rts
-}
-
 }
 
 // vim: ft=bass-65816 ts=4 sw=4 et:

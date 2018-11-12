@@ -55,21 +55,56 @@ function __EntityDestructor {
     rts
 }
 
-// Deletes all of the entities in the given list
-//
-// Entities in this list will be destructed and have their resources
-// freed.
-//
-// REQUIRES: 16 bit A, 16 bit Index, DB = 0x7e
-//
-// MODIFIES: DP
-inline _DeleteAllInList(listId) {
-    assert16a()
-    assert16i()
 
-    function DeleteEntities_{listId} {
-        lda.w   lists.{listId}
-        beq     NoneToDelete
+
+// Delete entities in the activateNextFrame entity list.
+//
+// Should be called at the start of each level.
+//
+// REQUIRES: 16 bit A, 16 bit Index, DB = 0x7e, DP = 0
+a16()
+i16()
+code()
+function DeleteEntitiesInActivateNextFrameList {
+    ldx.w   #lists._ACTIVATE_NEXT_FRAME_INDEX
+    bra     DeleteEntitiesInList._ListIndexX
+}
+
+
+
+// Deletes all of the entities in the deactivated list.
+//
+// REQUIRES: 16 bit A, 16 bit Index, DB = 0x7e, DP = 0
+a16()
+i16()
+code()
+function DeleteDeactivatedEntities {
+    ldx.w   #lists._DEACTIVATED_INDEX
+    bra     DeleteEntitiesInList._ListIndexX
+}
+
+
+
+// Deletes all entities in the given list
+//
+// MUST NOT be called inside an entity routine
+//
+// INPUT: A = entity list Id
+a16()
+i16()
+code()
+function DeleteEntitiesInList {
+    cmp.w   #lists.N_LISTS
+    bcs     InvalidEntityListId
+
+    asl
+    tax
+
+_ListIndexX:
+    lda.w   lists.FIRST,x
+    beq     NoneToDelete
+
+    phx
 
         Loop:
             tcd
@@ -79,62 +114,36 @@ inline _DeleteAllInList(listId) {
             lda.b   BaseEntity.next
             bne     Loop
 
-
-        // Move the list into the free list
-
-        // {listId}.last->next = lists.free
-        // lists.free = lists.{listId}
-        // lists.{listId} = NULL
-
-        lda.w   lists.free
-        sta.b   BaseEntity.next
-
-        lda.w   lists.{listId}
-        sta.w   lists.free
-
-        stz.w   lists.{listId}
-
-    NoneToDelete:
-    }
-}
-
-
-
-// Deletes all of the entities in the deactivated list
-//
-// REQUIRES: 16 bit A, 16 bit Index, DB = 0x7e, DP = 0
-a16()
-i16()
-code()
-function DeleteDeactivatedEntities {
-    lda.w   lists.deactivated
-    beq     NoneToDelete
-
-    Loop:
-        tcd
-
-        jsr     __EntityDestructor
-
-        lda.b   BaseEntity.next
-        bne     Loop
-
+    plx
 
     // Move the deactivated list into the free list
+
+    // lastEntityInList->next = lists.free
+    // lists.free = lists[listId]
+    // lists[listId] = NULL
+
+    // X = list Index
+    // DP = last entity in list
 
     lda.w   lists.free
     sta.b   BaseEntity.next
 
-    lda.w   lists.deactivated
+    lda.w   lists.FIRST,x
     sta.w   lists.free
 
-    stz.w   lists.deactivated
+    stz.w   lists.FIRST,x
 
 
     lda.w   #0
     tcd
 
+
 NoneToDelete:
     rts
+
+
+InvalidEntityListId:
+    break(INVALID_ENTITY_LIST_ID)
 }
 
 }

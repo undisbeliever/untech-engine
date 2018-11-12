@@ -47,6 +47,7 @@ include "tests/entity/entities/delete-if-outside.inc"
 
 include "tests/entity/_common.inc"
 include "tests/entity/allocation.inc"
+include "tests/entity/deallocation.inc"
 include "tests/entity/counters.inc"
 include "tests/entity/gameloop.inc"
 include "tests/entity/spawn.inc"
