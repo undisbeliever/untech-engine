@@ -3,6 +3,10 @@
 // Distributed under The MIT License: https://opensource.org/licenses/MIT
 
 
+// This break should not be invoked
+RegisterBreakId(ASSERT_FAILURE)
+
+
 namespace InteractiveTests {
 namespace EntityValidation {
 
@@ -13,7 +17,7 @@ constant cursorIndex = Test.dpTmp + 0
 constant menuLineIndex = Test.dpTmp + 2
 
 
-constant N_MENU_ITEMS = 9
+constant N_MENU_ITEMS = 11
 
 
 // REQUIRES: 16 bit A, 16 bit Index, DB = 0x7e, DP = 0
@@ -284,35 +288,34 @@ function MenuRoutine6 {
 
 rodata(rom0)
 MenuText7:
-    db  "Activated in free list", 0
+    db  "Acti in activateNextFrame", 0
 
 // REQUITES: 16 bit A, 16 bit Index, DB = 0x7e, DP = 0
 a16()
 i16()
 code()
 function MenuRoutine7 {
-    // free->last->next = enemy->first
-    // enemy->first = null
+    // test activateNextFrame empty
+    // swap activateNextFrame and enemy lists
 
-    ldy.w   Entity.lists.FIRST + Entity.lists._FREE_INDEX
-    Loop:
-        tyx
-        ldy.b   BaseEntity.next,x
-        bne     Loop
+    ldy.w   Entity.lists.FIRST + Entity.lists._ACTIVATE_NEXT_FRAME_INDEX
+    bne     Fail
 
-    // X = last item in free list
     lda.w   Entity.lists.FIRST + Entity.ListId.ENEMY * 2
-    sta.b   BaseEntity.next,x
+    sty.w   Entity.lists.FIRST + Entity.ListId.ENEMY * 2
 
-    stz.w   Entity.lists.FIRST + Entity.ListId.ENEMY * 2
+    sta.w   Entity.lists.FIRST + Entity.lists._ACTIVATE_NEXT_FRAME_INDEX
 
     rts
+
+Fail:
+    break(ASSERT_FAILURE)
 }
 
 
 rodata(rom0)
 MenuText8:
-    db  "Invalidate an enemy listId", 0
+    db  "Invalidate enemy listId", 0
 
 // REQUITES: 16 bit A, 16 bit Index, DB = 0x7e, DP = 0
 a16()
@@ -333,6 +336,61 @@ a8()
 
     rep     #$30
 a16()
+
+    rts
+}
+
+
+rodata(rom0)
+MenuText9:
+    db  "Activated in free list", 0
+
+// REQUITES: 16 bit A, 16 bit Index, DB = 0x7e, DP = 0
+a16()
+i16()
+code()
+function MenuRoutine9 {
+    // free->last->next = enemy->first
+    // enemy->first = null
+
+    ldy.w   Entity.lists.FIRST + Entity.lists._FREE_INDEX
+    beq     Fail
+
+    Loop:
+        tyx
+        ldy.b   BaseEntity.next,x
+        bne     Loop
+
+    // X = last item in free list
+    lda.w   Entity.lists.FIRST + Entity.ListId.ENEMY * 2
+    sta.b   BaseEntity.next,x
+
+    stz.w   Entity.lists.FIRST + Entity.ListId.ENEMY * 2
+
+    rts
+
+Fail:
+    // free list empty
+    break(ASSERT_FAILURE)
+}
+
+
+rodata(rom0)
+MenuText10:
+    db  "Invalid free functionTable", 0
+
+// REQUITES: 16 bit A, 16 bit Index, DB = 0x7e, DP = 0
+a16()
+i16()
+code()
+function MenuRoutine10 {
+    // free.first->next->next.functionTable = 0x1337
+
+    ldx.w   Entity.lists.FIRST + Entity.lists._FREE_INDEX
+    ldy.b   BaseEntity.next,x
+
+    lda.w   #0x1337
+    sta.w   BaseEntity.functionTable,y
 
     rts
 }

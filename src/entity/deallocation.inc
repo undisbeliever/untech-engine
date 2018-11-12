@@ -31,14 +31,19 @@ function __EntityDestructor {
     jsr     (BaseEntityFunctionTable.Destructor,x)
 
 
+    lda.w   #InvalidEntityFunctionTable
+    sta.b   BaseEntity.functionTable
+
+
     if !{defined NO_CLEAR_ENTITY_MEMORY} {
         // Clear entity memory with 0xdead when deleted
 
         assert(BaseEntity.next == 0)
+        assert(BaseEntity.functionTable == 2)
         assert(ENTITY_SIZE % 2 == 0)
 
         lda.w   #0xdead
-        evaluate n = 2
+        evaluate n = 4
         while {n} < ENTITY_SIZE {
             if {n} != BaseEntity.MetaSprite.status & ~1 {
                 sta.b   {n}

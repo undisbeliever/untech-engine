@@ -84,6 +84,7 @@ include "entity/allocation.inc"
 include "entity/counters.inc"
 include "entity/deallocation.inc"
 include "entity/gameloop.inc"
+include "entity/invalid-entity.inc"
 include "entity/spawn.inc"
 include "entity/validation.inc"
 

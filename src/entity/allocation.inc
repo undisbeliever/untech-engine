@@ -59,13 +59,16 @@ a16()
     ldx.w   #entityPool
     stx.w   lists.free
 
+
+    ldy.w   #InvalidEntityFunctionTable
     lda.w   #entityPool + ENTITY_SIZE
 
     Loop:
         sta.b   BaseEntity.next,x
-
-        stz.b   BaseEntity.functionTable,x
         stz.b   BaseEntity.MetaSprite.status,x
+
+        // Y = #InvalidEntityFunctionTable
+        sty.b   BaseEntity.functionTable,x
 
         tax
 
@@ -75,8 +78,9 @@ a16()
         bcc     Loop
 
     stz.w   BaseEntity.next + entityPool + ENTITY_SIZE * (N_ENTITIES - 1)
-    stz.w   BaseEntity.functionTable + entityPool + ENTITY_SIZE * (N_ENTITIES - 1)
     stz.w   BaseEntity.MetaSprite.status + entityPool + ENTITY_SIZE * (N_ENTITIES - 1)
+
+    sty.w   BaseEntity.functionTable + entityPool + ENTITY_SIZE * (N_ENTITIES - 1)
 
 
     // clear the other lists

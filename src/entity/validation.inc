@@ -13,6 +13,7 @@ RegisterBreakId(INVALID_ENTITY_COUNT)
 RegisterBreakId(INFINITE_LOOP)
 RegisterBreakId(ENTITY_IS_NOT_ACTIVATED)
 RegisterBreakId(ENTITY_IS_NOT_DEACTIVATED)
+RegisterBreakId(FREE_ENTITY_FUNC_TABLE_INVALID)
 
 
 namespace Entity {
@@ -175,11 +176,13 @@ allocateTmpWord(_currentListIndex)
 
 
 
-// Tests the special entity lists are valid
+// Tests the special entity lists are valid.
 //
 // An entity in the special list is valid if:
 //
 //  * It is deactivated
+//
+// NOTE: This routine does not test the free entity list
 //
 // REQUIRES: 16 bit A, 16 bit Index, DB = 0x7e
 //
@@ -213,8 +216,54 @@ macro __ValidateSpecialEntityLists() {
     Continue_OuterLoop:
         inx
         inx
-        cpx.w   #lists._LAST_SPECIAL_LIST_INDEX + 1
+
+        // do not test the free list, that is done separately
+        assert(lists._LAST_SPECIAL_LIST_INDEX == lists._FREE_INDEX)
+        cpx.w   #lists._LAST_SPECIAL_LIST_INDEX - 1
         bcc     OuterLoop
+}
+
+
+
+// Tests the free entity list is valid
+//
+// An entity in the free list is valid if:
+//
+//  * The entity is deactivated
+//  * The entity's function table points to `InvalidEntityFunctionTable`
+//
+// REQUIRES: 16 bit A, 16 bit Index, DB = 0x7e
+//
+// MODIFIES: DP
+//
+// BRANCH: `EntityIsNotDeactivated` if an entity was activated
+// BRANCH: `FreeEntityFunctionTableInvalid` if the function table was incorrect
+macro __ValidateFreeList() {
+
+    assert16a()
+    assert16i()
+
+
+    lda.w   Entity.lists.FIRST + Entity.lists._FREE_INDEX
+    beq     SkipTest
+
+        ldx.w   #InvalidEntityFunctionTable
+
+        Loop:
+            tcd
+
+            // branch to EntityIsNotDeactivated if entity has a MetaSprite palette or vram allocated
+            lda.b   BaseEntity.MetaSprite.status
+            and.w   #MetaSprite.StatusFlags.paletteSet | MetaSprite.StatusFlags.vramSet
+            bne     EntityIsNotDeactivated
+
+            // X = #InvalidEntityFunctionTable
+            cpx.b   BaseEntity.functionTable
+            bne     FreeEntityFunctionTableInvalid
+
+            lda.b   BaseEntity.next
+            bne     Loop
+    SkipTest:
 }
 
 
@@ -229,6 +278,8 @@ macro __ValidateSpecialEntityLists() {
 //    list but does not have an active MetaSprite tileset.
 //  * Breaks with `ENTITY_IS_NOT_DEACTIVATED` if the entity is in a
 //    special list but has an active MetaSprite palette or tileset.
+//  * Breaks with `FREE_ENTITY_FUNC_TABLE_INVALID` if a free entity's
+//    functionTable is not InvalidEntityFunctionTable.
 //
 // This routine should be called intermittently throughout the game.
 // If you call it too often you get lag, not enough and you might
@@ -247,6 +298,8 @@ function ValidateEntityLists {
     __ValidateNormalEntityLists()
 
     __ValidateSpecialEntityLists()
+
+    __ValidateFreeList()
 
     lda.w   #0
     tcd
@@ -278,6 +331,11 @@ EntityIsNotDeactivated:
     // X = list index
     // A = entity MetaSprite status
     break(ENTITY_IS_NOT_DEACTIVATED)
+
+FreeEntityFunctionTableInvalid:
+    // DP = entity
+    // X = expected function table
+    break(FREE_ENTITY_FUNC_TABLE_INVALID)
 }
 
 }
