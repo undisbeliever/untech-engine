@@ -184,8 +184,13 @@ i16()
 code()
 function MenuRoutine1 {
     ldy.w   Entity.lists.FIRST + Entity.ListId.ENEMY * 2
+    beq     Fail
 
     jmp     _CreateInfiniteLoop_Y
+
+Fail:
+    // enemy list empty
+    break(ASSERT_FAILURE)
 }
 
 
@@ -199,9 +204,16 @@ i16()
 code()
 function MenuRoutine2 {
     ldx.w   Entity.lists.FIRST + Entity.ListId.ENEMY * 2
+    beq     Fail
+
     ldy.b   BaseEntity.next,x
+    beq     Fail
 
     jmp     _CreateInfiniteLoop_Y
+
+Fail:
+    // unexpected null pointer
+    break(ASSERT_FAILURE)
 }
 
 
@@ -232,11 +244,16 @@ function MenuRoutine4 {
     // enemy->first = enemy->first->next
 
     ldx.w   Entity.lists.FIRST + Entity.ListId.ENEMY * 2
+    beq     Fail
 
     lda.b   BaseEntity.next,x
     sta.w   Entity.lists.FIRST + Entity.ListId.ENEMY * 2
 
     rts
+
+Fail:
+    // enemy list empty
+    break(ASSERT_FAILURE)
 }
 
 
@@ -252,11 +269,16 @@ function MenuRoutine5 {
     // deactivated->first = deactivated->first->next
 
     ldx.w   Entity.lists.FIRST + Entity.lists._DEACTIVATED_INDEX
+    beq     Fail
 
     lda.b   BaseEntity.next,x
     sta.w   Entity.lists.FIRST + Entity.lists._DEACTIVATED_INDEX
 
     rts
+
+Fail:
+    // deactivated list empty
+    break(ASSERT_FAILURE)
 }
 
 
@@ -269,10 +291,8 @@ a16()
 i16()
 code()
 function MenuRoutine6 {
-    // verify boss list empty
-    -
-        sta.w   Entity.lists.FIRST + Entity.ListId.BOSS * 2
-        beq     -
+    sta.w   Entity.lists.FIRST + Entity.ListId.BOSS * 2
+    beq     Fail
 
     // boss->first = deactivated->first
     // deactivated->first = null
@@ -283,6 +303,10 @@ function MenuRoutine6 {
     stz.w   Entity.lists.FIRST + Entity.lists._DEACTIVATED_INDEX
 
     rts
+
+Fail:
+    // boss list empty
+    break(ASSERT_FAILURE)
 }
 
 
@@ -298,6 +322,9 @@ function MenuRoutine7 {
     // test activateNextFrame empty
     // swap activateNextFrame and enemy lists
 
+    // I want to test the list before the free list
+    assert(Entity.lists._ACTIVATE_NEXT_FRAME_INDEX == Entity.lists._FREE_INDEX - 2)
+
     ldy.w   Entity.lists.FIRST + Entity.lists._ACTIVATE_NEXT_FRAME_INDEX
     bne     Fail
 
@@ -309,6 +336,7 @@ function MenuRoutine7 {
     rts
 
 Fail:
+    // unexpected null pointer
     break(ASSERT_FAILURE)
 }
 
@@ -325,7 +353,10 @@ function MenuRoutine8 {
     // enemy->next->listId = Entity.ListId.PLAYER
 
     ldy.w   Entity.lists.FIRST + Entity.ListId.ENEMY * 2
+    beq     Fail
+
     ldx.b   BaseEntity.next,y
+    beq     Fail
 
     // X = second entity in enemy list
 
@@ -338,6 +369,10 @@ a8()
 a16()
 
     rts
+
+Fail:
+    // unexpected null pointer
+    break(ASSERT_FAILURE)
 }
 
 
@@ -387,12 +422,19 @@ function MenuRoutine10 {
     // free.first->next->next.functionTable = 0x1337
 
     ldx.w   Entity.lists.FIRST + Entity.lists._FREE_INDEX
+    beq     Fail
+
     ldy.b   BaseEntity.next,x
+    beq     Fail
 
     lda.w   #0x1337
     sta.w   BaseEntity.functionTable,y
 
     rts
+
+Fail:
+    // unexpected null pointer
+    break(ASSERT_FAILURE)
 }
 
 
@@ -404,7 +446,7 @@ i16()
 code()
 function _CreateInfiniteLoop_Y {
     tya
-    beq     Return
+    beq     Fail
 
         Loop:
             tyx
@@ -415,8 +457,11 @@ function _CreateInfiniteLoop_Y {
         // X = last entity in list
         sta.b   BaseEntity.next,x
 
-Return:
     rts
+
+Fail:
+    // unexpected null pointer
+    break(ASSERT_FAILURE)
 }
 
 }
