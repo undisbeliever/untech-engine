@@ -110,13 +110,6 @@ function DeleteDeactivatedEntities {
 
         jsr     __EntityDestructor
 
-        // BaseEntity.functionPtr is invalid, retrieve it from romPtr
-
-        ldx.b   BaseEntity.romPtr
-        lda.l   BaseEntityData.functionTable,x
-        tax
-        jsr     (BaseEntityFunctionTable.Destructor,x)
-
         lda.b   BaseEntity.next
         bne     Loop
 

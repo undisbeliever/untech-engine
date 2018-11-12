@@ -115,10 +115,7 @@ function ClearActivateNextFrameList {
     Loop:
         tcd
 
-        ldx.b   BaseEntity.romPtr
-        lda.l   BaseEntityData.functionTable,x
-        tax
-        jsr     (BaseEntityFunctionTable.Destructor,x)
+        jsr     __EntityDestructor
 
         lda.b   BaseEntity.next
         bne     Loop
