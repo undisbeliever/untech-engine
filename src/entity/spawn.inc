@@ -69,6 +69,10 @@ allocateTmpWord(yPos)
         tcd
         lda.b   BaseEntity.next
         sta.w   lists.free
+        bne     +
+            // There are no more free entities left, clear lastFreeEntity
+            stz.w   lastFreeEntity
+        +
 
 
         // Get Entity ROM Data
@@ -407,6 +411,10 @@ SpawnProjectile:
         tcd
         lda.b   BaseEntity.next
         sta.w   Entity.lists.free
+        bne     +
+            // There are no more free entities left, clear lastFreeEntity
+            stz.w   lastFreeEntity
+        +
 
         // save entity listId
         lda.w   tmp_listId

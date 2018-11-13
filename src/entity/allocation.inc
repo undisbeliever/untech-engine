@@ -83,6 +83,11 @@ a16()
     sty.w   BaseEntity.functionTable + entityPool + ENTITY_SIZE * (N_ENTITIES - 1)
 
 
+    // set lastFreeEntity to the last entity in the free list
+    lda.w   #entityPool + ENTITY_SIZE * (N_ENTITIES - 1)
+    sta.w   lastFreeEntity
+
+
     // clear the other lists
     // free list is the last one
 

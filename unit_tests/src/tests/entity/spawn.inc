@@ -84,6 +84,9 @@ constant tmp = Test.tmp
         bne     Loop
 
 
+    jsr     _TestEntityListsValid
+    bcc     Fail
+
     // Test cannot make new entity
     lda.w   #Entities.BlankEntity.EntityId_0
     jsr     Entity.Spawn

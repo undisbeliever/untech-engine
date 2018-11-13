@@ -14,6 +14,7 @@ RegisterBreakId(INFINITE_LOOP)
 RegisterBreakId(ENTITY_IS_NOT_ACTIVATED)
 RegisterBreakId(ENTITY_IS_NOT_DEACTIVATED)
 RegisterBreakId(FREE_ENTITY_FUNC_TABLE_INVALID)
+RegisterBreakId(LAST_FREE_ENTITY_CORRUPT)
 
 
 namespace Entity {
@@ -232,17 +233,23 @@ macro __ValidateSpecialEntityLists() {
 //  * The entity is deactivated
 //  * The entity's function table points to `InvalidEntityFunctionTable`
 //
+// This macro also tests that `lastFreeEntity` points to the last
+// entity in the free list.
+//
 // REQUIRES: 16 bit A, 16 bit Index, DB = 0x7e
 //
 // MODIFIES: DP
 //
 // BRANCH: `EntityIsNotDeactivated` if an entity was activated
 // BRANCH: `FreeEntityFunctionTableInvalid` if the function table was incorrect
+// BRANCH: `FreeEntityFunctionTableInvalid` if `lastFreeEntity` is not the last entity in the free list.
 macro __ValidateFreeList() {
 
     assert16a()
     assert16i()
 
+    lda.w   #0
+    tcd
 
     lda.w   Entity.lists.FIRST + Entity.lists._FREE_INDEX
     beq     SkipTest
@@ -264,6 +271,14 @@ macro __ValidateFreeList() {
             lda.b   BaseEntity.next
             bne     Loop
     SkipTest:
+
+
+    // test lastFreeEntity is correct
+
+    // DP = last entity in free list (or 0 if list is empty)
+    tdc
+    cmp.w   lastFreeEntity
+    bne     LastFreeEntityCorrupt
 }
 
 
@@ -280,6 +295,8 @@ macro __ValidateFreeList() {
 //    special list but has an active MetaSprite palette or tileset.
 //  * Breaks with `FREE_ENTITY_FUNC_TABLE_INVALID` if a free entity's
 //    functionTable is not InvalidEntityFunctionTable.
+//  * Breaks with `LAST_FREE_ENTITY_CORRUPT` if `lastFreeEntity` does not
+//    point to the last entity in the free list.
 //
 // This routine should be called intermittently throughout the game.
 // If you call it too often you get lag, not enough and you might
@@ -336,6 +353,9 @@ FreeEntityFunctionTableInvalid:
     // DP = entity
     // X = expected function table
     break(FREE_ENTITY_FUNC_TABLE_INVALID)
+
+LastFreeEntityCorrupt:
+    break(LAST_FREE_ENTITY_CORRUPT)
 }
 
 }

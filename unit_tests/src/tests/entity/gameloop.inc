@@ -499,7 +499,6 @@ constant _loopsLeft = Test.dpTmp + 0
     cmp.w   #Entity.N_ENTITIES - Entity.lists.N_LISTS
     bne     Fail
 
-
     lda.w   #20
     sta.b   _loopsLeft
 

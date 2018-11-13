@@ -143,6 +143,11 @@ namespace Entity {
         constant _LAST_SPECIAL_LIST_INDEX = _FREE_INDEX
     }
 
+    // The last entity in the free list.
+    // If there are no free entities left then `lastFreeEntity` is 0.
+    // (word addr)
+    allocate(lastFreeEntity, wram7e, 2)
+
     // Entity list Id used for the BaseEntityData struct
     namespace ListId {
         createEnum()

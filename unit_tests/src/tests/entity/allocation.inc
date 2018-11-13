@@ -15,8 +15,7 @@ function Init {
     cmp.w   #Entity.N_ENTITIES
     bne     Fail
 
-    sec
-    rts
+    jmp     _TestEntityListsValid
 
 Fail:
     clc

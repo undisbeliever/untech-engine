@@ -89,6 +89,8 @@ function DeleteDeactivatedEntities {
 //
 // MUST NOT be called inside an entity routine
 //
+// REQUIRES: 16 bit A, 16 bit Index, DB = 0x7e, DP = 0
+//
 // INPUT: A = entity list Id
 a16()
 i16()
@@ -116,20 +118,22 @@ _ListIndexX:
 
     plx
 
-    // Move the deactivated list into the free list
 
-    // lastEntityInList->next = lists.free
-    // lists.free = lists[listId]
+    // Move the entity list to the end of the free list
+
+    // lastFreeEntity->next = lists[listId].first
+    // lastFreeEntity = lastEntity
     // lists[listId] = NULL
 
     // X = list Index
     // DP = last entity in list
 
-    lda.w   lists.free
-    sta.b   BaseEntity.next
-
     lda.w   lists.FIRST,x
-    sta.w   lists.free
+    ldy.w   lastFreeEntity
+    sta.w   BaseEntity.next,y
+
+    tdc
+    sta.w   lastFreeEntity
 
     stz.w   lists.FIRST,x
 

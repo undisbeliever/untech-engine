@@ -374,7 +374,7 @@ inline __GotoNextEntity() {
     lda.b   BaseEntity.next
 
 // A = next entity
-// z = next entity exists
+// z set if there are no more entities in the list
 EntityListChanged:
     beq     NoMoreEntities
 
@@ -469,9 +469,56 @@ function DeleteAndGotoNextEntity {
 
     jsr     __EntityDestructor
 
-    __ChangeEntityList(free)
-    // MUST JUMP directly to `GotoNextEntity.EntityListChanged` IMMEDIATELY AFTER a __ChangeEntityList() call
-    jmp     GotoNextEntity.EntityListChanged
+
+    // Move entity to end of free list
+
+    //  _previousEntity->next = dp->next
+    //  dp->next = 0
+    //
+    //  if lastFreeEntity is not null:
+    //      lastFreeEntity->next = dp
+    //  else:
+    //      lists[FREE] = dp
+    //
+    //  lastFreeEntity = dp
+    //
+    //  set A/n to _previousEntity->next
+    //  Goto GotoNextEntity.EntityListChanged
+
+
+    lda.b   BaseEntity.next
+    ldx.w   _previousEntity
+    sta.w   BaseEntity.next,x
+    tax
+
+    stz.b   BaseEntity.next
+
+    tdc
+    ldy.w   lastFreeEntity
+    sta.w   lastFreeEntity              // n unchanged
+
+    beq     FreeListEmpty
+        sta.w   BaseEntity.next,y
+
+        txa
+
+        // A = next entity
+        // z set if there are no more entities in the list
+
+        // MUST JUMP directly to `GotoNextEntity.EntityListChanged` IMMEDIATELY AFTER changing entity list
+        jmp     GotoNextEntity.EntityListChanged
+
+
+    FreeListEmpty:
+        sta.w   lists.free
+
+        txa
+
+        // A = next entity
+        // z set if there are no more entities in the list
+
+        // MUST JUMP directly to `GotoNextEntity.EntityListChanged` IMMEDIATELY AFTER changing entity list
+        jmp     GotoNextEntity.EntityListChanged
 }
 
 
