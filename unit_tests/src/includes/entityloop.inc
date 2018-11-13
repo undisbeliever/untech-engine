@@ -88,7 +88,10 @@ function ProcessUntilButtonPress {
 }
 
 
-// Processes a single frame of the Entity Loop
+// Processes a single frame of the Entity Loop.
+//
+// This routine will also validate the entity lists after
+// the entity loop has ended.
 //
 // REQUIRES: 16 bit A, 16 bit Index, DB = 0x7e, Init called
 //
@@ -103,7 +106,11 @@ function ProcessFrame {
 
     jsr     Entity.ProcessGameLoop
 
-    jmp     MetaSprite.Render.EndLoop
+    jsr     MetaSprite.Render.EndLoop
+
+    jsr     Entity.ValidateEntityLists
+
+    rts
 }
 
 }
