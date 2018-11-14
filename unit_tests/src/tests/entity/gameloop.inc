@@ -289,6 +289,84 @@ Fail:
 
 
 
+a16()
+i16()
+code()
+Test.add("Entity.GameLoop (Delete Animation Ends)")
+function GameLoop_DeleteIfAnimationsEnds {
+constant entityAddress  = Test.tmp + 0
+constant firstFrame   = Test.tmp + 2
+
+    jsr     Entity.Init
+
+    assert(Entity.lists.N_LISTS * 3 <= Entity.N_ENTITIES)
+
+    // Spawn a DeleteIfAnimationEndsEntity
+    // This entity has a single animation
+    //   which draws frame1 for two display frames
+    //   then draws frame2 for two display frames
+    //   then deletes itself on the fifth frame
+
+    lda.w   #Entities.DeleteIfAnimationEndsEntity.EntityId
+    jsr     Entity.Spawn
+    sty.w   entityAddress
+
+
+    // display frame 1
+    jsr     Entity.ProcessGameLoop
+
+    // save currentFrame
+    ldy.w   entityAddress
+    lda.w   BaseEntity.MetaSprite.currentFrame,y
+    sta.w   firstFrame
+
+
+    // display frame 2
+    jsr     Entity.ProcessGameLoop
+
+    // test there is one entity in play
+    jsr     _FreeListLength
+    cmp.w   #Entity.N_ENTITIES - 1
+    bne     Fail
+
+    // Check entity frame changed
+
+    ldy.w   entityAddress
+    lda.w   BaseEntity.MetaSprite.currentFrame,y
+    cmp.w   firstFrame
+    bne     Fail
+
+
+    // display frame 3
+    jsr     Entity.ProcessGameLoop
+
+    // test there is one still one entity in play
+    jsr     _FreeListLength
+    cmp.w   #Entity.N_ENTITIES - 1
+    bne     Fail
+
+
+    // display frame 4
+    jsr     Entity.ProcessGameLoop
+
+
+    // display frame 5
+    jsr     Entity.ProcessGameLoop
+
+    // test the entity has been deleted
+    jsr     _FreeListLength
+    cmp.w   #Entity.N_ENTITIES
+    bne     Fail
+
+    jmp     _TestEntityListsValid
+
+Fail:
+    clc
+    rts
+}
+
+
+
 // Tests:
 //   * Entity.DeactivateIfOutsideAndGotoNextEntity
 //   * Entity._ProcessActiveWindow

@@ -44,6 +44,7 @@ include "tests/entity/entities/changetoparticle.inc"
 include "tests/entity/entities/deleteafterdelay.inc"
 include "tests/entity/entities/deactivate-if-outside.inc"
 include "tests/entity/entities/delete-if-outside.inc"
+include "tests/entity/entities/delete-if-animation-ends.inc"
 
 include "tests/entity/_common.inc"
 include "tests/entity/allocation.inc"

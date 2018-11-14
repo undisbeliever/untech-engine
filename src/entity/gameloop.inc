@@ -659,6 +659,7 @@ function DrawAndGotoNextEntity {
 
     jsr     MetaSprite.Animation.Process
 
+AfterAnimationProcessed:
     jsr     MetaSprite.Render.RenderEntity
 
 // GotoNextEntity
@@ -688,6 +689,36 @@ function GotoNextEntity {
     assert(pc() == DrawAndGotoNextEntity.FallThrough)
 
     __GotoNextEntity()
+}
+
+
+
+// Process MetaSprite Animations, deleting the entity if the animation ends,
+// otherwise draw Entity MetaSprites and process the next entity in the list.
+//
+// MUST ONLY BE CALLED in the Entity's Process routine
+//
+// REQUIRES: 16 bit A, 16 bit Index, DB = 0x7e
+// INPUT: dp = current entity
+//
+// RETURN: DrawAndGotoNextEntity.AfterAnimationProcessed
+// RETURN: DeleteAndGotoNextEntity
+//
+// @EndEntityProcess
+a16()
+i16()
+code()
+function DeleteIfAnimationEndsOrDrawAndGotoNextEntity {
+
+    jsr     MetaSprite.Animation.Process
+
+    // If animation.id is < 0xff then the animation is still going
+
+    lda.b   BaseEntity.MetaSprite.Animation.id - 1
+    cmp.w   #0xff00
+    bcc     DrawAndGotoNextEntity.AfterAnimationProcessed
+
+    jmp     DeleteAndGotoNextEntity
 }
 
 
