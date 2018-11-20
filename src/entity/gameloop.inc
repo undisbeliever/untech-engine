@@ -143,63 +143,61 @@ macro __ChangeEntityList_Y() {
 // REQUIRES: 16 bit A, 16 bit Index, DB = 0x7e
 //
 // MODIFIES: DP
-inline _ProcessActivateNextFrameList() {
+macro _ProcessActivateNextFrameList() {
     assert16a()
     assert16i()
 
-    function ProcessActivateNextFrameList {
-        lda.w   lists.activateNextFrame
-        beq     EndLoop
+    lda.w   lists.activateNextFrame
+    beq     EndLoop
 
-        // this allows _previousEntity variable to work on first item
-        assert(BaseEntity.next == 0)
+    // this allows _previousEntity variable to work on first item
+    assert(BaseEntity.next == 0)
 
-        ldy.w   #lists.activateNextFrame
-        sty.w   _previousEntity
+    ldy.w   #lists.activateNextFrame
+    sty.w   _previousEntity
 
-        Loop:
-            tcd
+    Loop:
+        tcd
 
-            jsr     MetaSprite.Activate
-            bcs     ActivatedSuccessfully
+        jsr     MetaSprite.Activate
+        bcs     ActivatedSuccessfully
 
-                // Entity is still not active
-                // goto next entity
+            // Entity is still not active
+            // goto next entity
 
-                tdc
-                sta.w   _previousEntity
-                lda.b   BaseEntity.next
+            tdc
+            sta.w   _previousEntity
+            lda.b   BaseEntity.next
 
-                bne     Loop
-                bra     EndLoop
-
-
-            InvalidEntityId:
-                // This should not happen
-                break(INVALID_ENTITY_LIST_ID)
+            bne     Loop
+            bra     EndLoop
 
 
-            ActivatedSuccessfully:
-                // Entity is now Active
-                //  move entity to current list
+        InvalidEntityId:
+            // This should not happen
+            break(INVALID_ENTITY_LIST_ID)
 
-                lda.b   BaseEntity.listId
-                and.w   #0xff
-                cmp.w   #lists.N_LISTS
-                bcs     InvalidEntityId
 
-                asl
-                tay
+        ActivatedSuccessfully:
+            // Entity is now Active
+            //  move entity to current list
 
-                __ChangeEntityList_Y()
-                // A = next entity address
-                // z set if there are no more entities in the current list
-                // MUST NOT CHANGE _previousEntity as the entity is no longer in the activateNextFrame list
+            lda.b   BaseEntity.listId
+            and.w   #0xff
+            cmp.w   #lists.N_LISTS
+            bcs     InvalidEntityId
 
-                bne     Loop
+            asl
+            tay
 
-    EndLoop:
-    }
+            __ChangeEntityList_Y()
+            // A = next entity address
+            // z set if there are no more entities in the current list
+            // MUST NOT CHANGE _previousEntity as the entity is no longer in the activateNextFrame list
+
+            bne     Loop
+
+EndLoop:
 }
 
 
@@ -213,90 +211,88 @@ inline _ProcessActivateNextFrameList() {
 // REQUIRES: 16 bit A, 16 bit Index, DB = 0x7e
 //
 // MODIFIES: DP
-inline _ProcessActiveWindow() {
+macro _ProcessActiveWindow() {
     assert16a()
     assert16i()
 
-    function ProcessActiveWindow {
-        lda.w   Camera.xPos
-        and.w   #TEST_ACTIVE_WINDOW_MASK
-        tax
+    lda.w   Camera.xPos
+    and.w   #TEST_ACTIVE_WINDOW_MASK
+    tax
 
-        lda.w   Camera.yPos
-        and.w   #TEST_ACTIVE_WINDOW_MASK
+    lda.w   Camera.yPos
+    and.w   #TEST_ACTIVE_WINDOW_MASK
 
-        cpx.w   prevActiveWindowX
-        bne     XChanged
+    cpx.w   prevActiveWindowX
+    bne     XChanged
 
-        cmp.w   prevActiveWindowY
-        beq     SkipTests
+    cmp.w   prevActiveWindowY
+    beq     SkipTests
 
-        XChanged:
-            stx.w   prevActiveWindowX
-            sta.w   prevActiveWindowY
-
-
-            lda.w   lists.deactivated
-            beq     EndLoop
-
-            ldy.w   #lists.deactivated
-            sty.w   _previousEntity
-
-            Loop:
-                tcd
-
-                BranchEntityOutsideActiveWindow(Continue)
-
-                    // entity is now inside active window
-                    // try to activate it
-                    jsr     MetaSprite.Activate
-                    bcs     ActivatedSuccessfully
-
-                        // Could not activate the entity.
-                        // Try again in the next frame.
-                        ldy.w   #lists._ACTIVATE_NEXT_FRAME_INDEX
-                        bra     _ChangeEntityList_Y
+    XChanged:
+        stx.w   prevActiveWindowX
+        sta.w   prevActiveWindowY
 
 
-                    InvalidEntityId:
-                        // This should not happen
-                        break(INVALID_ENTITY_LIST_ID)
+        lda.w   lists.deactivated
+        beq     EndLoop
+
+        ldy.w   #lists.deactivated
+        sty.w   _previousEntity
+
+        Loop:
+            tcd
+
+            BranchEntityOutsideActiveWindow(Continue)
+
+                // entity is now inside active window
+                // try to activate it
+                jsr     MetaSprite.Activate
+                bcs     ActivatedSuccessfully
+
+                    // Could not activate the entity.
+                    // Try again in the next frame.
+                    ldy.w   #lists._ACTIVATE_NEXT_FRAME_INDEX
+                    bra     _ChangeEntityList_Y
 
 
-                    ActivatedSuccessfully:
-                        // Entity is now Active
-                        //  move entity to current list
-
-                        lda.b   BaseEntity.listId
-                        and.w   #0xff
-                        cmp.w   #lists.N_LISTS
-                        bcs     InvalidEntityId
-
-                        asl
-                        tay
-
-                    _ChangeEntityList_Y:
-                        __ChangeEntityList_Y()
-                        // A = next entity address
-                        // z set if there are no more entities in the current list
-                        // MUST NOT CHANGE _previousEntity as the entity is no longer in the deactivated list
-
-                        bne     Loop
-                        bra     EndLoop
+                InvalidEntityId:
+                    // This should not happen
+                    break(INVALID_ENTITY_LIST_ID)
 
 
-            Continue:
-                // goto next entity
+                ActivatedSuccessfully:
+                    // Entity is now Active
+                    //  move entity to current list
 
-                tdc
-                sta.w   _previousEntity
-                lda.b   BaseEntity.next
+                    lda.b   BaseEntity.listId
+                    and.w   #0xff
+                    cmp.w   #lists.N_LISTS
+                    bcs     InvalidEntityId
 
-                bne     Loop
+                    asl
+                    tay
 
-    EndLoop:
-    SkipTests:
-    }
+                _ChangeEntityList_Y:
+                    __ChangeEntityList_Y()
+                    // A = next entity address
+                    // z set if there are no more entities in the current list
+                    // MUST NOT CHANGE _previousEntity as the entity is no longer in the deactivated list
+
+                    bne     Loop
+                    bra     EndLoop
+
+
+        Continue:
+            // goto next entity
+
+            tdc
+            sta.w   _previousEntity
+            lda.b   BaseEntity.next
+
+            bne     Loop
+
+EndLoop:
+SkipTests:
 }
 
 
