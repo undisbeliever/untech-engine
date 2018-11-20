@@ -1,16 +1,11 @@
 // entity/gameloop.inc
 // ===================
 //
-// Entity Game-Loop.
+// Entity Game-Loop routines.
 //
-// The GameLoop will:
-//   * Process all active entities' Process routine
-//   * Entity Collision detection
-//   * Animate all active entities
-//   * Activate entities in the `Entity.activateNextFrame` list
-//   * Activate entities that enter the active window
-//   * Delete all entities in the `Entity.toDelete` list
-//
+// The Game-Loop exists as two macros, `ProcessSpecialLists` and
+// `ProcessEntityLists`, both of which need to be invoked by the
+// subproject.
 //
 // The design of the entity loop and the `@EndEntityProcess` routines
 // were inspired by cosmicchipsocket's Superfeather SNES Game Engine[1].
@@ -119,17 +114,17 @@ macro __ChangeEntityList_Y() {
     //
     // return _previousEntity->next
 
-    ldx.w   _previousEntity
+    ldx.w   Entity._previousEntity
 
     lda.b   BaseEntity.next
     sta.w   BaseEntity.next,x
     tax
 
-    lda.w   lists.FIRST,y
+    lda.w   Entity.lists.FIRST,y
     sta.b   BaseEntity.next
 
     tdc
-    sta.w   lists.FIRST,y
+    sta.w   Entity.lists.FIRST,y
 
     txa
 }
@@ -147,14 +142,14 @@ macro _ProcessActivateNextFrameList() {
     assert16a()
     assert16i()
 
-    lda.w   lists.activateNextFrame
+    lda.w   Entity.lists.activateNextFrame
     beq     EndLoop
 
     // this allows _previousEntity variable to work on first item
     assert(BaseEntity.next == 0)
 
-    ldy.w   #lists.activateNextFrame
-    sty.w   _previousEntity
+    ldy.w   #Entity.lists.activateNextFrame
+    sty.w   Entity._previousEntity
 
     Loop:
         tcd
@@ -166,7 +161,7 @@ macro _ProcessActivateNextFrameList() {
             // goto next entity
 
             tdc
-            sta.w   _previousEntity
+            sta.w   Entity._previousEntity
             lda.b   BaseEntity.next
 
             bne     Loop
@@ -184,13 +179,13 @@ macro _ProcessActivateNextFrameList() {
 
             lda.b   BaseEntity.listId
             and.w   #0xff
-            cmp.w   #lists.N_LISTS
+            cmp.w   #Entity.lists.N_LISTS
             bcs     InvalidEntityId
 
             asl
             tay
 
-            __ChangeEntityList_Y()
+            Entity.__ChangeEntityList_Y()
             // A = next entity address
             // z set if there are no more entities in the current list
             // MUST NOT CHANGE _previousEntity as the entity is no longer in the activateNextFrame list
@@ -216,33 +211,33 @@ macro _ProcessActiveWindow() {
     assert16i()
 
     lda.w   Camera.xPos
-    and.w   #TEST_ACTIVE_WINDOW_MASK
+    and.w   #Entity.TEST_ACTIVE_WINDOW_MASK
     tax
 
     lda.w   Camera.yPos
-    and.w   #TEST_ACTIVE_WINDOW_MASK
+    and.w   #Entity.TEST_ACTIVE_WINDOW_MASK
 
-    cpx.w   prevActiveWindowX
+    cpx.w   Entity.prevActiveWindowX
     bne     XChanged
 
-    cmp.w   prevActiveWindowY
+    cmp.w   Entity.prevActiveWindowY
     beq     SkipTests
 
     XChanged:
-        stx.w   prevActiveWindowX
-        sta.w   prevActiveWindowY
+        stx.w   Entity.prevActiveWindowX
+        sta.w   Entity.prevActiveWindowY
 
 
-        lda.w   lists.deactivated
+        lda.w   Entity.lists.deactivated
         beq     EndLoop
 
-        ldy.w   #lists.deactivated
-        sty.w   _previousEntity
+        ldy.w   #Entity.lists.deactivated
+        sty.w   Entity._previousEntity
 
         Loop:
             tcd
 
-            BranchEntityOutsideActiveWindow(Continue)
+            Entity.BranchEntityOutsideActiveWindow(Continue)
 
                 // entity is now inside active window
                 // try to activate it
@@ -251,7 +246,7 @@ macro _ProcessActiveWindow() {
 
                     // Could not activate the entity.
                     // Try again in the next frame.
-                    ldy.w   #lists._ACTIVATE_NEXT_FRAME_INDEX
+                    ldy.w   #Entity.lists._ACTIVATE_NEXT_FRAME_INDEX
                     bra     _ChangeEntityList_Y
 
 
@@ -266,14 +261,14 @@ macro _ProcessActiveWindow() {
 
                     lda.b   BaseEntity.listId
                     and.w   #0xff
-                    cmp.w   #lists.N_LISTS
+                    cmp.w   #Entity.lists.N_LISTS
                     bcs     InvalidEntityId
 
                     asl
                     tay
 
                 _ChangeEntityList_Y:
-                    __ChangeEntityList_Y()
+                    Entity.__ChangeEntityList_Y()
                     // A = next entity address
                     // z set if there are no more entities in the current list
                     // MUST NOT CHANGE _previousEntity as the entity is no longer in the deactivated list
@@ -286,7 +281,7 @@ macro _ProcessActiveWindow() {
             // goto next entity
 
             tdc
-            sta.w   _previousEntity
+            sta.w   Entity._previousEntity
             lda.b   BaseEntity.next
 
             bne     Loop
@@ -310,7 +305,7 @@ macro _ProcessEntityList(list) {
     lda.w   Entity.lists.{list}
     beq     _{list}_Empty
         ldy.w   #Entity.lists.{list}
-        jsr     __ProcessEntityList
+        jsr     Entity.__ProcessEntityList
 
 _{list}_Empty:
 }
@@ -403,47 +398,67 @@ StackSmashed:
 // PUBLIC API
 // ==========
 
-// Process the entity gameloop
+
+// Process the special entity lists.
+//
+// This macro:
+//   * Activates entities in the `Entity.activateNextFrame` list
+//   * Activates entities that enter the active window
+//
+// This macro should be invoked either:
+//  * Before Processing entity hitboxes, or
+//  * After `ProcessEntityLists`
 //
 // REQUIRES: 16 bit A, 16 bit Index, DB = 0x7e, DP = 0
+macro ProcessSpecialLists() {
+    assert16a()
+    assert16i()
+
+    // ::TODO move into Camera Module::
+    jsr     Entity._UpdateActiveWindows
+
+    Entity._ProcessActivateNextFrameList()
+
+    Entity._ProcessActiveWindow()
+
+    lda.w   #0
+    tcd
+}
+
+// Process the entity lists.
 //
-// INPUT: Y - address of list
+// The macro will call the `BaseEntityFunctionTable.Process` routine on
+// every entity in all entity lists.
+//
+// This macro should be invoked after the `MetaSprite.EntityHitbox` tests.
+//
+// REQUIRES: 16 bit A, 16 bit Index, DB = 0x7e, DP = 0
 a16()
 i16()
 code()
-function ProcessGameLoop {
-    jsr     _UpdateActiveWindows
+macro ProcessEntityLists() {
+    assert16a()
+    assert16i()
 
-    _ProcessActivateNextFrameList()
-
-    _ProcessActiveWindow()
-
-    lda.w   #0
-    tcd
-
-    MetaSprite.EntityHitbox.Begin()
-        MetaSprite.EntityHitbox.TestCollisions(playerProjectiles, enemies, bosses)
-        MetaSprite.EntityHitbox.TestCollisions(players, enemyProjectiles, enemies, bosses)
-    MetaSprite.EntityHitbox.End()
+    // ::TODO move into Camera Module::
+    jsr     Entity._UpdateActiveWindows
 
 
-    _ProcessEntityList(playerProjectiles)
-    _ProcessEntityList(enemyProjectiles)
+    Entity._ProcessEntityList(playerProjectiles)
+    Entity._ProcessEntityList(enemyProjectiles)
 
-    _ProcessEntityList(platforms)
-    _ProcessEntityList(enemies)
-    _ProcessEntityList(bosses)
-    _ProcessEntityList(npcs)
+    Entity._ProcessEntityList(platforms)
+    Entity._ProcessEntityList(enemies)
+    Entity._ProcessEntityList(bosses)
+    Entity._ProcessEntityList(npcs)
 
-    _ProcessEntityList(players)
+    Entity._ProcessEntityList(players)
 
-    _ProcessEntityList(particles)
+    Entity._ProcessEntityList(particles)
 
 
     lda.w   #0
     tcd
-
-    rts
 }
 
 

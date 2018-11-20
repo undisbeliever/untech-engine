@@ -82,7 +82,7 @@ assert(N_ENTITIES_TO_SPAWN < Entity.N_ENTITIES + 2)
     sta.w   Camera.yPos
 
     // update inactive window
-    jsr     Entity.ProcessGameLoop
+    jsr     ProcessEntityGameLoop
 
 
     lda.w   #N_ENTITIES_TO_SPAWN
@@ -169,7 +169,7 @@ assert(Entity.lists.N_LISTS > 2)
         bcc     Loop
 
 
-    jsr     Entity.ProcessGameLoop
+    jsr     ProcessEntityGameLoop
 
 
     ldx.w   #ListLengthTable_Initial

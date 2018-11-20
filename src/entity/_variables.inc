@@ -72,40 +72,27 @@ namespace Entity {
     // (word addr)
     namespace lists {
         // Player entity and allies
-        //  - collides with: enemies, bosses, enemyProjectiles
         allocate(players, wram7e, 2)
 
         // Bosses
-        //  - collides with: playerProjectiles
         allocate(bosses, wram7e, 2)
 
         // Enemies
-        //  - collides with: playerProjectiles
         allocate(enemies, wram7e, 2)
 
         // NPCs
-        //  - no entity collisions
         allocate(npcs, wram7e, 2)
 
         // Platforms
-        //  - no collision detection in entity gameloop.
-        //     * The process routine of the player entities is is
-        //       responsible for collision detection between entity and
-        //       platforms as some entities won't have collision with
-        //       platforms
-        //  - deactivated when moved outside active window
         allocate(platforms, wram7e, 2)
 
         // Particles
-        //  - no entity collisions
         allocate(particles, wram7e, 2)
 
         // Player projectiles
-        //  - collides with: enemies, bosses
         allocate(playerProjectiles, wram7e, 2)
 
         // Enemy projectiles
-        //  - collides with: players
         allocate(enemyProjectiles, wram7e, 2)
 
 

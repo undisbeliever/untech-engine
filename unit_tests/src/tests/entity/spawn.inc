@@ -43,7 +43,7 @@ function Spawn {
     bne     Fail
 
     // Must process the game loop to move the new entity into the entity list
-    jsr     Entity.ProcessGameLoop
+    jsr     ProcessEntityGameLoop
 
     // Test first list length
     jsr     _FirstListLength
@@ -99,7 +99,7 @@ constant tmp = Test.tmp
     stz.w   Warnings.current
 
     // Must process the game loop to move the new entities into their entity lists
-    jsr     Entity.ProcessGameLoop
+    jsr     ProcessEntityGameLoop
 
     // Test free list is 0
     jsr     _FreeListLength
@@ -167,7 +167,7 @@ constant tmp = Test.tmp
 
 
     // Must process the game loop to move the new entities into their entity lists
-    jsr     Entity.ProcessGameLoop
+    jsr     ProcessEntityGameLoop
 
     // test list decreased by N_LISTS
     jsr     _FreeListLength
@@ -247,7 +247,7 @@ if {N_LISTS_TESTED} > Entity.lists.N_LISTS {
         bpl     Loop
 
     // Must process the game loop to move the new entities into their entity lists
-    jsr     Entity.ProcessGameLoop
+    jsr     ProcessEntityGameLoop
 
     // Verify list sizes
     jsr     _FreeListLength

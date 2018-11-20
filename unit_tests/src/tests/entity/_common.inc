@@ -4,6 +4,22 @@
 
 namespace EntityTest {
 
+// Process the entity lists and special lists
+//
+// REQUIRES: 16 bit A, 16 bit Index, DB = 0x7e, DP = 0
+a16()
+i16()
+code()
+function ProcessEntityGameLoop {
+    lda.w   #0
+    tcd
+
+    Entity.ProcessSpecialLists()
+    Entity.ProcessEntityLists()
+
+    jmp     Entity.ValidateEntityLists
+}
+
 // REQUIRES: 16 bit A, 16 bit Index, DB = 0x7e
 // OUT: A = number of entities in free list
 a16()

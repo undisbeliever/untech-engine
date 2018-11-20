@@ -45,7 +45,7 @@ constant tmp_test = Test.tmp + 2
     sta.w   tmp_test
 
     TestLoop:
-        jsr     Entity.ProcessGameLoop
+        jsr     ProcessEntityGameLoop
 
         ldx.w   #ExpectedSizes
         jsr     _TestListLengthTable
@@ -145,31 +145,31 @@ constant tmp = Test.tmp
     bne     Fail
 
     // frame 1 - 1 list of entities deleted
-    jsr     Entity.ProcessGameLoop
+    jsr     ProcessEntityGameLoop
     jsr     _FreeListLength
     cmp.w   #Entity.N_ENTITIES - Entity.lists.N_LISTS * 3
     bne     Fail
 
     // frame 2 - 2 lists of entities deleted
-    jsr     Entity.ProcessGameLoop
+    jsr     ProcessEntityGameLoop
     jsr     _FreeListLength
     cmp.w   #Entity.N_ENTITIES - Entity.lists.N_LISTS * 1
     bne     Fail
 
     // frame 3 - no entities deleted
-    jsr     Entity.ProcessGameLoop
+    jsr     ProcessEntityGameLoop
     jsr     _FreeListLength
     cmp.w   #Entity.N_ENTITIES - Entity.lists.N_LISTS * 1
     bne     Fail
 
     // frame 4 - 1 list of entities deleted
-    jsr     Entity.ProcessGameLoop
+    jsr     ProcessEntityGameLoop
     jsr     _FreeListLength
     cmp.w   #Entity.N_ENTITIES - Entity.lists.N_LISTS * 0
     bne     Fail
 
     // frame 5 - no entities deleted
-    jsr     Entity.ProcessGameLoop
+    jsr     ProcessEntityGameLoop
     jsr     _FreeListLength
     cmp.w   #Entity.N_ENTITIES - Entity.lists.N_LISTS * 0
     bne     Fail
@@ -245,7 +245,7 @@ constant tmp = Test.tmp
         jsr     Dma.Init
         jsr     WaitFrame
 
-        jsr     Entity.ProcessGameLoop
+        jsr     ProcessEntityGameLoop
 
         jsr     _ActivateNextFrameListLength
         cmp.w   #0
@@ -273,7 +273,7 @@ constant tmp = Test.tmp
     // After the second frame the entities should be deleted
     // Tests that they were actually processed
     function TestNextFrame {
-        jsr     Entity.ProcessGameLoop
+        jsr     ProcessEntityGameLoop
 
         jsr     _FreeListLength
         cmp.w   #Entity.N_ENTITIES
@@ -313,7 +313,7 @@ constant firstFrame   = Test.tmp + 2
 
 
     // display frame 1
-    jsr     Entity.ProcessGameLoop
+    jsr     ProcessEntityGameLoop
 
     // save currentFrame
     ldy.w   entityAddress
@@ -322,7 +322,7 @@ constant firstFrame   = Test.tmp + 2
 
 
     // display frame 2
-    jsr     Entity.ProcessGameLoop
+    jsr     ProcessEntityGameLoop
 
     // test there is one entity in play
     jsr     _FreeListLength
@@ -338,7 +338,7 @@ constant firstFrame   = Test.tmp + 2
 
 
     // display frame 3
-    jsr     Entity.ProcessGameLoop
+    jsr     ProcessEntityGameLoop
 
     // test there is one still one entity in play
     jsr     _FreeListLength
@@ -347,11 +347,11 @@ constant firstFrame   = Test.tmp + 2
 
 
     // display frame 4
-    jsr     Entity.ProcessGameLoop
+    jsr     ProcessEntityGameLoop
 
 
     // display frame 5
-    jsr     Entity.ProcessGameLoop
+    jsr     ProcessEntityGameLoop
 
     // test the entity has been deleted
     jsr     _FreeListLength
@@ -407,7 +407,7 @@ constant tmp_listId = Test.tmp + 2
 
 
     // Test Initial Entity counts
-    jsr     Entity.ProcessGameLoop
+    jsr     ProcessEntityGameLoop
 
     ldx.w   #InitialExpectedSizes
     jsr     _TestListLengthTable
@@ -439,7 +439,7 @@ constant tmp_listId = Test.tmp + 2
             stz.w   Entities.DeactivateIfOutsideEntity.activatedCount
             stz.w   Entities.DeactivateIfOutsideEntity.deactivatedCount
 
-            jsr     Entity.ProcessGameLoop
+            jsr     ProcessEntityGameLoop
 
 
             // test activatedCount and deactivatedCount
@@ -581,7 +581,7 @@ constant _loopsLeft = Test.dpTmp + 0
     sta.b   _loopsLeft
 
     Loop:
-        jsr     Entity.ProcessGameLoop
+        jsr     ProcessEntityGameLoop
 
         jsr     _TestEntityListsValid
         bcc     Fail

@@ -104,7 +104,14 @@ function ProcessFrame {
 
     jsr     MetaSprite.Render.InitLoop
 
-    jsr     Entity.ProcessGameLoop
+    Entity.ProcessSpecialLists()
+
+    MetaSprite.EntityHitbox.Begin()
+        MetaSprite.EntityHitbox.TestCollisions(playerProjectiles, enemies, bosses)
+        MetaSprite.EntityHitbox.TestCollisions(players, enemyProjectiles, enemies, bosses)
+    MetaSprite.EntityHitbox.End()
+
+    Entity.ProcessEntityLists()
 
     jsr     MetaSprite.Render.EndLoop
 

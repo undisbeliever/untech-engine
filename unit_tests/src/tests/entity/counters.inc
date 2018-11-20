@@ -76,7 +76,7 @@ function _SetupCounterTest {
     jsr     Entity.Spawn
     bcc     Fail
 
-    jsr     Entity.ProcessGameLoop
+    jsr     ProcessEntityGameLoop
 
     sec
     rts
