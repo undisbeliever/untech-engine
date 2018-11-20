@@ -27,9 +27,15 @@ namespace Entity {
 
 
 // Previous entity being processed
-// Used in _ProcessActivateNextFrameList, _ProcessActiveWindow and the entity loop.
+// Used in _ProcessActivateNextFrameList, _ProcessActiveWindow and __ProcessEntityLists
 // (word address)
 allocateTmpWord(_previousEntity)
+
+
+// The current entity list being processed
+// Used in __ProcessEntityLists
+// (word address)
+allocateTmpWord(_currentEntityList)
 
 
 // Change the list of the current entity.
@@ -310,36 +316,51 @@ macro _ProcessEntityList(list) {
 _{list}_Empty:
 }
 
-// Process an entity list.
-//
-// ASSUMES: The list is not empty
+// Processes the entity lists.
 //
 // REQUIRES: 16 bit A, 16 bit Index, DB = 0x7e
-// INPUT: A = address of the first entity (NOT NULL)
-//        Y = address of the entity list (NOT NULL)
 //
 // MODIFIES: DP
-function __ProcessEntityList {
+function __ProcessEntityLists {
 
-    sty.w   _previousEntity
+    ldx.w   #lists.FIRST
 
-    tcd
-    ldx.b   BaseEntity.functionTable
-    beq     NoFunctionPointer
-    jsr     (BaseEntityFunctionTable.Process,x)
-AfterJSR:
+    Repeat:
+        lda.w   0,x
+        beq     ListEmpty
+            stx.w   _currentEntityList
+            stx.w   _previousEntity
 
-    // Using JSR above so the engine can panic when an entity's Process
-    // routine exits using an RTS instruction.
+            tcd
+            ldx.b   BaseEntity.functionTable
+            beq     NoFunctionPointer
+            jsr     (BaseEntityFunctionTable.Process,x)
 
-    // Get Process routine that failed, make it easier to find the invalid entity.
-    ldx.b   BaseEntity.functionTable
-    lda.l   BaseEntityFunctionTable.Process,x
+            AfterJSR:
+                // The entity process routine should eventually jump to
+                // `Entity.GotoNextEntity` and therefore we should not
+                // be here.
 
-    // X = entity function table
-    // A = entity process routine
+                // I am using JSR above so the engine can panic if an entity's Process
+                // routine exits using an RTS instruction.
 
-    break(INVALID_PROCESS_ENTITY_RETURN)
+                // Get Process routine that failed, to make it easier to find the invalid entity.
+                ldx.b   BaseEntity.functionTable
+                lda.l   BaseEntityFunctionTable.Process,x
+
+                // X = entity function table
+                // A = entity process routine
+
+                break(INVALID_PROCESS_ENTITY_RETURN)
+
+    ListEmpty:
+        inx
+        inx
+        cpx.w   #lists.LAST + 2
+        bcc     Repeat
+
+    // There are no entities
+    rts
 
 NoFunctionPointer:
     break(NO_FUNCTION_POINTER)
@@ -367,7 +388,7 @@ inline __GotoNextEntity() {
 // A = next entity
 // z set if there are no more entities in the list
 EntityListChanged:
-    beq     NoMoreEntities
+    beq     NoMoreEntitiesInCurrentList
 
         tcd
         ldx.b   BaseEntity.functionTable
@@ -375,12 +396,37 @@ EntityListChanged:
         jmp     (BaseEntityFunctionTable.Process,x)
 
 
-NoMoreEntities:
+NoMoreEntitiesInCurrentList:
+    // Process the next entity list
+    ldx.w   _currentEntityList
+    Repeat:
+        cpx.w   #lists.LAST
+        bcs     NoMoreLists
+
+        inx
+        inx
+
+        lda.w   0,x
+        beq     Repeat
+
+    // X = next list that is not empty
+    // A = first entity in list
+    stx.w   _currentEntityList
+    stx.w   _previousEntity
+
+    tcd
+    ldx.b   BaseEntity.functionTable
+    beq     NoFunctionPointer
+    jmp     (BaseEntityFunctionTable.Process,x)
+
+
+NoMoreLists:
+    // The last entity has been processed.
     // Verify the stack is unchanged.
     // This should never happen, but I decided to test for it anyway.
 
     plx
-    cpx.w   #__ProcessEntityList.AfterJSR - 1
+    cpx.w   #__ProcessEntityLists.AfterJSR - 1
     bne     StackSmashed
 
     rts
@@ -443,19 +489,7 @@ macro ProcessEntityLists() {
     // ::TODO move into Camera Module::
     jsr     Entity._UpdateActiveWindows
 
-
-    Entity._ProcessEntityList(playerProjectiles)
-    Entity._ProcessEntityList(enemyProjectiles)
-
-    Entity._ProcessEntityList(platforms)
-    Entity._ProcessEntityList(enemies)
-    Entity._ProcessEntityList(bosses)
-    Entity._ProcessEntityList(npcs)
-
-    Entity._ProcessEntityList(players)
-
-    Entity._ProcessEntityList(particles)
-
+    jsr     Entity.__ProcessEntityLists
 
     lda.w   #0
     tcd
