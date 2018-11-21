@@ -90,34 +90,12 @@ Fail:
 a16()
 i16()
 code()
-Test.add("Entity.CountEnemiesWithId")
-function CountEnemiesWithId {
+Test.add("Entity.CountEntitiesInList (macro)")
+function CountEntitiesInList_Macro {
     jsr     _SetupCounterTest
     bcc     Fail
 
-    lda.w   #_SetupCounterTest.DIO_ENTITY_ID
-    jsr     Entity.CountEnemiesWithId
-    cmp.w   #_SetupCounterTest.N_DIO_ENTITIES
-    bne     Fail
-
-    sec
-    rts
-
-Fail:
-    clc
-    rts
-}
-
-
-a16()
-i16()
-code()
-Test.add("Entity.CountActiveEnemies")
-function CountActiveEnemies {
-    jsr     _SetupCounterTest
-    bcc     Fail
-
-    jsr     Entity.CountActiveEnemies
+    Entity.CountEntitiesInList(ENEMY)
     cmp.w   #_SetupCounterTest.N_ACTIVE_ENEMIES
     bne     Fail
 
@@ -133,14 +111,36 @@ Fail:
 a16()
 i16()
 code()
-Test.add("Entity.CountEntitiesInList")
-function CountEntitiesInList {
+Test.add("Entity.CountEntitiesInList (enemies)")
+function CountEntitiesInList_Enemies {
     jsr     _SetupCounterTest
     bcc     Fail
 
     lda.w   #Entity.ListId.ENEMY
     jsr     Entity.CountEntitiesInList
     cmp.w   #_SetupCounterTest.N_ACTIVE_ENEMIES
+    bne     Fail
+
+    sec
+    rts
+
+Fail:
+    clc
+    rts
+}
+
+
+a16()
+i16()
+code()
+Test.add("Entity.CountEntitiesInList (players)")
+function CountEntitiesInList_Players {
+    jsr     _SetupCounterTest
+    bcc     Fail
+
+    lda.w   #Entity.ListId.PLAYER
+    jsr     Entity.CountEntitiesInList
+    cmp.w   #0
     bne     Fail
 
     sec
