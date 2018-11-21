@@ -146,8 +146,9 @@ namespace Entity {
             enum(PARTICLE)
             enum(PLAYER_PROJECTILE)
             enum(ENEMY_PROJECTILE)
+        endEnum()
 
-        assert({__ENUM__.current} == lists.N_LISTS)
+        assert(__ENUM__.count == lists.N_LISTS)
     }
 
 

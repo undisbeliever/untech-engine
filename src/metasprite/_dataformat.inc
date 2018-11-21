@@ -348,23 +348,24 @@ namespace Format {
     namespace AnimationDurationFormat {
         createEnum(0, 2)
 
-        // Frame duration = number of display frames to wait
-        enum(FRAME)
+            // Frame duration = number of display frames to wait
+            enum(FRAME)
 
-        // Frame duration = 1/75th of a second
-        enum(TIME)
+            // Frame duration = 1/75th of a second
+            enum(TIME)
 
-        // Frame duration = distance the entity travels vertically
-        // (0:3:5 fixed point pixels)
-        enum(DISTANCE_VERTICALL)
+            // Frame duration = distance the entity travels vertically
+            // (0:3:5 fixed point pixels)
+            enum(DISTANCE_VERTICALL)
 
-        // Frame duration = distance the entity to travel horizontally
-        // (0:3:5 fixed point pixels)
-        enum(DISTANCE_HORIZONTAL)
+            // Frame duration = distance the entity to travel horizontally
+            // (0:3:5 fixed point pixels)
+            enum(DISTANCE_HORIZONTAL)
 
+        endEnum()
 
         constant _MASK = %110
-        assert({__ENUM__.current} == _MASK + 2)
+        assert(__ENUM__.last == _MASK)
     }
 }
 

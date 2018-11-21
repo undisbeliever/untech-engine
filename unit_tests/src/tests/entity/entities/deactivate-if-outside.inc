@@ -28,6 +28,7 @@ namespace DeactivateIfOutsideEntity {
         createEnum(0, 2)
             enum(DEACTIVATED)
             enum(ACTIVE)
+        endEnum()
 
         constant MASK = 0x1 << 1
 
