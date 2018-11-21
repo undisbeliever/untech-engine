@@ -185,7 +185,7 @@ macro _ProcessActivateNextFrameList() {
 
             lda.b   BaseEntity.listId
             and.w   #0xff
-            cmp.w   #Entity.lists.N_LISTS
+            cmp.w   #Entity.N_ENTITY_LISTS
             bcs     InvalidEntityId
 
             asl
@@ -267,7 +267,7 @@ macro _ProcessActiveWindow() {
 
                     lda.b   BaseEntity.listId
                     and.w   #0xff
-                    cmp.w   #Entity.lists.N_LISTS
+                    cmp.w   #Entity.N_ENTITY_LISTS
                     bcs     InvalidEntityId
 
                     asl
@@ -819,12 +819,12 @@ i8()
     cmp.b   BaseEntity.listId
     beq     ListIdUnchanged
 
-    cmp.b   #lists.N_LISTS
+    cmp.b   #N_ENTITY_LISTS
     bcs     InvalidEntityId
 
     sta.b   BaseEntity.listId
 
-    assert(lists.N_LISTS < 128)
+    assert(N_ENTITY_LISTS < 128)
     asl
     tay
 

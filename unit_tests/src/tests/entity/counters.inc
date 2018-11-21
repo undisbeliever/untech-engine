@@ -25,7 +25,7 @@ function _SetupCounterTest {
 
     constant N_ACTIVE_ENEMIES = N_ONSCREEN_DIO_ENTITIES + N_DAD_ENTITIES
 
-    assert(Entity.ListId.ENEMY == 2)
+    assert(EntityLists.ENEMIES == 2)
     constant DIO_ENTITY_ID = Entities.DeactivateIfOutsideEntity.EntityId_2
     constant DAD_ENTITY_ID = Entities.DeleteAfterDelayEntity.EntityId_2
 
@@ -95,7 +95,7 @@ function CountEntitiesInList_Macro {
     jsr     _SetupCounterTest
     bcc     Fail
 
-    Entity.CountEntitiesInList(ENEMY)
+    Entity.CountEntitiesInList(ENEMIES)
     cmp.w   #_SetupCounterTest.N_ACTIVE_ENEMIES
     bne     Fail
 
@@ -116,7 +116,7 @@ function CountEntitiesInList_Enemies {
     jsr     _SetupCounterTest
     bcc     Fail
 
-    lda.w   #Entity.ListId.ENEMY
+    lda.w   #EntityLists.ENEMIES
     jsr     Entity.CountEntitiesInList
     cmp.w   #_SetupCounterTest.N_ACTIVE_ENEMIES
     bne     Fail
@@ -138,7 +138,7 @@ function CountEntitiesInList_Players {
     jsr     _SetupCounterTest
     bcc     Fail
 
-    lda.w   #Entity.ListId.PLAYER
+    lda.w   #EntityLists.PLAYERS
     jsr     Entity.CountEntitiesInList
     cmp.w   #0
     bne     Fail

@@ -107,8 +107,8 @@ function ProcessFrame {
     Entity.ProcessSpecialLists()
 
     MetaSprite.EntityHitbox.Begin()
-        MetaSprite.EntityHitbox.TestCollisions(playerProjectiles, enemies, bosses)
-        MetaSprite.EntityHitbox.TestCollisions(players, enemyProjectiles, enemies, bosses)
+        MetaSprite.EntityHitbox.TestCollisions(PLAYER_PROJECTILES, ENEMIES, BOSSES)
+        MetaSprite.EntityHitbox.TestCollisions(PLAYERS,            ENEMY_PROJECTILES, ENEMIES, BOSSES)
     MetaSprite.EntityHitbox.End()
 
     Entity.ProcessEntityLists()

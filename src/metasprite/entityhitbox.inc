@@ -83,7 +83,7 @@ macro TestCollisions(aList, bList) {
 
     // ::TODO move entity lists to dp::
 
-    lda.l   Entity.lists.{aList}
+    lda.l   {Entity.listAddress({aList})}
     beq     EndIf{#}
 
         MetaSprite.EntityHitbox._TestTwoEntityLists({aList}, {bList}, 1)
@@ -110,7 +110,7 @@ macro TestCollisions(aList, bList1, bList2) {
 
     // ::TODO move entity lists to dp::
 
-    lda.l   Entity.lists.{aList}
+    lda.l   {Entity.listAddress({aList})}
     beq     EndIf{#}
 
         MetaSprite.EntityHitbox._TestTwoEntityLists({aList}, {bList1}, 1)
@@ -124,7 +124,7 @@ macro TestCollisions(aList, bList1, bList2, bList3) {
 
     MetaSprite.EntityHitbox._TestInBlock()
 
-    lda.l   Entity.lists.{aList}
+    lda.l   {Entity.listAddress({aList})}
     beq     EndIf{#}
 
         MetaSprite.EntityHitbox._TestTwoEntityLists({aList}, {bList1}, 1)
@@ -139,7 +139,7 @@ macro TestCollisions(aList, bList1, bList2, bList3, bList4) {
 
     MetaSprite.EntityHitbox._TestInBlock()
 
-    lda.l   Entity.lists.{aList}
+    lda.l   {Entity.listAddress({aList})}
     beq     EndIf{#}
 
         MetaSprite.EntityHitbox._TestTwoEntityLists({aList}, {bList1}, 1)
@@ -155,7 +155,7 @@ macro TestCollisions(aList, bList1, bList2, bList3, bList4, bList5) {
 
     MetaSprite.EntityHitbox._TestInBlock()
 
-    lda.l   Entity.lists.{aList}
+    lda.l   {Entity.listAddress({aList})}
     beq     EndIf{#}
 
         MetaSprite.EntityHitbox._TestTwoEntityLists({aList}, {bList1}, 1)
@@ -283,18 +283,18 @@ inline _TestTwoEntityLists(aList, bList, evaluate isFirst) {
     assert16a()
     assert16i()
 
-    if Entity.lists.{aList} == Entity.lists.{bList} {
+    if {Entity.listAddress({aList})} == {Entity.listAddress({bList})} {
         error "Cannot preform a collision test between the same list ({aList} and {bList})"
     }
 
     // ::TODO move entity lists to dp::
 
-    lda.l   Entity.lists.{bList}
+    lda.l   {Entity.listAddress({bList})}
     beq     EndIf{#}
         tay
-        lda.l   Entity.lists.{aList}
+        lda.l   {Entity.listAddress({aList})}
 //        if {isFirst} == 0 {
-//            lda.l   Entity.lists.{aList}
+//            lda.l   {Entity.listAddress({aList})}
 //        }
         jsr     MetaSprite.EntityHitbox._TestTwoEntityLists
     EndIf{#}:

@@ -187,7 +187,7 @@ allocateTmpWord(tmp_listId)
 
         lda.w   tmp_listId
         inc
-        cmp.w   #Entity.lists.N_LISTS
+        cmp.w   #Entity.N_ENTITY_LISTS
         bcc     ListSizeLoop
 
     sec

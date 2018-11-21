@@ -87,7 +87,7 @@ ExpectedSizes: {
     dw  0                   // enemyprojectiles
 
     constant ExpectedSizes.size = pc() - ExpectedSizes
-    assert(ExpectedSizes.size / 2 == Entity.lists.N_LISTS)
+    assert(ExpectedSizes.size / 2 == Entity.N_ENTITY_LISTS)
 }
 }
 
@@ -102,7 +102,7 @@ constant tmp = Test.tmp
 
     jsr     Entity.Init
 
-    assert(Entity.lists.N_LISTS * 3 <= Entity.N_ENTITIES)
+    assert(Entity.N_ENTITY_LISTS * 3 <= Entity.N_ENTITIES)
 
     lda.w   #0x1000
     sta.w   Entity.Spawn.xPos
@@ -135,43 +135,43 @@ constant tmp = Test.tmp
 
         lda.w   tmp
         inc
-        cmp.w   #Entities.DeleteAfterDelayEntity.EntityId_0 + Entity.lists.N_LISTS
+        cmp.w   #Entities.DeleteAfterDelayEntity.EntityId_0 + Entity.N_ENTITY_LISTS
         bcc     Loop
 
     // Test list lengths
 
     jsr     _FreeListLength
-    cmp.w   #Entity.N_ENTITIES - Entity.lists.N_LISTS * 4
+    cmp.w   #Entity.N_ENTITIES - Entity.N_ENTITY_LISTS * 4
     bne     Fail
 
     // frame 1 - 1 list of entities deleted
     jsr     ProcessEntityGameLoop
     jsr     _FreeListLength
-    cmp.w   #Entity.N_ENTITIES - Entity.lists.N_LISTS * 3
+    cmp.w   #Entity.N_ENTITIES - Entity.N_ENTITY_LISTS * 3
     bne     Fail
 
     // frame 2 - 2 lists of entities deleted
     jsr     ProcessEntityGameLoop
     jsr     _FreeListLength
-    cmp.w   #Entity.N_ENTITIES - Entity.lists.N_LISTS * 1
+    cmp.w   #Entity.N_ENTITIES - Entity.N_ENTITY_LISTS * 1
     bne     Fail
 
     // frame 3 - no entities deleted
     jsr     ProcessEntityGameLoop
     jsr     _FreeListLength
-    cmp.w   #Entity.N_ENTITIES - Entity.lists.N_LISTS * 1
+    cmp.w   #Entity.N_ENTITIES - Entity.N_ENTITY_LISTS * 1
     bne     Fail
 
     // frame 4 - 1 list of entities deleted
     jsr     ProcessEntityGameLoop
     jsr     _FreeListLength
-    cmp.w   #Entity.N_ENTITIES - Entity.lists.N_LISTS * 0
+    cmp.w   #Entity.N_ENTITIES - Entity.N_ENTITY_LISTS * 0
     bne     Fail
 
     // frame 5 - no entities deleted
     jsr     ProcessEntityGameLoop
     jsr     _FreeListLength
-    cmp.w   #Entity.N_ENTITIES - Entity.lists.N_LISTS * 0
+    cmp.w   #Entity.N_ENTITIES - Entity.N_ENTITY_LISTS * 0
     bne     Fail
 
     jmp     _TestEntityListsValid
@@ -201,7 +201,7 @@ constant tmp = Test.tmp
         sta.w   Entity.Spawn.xPos
         sta.w   Entity.Spawn.yPos
 
-        assert(Entity.N_ENTITIES >= Entity.lists.N_LISTS)
+        assert(Entity.N_ENTITIES >= Entity.N_ENTITY_LISTS)
 
         lda.w   #Entities.DeleteAfterDelayEntity.EntityId_0
         Loop:
@@ -213,12 +213,12 @@ constant tmp = Test.tmp
 
             lda.w   tmp
             inc
-            cmp.w   #Entities.DeleteAfterDelayEntity.EntityId_0 + Entity.lists.N_LISTS
+            cmp.w   #Entities.DeleteAfterDelayEntity.EntityId_0 + Entity.N_ENTITY_LISTS
             bcc     Loop
 
 
         jsr     _ActivateNextFrameListLength
-        cmp.w   #Entity.lists.N_LISTS
+        cmp.w   #Entity.N_ENTITY_LISTS
         bne     Fail
 
         // Test each list has no entities in them (not active)
@@ -233,7 +233,7 @@ constant tmp = Test.tmp
 
             tya
             inc
-            cmp.w   #Entity.lists.N_LISTS
+            cmp.w   #Entity.N_ENTITY_LISTS
             bcc     ListLoop
 
         jsr     _TestEntityListsValid
@@ -263,7 +263,7 @@ constant tmp = Test.tmp
 
             tya
             inc
-            cmp.w   #Entity.lists.N_LISTS
+            cmp.w   #Entity.N_ENTITY_LISTS
             bcc     Loop
 
         jsr     _TestEntityListsValid
@@ -299,7 +299,7 @@ constant firstFrame   = Test.tmp + 2
 
     jsr     Entity.Init
 
-    assert(Entity.lists.N_LISTS * 3 <= Entity.N_ENTITIES)
+    assert(Entity.N_ENTITY_LISTS * 3 <= Entity.N_ENTITIES)
 
     // Spawn a DeleteIfAnimationEndsEntity
     // This entity has a single animation
@@ -382,7 +382,7 @@ constant tmp_listId = Test.tmp + 2
     jsr     Entity.Init
 
     // Spawn 4 entities at different point on the screen
-    assert(Entity.N_ENTITIES >= Entity.lists.N_LISTS * 4)
+    assert(Entity.N_ENTITIES >= Entity.N_ENTITY_LISTS * 4)
 
     lda.w   #OldBehaviourTestEntities.firstId
     Loop:
@@ -402,7 +402,7 @@ constant tmp_listId = Test.tmp + 2
 
         lda.w   tmp_listId
         inc
-        cmp.w   #OldBehaviourTestEntities.firstId + Entity.lists.N_LISTS
+        cmp.w   #OldBehaviourTestEntities.firstId + Entity.N_ENTITY_LISTS
         bcc     Loop
 
 
@@ -486,7 +486,7 @@ function SpawnEntity_XY {
 }
 
 namespace OldBehaviourTestEntities {
-    assert(Entity.lists.N_LISTS == 8)
+    assert(Entity.N_ENTITY_LISTS == 8)
 
     rodata(EN_EntityList)
     constant firstId = (pc() - Entity.Data.EntityList) / 2
@@ -511,7 +511,7 @@ InitialExpectedSizes: {
     dw  1   // player projectile
     dw  1   // enemy projectile
 
-    assert((pc() - InitialExpectedSizes) / 2 == Entity.lists.N_LISTS)
+    assert((pc() - InitialExpectedSizes) / 2 == Entity.N_ENTITY_LISTS)
 }
 
 rodata(rom0)
@@ -539,7 +539,7 @@ MoveCameraTable: {
     _row(0x2000, 0x1000, 2,     0,          0)
     _row(0x3000, 0x3000, 0,     0,          2)
 
-    constant MoveCameraTable.rowSize = (4 + Entity.lists.N_LISTS) * 2
+    constant MoveCameraTable.rowSize = (4 + Entity.N_ENTITY_LISTS) * 2
     constant MoveCameraTable.size = pc() - MoveCameraTable
 }
 }
@@ -561,7 +561,7 @@ constant _loopsLeft = Test.dpTmp + 0
     sta.w   Entity.Spawn.xPos
     sta.w   Entity.Spawn.yPos
 
-    ldy.w   #Entity.lists.N_LISTS - 1
+    ldy.w   #Entity.N_ENTITY_LISTS - 1
     SpawnLoop:
         phy
             // Y = listId to spawn entity in
@@ -574,7 +574,7 @@ constant _loopsLeft = Test.dpTmp + 0
         bpl     SpawnLoop
 
     jsr     _FreeListLength
-    cmp.w   #Entity.N_ENTITIES - Entity.lists.N_LISTS
+    cmp.w   #Entity.N_ENTITIES - Entity.N_ENTITY_LISTS
     bne     Fail
 
     lda.w   #20
@@ -655,7 +655,7 @@ namespace SpawnAndChangeListTestEntity {
         and.w   #0xff
         dec
         bpl     +
-            lda.w   #Entity.lists.N_LISTS - 1
+            lda.w   #Entity.N_ENTITY_LISTS - 1
         +
         jmp     Entity.ChangeEntityListIdAndGotoNextEntity
     }
@@ -676,9 +676,9 @@ namespace SpawnAndChangeListTestEntity {
         tay
         bpl     +
             // A < 0
-            lda.w   #Entity.lists.N_LISTS - 1
+            lda.w   #Entity.N_ENTITY_LISTS - 1
         +
-        cmp.w   #Entity.lists.N_LISTS
+        cmp.w   #Entity.N_ENTITY_LISTS
         bcc     +
             lda.w   #0
         +

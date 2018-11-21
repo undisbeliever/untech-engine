@@ -138,7 +138,7 @@ constant tmp = Test.tmp
     sta.w   Entity.Spawn.xPos
     sta.w   Entity.Spawn.yPos
 
-    assert(Entity.N_ENTITIES >= Entity.lists.N_LISTS * 2)
+    assert(Entity.N_ENTITIES >= Entity.N_ENTITY_LISTS * 2)
 
     // spawn 2 entities per list
     lda.w   #Entities.BlankEntity.EntityId_0
@@ -156,13 +156,13 @@ constant tmp = Test.tmp
 
         lda.w   tmp
         inc
-        cmp.w   #Entities.BlankEntity.EntityId_0 + Entity.lists.N_LISTS
+        cmp.w   #Entities.BlankEntity.EntityId_0 + Entity.N_ENTITY_LISTS
         bcc     Loop
 
 
     // Test parameter Sum is correct value
     lda.w   Entities.BlankEntity.parameterSum
-    cmp.w   #2 * Entity.lists.N_LISTS
+    cmp.w   #2 * Entity.N_ENTITY_LISTS
     bne     Fail
 
 
@@ -171,7 +171,7 @@ constant tmp = Test.tmp
 
     // test list decreased by N_LISTS
     jsr     _FreeListLength
-    cmp.w   #Entity.N_ENTITIES - Entity.lists.N_LISTS * 2
+    cmp.w   #Entity.N_ENTITIES - Entity.N_ENTITY_LISTS * 2
     bne     Fail
 
     // Test each list length
@@ -186,7 +186,7 @@ constant tmp = Test.tmp
 
         tya
         inc
-        cmp.w   #Entity.lists.N_LISTS
+        cmp.w   #Entity.N_ENTITY_LISTS
         bcc     ListLoop
 
     jmp     _TestEntityListsValid
@@ -220,8 +220,8 @@ constant DEACTIVATED_PER_LIST = 4
 // still leaving some free.
 evaluate N_LISTS_TESTED = (Entity.N_ENTITIES - 2) / (ACTIVE_PER_LIST + DEACTIVATED_PER_LIST)
 assert({N_LISTS_TESTED} > 3)
-if {N_LISTS_TESTED} > Entity.lists.N_LISTS {
-    evaluate N_LISTS_TESTED = Entity.lists.N_LISTS
+if {N_LISTS_TESTED} > Entity.N_ENTITY_LISTS {
+    evaluate N_LISTS_TESTED = Entity.N_ENTITY_LISTS
 }
 
     jsr     Entity.Init
@@ -293,7 +293,7 @@ rodata(rom0)
 ExpectedSizes:
 namespace ExpectedSizes {
     evaluate n = 0
-    while {n} < Entity.lists.N_LISTS {
+    while {n} < Entity.N_ENTITY_LISTS {
         if {n} < {N_LISTS_TESTED} {
             dw  ACTIVE_PER_LIST
         } else {
@@ -309,7 +309,7 @@ namespace ExpectedSizes {
     assert(FREE > 0)
 
     constant size = pc() - ExpectedSizes
-    assert(size / 2 == Entity.lists.N_LISTS)
+    assert(size / 2 == Entity.N_ENTITY_LISTS)
 }
 }
 

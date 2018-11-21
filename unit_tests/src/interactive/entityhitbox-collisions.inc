@@ -234,7 +234,7 @@ namespace PlayerEntity {
     rodata(EN_RomData)
     RomData:
         dw  FunctionTable
-        db  Entity.ListId.PLAYER        // initialListId
+        db  EntityLists.PLAYERS         // initialListId
         db  0                           // defaultPalette
         dw  MSFS.EhCollisionTest_Player // frameSetId
 
@@ -303,7 +303,7 @@ namespace EnemyEntity {
     rodata(EN_RomData)
     RomData:
         dw  FunctionTable
-        db  Entity.ListId.ENEMY         // initialListId
+        db  EntityLists.ENEMIES         // initialListId
         db  0                           // defaultPalette
         dw  MSFS.EhCollisionTest_Enemy  // frameSetId
 
@@ -377,7 +377,7 @@ namespace CollisionCentreEntity {
     rodata(EN_RomData)
     RomData:
         dw  FunctionTable
-        db  Entity.ListId.PARTICLE      // initialListId
+        db  EntityLists.PARTICLES       // initialListId
         db  0                           // defaultPalette
         dw  MSFS.EhCollisionTest_Centre // frameSetId
 
@@ -405,7 +405,7 @@ constant X_CENTER = Camera.ORIGIN + Camera.DISPLAY_WIDTH / 2
         field(parameter, 2)
     endstruct()
 
-evaluate EN_ID = Entity.ListId.ENEMY
+evaluate EN_ID = EntityLists.ENEMIES
 
 constant PLAYER = PlayerEntity.ENTITY_ID
 constant ENEMY  = EnemyEntity.ENTITY_ID

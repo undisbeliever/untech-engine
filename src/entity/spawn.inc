@@ -293,7 +293,7 @@ a16()
 i16()
 code()
 function SpawnEnemyProjectileFromActionPoint {
-    ldx.w   #ListId.ENEMY_PROJECTILE
+    ldx.w   #EntityLists.ENEMY_PROJECTILES
     bra     _SpawnProjectileFromActionPoint
 }
 
@@ -315,7 +315,7 @@ a16()
 i16()
 code()
 function SpawnPlayerProjectileFromActionPoint {
-    ldx.w   #ListId.PLAYER_PROJECTILE
+    ldx.w   #EntityLists.PLAYER_PROJECTILES
 _fallthrough:
 }
 

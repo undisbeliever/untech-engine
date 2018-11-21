@@ -25,7 +25,7 @@ constant tmp = Test.tmp
     sta.w   Entity.Spawn.xPos
     sta.w   Entity.Spawn.yPos
 
-    assert(Entity.N_ENTITIES >= Entity.lists.N_LISTS)
+    assert(Entity.N_ENTITIES >= Entity.N_ENTITY_LISTS)
 
     lda.w   #Entities.BlankEntity.EntityId_0
     Loop:
@@ -36,12 +36,12 @@ constant tmp = Test.tmp
 
         lda.w   tmp
         inc
-        cmp.w   #Entities.BlankEntity.EntityId_0 + Entity.lists.N_LISTS
+        cmp.w   #Entities.BlankEntity.EntityId_0 + Entity.N_ENTITY_LISTS
         bcc     Loop
 
 
     jsr     _ActivateNextFrameListLength
-    cmp.w   #Entity.lists.N_LISTS
+    cmp.w   #Entity.N_ENTITY_LISTS
     bne     Fail
 
 
@@ -134,8 +134,8 @@ constant tmp = Test.tmp
 constant ENTITIES_PER_LIST = 3
 constant TEST_LIST_ID = 2
 
-assert(Entity.lists.N_LISTS * ENTITIES_PER_LIST < Entity.N_ENTITIES + 2)
-assert(Entity.lists.N_LISTS > 2)
+assert(Entity.N_ENTITY_LISTS * ENTITIES_PER_LIST < Entity.N_ENTITIES + 2)
+assert(Entity.N_ENTITY_LISTS > 2)
 
 
     jsr     Entity.Init
@@ -165,7 +165,7 @@ assert(Entity.lists.N_LISTS > 2)
 
         lda.w   tmp
         inc
-        cmp.w   #Entities.BlankEntity.EntityId_0 + Entity.lists.N_LISTS
+        cmp.w   #Entities.BlankEntity.EntityId_0 + Entity.N_ENTITY_LISTS
         bcc     Loop
 
 
@@ -202,7 +202,7 @@ Fail:
 rodata(rom0)
 ListLengthTable_Initial:
     evaluate n = 0
-    while {n} < Entity.lists.N_LISTS {
+    while {n} < Entity.N_ENTITY_LISTS {
         dw  ENTITIES_PER_LIST
         evaluate n = {n} + 1
     }
@@ -210,7 +210,7 @@ ListLengthTable_Initial:
 rodata(rom0)
 ListLengthTable_AfterDelete:
     evaluate n = 0
-    while {n} < Entity.lists.N_LISTS {
+    while {n} < Entity.N_ENTITY_LISTS {
         dw {n} != TEST_LIST_ID ? ENTITIES_PER_LIST : 0
         evaluate n = {n} + 1
     }

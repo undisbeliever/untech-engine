@@ -112,7 +112,7 @@ function Process_Active {
 
 
 evaluate n = 0
-while {n} < Entity.lists.N_LISTS {
+while {n} < Entity.N_ENTITY_LISTS {
     rodata(EN_RomData)
     RomData{n}:
         dw  FunctionTable

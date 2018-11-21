@@ -228,7 +228,7 @@ namespace MapCursorEntity {
     rodata(EN_RomData)
     RomData:
         dw  FunctionTable
-        db  Entity.ListId.PLAYER    // initialListId
+        db  EntityLists.PLAYERS     // initialListId
         db  0                       // defaultPalette
         dw  MSFS.Cursor             // frameSetId
 

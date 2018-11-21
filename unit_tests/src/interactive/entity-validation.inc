@@ -183,7 +183,7 @@ a16()
 i16()
 code()
 function MenuRoutine1 {
-    ldy.w   Entity.lists.FIRST + Entity.ListId.ENEMY * 2
+    ldx.w   {Entity.listAddress(ENEMIES)}
     beq     Fail
 
     jmp     _CreateInfiniteLoop_Y
@@ -203,7 +203,7 @@ a16()
 i16()
 code()
 function MenuRoutine2 {
-    ldx.w   Entity.lists.FIRST + Entity.ListId.ENEMY * 2
+    ldx.w   {Entity.listAddress(ENEMIES)}
     beq     Fail
 
     ldy.b   BaseEntity.next,x
@@ -226,7 +226,7 @@ a16()
 i16()
 code()
 function MenuRoutine3 {
-    ldy.w   Entity.lists.FIRST + Entity.lists._FREE_INDEX
+    ldy.w   Entity.lists.free
 
     jmp     _CreateInfiniteLoop_Y
 }
@@ -243,11 +243,11 @@ code()
 function MenuRoutine4 {
     // enemy->first = enemy->first->next
 
-    ldx.w   Entity.lists.FIRST + Entity.ListId.ENEMY * 2
+    ldx.w   {Entity.listAddress(ENEMIES)}
     beq     Fail
 
     lda.b   BaseEntity.next,x
-    sta.w   Entity.lists.FIRST + Entity.ListId.ENEMY * 2
+    sta.w   {Entity.listAddress(ENEMIES)}
 
     rts
 
@@ -268,11 +268,11 @@ code()
 function MenuRoutine5 {
     // deactivated->first = deactivated->first->next
 
-    ldx.w   Entity.lists.FIRST + Entity.lists._DEACTIVATED_INDEX
+    ldx.w   Entity.lists.deactivated
     beq     Fail
 
     lda.b   BaseEntity.next,x
-    sta.w   Entity.lists.FIRST + Entity.lists._DEACTIVATED_INDEX
+    sta.w   Entity.lists.deactivated
 
     rts
 
@@ -291,16 +291,16 @@ a16()
 i16()
 code()
 function MenuRoutine6 {
-    sta.w   Entity.lists.FIRST + Entity.ListId.BOSS * 2
+    sta.w   {Entity.listAddress(BOSSES)}
     beq     Fail
 
-    // boss->first = deactivated->first
+    // bosses->first = deactivated->first
     // deactivated->first = null
 
-    lda.w   Entity.lists.FIRST + Entity.lists._DEACTIVATED_INDEX
-    sta.w   Entity.lists.FIRST + Entity.ListId.BOSS * 2
+    lda.w   Entity.lists.deactivated
+    sta.w   {Entity.listAddress(BOSSES)}
 
-    stz.w   Entity.lists.FIRST + Entity.lists._DEACTIVATED_INDEX
+    stz.w   Entity.lists.deactivated
 
     rts
 
@@ -323,15 +323,15 @@ function MenuRoutine7 {
     // swap activateNextFrame and enemy lists
 
     // I want to test the list before the free list
-    assert(Entity.lists._ACTIVATE_NEXT_FRAME_INDEX == Entity.lists._FREE_INDEX - 2)
+    assert(Entity.lists.activateNextFrame == Entity.lists.free - 2)
 
-    ldy.w   Entity.lists.FIRST + Entity.lists._ACTIVATE_NEXT_FRAME_INDEX
+    ldy.w   Entity.lists.activateNextFrame
     bne     Fail
 
-    lda.w   Entity.lists.FIRST + Entity.ListId.ENEMY * 2
-    sty.w   Entity.lists.FIRST + Entity.ListId.ENEMY * 2
+    lda.w   {Entity.listAddress(ENEMIES)}
+    sty.w   {Entity.listAddress(ENEMIES)}
 
-    sta.w   Entity.lists.FIRST + Entity.lists._ACTIVATE_NEXT_FRAME_INDEX
+    sta.w   Entity.lists.activateNextFrame
 
     rts
 
@@ -350,9 +350,9 @@ a16()
 i16()
 code()
 function MenuRoutine8 {
-    // enemy->next->listId = Entity.ListId.PLAYER
+    // enemies->next->listId = EntityLists.PLAYERS
 
-    ldy.w   Entity.lists.FIRST + Entity.ListId.ENEMY * 2
+    ldy.w   {Entity.listAddress(PLAYERS)}
     beq     Fail
 
     ldx.b   BaseEntity.next,y
@@ -362,7 +362,7 @@ function MenuRoutine8 {
 
     sep     #$20
 a8()
-    lda.b   #Entity.ListId.PLAYER
+    lda.b   #EntityLists.PLAYERS
     sta.b   BaseEntity.listId,x
 
     rep     #$30
@@ -385,10 +385,10 @@ a16()
 i16()
 code()
 function MenuRoutine9 {
-    // free->last->next = enemy->first
-    // enemy->first = null
+    // free->last->next = enemies->first
+    // enemies->first = null
 
-    ldy.w   Entity.lists.FIRST + Entity.lists._FREE_INDEX
+    ldy.w   Entity.lists.free
     beq     Fail
 
     Loop:
@@ -397,10 +397,10 @@ function MenuRoutine9 {
         bne     Loop
 
     // X = last item in free list
-    lda.w   Entity.lists.FIRST + Entity.ListId.ENEMY * 2
+    lda.w   {Entity.listAddress(ENEMIES)}
     sta.b   BaseEntity.next,x
 
-    stz.w   Entity.lists.FIRST + Entity.ListId.ENEMY * 2
+    stz.w   {Entity.listAddress(ENEMIES)}
 
     rts
 
@@ -421,7 +421,7 @@ code()
 function MenuRoutine10 {
     // free.first->next->next.functionTable = 0x1337
 
-    ldx.w   Entity.lists.FIRST + Entity.lists._FREE_INDEX
+    ldx.w   Entity.lists.free
     beq     Fail
 
     ldy.b   BaseEntity.next,x

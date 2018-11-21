@@ -156,7 +156,7 @@ namespace ProjectileEntity {
     rodata(EN_RomData)
     RomData:
         dw  FunctionTable
-        db  Entity.ListId.NPC   // initialListId
+        db  EntityLists.NPCS    // initialListId
         db  0                   // defaultPalette
         dw  MSFS.Projectile     // frameSetId
 
@@ -308,7 +308,7 @@ namespace SpawnerEntity {
     rodata(EN_RomData)
     RomData:
         dw  FunctionTable
-        db  Entity.ListId.BOSS      // initialListId
+        db  EntityLists.BOSSES      // initialListId
         db  0                       // defaultPalette
         dw  MSFS.ActionPointSpawner // frameSetId
 
@@ -327,17 +327,17 @@ macro PrintListSizes() {
     Text.Console.SetCursor(0, 20)
     Text.Console.PrintConstString("\nPlayer Projectiles: ")
 
-    Entity.CountEntitiesInList(PLAYER_PROJECTILE)
+    Entity.CountEntitiesInList(PLAYER_PROJECTILES)
     jsr     Text.Console.PrintU16A
 
     Text.Console.PrintConstString("\nEnemy Projectiles:  ")
 
-    Entity.CountEntitiesInList(ENEMY_PROJECTILE)
+    Entity.CountEntitiesInList(ENEMY_PROJECTILES)
     jsr     Text.Console.PrintU16A
 
     Text.Console.PrintConstString("\nNPC Entities:       ")
 
-    Entity.CountEntitiesInList(NPC)
+    Entity.CountEntitiesInList(NPCS)
     jsr     Text.Console.PrintU16A
 }
 

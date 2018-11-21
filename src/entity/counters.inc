@@ -23,8 +23,8 @@ macro CountEntitiesInList(listName) {
     assert16a()
     assert16i()
 
-    lda.w   #Entity.ListId.{listName}
-    jsr     Entity.CountEntitiesInList
+    ldx.w   #{Entity.listIndex({listName})}
+    jsr     Entity.CountEntitiesInList._ListIndexX
 }
 
 
@@ -39,7 +39,7 @@ a16()
 i16()
 code()
 function CountEntitiesInList {
-    cmp.w   #lists.N_LISTS
+    cmp.w   #N_ENTITY_LISTS
     bcs     InvalidEntityListId
 
     asl

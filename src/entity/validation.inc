@@ -171,7 +171,7 @@ allocateTmpWord(_currentListIndex)
     Continue_OuterLoop:
         inx
         inx
-        cpx.w   #Entity.lists.N_LISTS * 2
+        cpx.w   #Entity.N_ENTITY_LISTS * 2
         bcc     OuterLoop
 }
 

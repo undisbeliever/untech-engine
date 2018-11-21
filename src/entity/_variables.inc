@@ -67,38 +67,38 @@ namespace BaseEntity {
     endstruct()
 }
 
+
+// The EntityLists enum contains the names of the entity lists
+// used by the subproject.
+if !{defined EntityLists.__ENUM__.current} {
+    error "Expected an enum named EntityLists"
+}
+
+// The engine requires that the EntityLists enum be:
+//   1. Closed with endEnum()
+//   2. With a starting value of 0
+//   3. With an increment value of 1
+assert({defined EntityLists.__ENUM__.closed})
+assert(EntityLists.__ENUM__.first == 0)
+assert(EntityLists.__ENUM__.last + 1 == EntityLists.__ENUM__.count)
+
 namespace Entity {
-    // A linked list of entity types
-    // (word addr)
+    constant N_ENTITY_LISTS = EntityLists.__ENUM__.count
+
+    // Retrieves the list index for a given entity list
+    define listIndex(l) = (EntityLists.{l} * 2)
+
+    // Retrieves the address of a given entity list
+    define listAddress(l) = (Entity.lists.FIRST + EntityLists.{l} * 2)
+
     namespace lists {
-        // Player entity and allies
-        allocate(players, wram7e, 2)
+        // A linked list containing the entities
+        // (word addr * N_ENTITY_LISTS)
+        allocate(_entityLists, wram7e, N_ENTITY_LISTS * 2)
 
-        // Bosses
-        allocate(bosses, wram7e, 2)
+        constant FIRST = _entityLists
+        constant LAST = FIRST + (N_ENTITY_LISTS - 1) * 2
 
-        // Enemies
-        allocate(enemies, wram7e, 2)
-
-        // NPCs
-        allocate(npcs, wram7e, 2)
-
-        // Platforms
-        allocate(platforms, wram7e, 2)
-
-        // Particles
-        allocate(particles, wram7e, 2)
-
-        // Player projectiles
-        allocate(playerProjectiles, wram7e, 2)
-
-        // Enemy projectiles
-        allocate(enemyProjectiles, wram7e, 2)
-
-
-    constant FIRST = players
-    constant LAST = enemyProjectiles
-    constant N_LISTS = (LAST - FIRST) / 2 + 1
 
         // Special lists
         // =============
@@ -134,23 +134,6 @@ namespace Entity {
     // If there are no free entities left then `lastFreeEntity` is 0.
     // (word addr)
     allocate(lastFreeEntity, wram7e, 2)
-
-    // Entity list Id used for the BaseEntityData struct
-    namespace ListId {
-        createEnum()
-            enum(PLAYER)
-            enum(BOSS)
-            enum(ENEMY)
-            enum(NPC)
-            enum(PLATFORM)
-            enum(PARTICLE)
-            enum(PLAYER_PROJECTILE)
-            enum(ENEMY_PROJECTILE)
-        endEnum()
-
-        assert(__ENUM__.count == lists.N_LISTS)
-    }
-
 
     // Active window size (beyond camera display)
     // inactive entities inside this window will become active.

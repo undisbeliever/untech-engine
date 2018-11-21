@@ -96,7 +96,7 @@ a16()
 i16()
 code()
 function DeleteEntitiesInList {
-    cmp.w   #lists.N_LISTS
+    cmp.w   #N_ENTITY_LISTS
     bcs     InvalidEntityListId
 
     asl
