@@ -54,6 +54,15 @@ i8()
     FrameCounter.VBlank()
     Controller.VBlank()
 
+    allocate(spritePriority, shadow, 2)
+    lda.w   spritePriority
+    inc
+    and.w   #(1 << 9) - 1
+    ora.w   #0x8000
+    sta.w   spritePriority
+    sta.w   OAMADD
+
+
     InidispBuffer.VBlank()
 
 
