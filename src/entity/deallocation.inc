@@ -66,7 +66,7 @@ a16()
 i16()
 code()
 function DeleteEntitiesInActivateNextFrameList {
-    ldx.w   #lists._ACTIVATE_NEXT_FRAME_INDEX
+    ldx.w   #specialLists.ACTIVATE_NEXT_FRAME_INDEX
     bra     DeleteEntitiesInList._ListIndexX
 }
 
@@ -79,7 +79,7 @@ a16()
 i16()
 code()
 function DeleteDeactivatedEntities {
-    ldx.w   #lists._DEACTIVATED_INDEX
+    ldx.w   #specialLists.DEACTIVATED_INDEX
     bra     DeleteEntitiesInList._ListIndexX
 }
 

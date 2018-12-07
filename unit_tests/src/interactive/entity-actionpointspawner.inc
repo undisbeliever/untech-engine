@@ -228,7 +228,7 @@ namespace SpawnerEntity {
         dec
         bpl     SkipSpawn
 
-            lda.w   Entity.lists.free
+            lda.w   Entity.specialLists.free
             sta.b   EntityStruct._freeListValue
 
 
@@ -239,7 +239,7 @@ namespace SpawnerEntity {
             jsr     (SpawnRoutineTable,x)
 
 
-            lda.w   Entity.lists.free
+            lda.w   Entity.specialLists.free
             cmp.b   EntityStruct._freeListValue
             beq     NoEntitySpawned
 

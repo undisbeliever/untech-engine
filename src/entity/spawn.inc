@@ -58,7 +58,7 @@ allocateTmpWord(yPos)
     asl
     tax
 
-    lda.w   lists.free
+    lda.w   specialLists.free
     beq     EntityPoolEmpty
 
     phd
@@ -68,7 +68,7 @@ allocateTmpWord(yPos)
 
         tcd
         lda.b   BaseEntity.next
-        sta.w   lists.free
+        sta.w   specialLists.free
         bne     +
             // There are no more free entities left, clear lastFreeEntity
             stz.w   lastFreeEntity
@@ -127,14 +127,14 @@ allocateTmpWord(yPos)
             SkipActiveWindowTest:
                 // We cannot move the entity into its entity list while
                 // the entity-loop is running.
-                // Instead we move it to the `activateNextFrame` list,
+                // Instead we move it to the `activateNextFrame` special list,
                 // where it will be activated and moved to the correct
                 // entity list at the start of the next frame.
 
-                lda.w   lists.activateNextFrame
+                lda.w   specialLists.activateNextFrame
                 sta.b   BaseEntity.next
                 tdc
-                sta.w   lists.activateNextFrame
+                sta.w   specialLists.activateNextFrame
 
                 bra     EndIf
 
@@ -146,10 +146,10 @@ allocateTmpWord(yPos)
             IsInactive:
                 // Insert the entity into the deactivated list
 
-                lda.w   lists.deactivated
+                lda.w   specialLists.deactivated
                 sta.b   BaseEntity.next
                 tdc
-                sta.w   lists.deactivated
+                sta.w   specialLists.deactivated
 
             EndIf:
 
@@ -402,7 +402,7 @@ EntityPoolEmpty:
 SpawnProjectile:
         rep     #$31
     a16()
-        lda.w   Entity.lists.free
+        lda.w   Entity.specialLists.free
         beq     EntityPoolEmpty
 
         stx.w   MetaSprite.ActionPoint.address
@@ -410,7 +410,7 @@ SpawnProjectile:
         // remove entity from free list
         tcd
         lda.b   BaseEntity.next
-        sta.w   Entity.lists.free
+        sta.w   Entity.specialLists.free
         bne     +
             // There are no more free entities left, clear lastFreeEntity
             stz.w   lastFreeEntity
@@ -466,14 +466,14 @@ SpawnProjectile:
 
         // We cannot move the entity into its entity list while the
         // entity-loop is running.
-        // Instead we move it to the `activateNextFrame` list, where it
+        // Instead we move it to the `activateNextFrame` special list, where it
         // will be activated and moved to the correct entity list at the
         // start of the next frame.
 
-        lda.w   lists.activateNextFrame
+        lda.w   specialLists.activateNextFrame
         sta.b   BaseEntity.next
         tdc
-        sta.w   lists.activateNextFrame
+        sta.w   specialLists.activateNextFrame
 
         ldx.w   MetaSprite.ActionPoint.address
 

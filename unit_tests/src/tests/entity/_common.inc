@@ -26,7 +26,7 @@ a16()
 i16()
 code()
 function _FreeListLength {
-    ldx.w   #Entity.lists._FREE_INDEX
+    ldx.w   #Entity.specialLists.FREE_INDEX
     jmp     Entity._CountEntitiesInListIndexX
 }
 
@@ -36,7 +36,7 @@ a16()
 i16()
 code()
 function _DeactivatedListLength {
-    ldx.w   #Entity.lists._DEACTIVATED_INDEX
+    ldx.w   #Entity.specialLists.DEACTIVATED_INDEX
     jmp     Entity._CountEntitiesInListIndexX
 }
 
@@ -46,7 +46,7 @@ a16()
 i16()
 code()
 function _ActivateNextFrameListLength {
-    ldx.w   #Entity.lists._ACTIVATE_NEXT_FRAME_INDEX
+    ldx.w   #Entity.specialLists.ACTIVATE_NEXT_FRAME_INDEX
     jmp     Entity._CountEntitiesInListIndexX
 }
 
@@ -80,10 +80,10 @@ allocateTmpWord(tmp_count)
 
     stz.w   tmp_count
 
-    // test deactivated entity is not active
-    macro _TestDeactivated(list) {
+    // test that entities in the given special list are not active
+    macro _TestSpecialListsDeactivated(list) {
         namespace {list} {
-            lda.w   Entity.lists.{list}
+            lda.w   Entity.specialLists.{list}
             beq     Skip
 
             Loop:
@@ -102,8 +102,8 @@ allocateTmpWord(tmp_count)
         }
     }
 
-    _TestDeactivated(deactivated)
-    _TestDeactivated(activateNextFrame)
+    _TestSpecialListsDeactivated(deactivated)
+    _TestSpecialListsDeactivated(activateNextFrame)
 
 
     // test all other entities are active

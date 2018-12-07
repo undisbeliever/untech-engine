@@ -57,7 +57,7 @@ a16()
     assert(N_ENTITIES > 2)
 
     ldx.w   #entityPool
-    stx.w   lists.free
+    stx.w   specialLists.free
 
 
     ldy.w   #InvalidEntityFunctionTable
@@ -92,12 +92,11 @@ a16()
     // free list is the last one
 
     // Ensure free list is the last one
-    assert(lists.deactivated < lists.free)
-    assert(lists.activateNextFrame < lists.free)
-    assert(lists.LAST < lists.free)
+    assert(specialLists.deactivated < specialLists.free)
+    assert(specialLists.activateNextFrame < specialLists.free)
+    assert(lists.LAST < specialLists.free)
 
-    lda.w   lists.free
-    ldx.w   #lists.free - lists.FIRST - 2
+    ldx.w   #specialLists.FREE_INDEX - 2
     -
         stz.w   lists.FIRST,x
         dex

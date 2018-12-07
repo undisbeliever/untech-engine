@@ -98,18 +98,19 @@ namespace Entity {
 
         constant FIRST = _entityLists
         constant LAST = FIRST + (N_ENTITY_LISTS - 1) * 2
+    }
 
+    // Special lists
+    // =============
+    // These lists MUST NOT BE accessed by the subproject
 
-        // Special lists
-        // =============
-        // These lists MUST NOT BE accessed by the subproject
-
+    namespace specialLists {
         // Deactivated entities
         //  - will not be processed
         //  - will be reactivated when the camera moves the entity inside
         //  active window
         allocate(deactivated, wram7e, 2)
-        constant _DEACTIVATED_INDEX = deactivated - FIRST
+        constant DEACTIVATED_INDEX = deactivated - lists.FIRST
 
         // List of entities that are to be activated at the start of the
         // next frame.
@@ -119,15 +120,15 @@ namespace Entity {
         //  frame, and
         //  B) Newly spawned active entities.
         allocate(activateNextFrame, wram7e, 2)
-        constant _ACTIVATE_NEXT_FRAME_INDEX = activateNextFrame - FIRST
+        constant ACTIVATE_NEXT_FRAME_INDEX = activateNextFrame - lists.FIRST
 
         // Unallocated Entities
         allocate(free, wram7e, 2)
-        constant _FREE_INDEX = free - FIRST
+        constant FREE_INDEX = free - lists.FIRST
 
 
-        constant _FIRST_SPECIAL_LIST_INDEX = _DEACTIVATED_INDEX
-        constant _LAST_SPECIAL_LIST_INDEX = _FREE_INDEX
+        constant FIRST_SPECIAL_LIST_INDEX = DEACTIVATED_INDEX
+        constant LAST_SPECIAL_LIST_INDEX = FREE_INDEX
     }
 
     // The last entity in the free list.

@@ -226,7 +226,7 @@ a16()
 i16()
 code()
 function MenuRoutine3 {
-    ldy.w   Entity.lists.free
+    ldy.w   Entity.specialLists.free
 
     jmp     _CreateInfiniteLoop_Y
 }
@@ -268,11 +268,11 @@ code()
 function MenuRoutine5 {
     // deactivated->first = deactivated->first->next
 
-    ldx.w   Entity.lists.deactivated
+    ldx.w   Entity.specialLists.deactivated
     beq     Fail
 
     lda.b   BaseEntity.next,x
-    sta.w   Entity.lists.deactivated
+    sta.w   Entity.specialLists.deactivated
 
     rts
 
@@ -297,10 +297,10 @@ function MenuRoutine6 {
     // bosses->first = deactivated->first
     // deactivated->first = null
 
-    lda.w   Entity.lists.deactivated
+    lda.w   Entity.specialLists.deactivated
     sta.w   {Entity.listAddress(BOSSES)}
 
-    stz.w   Entity.lists.deactivated
+    stz.w   Entity.specialLists.deactivated
 
     rts
 
@@ -323,15 +323,15 @@ function MenuRoutine7 {
     // swap activateNextFrame and enemy lists
 
     // I want to test the list before the free list
-    assert(Entity.lists.activateNextFrame == Entity.lists.free - 2)
+    assert(Entity.specialLists.activateNextFrame == Entity.specialLists.free - 2)
 
-    ldy.w   Entity.lists.activateNextFrame
+    ldy.w   Entity.specialLists.activateNextFrame
     bne     Fail
 
     lda.w   {Entity.listAddress(ENEMIES)}
     sty.w   {Entity.listAddress(ENEMIES)}
 
-    sta.w   Entity.lists.activateNextFrame
+    sta.w   Entity.specialLists.activateNextFrame
 
     rts
 
@@ -388,7 +388,7 @@ function MenuRoutine9 {
     // free->last->next = enemies->first
     // enemies->first = null
 
-    ldy.w   Entity.lists.free
+    ldy.w   Entity.specialLists.free
     beq     Fail
 
     Loop:
@@ -421,7 +421,7 @@ code()
 function MenuRoutine10 {
     // free.first->next->next.functionTable = 0x1337
 
-    ldx.w   Entity.lists.free
+    ldx.w   Entity.specialLists.free
     beq     Fail
 
     ldy.b   BaseEntity.next,x

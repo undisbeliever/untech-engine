@@ -109,7 +109,7 @@ macro __ValidateEntityLists() {
 
         inx
         inx
-        cpx.w   #Entity.lists._LAST_SPECIAL_LIST_INDEX + 1
+        cpx.w   #Entity.specialLists.LAST_SPECIAL_LIST_INDEX + 1
         bcc     OuterLoop
 
 
@@ -196,7 +196,7 @@ macro __ValidateSpecialEntityLists() {
     assert16i()
 
 
-    ldx.w   #lists._FIRST_SPECIAL_LIST_INDEX
+    ldx.w   #specialLists.FIRST_SPECIAL_LIST_INDEX
 
     OuterLoop:
         lda.w   lists.FIRST,x
@@ -219,8 +219,8 @@ macro __ValidateSpecialEntityLists() {
         inx
 
         // do not test the free list, that is done separately
-        assert(lists._LAST_SPECIAL_LIST_INDEX == lists._FREE_INDEX)
-        cpx.w   #lists._LAST_SPECIAL_LIST_INDEX - 1
+        assert(specialLists.LAST_SPECIAL_LIST_INDEX == specialLists.FREE_INDEX)
+        cpx.w   #specialLists.LAST_SPECIAL_LIST_INDEX - 1
         bcc     OuterLoop
 }
 
@@ -251,7 +251,7 @@ macro __ValidateFreeList() {
     lda.w   #0
     tcd
 
-    lda.w   Entity.lists.FIRST + Entity.lists._FREE_INDEX
+    lda.w   Entity.specialLists.free
     beq     SkipTest
 
         ldx.w   #InvalidEntityFunctionTable

@@ -38,27 +38,27 @@ allocateTmpWord(_previousEntity)
 allocateTmpWord(_currentEntityList)
 
 
-// Change the list of the current entity.
+// Move the current entity to a given special list.
 //
 // ASSUMES: The system is in the middle of an entity loop.
 // ASSUMES: The given list if not the currently looping list
 //
 // REQUIRES: 16 bit A, 16 bit Index, DB = 0x7e
 //
-// PARAM: the entity list to move the entity to
+// PARAM: the special list to move the entity into
 //
 // INPUT: DP = The current entity being processed
 //        _previousEntity = The address of the previous entity.
 //                          If there is no previous entity, then
 //                          `_previousEntity` is the address of the
 //                          current entity list.
-// OUTPUT: A = The address of the next entity of the original entity
+// OUTPUT: A = The address of the next entity of the original list
 //         z set if the current entity has no next entity
 //               (ie, there is no more entities in the current list)
 //
 // NOTE: You MUST NOT set the `_previousEntity` variable after invoking
 // this macro.
-macro __ChangeEntityList(list) {
+macro __MoveEntityToSpecialList(list) {
     assert16a()
     assert16i()
 
@@ -79,11 +79,11 @@ macro __ChangeEntityList(list) {
     sta.w   BaseEntity.next,x
     tax
 
-    lda.w   Entity.lists.{list}
+    lda.w   Entity.specialLists.{list}
     sta.b   BaseEntity.next
 
     tdc
-    sta.w   Entity.lists.{list}
+    sta.w   Entity.specialLists.{list}
 
     txa
 }
@@ -148,13 +148,13 @@ macro _ProcessActivateNextFrameList() {
     assert16a()
     assert16i()
 
-    lda.w   Entity.lists.activateNextFrame
+    lda.w   Entity.specialLists.activateNextFrame
     beq     EndLoop
 
     // this allows _previousEntity variable to work on first item
     assert(BaseEntity.next == 0)
 
-    ldy.w   #Entity.lists.activateNextFrame
+    ldy.w   #Entity.specialLists.activateNextFrame
     sty.w   Entity._previousEntity
 
     Loop:
@@ -234,10 +234,10 @@ macro _ProcessActiveWindow() {
         sta.w   Entity.prevActiveWindowY
 
 
-        lda.w   Entity.lists.deactivated
+        lda.w   Entity.specialLists.deactivated
         beq     EndLoop
 
-        ldy.w   #Entity.lists.deactivated
+        ldy.w   #Entity.specialLists.deactivated
         sty.w   Entity._previousEntity
 
         Loop:
@@ -251,8 +251,8 @@ macro _ProcessActiveWindow() {
                 bcs     ActivatedSuccessfully
 
                     // Could not activate the entity.
-                    // Try again in the next frame.
-                    ldy.w   #Entity.lists._ACTIVATE_NEXT_FRAME_INDEX
+                    // Try again on the next frame.
+                    ldy.w   #Entity.specialLists.ACTIVATE_NEXT_FRAME_INDEX
                     bra     _ChangeEntityList_Y
 
 
@@ -368,9 +368,10 @@ NoFunctionPointer:
 
 // Goto and process to the next entity.
 //
-// NOTE: If the entity list has changed by using `__ChangeEntityList` or
-// `__ChangeEntityList_Y` then you MUST IMMEDIATELY ENTER this routine
-// via the `GotoNextEntity.EntityListChanged` label.
+// NOTE: If the entity is moved into a different list (ie, by using
+// `__ChangeEntityList_Y`) then you MUST NOT change `_previousEntity`
+// AND IMMEDIATELY ENTER this routine via the
+// `GotoNextEntity.EntityListChanged` label.
 //
 // REQUITES: 16 bit A, 16 bit Index, DB = 0x7e
 // INPUT: dp = current entity
@@ -555,7 +556,7 @@ function DeleteAndGotoNextEntity {
 
 
     FreeListEmpty:
-        sta.w   lists.free
+        sta.w   specialLists.free
 
         txa
 
@@ -632,8 +633,8 @@ function DeactivateAndGotoNextEntity {
     ldx.b   BaseEntity.functionTable
     jsr     (BaseEntityFunctionTable.Deactivated,x)
 
-    __ChangeEntityList(deactivated)
-    // MUST JUMP directly to `GotoNextEntity.EntityListChanged` IMMEDIATELY AFTER a __ChangeEntityList() call
+    __MoveEntityToSpecialList(deactivated)
+    // MUST JUMP directly to `GotoNextEntity.EntityListChanged` IMMEDIATELY AFTER a __MoveEntityToSpecialList() call
 
     bra     GotoNextEntity.EntityListChanged
 }
@@ -717,9 +718,10 @@ FallThrough:
 //
 // MUST ONLY BE CALLED in the Entity's Process routine
 //
-// INTERNAL NOTE: If the entity list has changed by using
-// `__ChangeEntityList` or `__ChangeEntityList_Y` then you MUST
-// IMMEDIATELY ENTER this routine via the `EntityListChanged` label.
+// INTERNAL NOTE: If the entity is moved into a different list (ie, by
+// using `__ChangeEntityList_Y`) then you MUST NOT change
+// `_previousEntity` AND IMMEDIATELY ENTER this routine via the
+// `EntityListChanged` label.
 //
 // REQUIRES: 16 bit A, 16 bit Index, DB = 0x7e
 // INPUT: dp = current entity
