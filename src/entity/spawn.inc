@@ -89,11 +89,11 @@ allocateTmpWord(yPos)
 
         lda.w   xPos
         sta.b   BaseEntity.xPos.px
-        stz.b   BaseEntity.xPos
+        stz.b   BaseEntity.xPos.sx
 
         lda.w   yPos
         sta.b   BaseEntity.yPos.px
-        stz.b   BaseEntity.yPos
+        stz.b   BaseEntity.yPos.sx
 
         stz.b   BaseEntity.xVecl
         stz.b   BaseEntity.xVecl + 2
@@ -430,7 +430,7 @@ SpawnProjectile:
         adc.w   #-INT_MS8_OFFSET - 1
         adc.w   BaseEntity.xPos.px,y
         sta.b   BaseEntity.xPos.px
-        stz.b   BaseEntity.xPos
+        stz.b   BaseEntity.xPos.sx
 
         clc
         lda.l   MetaSprite.Format.ActionPoints.yPos,x
@@ -439,7 +439,7 @@ SpawnProjectile:
         adc.w   #-INT_MS8_OFFSET - 1
         adc.w   BaseEntity.yPos.px,y
         sta.b   BaseEntity.yPos.px
-        stz.b   BaseEntity.yPos
+        stz.b   BaseEntity.yPos.sx
 
         stz.b   BaseEntity.xVecl
         stz.b   BaseEntity.xVecl + 2

@@ -146,10 +146,10 @@ namespace MapCursorEntity {
             //      Camera.pos = pos - displaySize
 
             clc
-            lda.b   EntityStruct.{c}Pos
+            lda.b   EntityStruct.{c}Pos.sx
             adc.b   EntityStruct.{c}Vecl
-            sta.b   EntityStruct.{c}Pos
-            lda.b   EntityStruct.{c}Pos + 2
+            sta.b   EntityStruct.{c}Pos.sx
+            lda.b   EntityStruct.{c}Pos.px
             adc.b   EntityStruct.{c}Vecl + 2
 
             cmp.w   MetaTiles.map.{minMap}
@@ -162,7 +162,7 @@ namespace MapCursorEntity {
                 lda.w   MetaTiles.map.{maxMap}
                 dec
             +
-            sta.b   EntityStruct.{c}Pos + 2
+            sta.b   EntityStruct.{c}Pos.px
 
             cmp.w   Camera.{c}Pos
             bcc     +

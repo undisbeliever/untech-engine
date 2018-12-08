@@ -54,11 +54,11 @@ namespace BaseEntity {
         MetaSprite.EntityData()
 
         // position of entities relative to map
-        // (2 x 0:16:16 fixed point - pixels)
-        field(xPos, 2)
-        field(xPos.px, 2)
-        field(yPos, 2)
-        field(yPos.px, 2)
+        // (2 x 0:16:16 fixed point)
+        field(xPos.sx, 2)   // subpixel position
+        field(xPos.px, 2)   // pixel position
+        field(yPos.sx, 2)   // subpixel position
+        field(yPos.px, 2)   // pixel position
 
         // velocity of entity
         // (2 x 1:15:16 fixed point - pixels/display frame)
