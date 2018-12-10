@@ -35,6 +35,13 @@ function __EntityDestructor {
     sta.b   BaseEntity.functionTable
 
 
+    sep     #$10
+i8()
+    _EntityIdTable.RemoveEntity()
+    rep     #$30
+i16()
+a16()
+
     if !{defined NO_CLEAR_ENTITY_MEMORY} {
         // Clear entity memory with 0xdead when deleted
 
@@ -45,7 +52,11 @@ function __EntityDestructor {
         lda.w   #0xdead
         evaluate n = 4
         while {n} < ENTITY_SIZE {
-            if {n} != BaseEntity.MetaSprite.status & ~1 {
+            if {n} == BaseEntity.entityId & ~1 {
+                // do nothing, cleared by _EntityIdTable.RemoveEntity
+            } else if {n} == BaseEntity.MetaSprite.status & ~1 {
+                // do nothing, cleared by MetaSprite.EntityDestructor
+            } else {
                 sta.b   {n}
             }
             evaluate n = {n} + 2
@@ -53,6 +64,9 @@ function __EntityDestructor {
     }
 
     rts
+
+InvalidEntityId:
+    break(ENTITYID_INVALID)
 }
 
 

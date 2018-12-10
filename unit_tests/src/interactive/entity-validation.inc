@@ -17,7 +17,7 @@ constant cursorIndex = Test.dpTmp + 0
 constant menuLineIndex = Test.dpTmp + 2
 
 
-constant N_MENU_ITEMS = 11
+constant N_MENU_ITEMS = 17
 
 
 // REQUIRES: 16 bit A, 16 bit Index, DB = 0x7e, DP = 0
@@ -412,7 +412,7 @@ Fail:
 
 rodata(rom0)
 MenuText10:
-    db  "Invalid free functionTable", 0
+    db  "Invalid free functionTabl", 0
 
 // REQUITES: 16 bit A, 16 bit Index, DB = 0x7e, DP = 0
 a16()
@@ -434,6 +434,171 @@ function MenuRoutine10 {
 
 Fail:
     // unexpected null pointer
+    break(ASSERT_FAILURE)
+}
+
+
+rodata(rom0)
+MenuText11:
+    db  "Corrupt entityIdTable[0]", 0
+
+// REQUITES: 16 bit A, 16 bit Index, DB = 0x7e, DP = 0
+a16()
+i16()
+code()
+function MenuRoutine11 {
+    // Entity.entityIdTable[0] = Entity.entityPool + ENTITY_SIZE * 20
+
+    assert(Entity.N_ENTITIES > 21)
+    constant entity = Entity.entityPool + Entity.ENTITY_SIZE * 20
+
+    // Cell 0 should always be _unusedEntity
+
+    lda.w   #entity
+    sta.w   Entity.entityIdTable
+
+    // Ensure the entityId -> entity mapping test passes
+    stz.w   entity + BaseEntity.entityId
+
+    rts
+}
+
+
+rodata(rom0)
+MenuText12:
+    db  "Corrupt entityIdTable", 0
+
+// REQUITES: 16 bit A, 16 bit Index, DB = 0x7e, DP = 0
+a16()
+i16()
+code()
+function MenuRoutine12 {
+    // Entity.entityIdTable[6] = 0x1337
+
+    lda.w   #0x1337
+    sta.w   Entity.entityIdTable + 6 * 2
+
+    rts
+}
+
+
+rodata(rom0)
+MenuText13:
+    db  "Dup entityIdTable cell", 0
+
+// REQUITES: 16 bit A, 16 bit Index, DB = 0x7e, DP = 0
+a16()
+i16()
+code()
+function MenuRoutine13 {
+    // assert(entityIdTable[120] < 0x8000)
+    // assert(entityIdTable[124] < 0x8000)
+    // entityIdTable[120] = entityIdTable[124]
+
+    assert(124 * 2 < Entity.MAX_ENTITY_ID)
+    constant OFFSET_A = 120 * 2
+    constant OFFSET_B = 124 * 2
+
+    lda.w   Entity.entityIdTable + OFFSET_A
+    bmi     Fail
+
+    ldy.w   Entity.entityIdTable + OFFSET_B
+    bmi     Fail
+
+    sta.w   Entity.entityIdTable + OFFSET_B
+
+    rts
+
+Fail:
+    break(ASSERT_FAILURE)
+}
+
+
+rodata(rom0)
+MenuText14:
+    db  "Clear entityIdTable cell", 0
+
+// REQUITES: 16 bit A, 16 bit Index, DB = 0x7e, DP = 0
+a16()
+i16()
+code()
+function MenuRoutine14 {
+    // assert(entityIdTable[123] != _unusedEntity)
+    // entityIdTable[123] = _unusedEntity
+
+    constant OFFSET = 123 * 2
+
+    lda.w   #Entity._unusedEntity
+    cmp.w   Entity.entityIdTable + OFFSET
+    beq     Fail
+    sta.w   Entity.entityIdTable + OFFSET
+
+    rts
+
+Fail:
+    break(ASSERT_FAILURE)
+}
+
+
+rodata(rom0)
+MenuText15:
+    db  "Corrupt entityId", 0
+
+// REQUITES: 16 bit A, 16 bit Index, DB = 0x7e, DP = 0
+a16()
+i16()
+code()
+function MenuRoutine15 {
+    // enemies.first->next->entityId++
+
+    ldy.w   {Entity.listAddress(ENEMIES)}
+    beq     Fail
+
+    ldx.w   BaseEntity.next,y
+    beq     Fail
+
+    sep     #$20
+a8()
+    inc.w   BaseEntity.entityId,x
+    rep     #$30
+a16()
+
+    rts
+
+Fail:
+    // boss list empty
+    break(ASSERT_FAILURE)
+}
+
+
+rodata(rom0)
+MenuText16:
+    db  "Two entities with same id", 0
+
+// REQUITES: 16 bit A, 16 bit Index, DB = 0x7e, DP = 0
+a16()
+i16()
+code()
+function MenuRoutine16 {
+    // enemies.first->next->entityId = enemies.first->entityId
+
+    ldx.w   {Entity.listAddress(ENEMIES)}
+    beq     Fail
+
+    ldy.w   BaseEntity.next,x
+    beq     Fail
+
+    sep     #$20
+a8()
+    lda.w   BaseEntity.entityId,x
+    sta.w   BaseEntity.entityId,y
+    rep     #$30
+a16()
+
+    rts
+
+Fail:
+    // boss list empty
     break(ASSERT_FAILURE)
 }
 

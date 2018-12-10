@@ -79,6 +79,7 @@ include "metasprite/vram.inc"
 include "metasprite/render.inc"
 include "metasprite/_common.inc"
 
+include "entity/entityidtable.inc"
 include "entity/activewindow.inc"
 include "entity/allocation.inc"
 include "entity/counters.inc"

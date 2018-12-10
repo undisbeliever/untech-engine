@@ -74,7 +74,6 @@ allocateTmpWord(yPos)
             stz.w   lastFreeEntity
         +
 
-
         // Get Entity ROM Data
 
         lda.l   Entity.Data.EntityList,x
@@ -102,6 +101,8 @@ allocateTmpWord(yPos)
 
         lda.l   BaseEntityData.initialListId,x
         sta.b   BaseEntity.listId
+        // check if was safe to do a 16 bit write to listId
+        assert(BaseEntity.listId + 1 == BaseEntity.MetaSprite.frameSet)
 
         assert(BaseEntityData.initialListId + 1 == BaseEntityData.defaultPalette)
         xba
@@ -109,6 +110,14 @@ allocateTmpWord(yPos)
         lda.l   BaseEntityData.frameSetId,x
 
         MetaSprite._InitEntity()
+
+
+        // Assign an new entityId to the entity
+        sep     #$10
+    i8()
+        Entity._EntityIdTable.AssignEntityId()
+        rep     #$30
+    i16()
 
 
         // Call Entity Init function
@@ -419,6 +428,8 @@ SpawnProjectile:
         // save entity listId
         lda.w   tmp_listId
         sta.b   BaseEntity.listId
+        // check if was safe to do a 16 bit write to listId
+        assert(BaseEntity.listId + 1 == BaseEntity.MetaSprite.frameSet)
 
         // calculate entity location
         ldy.w   tmp_entityDoingSpawning

@@ -38,6 +38,15 @@ namespace BaseEntity {
         // (word addr)
         field(romPtr, 2)
 
+        // EntityIdTable identifier for the current entity.
+        //
+        // If zero then the entity is not in the `entityIdTable`.
+        //
+        // NOTE: projectile entities will not be given an entityId.
+        //
+        // (byte index)
+        field(entityId, 1)
+
         // Entity List Id for the current entity
         //
         // Set to `BaseEntityData.initialListId` before entity's
@@ -177,6 +186,51 @@ namespace Entity {
 
     // The mask which the Camera pos is compared to prevActiveWindow.
     constant TEST_ACTIVE_WINDOW_MASK = ~3
+
+
+
+    // Entity Table
+    // ============
+
+    // The largest valid entityId
+    // NOTE: bit 0 of this value must be clear
+    constant MAX_ENTITY_ID = 127 * 2
+
+    // Mapping of entity ids to addresses
+    // If the entity id does not exist it points to `_emptyEntity`
+    // (addr table)
+    allocate(entityIdTable, wram7e, MAX_ENTITY_ID + 2)
+
+    // Placeholder for the unused entity Ids.
+    //
+    // It exists in ROM space (address > 0x8000) for two reasons:
+    //   1) Bad code that writes to an unused entity Id will not clobber
+    //      zero-page.
+    //   2) Testing if an entityId is unused can be done with the `n`
+    //      status flag.
+    allocate(_unusedEntity, wram7e, ENTITY_SIZE)
+    assert(_unusedEntity > 0x8000)
+
+    // The cursor position in the entityIdTable.
+    //
+    // This value MUST BE:
+    //  * Less than or equal to MAX_ENTITY_ID
+    //  * Have bit 0 clear
+    // (byte index)
+    allocate(currentEntityId, wram7e, 1)
+
+    // The minimum allowed entityId when Spawning a new entity
+    //
+    // This value will be set to the number of entities in the
+    // level.
+    //
+    // This value must be:
+    //  * Non-zero
+    //  * Less than MAX_ENTITY_ID
+    //  * Have bit 0 clear
+    //
+    // (byte index)
+    allocate(minimumEntityId, wram7e, 1)
 }
 
 // vim: ft=bass-65816 ts=4 sw=4 et:
