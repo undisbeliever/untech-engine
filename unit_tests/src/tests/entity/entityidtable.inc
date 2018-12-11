@@ -37,11 +37,18 @@ a8()
     rep     #$30
 a16()
 
-    // Test GetEntityWithIdOrBranchIfEmpty returns this entity
+    // Test GetEntityWithIdOrBranchIfEmpty_Y returns this entity
     // Y = entityAddr
     lda.w   BaseEntity.entityId,y
-    Entity.GetEntityWithIdOrBranchIfEmpty(Fail)
+    Entity.GetEntityWithIdOrBranchIfEmpty_Y(Fail)
     cpy.w   entityAddr
+    bne     Fail
+
+    // Test GetEntityWithIdOrBranchIfEmpty_X returns this entity
+    ldy.w   entityAddr
+    lda.w   BaseEntity.entityId,y
+    Entity.GetEntityWithIdOrBranchIfEmpty_X(Fail)
+    cpx.w   entityAddr
     bne     Fail
 
 
@@ -84,13 +91,19 @@ a8()
     cmp.w   oldCurrent
     beq     Fail
 
-    // Test GetEntityWithIdOrBranchIfEmpty_A8 returns this entity
+    // Test GetEntityWithIdOrBranchIfEmpty_A8Y returns this entity
     // Y = entityAddr
     lda.w   BaseEntity.entityId,y
-    Entity.GetEntityWithIdOrBranchIfEmpty_A8(Fail)
+    Entity.GetEntityWithIdOrBranchIfEmpty_A8Y(Fail)
     cpy.w   entityAddr
     bne     Fail
 
+    // Test GetEntityWithIdOrBranchIfEmpty_A8X returns this entity
+    ldy.w   entityAddr
+    lda.w   BaseEntity.entityId,y
+    Entity.GetEntityWithIdOrBranchIfEmpty_A8X(Fail)
+    cpx.w   entityAddr
+    bne     Fail
 
     rep     #$30
 a16()
@@ -193,7 +206,7 @@ _AfterInit:
 
 
             // Test entityIdTable value is correct
-            Entity.GetEntityWithIdOrBranchIfEmpty(Fail)
+            Entity.GetEntityWithIdOrBranchIfEmpty_Y(Fail)
             cpy.w   entityAddr
             bne     Fail
 

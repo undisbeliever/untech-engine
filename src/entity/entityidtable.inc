@@ -144,7 +144,7 @@ SkipRemoveEntity:
 // INPUT: A = entityId (only the first n bits are used)
 // OUTPUT: Y = entity address
 // BRANCH: *label* if there is no entity with the id
-macro GetEntityWithIdOrBranchIfEmpty(label) {
+macro GetEntityWithIdOrBranchIfEmpty_Y(label) {
     assert(Entity._unusedEntity > 0x8000)
     assertPowerOfTwo(Entity.MAX_ENTITY_ID + 2)
     assert(Entity.MAX_ENTITY_ID & 1 == 0)
@@ -159,6 +159,29 @@ macro GetEntityWithIdOrBranchIfEmpty(label) {
 }
 
 
+// Get the address of the entity with the given entityId,
+// branching to *label* if there is no entity with the
+// given entityId.
+//
+// REQUIRES: 16 bit A, 16 bit Index, DB = 0x7e
+// INPUT: A = entityId (only the first n bits are used)
+// OUTPUT: X = entity address
+// BRANCH: *label* if there is no entity with the id
+macro GetEntityWithIdOrBranchIfEmpty_X(label) {
+    assert(Entity._unusedEntity > 0x8000)
+    assertPowerOfTwo(Entity.MAX_ENTITY_ID + 2)
+    assert(Entity.MAX_ENTITY_ID & 1 == 0)
+
+    assert16a()
+    assert16i()
+
+    and.w   #Entity.MAX_ENTITY_ID
+    tay
+    ldx.w   Entity.entityIdTable,y
+    bmi     {label}
+}
+
+
 
 // Get the address of the entity with the given entityId,
 // branching to *label* if there is no entity with the
@@ -168,7 +191,7 @@ macro GetEntityWithIdOrBranchIfEmpty(label) {
 // INPUT: A = entityId
 // OUTPUT: Y = entity address
 // BRANCH: *label* if there is no entity with the id
-macro GetEntityWithIdOrBranchIfEmpty_A8(label) {
+macro GetEntityWithIdOrBranchIfEmpty_A8Y(label) {
     assert(Entity._unusedEntity > 0x8000)
     assertPowerOfTwo(Entity.MAX_ENTITY_ID + 2)
     assert(Entity.MAX_ENTITY_ID & 1 == 0)
@@ -184,6 +207,35 @@ i8()
     rep     #$10
 i16()
     ldy.w   Entity.entityIdTable,x
+    bmi     {label}
+}
+
+
+
+// Get the address of the entity with the given entityId,
+// branching to *label* if there is no entity with the
+// given entityId.
+//
+// REQUIRES: 16 bit Index, DB = 0x7e
+// INPUT: A = entityId
+// OUTPUT: X = entity address
+// BRANCH: *label* if there is no entity with the id
+macro GetEntityWithIdOrBranchIfEmpty_A8X(label) {
+    assert(Entity._unusedEntity > 0x8000)
+    assertPowerOfTwo(Entity.MAX_ENTITY_ID + 2)
+    assert(Entity.MAX_ENTITY_ID & 1 == 0)
+    assert(Entity.MAX_ENTITY_ID < 255)
+
+    assert8a()
+    assert16i()
+
+    and.b   #Entity.MAX_ENTITY_ID
+    sep     #$10
+i8()
+    tay
+    rep     #$10
+i16()
+    ldx.w   Entity.entityIdTable,y
     bmi     {label}
 }
 
