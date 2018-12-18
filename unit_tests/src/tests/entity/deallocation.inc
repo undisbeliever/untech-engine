@@ -27,7 +27,7 @@ constant tmp = Test.tmp
 
     assert(Entity.N_ENTITIES >= Entity.N_ENTITY_LISTS)
 
-    lda.w   #Entities.BlankEntity.EntityId_0
+    lda.w   #Entities.BlankEntity.EntityDataId_0
     Loop:
         sta.w   tmp
 
@@ -36,7 +36,7 @@ constant tmp = Test.tmp
 
         lda.w   tmp
         inc
-        cmp.w   #Entities.BlankEntity.EntityId_0 + Entity.N_ENTITY_LISTS
+        cmp.w   #Entities.BlankEntity.EntityDataId_0 + Entity.N_ENTITY_LISTS
         bcc     Loop
 
 
@@ -94,7 +94,7 @@ assert(N_ENTITIES_TO_SPAWN < Entity.N_ENTITIES + 2)
         sta.w   Entity.Spawn.xPos
         sta.w   Entity.Spawn.yPos
 
-        lda.w   #Entities.DeactivateIfOutsideEntity.EntityId_0
+        lda.w   #Entities.DeactivateIfOutsideEntity.EntityDataId_0
         jsr     Entity.Spawn
         bcc     Fail
 
@@ -146,7 +146,7 @@ assert(Entity.N_ENTITY_LISTS > 2)
     sta.w   Entity.Spawn.xPos
     sta.w   Entity.Spawn.yPos
 
-    lda.w   #Entities.BlankEntity.EntityId_0
+    lda.w   #Entities.BlankEntity.EntityDataId_0
     Loop:
         sta.w   tmp
 
@@ -165,7 +165,7 @@ assert(Entity.N_ENTITY_LISTS > 2)
 
         lda.w   tmp
         inc
-        cmp.w   #Entities.BlankEntity.EntityId_0 + Entity.N_ENTITY_LISTS
+        cmp.w   #Entities.BlankEntity.EntityDataId_0 + Entity.N_ENTITY_LISTS
         bcc     Loop
 
 

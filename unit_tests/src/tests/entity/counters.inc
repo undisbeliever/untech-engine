@@ -26,8 +26,8 @@ function _SetupCounterTest {
     constant N_ACTIVE_ENEMIES = N_ONSCREEN_DIO_ENTITIES + N_DAD_ENTITIES
 
     assert(EntityLists.ENEMIES == 2)
-    constant DIO_ENTITY_ID = Entities.DeactivateIfOutsideEntity.EntityId_2
-    constant DAD_ENTITY_ID = Entities.DeleteAfterDelayEntity.EntityId_2
+    constant DIO_ENTITY_DATA_ID = Entities.DeactivateIfOutsideEntity.EntityDataId_2
+    constant DAD_ENTITY_DATA_ID = Entities.DeleteAfterDelayEntity.EntityDataId_2
 
     jsr     Entity.Init
     bcc     Fail
@@ -38,15 +38,15 @@ function _SetupCounterTest {
     sta.w   Camera.xPos
     sta.w   Camera.yPos
 
-    lda.w   #DIO_ENTITY_ID
+    lda.w   #DIO_ENTITY_DATA_ID
     jsr     Entity.Spawn
     bcc     Fail
 
-    lda.w   #DAD_ENTITY_ID
+    lda.w   #DAD_ENTITY_DATA_ID
     jsr     Entity.Spawn
     bcc     Fail
 
-    lda.w   #DIO_ENTITY_ID
+    lda.w   #DIO_ENTITY_DATA_ID
     jsr     Entity.Spawn
     bcc     Fail
 
@@ -56,23 +56,23 @@ function _SetupCounterTest {
     sta.w   Entity.Spawn.xPos
     sta.w   Entity.Spawn.yPos
 
-    lda.w   #DIO_ENTITY_ID
+    lda.w   #DIO_ENTITY_DATA_ID
     jsr     Entity.Spawn
     bcc     Fail
 
-    lda.w   #DIO_ENTITY_ID
+    lda.w   #DIO_ENTITY_DATA_ID
     jsr     Entity.Spawn
     bcc     Fail
 
-    lda.w   #DAD_ENTITY_ID
+    lda.w   #DAD_ENTITY_DATA_ID
     jsr     Entity.Spawn
     bcc     Fail
 
-    lda.w   #DAD_ENTITY_ID
+    lda.w   #DAD_ENTITY_DATA_ID
     jsr     Entity.Spawn
     bcc     Fail
 
-    lda.w   #DAD_ENTITY_ID
+    lda.w   #DAD_ENTITY_DATA_ID
     jsr     Entity.Spawn
     bcc     Fail
 

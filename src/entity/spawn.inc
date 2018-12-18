@@ -35,7 +35,7 @@ EntityPoolEmpty:
 //
 // REQUIRES: 16 bit A, 16 bit Index, DB = $7E
 //
-// INPUT: A - Entity Id
+// INPUT: A - Entity Data Id
 //        Y - entity parameter (passed to entity init function)
 //        Entity.Spawn.xPos - entity x Position (uint16)
 //        Entity.Spawn.yPos - entity y Position (uint16)
@@ -50,7 +50,7 @@ function Spawn {
 allocateTmpWord(xPos)
 allocateTmpWord(yPos)
 
-    cmp.w   #Entity.Data.EntityListCount
+    cmp.w   #Entity.Data.EntityDataListCount
     bcc     +
         break(INVALID_ENTITY_ID)
     +
@@ -76,7 +76,7 @@ allocateTmpWord(yPos)
 
         // Get Entity ROM Data
 
-        lda.l   Entity.Data.EntityList,x
+        lda.l   Entity.Data.EntityDataList,x
         tax
         stx.b   BaseEntity.romPtr
 
@@ -176,7 +176,7 @@ allocateTmpWord(yPos)
 //
 // REQUIRES: 16 bit A, 16 bit Index, DB = 0x7e
 //
-// INPUT: A - Entity Id
+// INPUT: A - Entity Data Id
 //        Y - entity parameter (passed to entity init function)
 //
 // OUTPUT: Y - address of new entity
@@ -204,7 +204,7 @@ function SpawnAtMetaSpriteCollisionCentre {
 // MUST NOT BE CALLED IN ENTITY CONSTRUCTOR
 //
 // INPUT: DP = entity
-//        Y = entityId
+//        Y = Entity Data id
 //        A = type to match
 a16()
 i16()
@@ -213,7 +213,7 @@ function SpawnAtActionPoint {
 allocateTmpWord(tmp_compare)
 allocateTmpWord(tmp_entityToSpawn)
 
-    cpy.w   #Entity.Data.EntityListCount
+    cpy.w   #Entity.Data.EntityDataListCount
     bcc     +
         break(INVALID_ENTITY_ID)
     +

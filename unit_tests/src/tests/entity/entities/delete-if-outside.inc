@@ -49,8 +49,8 @@ while {n} < Entity.N_ENTITY_LISTS {
         db  0               // defaultPalette
         dw  0               // frameSetId
 
-    rodata(EN_EntityList)
-    constant EntityId_{n} = (pc() - Entity.Data.EntityList) / 2
+    rodata(EN_EntityDataList)
+    constant EntityDataId_{n} = (pc() - Entity.Data.EntityDataList) / 2
         dw  RomData{n}
 
     evaluate n = {n} + 1

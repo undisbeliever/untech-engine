@@ -62,8 +62,8 @@ Fail:
 
 rodata(rom0)
 SpawnList: {
-    define C = Entities.ChangeToParticleEntity.EntityId_
-    define B = Entities.BlankEntity.EntityId_
+    define C = Entities.ChangeToParticleEntity.EntityDataId_
+    define B = Entities.BlankEntity.EntityDataId_
 
     dw  {C}0, {C}0, {B}0, {B}0, {B}0    // player
     dw  {B}1, {C}1, {C}1, {B}1, {B}1    // boss
@@ -110,7 +110,7 @@ constant tmp = Test.tmp
 
     // spawn 3 entities per list
     // these entities will delete themselves after Y frames
-    lda.w   #Entities.DeleteAfterDelayEntity.EntityId_0
+    lda.w   #Entities.DeleteAfterDelayEntity.EntityDataId_0
     Loop:
         sta.w   tmp
 
@@ -135,7 +135,7 @@ constant tmp = Test.tmp
 
         lda.w   tmp
         inc
-        cmp.w   #Entities.DeleteAfterDelayEntity.EntityId_0 + Entity.N_ENTITY_LISTS
+        cmp.w   #Entities.DeleteAfterDelayEntity.EntityDataId_0 + Entity.N_ENTITY_LISTS
         bcc     Loop
 
     // Test list lengths
@@ -203,7 +203,7 @@ constant tmp = Test.tmp
 
         assert(Entity.N_ENTITIES >= Entity.N_ENTITY_LISTS)
 
-        lda.w   #Entities.DeleteAfterDelayEntity.EntityId_0
+        lda.w   #Entities.DeleteAfterDelayEntity.EntityDataId_0
         Loop:
             sta.w   tmp
 
@@ -213,7 +213,7 @@ constant tmp = Test.tmp
 
             lda.w   tmp
             inc
-            cmp.w   #Entities.DeleteAfterDelayEntity.EntityId_0 + Entity.N_ENTITY_LISTS
+            cmp.w   #Entities.DeleteAfterDelayEntity.EntityDataId_0 + Entity.N_ENTITY_LISTS
             bcc     Loop
 
 
@@ -307,7 +307,7 @@ constant firstFrame   = Test.tmp + 2
     //   then draws frame2 for two display frames
     //   then deletes itself on the fifth frame
 
-    lda.w   #Entities.DeleteIfAnimationEndsEntity.EntityId
+    lda.w   #Entities.DeleteIfAnimationEndsEntity.EntityDataId
     jsr     Entity.Spawn
     sty.w   entityAddress
 
@@ -488,8 +488,8 @@ function SpawnEntity_XY {
 namespace OldBehaviourTestEntities {
     assert(Entity.N_ENTITY_LISTS == 8)
 
-    rodata(EN_EntityList)
-    constant firstId = (pc() - Entity.Data.EntityList) / 2
+    rodata(EN_EntityDataList)
+    constant firstId = (pc() - Entity.Data.EntityDataList) / 2
         dw  Entities.BlankEntity.RomData0               // player list
         dw  Entities.BlankEntity.RomData1               // boss list
         dw  Entities.DeactivateIfOutsideEntity.RomData2 // enemy list
@@ -565,7 +565,7 @@ constant _loopsLeft = Test.dpTmp + 0
     SpawnLoop:
         phy
             // Y = listId to spawn entity in
-            lda.w   #SpawnAndChangeListTestEntity.EntityId
+            lda.w   #SpawnAndChangeListTestEntity.EntityDataId
 
             jsr     Entity.Spawn
             bcc     Fail
@@ -684,7 +684,7 @@ namespace SpawnAndChangeListTestEntity {
         +
 
         clc
-        adc.w   #Entities.DeleteAfterDelayEntity.EntityId_0
+        adc.w   #Entities.DeleteAfterDelayEntity.EntityDataId_0
         ldy.w   #DELETE_DELAY
         jmp     Entity.Spawn
     }
@@ -708,8 +708,8 @@ namespace SpawnAndChangeListTestEntity {
         db  0               // defaultPalette
         dw  0               // frameSetId
 
-    rodata(EN_EntityList)
-    constant EntityId = (pc() - Entity.Data.EntityList) / 2
+    rodata(EN_EntityDataList)
+    constant EntityDataId = (pc() - Entity.Data.EntityDataList) / 2
         dw  RomData
 }
 }

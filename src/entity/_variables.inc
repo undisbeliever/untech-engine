@@ -9,6 +9,22 @@
 // Distributed under The MIT License: https://opensource.org/licenses/MIT
 
 
+// NOTE: There are three types of ids used by the entity subsystem:
+//
+//   * `entityId`: An 8 bit identifier used to uniquely identify entity
+//                 instances.  This value is assigned at Spawn and should
+//                 be unique for each stage.  Entity Id's can be converted to
+//                 entity address using the `GetEntityWithIdOrBranchIfEmpty*`
+//                 macros.
+//
+//   * `entityDataId`: An array index (NOT a multiple of two) within
+//                     `Entity.Data.EntityDataList` that points to a
+//                     `BaseEntityData` block contained in the ROM.
+//
+//   * `listId`: The `EntityLists` value, which represents the entity list the
+//               entity is in.
+
+
 namespace Entity {
     assert(N_ENTITIES >= 10)
 
@@ -56,6 +72,9 @@ namespace BaseEntity {
         // This variable MUST NOT BE MODIFIED after the `Init` method returns.
         // To change the `listId` after construction use the
         // `ChangeEntityListIdAndGotoNextEntity` routine.
+        //
+        // This variable is dependant on the contents of the `EntityLists` enum,
+        // which is project definable.
         //
         // (byte)
         field(listId, 1)

@@ -18,7 +18,7 @@ function Spawn {
     lda.w   #0x5678
     sta.w   Entity.Spawn.yPos
 
-    lda.w   #Entities.BlankEntity.EntityId_0
+    lda.w   #Entities.BlankEntity.EntityDataId_0
     ldy.w   #0x1337
     jsr     Entity.Spawn
     bcc     Fail
@@ -74,7 +74,7 @@ constant tmp = Test.tmp
     Loop:
         stx.w   tmp
 
-        lda.w   #Entities.BlankEntity.EntityId_0
+        lda.w   #Entities.BlankEntity.EntityDataId_0
         ldy.w   #5
         jsr     Entity.Spawn
         bcc     Fail
@@ -88,7 +88,7 @@ constant tmp = Test.tmp
     bcc     Fail
 
     // Test cannot make new entity
-    lda.w   #Entities.BlankEntity.EntityId_0
+    lda.w   #Entities.BlankEntity.EntityDataId_0
     jsr     Entity.Spawn
     bcs     Fail
 
@@ -141,7 +141,7 @@ constant tmp = Test.tmp
     assert(Entity.N_ENTITIES >= Entity.N_ENTITY_LISTS * 2)
 
     // spawn 2 entities per list
-    lda.w   #Entities.BlankEntity.EntityId_0
+    lda.w   #Entities.BlankEntity.EntityDataId_0
     Loop:
         sta.w   tmp
 
@@ -156,7 +156,7 @@ constant tmp = Test.tmp
 
         lda.w   tmp
         inc
-        cmp.w   #Entities.BlankEntity.EntityId_0 + Entity.N_ENTITY_LISTS
+        cmp.w   #Entities.BlankEntity.EntityDataId_0 + Entity.N_ENTITY_LISTS
         bcc     Loop
 
 
@@ -276,13 +276,13 @@ function SpawnEntities_XY {
 
     lda.w   tmp_listId
     clc
-    adc.w   #Entities.BlankEntity.EntityId_0
+    adc.w   #Entities.BlankEntity.EntityDataId_0
     jsr     Entity.Spawn
     bcc     Return
 
     lda.w   tmp_listId
     clc
-    adc.w   #Entities.DeactivateIfOutsideEntity.EntityId_0
+    adc.w   #Entities.DeactivateIfOutsideEntity.EntityDataId_0
     jsr     Entity.Spawn
 
 Return:

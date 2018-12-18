@@ -30,7 +30,7 @@ createDataBlock(DMA_Tile16Data,         0xc14800, 0xc14fff)
 createDataBlock(MS_TileBlock_0,         0xc15000, 0xc16fff)
 createDataBlock(MS_TileBlock_1,         0xc17000, 0xc18fff)
 
-createDataBlock(EN_EntityList,          0xc19000, 0xc1907f)
+createDataBlock(EN_EntityDataList,      0xc19000, 0xc1907f)
 createDataBlock(EN_ProjectileList,      0xc19080, 0xc190ff)
 createDataBlock(EN_RomData,             0xc19100, 0xc19fff)
 

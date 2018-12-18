@@ -164,8 +164,8 @@ namespace ProjectileEntity {
     constant PROJECTILE_ID = (pc() - Entity.Data.ProjectileList) / 2
         dw  RomData
 
-    rodata(EN_EntityList)
-    constant ENTITY_ID = (pc() - Entity.Data.EntityList) / 2
+    rodata(EN_EntityDataList)
+    constant ENTITY_DATA_ID = (pc() - Entity.Data.EntityDataList) / 2
         dw  RomData
 }
 
@@ -300,7 +300,7 @@ namespace SpawnerEntity {
     i16()
     code()
     function SpawnEntityAtAp {
-        ldy.w   #ProjectileEntity.ENTITY_ID
+        ldy.w   #ProjectileEntity.ENTITY_DATA_ID
         jmp     Entity.SpawnAtActionPoint
     }
 
@@ -312,8 +312,8 @@ namespace SpawnerEntity {
         db  0                       // defaultPalette
         dw  MSFS.ActionPointSpawner // frameSetId
 
-    rodata(EN_EntityList)
-    constant ENTITY_ID = (pc() - Entity.Data.EntityList) / 2
+    rodata(EN_EntityDataList)
+    constant ENTITY_DATA_ID = (pc() - Entity.Data.EntityDataList) / 2
         dw  RomData
 }
 
@@ -364,7 +364,7 @@ function Test {
     lda.w   #Camera.ORIGIN + Camera.DISPLAY_HEIGHT / 2
     sta.w   Entity.Spawn.yPos
 
-    lda.w   #SpawnerEntity.ENTITY_ID
+    lda.w   #SpawnerEntity.ENTITY_DATA_ID
 
     jsr     Entity.Spawn
     bcc     Fail

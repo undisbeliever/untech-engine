@@ -52,8 +52,8 @@ RomData:
     db  0                            // defaultPalette
     dw  MSFS.DeleteIfAnimationEnds   // frameSetId
 
-rodata(EN_EntityList)
-constant EntityId = (pc() - Entity.Data.EntityList) / 2
+rodata(EN_EntityDataList)
+constant EntityDataId = (pc() - Entity.Data.EntityDataList) / 2
     dw  RomData
 
 code()

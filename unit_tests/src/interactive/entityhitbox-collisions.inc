@@ -182,7 +182,7 @@ namespace PlayerEntity {
         jsr     PrintProcessCollisionArgs
 
         // Spawn the CollisionCentreEntity
-        lda.w   #CollisionCentreEntity.ENTITY_ID
+        lda.w   #CollisionCentreEntity.ENTITY_DATA_ID
         jmp     Entity.SpawnAtMetaSpriteCollisionCentre
     }
 
@@ -238,8 +238,8 @@ namespace PlayerEntity {
         db  0                           // defaultPalette
         dw  MSFS.EhCollisionTest_Player // frameSetId
 
-    rodata(EN_EntityList)
-    constant ENTITY_ID = (pc() - Entity.Data.EntityList) / 2
+    rodata(EN_EntityDataList)
+    constant ENTITY_DATA_ID = (pc() - Entity.Data.EntityDataList) / 2
         dw  RomData
 }
 
@@ -307,8 +307,8 @@ namespace EnemyEntity {
         db  0                           // defaultPalette
         dw  MSFS.EhCollisionTest_Enemy  // frameSetId
 
-    rodata(EN_EntityList)
-    constant ENTITY_ID = (pc() - Entity.Data.EntityList) / 2
+    rodata(EN_EntityDataList)
+    constant ENTITY_DATA_ID = (pc() - Entity.Data.EntityDataList) / 2
         dw  RomData
 }
 
@@ -381,8 +381,8 @@ namespace CollisionCentreEntity {
         db  0                           // defaultPalette
         dw  MSFS.EhCollisionTest_Centre // frameSetId
 
-    rodata(EN_EntityList)
-    constant ENTITY_ID = (pc() - Entity.Data.EntityList) / 2
+    rodata(EN_EntityDataList)
+    constant ENTITY_DATA_ID = (pc() - Entity.Data.EntityDataList) / 2
         dw  RomData
 }
 
@@ -399,7 +399,7 @@ constant X_RIGHT = Camera.ORIGIN + Camera.DISPLAY_WIDTH / 2 + 10
 constant X_CENTER = Camera.ORIGIN + Camera.DISPLAY_WIDTH / 2
 
     struct(pc())
-        field(entityId, 2)
+        field(entityDataId, 2)
         field(xPos, 2)
         field(yPos, 2)
         field(parameter, 2)
@@ -407,9 +407,9 @@ constant X_CENTER = Camera.ORIGIN + Camera.DISPLAY_WIDTH / 2
 
 evaluate EN_ID = EntityLists.ENEMIES
 
-constant PLAYER = PlayerEntity.ENTITY_ID
-constant ENEMY  = EnemyEntity.ENTITY_ID
-constant BLANK  = EntityTest.Entities.BlankEntity.EntityId_{EN_ID}
+constant PLAYER = PlayerEntity.ENTITY_DATA_ID
+constant ENEMY  = EnemyEntity.ENTITY_DATA_ID
+constant BLANK  = EntityTest.Entities.BlankEntity.EntityDataId_{EN_ID}
 
 
 Data:
@@ -479,7 +479,7 @@ function Test {
         lda.l   EnemyTable.parameter,x
         tay
 
-        lda.l   EnemyTable.entityId,x
+        lda.l   EnemyTable.entityDataId,x
 
         jsr     Entity.Spawn
         bcc     Fail

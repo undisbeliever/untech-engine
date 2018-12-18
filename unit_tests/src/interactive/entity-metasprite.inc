@@ -122,8 +122,8 @@ namespace ShowAllFramesEntity {
             db  0                       // defaultPalette
             dw  MSFS.{name}             // frameSetId
 
-        rodata(EN_EntityList)
-        constant {name}_entityId = (pc() - Entity.Data.EntityList) / 2
+        rodata(EN_EntityDataList)
+        constant {name}_entityDataId = (pc() - Entity.Data.EntityDataList) / 2
             dw  RomData_{name}
     }
     BuildEntityData(Man)
@@ -139,14 +139,14 @@ namespace ShowAllFramesEntity {
 rodata(rom0)
 namespace EntityTable {
     struct(pc())
-        field(entityId, 2)
+        field(entityDataId, 2)
         field(parameter, 2)
         field(xPos, 2)
         field(yPos, 2)
     endstruct()
 
     macro data(eName, frameDelay, xPos, yPos) {
-        dw  ShowAllFramesEntity.{eName}_entityId
+        dw  ShowAllFramesEntity.{eName}_entityDataId
         dw  {frameDelay}
         dw  {xPos} + Camera.ORIGIN
         dw  {yPos} + Camera.ORIGIN
@@ -198,7 +198,7 @@ constant tmp_index = Test.tmp
 
         lda.l   EntityTable.parameter,x
         tay
-        lda.l   EntityTable.entityId,x
+        lda.l   EntityTable.entityDataId,x
 
         jsr     Entity.Spawn
         bcc     Fail

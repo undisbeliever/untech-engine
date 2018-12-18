@@ -232,8 +232,8 @@ namespace MapCursorEntity {
         db  0                       // defaultPalette
         dw  MSFS.Cursor             // frameSetId
 
-    rodata(EN_EntityList)
-    constant ENTITY_ID = (pc() - Entity.Data.EntityList) / 2
+    rodata(EN_EntityDataList)
+    constant ENTITY_DATA_ID = (pc() - Entity.Data.EntityDataList) / 2
         dw  RomData
 }
 
@@ -441,7 +441,7 @@ a16()
     lda.w   #CAMERA_START_Y + Camera.DISPLAY_HEIGHT / 2
     sta.w   Entity.Spawn.yPos
 
-    lda.w   #MapCursorEntity.ENTITY_ID
+    lda.w   #MapCursorEntity.ENTITY_DATA_ID
     jsr     Entity.Spawn
     bcs     +
         rts
