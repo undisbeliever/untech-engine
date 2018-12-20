@@ -97,7 +97,8 @@ i16()
     ldy.w   #paletteBuffer.size     // 3
 
     lda.l   RDDIV                   // 2 from loading instruction
-    sta.l   animationFrameSize
+    sta.w   animationFrameSize
+    Dma.Resources.CalcualateDmaTime(Palette)
 
     sep     #$20
 a8()

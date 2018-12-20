@@ -70,6 +70,7 @@ HasAnimation:
         break(INVALID_ANIMATED_TILESET)
     +
     sta.w   animationFrameSize
+    Dma.Resources.CalcualateDmaTime(AnimatedTileset)
 
     lda.w   #animationBuffer
     sta.w   animationBufferPos

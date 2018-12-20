@@ -38,21 +38,15 @@ a8()
 a16()
 }
 
-
-// Tests that there is enough DMA time to upload the animation frame
-// during VBlank and either sets the upload flag if it is possible,
-// or branches to NotEnoughDmaTime.
+// Calculates the dmaTime used by the resource
 //
-// REQUIRES: 16 bit A, DB access shadow
-// BRANCH: to NotEnoughDmaTime if out of dma time
-// KEEP: X, Y
-macro TestDmaTimeAndSetUploadFlag(name, NotEnoughDmaTime) {
+// This macro MUST BE called after writing to `animationFrameSize`
+//
+// REQUITES: 16 bit A, DB = 0x7e
+macro CalcualateDmaTime(name) {
     assert16a()
 
-    // time = (animationFrameSize + VRAM_CYCLES + TRANSFER_SCALE - 1) / TRANSFER_SCALE
-    // if Dma.transfersLeft < time: goto NotEnoughDmaTimeBranch
-    // Dma.transfersLeft -= time
-    // uploadPaletteOnZero = 0
+    // dmaTime = (animationFrameSize + VRAM_CYCLES + TRANSFER_SCALE - 1) / TRANSFER_SCALE
 
     assert(Dma.TRANSFER_SCALE == 32)
 
@@ -64,16 +58,37 @@ macro TestDmaTimeAndSetUploadFlag(name, NotEnoughDmaTime) {
     lsr
     lsr
     lsr
+    sta.w   Resources.{name}.dmaTime
+}
 
-    eor.w   #0xffff
+
+// Tests that there is enough DMA time to upload the animation frame
+// during VBlank and either sets the upload flag if it is possible,
+// or branches to NotEnoughDmaTime.
+//
+// REQUIRES: 16 bit A, DB = 0x7e
+// BRANCH: to NotEnoughDmaTime if out of dma time
+// KEEP: X, Y
+macro TestDmaTimeAndSetUploadFlag(name, NotEnoughDmaTime) {
+    assert16a()
+
+    // if Dma.transfersLeft < dmaTime: goto NotEnoughDmaTime
+    // Dma.transfersLeft -= dmaTime
+    // uploadPaletteOnZero = 0
+
+    lda.w   Dma.transfersLeft
     sec
-    adc.w   Dma.transfersLeft
+    sbc.w   Resources.{name}.dmaTime
     bcc     {NotEnoughDmaTime}
 
     sta.w   Dma.transfersLeft
 
-    lda.w   #0xff
-    trb.w   Dma.Resources.upload{name}OnZero
+    sep     #$20
+a8()
+    stz.w   Dma.Resources.upload{name}OnZero
+
+    rep     #$30
+a16()
 }
 
 

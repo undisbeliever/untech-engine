@@ -39,12 +39,18 @@ namespace AnimatedTileset {
     allocate(animationBufferPos, shadow, 2)
 
     // The size of the palette animation frame in bytes
+    // NOTE: After setting this value you MUST INVOKE
+    //       `Dma.Resources.CalcualateDmaTime(AnimatedTileset)`
     // (uint16 - shadow)
     allocate(animationFrameSize, shadow, 2)
 
     // The address following the end of the data in the palette buffer
     // (word addr - shadow)
     allocate(animationBufferEnd, wram7e, 2)
+
+    // The amount of DMA time requited to upload the animation frame to VRAM
+    // (uint16)
+    allocate(dmaTime, wram7e, 2)
 
 
     // Animation frame delay
@@ -71,12 +77,18 @@ namespace Palette {
     allocate(animationPos, shadow, 2)
 
     // The size of the palette animation frame in bytes
+    // NOTE: After setting this value you MUST INVOKE
+    //       `Dma.Resources.CalcualateDmaTime(Palette)`
     // (uint16 - shadow)
     allocate(animationFrameSize, shadow, 2)
 
     // The address following the end of the data in the palette buffer
     // (word addr - shadow)
     allocate(paletteBufferEnd, wram7e, 2)
+
+    // The amount of DMA time required to upload the animation frame to CGRAM
+    // (uint16)
+    allocate(dmaTime, wram7e, 2)
 
 
     // Animation frame delay
