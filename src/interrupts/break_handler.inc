@@ -415,7 +415,7 @@ a16()
 
     sep     #$20
 a8()
-    Print8BitRegister(22, 6, PString, 9)
+    Print8BitRegister(22, 6, PString, 10)
     Print8BitRegister(21, 8, DBString, 1)
 }
 
