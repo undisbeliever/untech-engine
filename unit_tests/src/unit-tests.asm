@@ -53,6 +53,7 @@ include "tests/entity/counters.inc"
 include "tests/entity/entityidtable.inc"
 include "tests/entity/gameloop.inc"
 include "tests/entity/spawn.inc"
+include "tests/entity/transitions.inc"
 
 include "tests/math/_common.inc"
 include "tests/math/division.inc"

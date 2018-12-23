@@ -87,6 +87,7 @@ include "entity/gameloop.inc"
 include "entity/deallocation.inc"
 include "entity/invalid-entity.inc"
 include "entity/spawn.inc"
+include "entity/transitions.inc"
 include "entity/validation.inc"
 
 // vim: ft=bass-65816 ts=4 sw=4 et:

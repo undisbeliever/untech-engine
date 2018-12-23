@@ -628,10 +628,12 @@ i16()
 code()
 function DeactivateAndGotoNextEntity {
 
+    // If you change this section, also change `TemporarilyDeactivateEntities`
     jsr     MetaSprite.Deactivate
 
     ldx.b   BaseEntity.functionTable
     jsr     (BaseEntityFunctionTable.Deactivated,x)
+
 
     __MoveEntityToSpecialList(deactivated)
     // MUST JUMP directly to `GotoNextEntity.EntityListChanged` IMMEDIATELY AFTER a __MoveEntityToSpecialList() call
