@@ -334,7 +334,8 @@ function Overflow {
 
     ldy.w   #8
     lda.w   #MSFS.FST_10Palettes
-    jsr     _InitEntityAndActivate
+    jsr     _InitEntity
+    jsr     _ActivatePalette
     bcs     Fail
 
     // Test NO_MS_PALETTE_SLOTS warning was emitted
@@ -349,7 +350,8 @@ function Overflow {
 
     ldy.w   #9
     lda.w   #MSFS.FST_10Palettes
-    jsr     _InitEntityAndActivate
+    jsr     _InitEntity
+    jsr     _ActivatePalette
     bcs     Fail
 
     // Test NO_MS_PALETTE_SLOTS warning was emitted
@@ -370,7 +372,7 @@ a8()
 
     rep     #$20
 a16()
-    jsr     MetaSprite.Activate
+    jsr     _ActivatePalette
     bcs     Fail
 
 
@@ -381,7 +383,7 @@ a16()
 
     lda.w   #EntityPool.entity8
     tcd
-    jsr     MetaSprite.Activate
+    jsr     _ActivatePalette
     bcs     Fail
 
     // Test NO_MS_PALETTE_SLOTS warning was emitted
@@ -399,7 +401,7 @@ a8()
 
     rep     #$20
 a16()
-    jsr     MetaSprite.Activate
+    jsr     _ActivatePalette
     bcs     _Pass
     Fail:
         clc
@@ -414,7 +416,7 @@ a16()
 
     lda.w   #EntityPool.entity9
     tcd
-    jsr     MetaSprite.Activate
+    jsr     _ActivatePalette
     bcc     Fail
 
     jsr     _ValidateUsedSlotList
@@ -422,6 +424,29 @@ a16()
 
     sec
     rts
+
+
+function _ActivatePalette {
+    sep     #$20
+    rep     #$10
+a8()
+i16()
+
+    ldx.b   BaseEntity.MetaSprite.frameSet
+    beq     Fail
+    jsr     MetaSprite.Palette._ProcessSlots
+
+    rep     #$30
+a16()
+i16()
+    rts
+
+Fail:
+    rep     #$31
+a16()
+i16()
+}
+
 }
 
 

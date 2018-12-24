@@ -105,12 +105,17 @@ macro EntityDestructor() {
 
 
 
-// Activates an entity, allocating resources to it
+// Activates an entity, allocating resources to it.
+//
+// NOTE: This routine will return true if the VRAM was activated
+//       but the palette was not.
+//       When the engine runs out of palettes, the newly activated
+//       MetaSprite will have a glitched palette.
 //
 // REQUIRES: 16 bit A, 16 bit Index, DB = $7E
 //
 // INPUT: DP = Entity
-// OUTPUT: C set if successful
+// OUTPUT: C set if there is no frameSet or activating VRAM is successful
 a16()
 i16()
 code()
@@ -131,12 +136,12 @@ i16()
 
     ldx.b   BaseEntity.MetaSprite.frameSet
     jsr     MetaSprite.Palette._ProcessSlots
-    // c = return
 
     rep     #$30
 a16()
 i16()
 Return:
+    sec
     rts
 
 ReturnFailure:
