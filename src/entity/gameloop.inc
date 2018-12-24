@@ -144,12 +144,13 @@ macro __ChangeEntityList_Y() {
 // REQUIRES: 16 bit A, 16 bit Index, DB = 0x7e
 //
 // MODIFIES: DP
-macro _ProcessActivateNextFrameList() {
-    assert16a()
-    assert16i()
+a16()
+i16()
+code()
+function _ProcessActivateNextFrameList {
 
     lda.w   Entity.specialLists.activateNextFrame
-    beq     EndLoop
+    beq     Return
 
     // this allows _previousEntity variable to work on first item
     assert(BaseEntity.next == 0)
@@ -171,7 +172,8 @@ macro _ProcessActivateNextFrameList() {
             lda.b   BaseEntity.next
 
             bne     Loop
-            bra     EndLoop
+
+            rts
 
 
         InvalidEntityId:
@@ -198,7 +200,8 @@ macro _ProcessActivateNextFrameList() {
 
             bne     Loop
 
-EndLoop:
+Return:
+    rts
 }
 
 
@@ -464,7 +467,7 @@ macro ProcessSpecialLists() {
     // ::TODO move into Camera Module::
     jsr     Entity._UpdateActiveWindows
 
-    Entity._ProcessActivateNextFrameList()
+    jsr     Entity._ProcessActivateNextFrameList
 
     Entity._ProcessActiveWindow()
 

@@ -52,6 +52,58 @@ Fail:
     rts
 }
 
+
+
+a16()
+i16()
+code()
+Test.add("Entity.PreloadEntityMetaSprites")
+function PreloadEntityMetaSprites {
+// The test MUST NOT USE Test.tmp variables
+
+    jsr     Entity.Init
+    bcc     Fail
+
+    // Spawn entities that have MetaSprite Data
+    jsr     InteractiveTests.MetaSpriteInteractiveTest.SpawnEntities
+    bcc     Fail
+
+constant N_ENTITIES = InteractiveTests.MetaSpriteInteractiveTest.EntityTable.N_ENTITIES
+
+    // Ensure ActivateNextFrame list length is correct
+    jsr     _ActivateNextFrameListLength
+    cmp.w   #N_ENTITIES
+    bne     Fail
+
+
+    jsr     EnableDisplay_Full
+    lda.w   #4
+    Loop:
+        pha
+            jsr     Entity.PreloadEntityMetaSprites
+            jsr     WaitFrame
+        pla
+        dec
+        bne     Loop
+
+
+    // Ensure All entities are active
+    jsr     _ActivateNextFrameListLength
+    cmp.w   #0
+    bne     Fail
+
+    Entity.CountEntitiesInList(PLAYERS)
+    cmp.w   #N_ENTITIES
+    bne     Fail
+
+    jmp     _TestEntityListsValid
+
+
+Fail:
+    clc
+    rts
+}
+
 }
 
 // vim: ft=bass-65816 ts=4 sw=4 et:

@@ -168,22 +168,14 @@ Data:
     constant N_ENTITIES = (pc() - Data) / EntityTable.size
 }
 
-
-// The Test
+// Spawns the entities used by the test
+// OUTPUT: c set if successful
 a16()
 i16()
 code()
-Test.add("Entity/MetaSprite Test")
-function Test {
+function SpawnEntities {
 constant tmp_index = Test.tmp
 
-    jsr     EntityLoop.Init
-
-    jsr     EnableDisplay_Full
-
-
-    // Load the entities
-    // -----------------
     assert(EntityTable.N_ENTITIES > 0)
     ldx.w   #0
 
@@ -211,8 +203,33 @@ constant tmp_index = Test.tmp
         cpx.w   #EntityTable.size * EntityTable.N_ENTITIES
         bcc     Loop
 
+    sec
+    rts
+
+
+Fail:
+    clc
+    rts
+}
+
+
+
+// The Test
+a16()
+i16()
+code()
+Test.add("Entity/MetaSprite Test")
+function Test {
+    jsr     EntityLoop.Init
+
+    jsr     EnableDisplay_Full
+
+
+    jsr     SpawnEntities
+    bcc     Fail
 
     jmp     EntityLoop.ProcessUntilButtonPress
+
 
 Fail:
     clc

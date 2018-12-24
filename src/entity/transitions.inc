@@ -75,6 +75,35 @@ function TemporarilyDeactivateEntities {
     rts
 }
 
+
+
+// Preloads the entity MetaSprites and activates the entities in the
+// `activateNextFrame` special list.
+//
+// This routine is useful for preloading the entity MetaSprites when
+// transitioning between menu-mode and game-mode.
+//
+// As this routine might not have enough DMA time to upload all entities in the
+// `activateNextFrame` special list it is recommended you call this routine:
+//      * When the display is enabled.
+//      * Once per frame during the menu-mode fade-out transition effect.
+//      * Just before the `WaitFrame` call.
+//
+// MUST NOT BE CALLED in the Entity GameLoop.
+//
+// REQUIRES: 16 bit A, 16 bit Index, DB = 0x7e
+a16()
+i16()
+code()
+function PreloadEntityMetaSprites {
+    phd
+
+    jsr     Entity._ProcessActivateNextFrameList
+
+    pld
+    rts
+}
+
 }
 
 // vim: ft=bass-65816 ts=4 sw=4 et:
