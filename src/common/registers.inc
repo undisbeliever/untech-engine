@@ -414,7 +414,7 @@ constant BG4HOFS = 0x2113
 // ---mmmmm mmmmmmmm
 //
 // m = Mode 7 BG Offset(M7HOFS only)
-constant M7HOFS = 0x210E
+constant M7HOFS = 0x210D
 
 
 
