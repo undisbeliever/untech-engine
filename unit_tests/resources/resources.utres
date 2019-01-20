@@ -1,7 +1,0 @@
-<?xml version="1.0" encoding="UTF_8"?>
-<!DOCTYPE untech>
-<resources block-size="8192" block-count="2">
-  <metatile-engine-settings max-map-size="8192" n-metatiles="512"/>
-  <palette name="MetaTileRenderTest" image="palettes/metatile-render-test.palette.png" rows-per-frame="3" animation-delay="300"/>
-  <metatile-tileset src="metatile-tilesets/metatile-render-test.utmt"/>
-</resources>

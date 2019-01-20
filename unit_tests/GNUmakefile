@@ -6,8 +6,7 @@ all: static-tests
 BINARY         := bin/unit-tests.sfc
 MAIN           := src/unit-tests.asm
 
-METASPRITE_PRO := resources/metasprite/metasprites.utmspro
-RESOURCES_PRO  := resources/resources.utres
+PROJECT_FILE   := resources/unit-tests.utproject
 
 SRC_DIRS       := src resources
 UNTECH_DIR     := ..

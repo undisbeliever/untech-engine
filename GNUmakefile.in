@@ -10,9 +10,10 @@ GEN_DIR        ?= gen
 TABLE_DIRS     += $(UNTECH_DIR)/tables
 TABLE_INCS     := $(foreach d,$(TABLE_DIRS),$(patsubst $d/%.py,$(GEN_DIR)/tables/%.inc,$(wildcard $d/*.py)))
 
+PROJECT_BIN    := $(GEN_DIR)/project.bin
+PROJECT_INC    := $(GEN_DIR)/project.inc
 
-RESOURCES      += $(GEN_DIR)/metasprites.inc
-RESOURCES      += $(GEN_DIR)/resources.inc $(GEN_DIR)/resources.bin
+RESOURCES      += $(PROJECT_BIN) $(PROJECT_INC)
 
 
 # If VANILLA_BASS is not 'n' then the Makefile will use vanilla bass instead of bass-untech
@@ -37,20 +38,18 @@ ifeq ($(LOCAL_TOOLS), n)
   UTEDITOR_DIR := $(UNTECH_DIR)/tools/untech-editor
 
   untech-editor-gui         := $(UTEDITOR_DIR)/bin/untech-editor-gui
+  untech-compiler           := $(UTEDITOR_DIR)/bin/untech-compiler
   untech-lz4c               := $(UTEDITOR_DIR)/bin/untech-lz4c
-  untech-msc                := $(UTEDITOR_DIR)/bin/untech-msc
   untech-png2snes           := $(UTEDITOR_DIR)/bin/untech-png2snes
   untech-png2tileset        := $(UTEDITOR_DIR)/bin/untech-png2tileset
-  untech-resc               := $(UTEDITOR_DIR)/bin/untech-resc
   untech-utsi2utms          := $(UTEDITOR_DIR)/bin/untech-utsi2utms
   untech-write-sfc-checksum := $(UTEDITOR_DIR)/bin/untech-write-sfc-checksum
 else
   untech-editor-gui         := untech-editor-gui
+  untech-compiler           := untech-compiler
   untech-lz4c               := untech-lz4c
-  untech-msc                := untech-msc
   untech-png2snes           := untech-png2snes
   untech-png2tileset        := untech-png2tileset
-  untech-resc               := untech-resc
   untech-utsi2utms          := untech-utsi2utms
   untech-write-sfc-checksum := untech-write-sfc-checksum
 endif
@@ -83,13 +82,9 @@ memory-usage: directories $(BINARY)
 
 
 
-.PHONY: edit-metasprites
-edit-metasprites:
-	$(untech-editor-gui) $(METASPRITE_PRO)
-
-.PHONY: edit-resources
-edit-resources:
-	$(untech-editor-gui) $(RESOURCES_PRO)
+.PHONY: edit-project
+edit-project:
+	$(untech-editor-gui) $(PROJECT_FILE)
 
 
 
@@ -104,14 +99,12 @@ $(foreach d, $(TABLE_DIRS), $(eval $(call TABLE_template, $d)))
 
 
 
-$(GEN_DIR)/metasprites.inc: $(call rwildcard_all, $(dir $(METASPRITE_PRO)))
-$(GEN_DIR)/metasprites.inc: $(METASPRITE_PRO)
-	$(untech-msc) -o "$(GEN_DIR)/metasprites.inc" "$(METASPRITE_PRO)"
+.PHONY: project-data
+project-data: $(call rwildcard_all, $(dir $(PROJECT_INC))) $(PROJECT_FILE)
+	$(untech-compiler) --output-bin "$(PROJECT_BIN)" --output-inc "$(PROJECT_INC)" "$(PROJECT_FILE)"
 
+$(PROJECT_BIN) $(PROJECT_INC): project-data
 
-$(GEN_DIR)/resources.inc: $(call rwildcard_all, $(dir $(RESOURCES_PRO)))
-$(GEN_DIR)/resources.inc $(GEN_DIR)/resources.bin: $(RESOURCES_PRO)
-	$(untech-resc) --output-inc "$(GEN_DIR)/resources.inc" --output-bin "$(GEN_DIR)/resources.bin" "$(RESOURCES_PRO)"
 
 
 ifdef BASS_DIR
@@ -131,7 +124,7 @@ ifdef UTEDITOR_DIR
   tools: untech-editor untech-editor-gui
 
 
-  $(RESOURCES): untech-editor
+  project-data: untech-editor
 
   .INTERMEDIATE: untech-editor
 
@@ -139,15 +132,13 @@ ifdef UTEDITOR_DIR
 	$(MAKE) -C "$(UTEDITOR_DIR)" cli
 
   $(untech-lz4c): untech-editor
-  $(untech-msc): untech-editor
+  $(untech-compiler): untech-editor
   $(untech-png2snes): untech-editor
   $(untech-png2tileset): untech-editor
-  $(untech-resc): untech-editor
   $(untech-utsi2utms): untech-editor
   $(untech-write-sfc-checksum): untech-editor
 
-  edit-metasprites: untech-editor-gui
-  edit-resources: untech-editor-gui
+  edit-project: untech-editor-gui
 
   .INTERMEDIATE: untech-editor-gui
 

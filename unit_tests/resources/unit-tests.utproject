@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF_8"?>
+<!DOCTYPE untech>
+<project>
+  <block-settings block-size="8192" block-count="2"/>
+  <metatile-engine-settings max-map-size="8192" n-metatiles="512"/>
+  <exportorder src="metasprite/formats/Human.utfseo"/>
+  <exportorder src="metasprite/formats/Walker.utfseo"/>
+  <exportorder src="metasprite/formats/OneFrame.utfseo"/>
+  <exportorder src="metasprite/formats/OneSmallAndLarge.utfseo"/>
+  <exportorder src="metasprite/formats/TwoFrames.utfseo"/>
+  <exportorder src="metasprite/formats/AnimationTest.utfseo"/>
+  <exportorder src="metasprite/formats/EhCollisionTest_Player.utfseo"/>
+  <exportorder src="metasprite/formats/EhCollisionTest_Enemy.utfseo"/>
+  <exportorder src="metasprite/formats/DeleteIfAnimationEnds.utfseo"/>
+  <frameset src="metasprite/utsi/Cursor.utsi" type="spriteimporter"/>
+  <frameset src="metasprite/utms/FST_10Palettes.utms" type="metasprite"/>
+  <frameset/>
+  <frameset/>
+  <frameset src="metasprite/utms/FST_OneTileFixed1.utms" type="metasprite"/>
+  <frameset src="metasprite/utms/FST_OneTileFixed2.utms" type="metasprite"/>
+  <frameset src="metasprite/utms/FST_OneTileFixed3.utms" type="metasprite"/>
+  <frameset src="metasprite/utms/FST_OneRowFixed1.utms" type="metasprite"/>
+  <frameset src="metasprite/utms/FST_OneRowFixed2.utms" type="metasprite"/>
+  <frameset src="metasprite/utms/FST_OneRowFixed3.utms" type="metasprite"/>
+  <frameset src="metasprite/utms/FST_TwoTilesFixed1.utms" type="metasprite"/>
+  <frameset src="metasprite/utms/FST_TwoTilesFixed2.utms" type="metasprite"/>
+  <frameset src="metasprite/utms/FST_TwoTilesFixed3.utms" type="metasprite"/>
+  <frameset src="metasprite/utms/FST_TwoRowsFixed1.utms" type="metasprite"/>
+  <frameset src="metasprite/utms/FST_TwoRowsFixed2.utms" type="metasprite"/>
+  <frameset src="metasprite/utms/FST_TwoRowsFixed3.utms" type="metasprite"/>
+  <frameset/>
+  <frameset src="metasprite/utms/FST_OneTile.utms" type="metasprite"/>
+  <frameset src="metasprite/utms/FST_TwoTiles.utms" type="metasprite"/>
+  <frameset/>
+  <frameset src="metasprite/utsi/SpikedWalker.utsi" type="spriteimporter"/>
+  <frameset src="metasprite/utsi/Man.utsi" type="spriteimporter"/>
+  <frameset src="metasprite/utsi/Woman.utsi" type="spriteimporter"/>
+  <frameset src="metasprite/utsi/FST_TwoRows.utsi" type="spriteimporter"/>
+  <frameset src="metasprite/utms/FST_Animations.utms" type="metasprite"/>
+  <frameset src="metasprite/utms/Projectile.utms" type="metasprite"/>
+  <frameset src="metasprite/utms/ActionPointSpawner.utms" type="metasprite"/>
+  <frameset src="metasprite/utms/EhCollisionTest_Enemy.utms" type="metasprite"/>
+  <frameset src="metasprite/utms/EhCollisionTest_Player.utms" type="metasprite"/>
+  <frameset src="metasprite/utms/EhCollisionTest_Centre.utms" type="metasprite"/>
+  <frameset src="metasprite/utms/DeleteIfAnimationEnds.utms" type="metasprite"/>
+  <palette name="MetaTileRenderTest" image="palettes/metatile-render-test.palette.png" rows-per-frame="3" animation-delay="300"/>
+  <metatile-tileset src="metatile-tilesets/metatile-render-test.utmt"/>
+</project>
