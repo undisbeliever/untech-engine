@@ -291,7 +291,6 @@ i16()
 code()
 function _UploadDynamicTileset {
     ldx.b   BaseEntity.MetaSprite.currentFrame
-    beq     ReturnTrue
 
 GivenFrame:
     lda.l   MetaSprite.Format.Frame.tileset,x

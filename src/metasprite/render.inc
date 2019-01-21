@@ -87,7 +87,6 @@ function RenderEntity {
 constant Return = InitLoop.Return
 
     ldx.b   BaseEntity.MetaSprite.currentFrame
-    beq     Return
 
     lda.b   BaseEntity.xPos.px
     sec

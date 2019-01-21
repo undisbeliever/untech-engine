@@ -51,42 +51,6 @@ macro _MoveAndRenderEntity(evaluate xPos, evaluate yPos) {
 a16()
 i16()
 code()
-Test.add("MetaSprite.RenderEntity (Null)")
-function RenderEntity_Null {
-    jsr     _Init
-    bcc     Fail
-
-    // Try render a destroyed frameset
-    lda.w   #EntityPool.entity0
-    tcd
-    MetaSprite.EntityDestructor()
-    jsr     MetaSprite.Render.RenderEntity
-
-    // Then a metasprite with no frame
-    lda.w   #EntityPool.entity1
-    tcd
-    stz.b   BaseEntity.MetaSprite.currentFrame
-    jsr     MetaSprite.Render.RenderEntity
-
-    jsr     MetaSprite.Render.EndLoop
-
-    // Check that bufferPos is 0
-    lda.w   MetaSprite.Render.bufferPos
-    bne     Fail
-
-    // Check all sprites offscreen
-    lda.w   #0
-    jmp     _CheckSpritesOffscreen
-
-Fail:
-    clc
-    rts
-}
-
-
-a16()
-i16()
-code()
 Test.add("MetaSprite.RenderEntity (One Small)")
 function RenderEntity_OneSmall {
     jsr     _Init

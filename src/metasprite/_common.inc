@@ -53,7 +53,6 @@ macro _InitEntity() {
     assert16i()
 
     stz.b   BaseEntity.MetaSprite.status
-    stz.b   BaseEntity.MetaSprite.currentFrame
 
     // Determine FrameSet address
     cmp.w   #MetaSprite.Data.FrameSetListCount
@@ -66,6 +65,12 @@ macro _InitEntity() {
     lda.l   MetaSprite.Data.FrameSetList,x
     sta.b   BaseEntity.MetaSprite.frameSet
     tax
+
+    // Set currentFrame to frame 0
+    lda.l   MetaSprite.Format.FrameSet.frameTable,x
+    tax
+    lda.l   MetaSprite.Data.FrameList,x
+    sta.b   BaseEntity.MetaSprite.currentFrame
 
     sep     #$10
 i8()
@@ -96,7 +101,6 @@ macro EntityDestructor() {
 
     jsr     MetaSprite.Deactivate
     stz.b   BaseEntity.MetaSprite.frameSet
-    stz.b   BaseEntity.MetaSprite.currentFrame
 
     // Disable animation
     ldx.w   #0xffff

@@ -31,6 +31,7 @@ namespace MetaSprite {
         field(MetaSprite.palette, 1)
 
         // Frame address
+        // MUST NOT BE NULL
         field(MetaSprite.currentFrame, 2)
 
         // Offset between frame object data and the OAM charattr data

@@ -221,8 +221,6 @@ allocateTmpWord(tmp_entityToSpawn)
     sta.w   tmp_compare
 
     ldx.b   BaseEntity.MetaSprite.currentFrame
-    beq     Return
-
     lda.l   MetaSprite.Format.Frame.actionPoints,x
     beq     Return
 
@@ -355,8 +353,6 @@ allocateTmpWord(tmp_entityDoingSpawning)
     stx.w   tmp_listId
 
     ldx.b   BaseEntity.MetaSprite.currentFrame
-    beq     Return
-
     lda.l   MetaSprite.Format.Frame.actionPoints,x
     beq     Return
 

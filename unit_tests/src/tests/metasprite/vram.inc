@@ -128,9 +128,10 @@ inline _ActivateDynamicTest(FrameSet, nSlots, staticUploads) {
         cpx.w   #({nSlots} + {staticUploads}) * 2
         bne     Fail
 
+        jsr     WaitFrame
 
         // Second entity
-        // NULL frame upload
+        // also a frame 0 upload
         lda.w   #EntityPool.entity1
         tcd
 
@@ -140,9 +141,9 @@ inline _ActivateDynamicTest(FrameSet, nSlots, staticUploads) {
         jsr     MetaSprite.Activate
         bcc     Fail
 
-        // Test that static tiles were uploaded (if exist)
+        // Test that the tiles were uploaded (if exist)
         ldx.w   Dma.Tile16.transferQueueIndex
-        cpx.w   #({nSlots} + {staticUploads} * 2) * 2
+        cpx.w   #({nSlots} + {staticUploads}) * 2
         bne     Fail
 
         // Test vramSet and dynamic set
@@ -295,6 +296,9 @@ inline _DeallocateTest(type) {
         jsr     MetaSprite.Deactivate
         jsr     MetaSprite.Deactivate
 
+
+        // Must wait one frame to free the DMA slots
+        jsr     WaitFrame
 
         // Finally create single slot
         lda.w   #EntityPool.entity12

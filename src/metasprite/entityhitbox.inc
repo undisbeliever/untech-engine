@@ -725,7 +725,6 @@ function _TestTwoEntityLists {
         // A & Y = entityA
 
         ldx.b   BaseEntity.MetaSprite.currentFrame,y
-        beq     NoHitbox
 
         if Data.FrameList >> 16 == EntityHitboxBank {
             ldy.w   Format.Frame.entityHitbox,x
@@ -808,7 +807,6 @@ START:
         // Y = entityB address
 
         ldx.b   BaseEntity.MetaSprite.currentFrame,y
-        beq     NoEntityOuterCollision_Y
 
         if Data.FrameList >> 16 == EntityHitboxBank {
             lda.w   Format.Frame.entityHitbox,x
@@ -905,7 +903,6 @@ function _TestList_EntityA_MultipleHitboxes {
         // Y = entityB
 
         ldx.b   BaseEntity.MetaSprite.currentFrame,y
-        beq     NoEntityOuterCollision_Y
 
         if Data.FrameList >> 16 == EntityHitboxBank {
             lda.w   Format.Frame.entityHitbox,x
