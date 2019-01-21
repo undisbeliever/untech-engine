@@ -64,6 +64,9 @@ namespace MetaSprite {
         constant paletteSet = 0x80
         constant dynamicTileset = 0x40
         constant vramSlotMask = 0x3e
+
+        // The entity has a VRAM slot assigned to it
+        // (NOTE: does not signify the entity's tiles are uploaded to VRAM)
         constant vramSet = 0x01
     }
 

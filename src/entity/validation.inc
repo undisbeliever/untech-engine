@@ -252,9 +252,13 @@ macro __ValidateSpecialEntityLists() {
         InnerLoop:
             tcd
 
-            // branch to EntityIsNotDeactivated if entity has a MetaSprite palette or vram allocated
+            // branch to EntityIsNotDeactivated if entity has a MetaSprite palette
+            //
+            // We do not test vramSet as that flag indicates if an entity has a
+            // VRAM slot, not that the tileset has been uploaded successfully.
+
             lda.b   BaseEntity.MetaSprite.status
-            and.w   #MetaSprite.StatusFlags.paletteSet | MetaSprite.StatusFlags.vramSet
+            and.w   #MetaSprite.StatusFlags.paletteSet
             bne     EntityIsNotDeactivated
 
 

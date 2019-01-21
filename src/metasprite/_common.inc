@@ -112,6 +112,14 @@ macro EntityDestructor() {
 //       When the engine runs out of palettes, the newly activated
 //       MetaSprite will have a glitched palette.
 //
+// NOTE: If the entity uses a dynamic tileset this routine will always try to
+//       upload the dynamic tiles to VRAM.
+//
+// NOTE: FrameSets with a dynamic tileset can fail if the static tiles were
+//       uploaded to VRAM but the system ran out of time/space to upload the
+//       static tiles.
+//
+// ASSUMES: The entity has not been activated
 // REQUIRES: 16 bit A, 16 bit Index, DB = $7E
 //
 // INPUT: DP = Entity
