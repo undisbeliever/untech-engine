@@ -14,8 +14,6 @@
   <exportorder src="metasprite/formats/DeleteIfAnimationEnds.utfseo"/>
   <frameset src="metasprite/utsi/Cursor.utsi" type="spriteimporter"/>
   <frameset src="metasprite/utms/FST_10Palettes.utms" type="metasprite"/>
-  <frameset/>
-  <frameset/>
   <frameset src="metasprite/utms/FST_OneTileFixed1.utms" type="metasprite"/>
   <frameset src="metasprite/utms/FST_OneTileFixed2.utms" type="metasprite"/>
   <frameset src="metasprite/utms/FST_OneTileFixed3.utms" type="metasprite"/>
@@ -28,10 +26,8 @@
   <frameset src="metasprite/utms/FST_TwoRowsFixed1.utms" type="metasprite"/>
   <frameset src="metasprite/utms/FST_TwoRowsFixed2.utms" type="metasprite"/>
   <frameset src="metasprite/utms/FST_TwoRowsFixed3.utms" type="metasprite"/>
-  <frameset/>
   <frameset src="metasprite/utms/FST_OneTile.utms" type="metasprite"/>
   <frameset src="metasprite/utms/FST_TwoTiles.utms" type="metasprite"/>
-  <frameset/>
   <frameset src="metasprite/utsi/SpikedWalker.utsi" type="spriteimporter"/>
   <frameset src="metasprite/utsi/Man.utsi" type="spriteimporter"/>
   <frameset src="metasprite/utsi/Woman.utsi" type="spriteimporter"/>
