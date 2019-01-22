@@ -15,6 +15,8 @@ namespace MetaSprite {
     // MUST BE called inside the BaseEntity struct
     inline EntityData() {
         // The frameSet that the metasprite belongs to
+        // MUST NOT BE NULL
+        // (word index)
         field(MetaSprite.frameSet, 2)
 
         // The state of the MetaSprite's VRAM/Palette allocations
@@ -30,8 +32,9 @@ namespace MetaSprite {
         // Palette id
         field(MetaSprite.palette, 1)
 
-        // Frame address
+        // Current frame to display/process
         // MUST NOT BE NULL
+        // (word index)
         field(MetaSprite.currentFrame, 2)
 
         // Offset between frame object data and the OAM charattr data

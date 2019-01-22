@@ -433,7 +433,6 @@ a8()
 i16()
 
     ldx.b   BaseEntity.MetaSprite.frameSet
-    beq     Fail
     jsr     MetaSprite.Palette._ProcessSlots
 
     rep     #$30

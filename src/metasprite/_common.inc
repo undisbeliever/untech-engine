@@ -54,15 +54,20 @@ macro _InitEntity() {
 
     stz.b   BaseEntity.MetaSprite.status
 
-    // Determine FrameSet address
+    // Determine FrameSet index
     cmp.w   #MetaSprite.Data.FrameSetListCount
     bcc     +
         lda.w   #0
     +
 
+    // frameSet = frameSetId * MetaSprite.Format.FrameSet.size
+    assert(MetaSprite.Format.FrameSet.size == 12)
+    assert(MetaSprite.Data.FrameSetListCount < (0xffff >> 3))
     asl
-    tax
-    lda.l   MetaSprite.Data.FrameSetList,x
+    asl
+    sta.b   BaseEntity.MetaSprite.frameSet
+    asl
+    adc.b   BaseEntity.MetaSprite.frameSet
     sta.b   BaseEntity.MetaSprite.frameSet
     tax
 
@@ -100,7 +105,6 @@ macro EntityDestructor() {
     assert16i()
 
     jsr     MetaSprite.Deactivate
-    stz.b   BaseEntity.MetaSprite.frameSet
 
     // Disable animation
     ldx.w   #0xffff
@@ -133,7 +137,6 @@ i16()
 code()
 function Activate {
     ldx.b   BaseEntity.MetaSprite.frameSet
-    beq     Return
 
     sep     #$20
 a8()
@@ -230,7 +233,6 @@ i16()
 code()
 function SetFrame {
     ldx.b   BaseEntity.MetaSprite.frameSet
-    beq     ReturnFalse
 
     sep     #$20
 a8()

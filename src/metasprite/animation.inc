@@ -50,7 +50,6 @@ i16()
 code()
 function SetAnimationId {
     ldx.b   BaseEntity.MetaSprite.frameSet
-    beq     InvalidAnimation
 
     sep     #$20
 a8()

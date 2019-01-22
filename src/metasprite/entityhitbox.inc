@@ -176,7 +176,7 @@ EndIf{#}:
 variable __EH_BLOCK = 0
 
 // Data bank containing the EntityHitbox data
-constant EntityHitboxBank = Data.EntityHitboxOffset >> 16
+constant EntityHitboxBank = Data.EntityHitboxData >> 16
 
 // Temporary store for the offset/size pair from EntityHitbox struct
 // Used to convert width/height from uint8 to uint16

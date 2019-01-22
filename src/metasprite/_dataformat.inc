@@ -10,7 +10,7 @@
 
 
 // Data format may be subject to changes
-if MetaSprite.Data.METASPRITE_FORMAT_VERSION != 32 {
+if MetaSprite.Data.METASPRITE_FORMAT_VERSION != 33 {
     error "Invalid UnTech MetaSprite Format"
 }
 
@@ -23,39 +23,39 @@ if MetaSprite.Data.METASPRITE_FORMAT_VERSION != 32 {
 //
 constant INT_MS8_OFFSET = 128
 
+// `Index+1` is an word index data format with the following meaning
+//
+//      0:          There is no data (NULL)
+//      1-0xffff:   Data index + 1
+//
+// As the data structs in this file are offset by one there is
+// no need to modify the index once it has been read.
 
 namespace MetaSprite {
 
 namespace Data {
-    storeBlockStart(FrameSetList, MS_FrameSetList)
-    storeBlockStart(PaletteList,  MS_PaletteList)
-    storeBlockStart(FrameList,    MS_FrameList)
-    storeBlockStart(AnimationList,MS_AnimationList)
+    // Table of word indexes within the FrameData block
+    storeBlockStart(FrameList,          MS_FrameList)
 
-    rodata(MS_FrameSetData)
-        constant FrameSetOffset = pc() & 0xff0000
+    // Table of word indexes within the AnimationData block
+    storeBlockStart(AnimationList,      MS_AnimationList)
 
+    // Table of word addresses that point to Palette data
+    storeBlockStart(PaletteList,        MS_PaletteList)
+
+    storeBlockStart(FrameSetData,       MS_FrameSetData)
+    storeBlockStart(FrameData,          MS_FrameData)
+    storeBlockStart(FrameObjectsData,   MS_FrameObjectsData)
+    storeBlockStart(EntityHitboxData,   MS_EntityHitboxData)
+    storeBlockStart(TileHitboxData,     MS_TileHitboxData)
+    storeBlockStart(ActionPointsData,   MS_ActionPointsData)
+    storeBlockStart(AnimationData,      MS_AnimationData)
+
+    // Palette Data
+    // (30 bytes per palette)
     rodata(MS_PaletteData)
         constant PaletteBank = pc() >> 16
         constant PaletteOffset = pc() & 0xff0000
-
-    rodata(MS_FrameData)
-        constant FrameOffset = pc() & 0xff0000
-
-    rodata(MS_FrameObjectsData)
-        constant FrameObjectsOffset = pc() & 0xff0000
-
-    rodata(MS_AnimationData)
-        constant AnimationOffset = pc() & 0xff0000
-
-    rodata(MS_TileHitboxData)
-        constant TileHitboxOffset = pc() & 0xff0000
-
-    rodata(MS_EntityHitboxData)
-        constant EntityHitboxOffset = pc() & 0xff0000
-
-    rodata(MS_ActionPointsData)
-        constant ActionPointsOffset = pc() & 0xff0000
 
     code()
 }
@@ -64,32 +64,39 @@ namespace Format {
 
     // The root FrameSet data structure
     namespace FrameSet {
-        struct(Data.FrameSetOffset)
+        struct(Data.FrameSetData)
             // Index of the palette table in `Data.PaletteList`
+            // (word index)
             field(paletteTable, 2)
             // Number of palettes for the framseSet
+            // (uint8)
             field(nPalettes, 1)
 
-            // Address of the tileset in the `DMA_Tile16Data` block
+            // Index+1 of the tileset in the `DMA_Tile16Data` block
             // May be NULL
             //
             // If not NULL and tileset lifespan is dynamic then the
             // tileset will be uploaded to the end of the VRAM slot on
             // MetaSprite activation.
+            //
+            // (Index+1 format)
             field(tileset, 2)
 
             // The tileset size and lifestyle
+            // (see TilesetType namespace)
             field(tilesetType, 1)
 
             // Index of the frame table in `Data.FrameList`
             field(frameTable, 2)
             // Number of frames for the frameSet
-            // (1 byte index)
+            // (uint8)
             field(nFrames, 1)
 
             // Index of the animation table in `Data.AnimationList`
+            // (word index)
             field(animationTable, 2)
             // Number of animations
+            // (uint8)
             field(nAnimations, 1)
         endstruct()
 
@@ -112,28 +119,33 @@ namespace Format {
     // Any of these values can be NULL (0), in which case processing
     // will be aborted
     namespace Frame {
-        struct(Data.FrameOffset)
-            // Address of the FrameObjects in the `MS_FrameObjectsData` block
+        struct(Data.FrameData)
+            // Index+1 of the FrameObjects data in the `FrameObjectsData` block
             // May be NULL
+            // (Index+1 format)
             field(frameObjects, 2)
 
-            // Address of the EntityHitbox in the `MS_EntityHitboxData` block
+            // Index+1 of the EntityHitbox data in the `EntityHitboxData` block
             // May be NULL
+            // (Index+1 format)
             field(entityHitbox, 2)
 
-            // Address of the TileHitbox` in the `MS_TileHitboxData` block
+            // Index+1 of the TileHitbox` data in the `TileHitboxData` block
             // May be NULL
+            // (Index+1 format)
             field(tileHitbox, 2)
 
-            // Address of the ActionPoints in the `MS_ActionPointsData` block
+            // Index+1 of the ActionPoints data in the `ActionPointsData` block
             // May be NULL
+            // (Index+1 format)
             field(actionPoints, 2)
 
-            // Address of the tileset in the `DMA_Tile16Data` block
+            // Index+1 of the tileset in the `DMA_Tile16Data` block
             //
             // MUST exist if FrameSet is dynamic
             //
             // Optional: Never read on fixed tilesets
+            // (Index+1 format)
             field(tileset, 2)
         endstruct()
     }
@@ -151,7 +163,7 @@ namespace Format {
     //   else:
     //      oam.charAttr = (frameObject.charAttr & 0xF01F) + entity.blockTwoCharAttrOffset
     namespace FrameObjects {
-        struct(Data.FrameObjectsOffset)
+        struct(Data.FrameObjectsData - 1)
             // Determines the number of objects used by the frame
             //
             // Value is `number of objects - 1`.
@@ -215,7 +227,7 @@ namespace Format {
     // Some hitboxes only involve one AABB. In this case count is 0 and
     // the outer hitbox is checked.
     namespace EntityHitbox {
-        struct(Data.EntityHitboxOffset)
+        struct(Data.EntityHitboxData - 1)
             // Determines the number of hitboxes used by the entity.
             //
             // Value is `number of hitboxes - 1`. The maximum allowed
@@ -280,7 +292,7 @@ namespace Format {
     //
     // For the moment the engine only supports a single AABB hitbox.
     namespace TileHitbox {
-        struct(Data.TileHitboxOffset)
+        struct(Data.TileHitboxData - 1)
             field(xOffset, 1) // int_ms8 format
             field(yOffset, 1) // int_ms8 format
             field(width, 1) // uint8
@@ -302,7 +314,7 @@ namespace Format {
     //      * Feed touching ground - used for run/walk sounds.
     //
     namespace ActionPoints {
-        struct(Data.ActionPointsOffset)
+        struct(Data.ActionPointsData - 1)
             // The type of action point
             // Value passed to the entity's ProcessPoint routine
             //
@@ -317,7 +329,7 @@ namespace Format {
 
     // The animation data
     namespace Animation {
-        struct(Data.AnimationOffset)
+        struct(Data.AnimationData)
             // The format of the `Animation.Frames.duration` field
             // (DurationFormat uint8 value)
             field(durationFormat, 1)
