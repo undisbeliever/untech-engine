@@ -15,7 +15,7 @@
 namespace Dma {
 namespace Tile16 {
 
-storeBlockStart(TileListData, DMA_Tile16Data)
+constant TileListData = Project.DMA_Tile16Data
 
     // Tile list format:
     //    byte: number of tiles
@@ -25,6 +25,7 @@ storeBlockStart(TileListData, DMA_Tile16Data)
     //       a `Index+1` index.
     //       (see `src/metasprite/_dataformat.inc`)
     namespace TileListData {
+        assert(TileListData & 0xffff != 0)
         struct(TileListData - 1)
             field(count, 1)
             field(addr, 2)

@@ -178,6 +178,7 @@ variable __EH_BLOCK = 0
 // Data bank containing the EntityHitbox data
 constant EntityHitboxBank = Data.EntityHitboxData >> 16
 
+
 // Temporary store for the offset/size pair from EntityHitbox struct
 // Used to convert width/height from uint8 to uint16
 // Also used to store the last hitbox read by the test collision code

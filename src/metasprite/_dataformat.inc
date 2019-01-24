@@ -10,7 +10,7 @@
 
 
 // Data format may be subject to changes
-if MetaSprite.Data.METASPRITE_FORMAT_VERSION != 33 {
+if MetaSprite.Data.METASPRITE_FORMAT_VERSION != 34 {
     error "Invalid UnTech MetaSprite Format"
 }
 
@@ -35,27 +35,28 @@ namespace MetaSprite {
 
 namespace Data {
     // Table of word indexes within the FrameData block
-    storeBlockStart(FrameList,          MS_FrameList)
+    constant FrameList = Project.MS_FrameList
 
     // Table of word indexes within the AnimationData block
-    storeBlockStart(AnimationList,      MS_AnimationList)
+    constant AnimationList = Project.MS_AnimationList
 
     // Table of word addresses that point to Palette data
-    storeBlockStart(PaletteList,        MS_PaletteList)
+    constant PaletteList = Project.MS_PaletteList;
 
-    storeBlockStart(FrameSetData,       MS_FrameSetData)
-    storeBlockStart(FrameData,          MS_FrameData)
-    storeBlockStart(FrameObjectsData,   MS_FrameObjectsData)
-    storeBlockStart(EntityHitboxData,   MS_EntityHitboxData)
-    storeBlockStart(TileHitboxData,     MS_TileHitboxData)
-    storeBlockStart(ActionPointsData,   MS_ActionPointsData)
-    storeBlockStart(AnimationData,      MS_AnimationData)
+    constant FrameSetData = Project.MS_FrameSetData;
+    constant FrameSetListCount = Project.MS_FrameSetListCount
+
+    constant FrameData = Project.MS_FrameData;
+    constant FrameObjectsData = Project.MS_FrameObjectsData;
+    constant EntityHitboxData = Project.MS_EntityHitboxData;
+    constant TileHitboxData = Project.MS_TileHitboxData;
+    constant ActionPointsData = Project.MS_ActionPointsData;
+    constant AnimationData = Project.MS_AnimationData;
 
     // Palette Data
     // (30 bytes per palette)
-    rodata(MS_PaletteData)
-        constant PaletteBank = pc() >> 16
-        constant PaletteOffset = pc() & 0xff0000
+    constant PaletteBank = Project.MS_PaletteData >> 16
+    constant PaletteOffset = Project.MS_PaletteData & 0xff0000
 
     code()
 }
@@ -163,6 +164,7 @@ namespace Format {
     //   else:
     //      oam.charAttr = (frameObject.charAttr & 0xF01F) + entity.blockTwoCharAttrOffset
     namespace FrameObjects {
+        assert(Data.FrameObjectsData & 0xffff != 0)
         struct(Data.FrameObjectsData - 1)
             // Determines the number of objects used by the frame
             //
@@ -227,6 +229,7 @@ namespace Format {
     // Some hitboxes only involve one AABB. In this case count is 0 and
     // the outer hitbox is checked.
     namespace EntityHitbox {
+        assert(Data.EntityHitboxData & 0xffff != 0)
         struct(Data.EntityHitboxData - 1)
             // Determines the number of hitboxes used by the entity.
             //
@@ -292,6 +295,7 @@ namespace Format {
     //
     // For the moment the engine only supports a single AABB hitbox.
     namespace TileHitbox {
+        assert(Data.TileHitboxData & 0xffff != 0)
         struct(Data.TileHitboxData - 1)
             field(xOffset, 1) // int_ms8 format
             field(yOffset, 1) // int_ms8 format
@@ -314,6 +318,7 @@ namespace Format {
     //      * Feed touching ground - used for run/walk sounds.
     //
     namespace ActionPoints {
+        assert(Data.ActionPointsData & 0xffff != 0)
         struct(Data.ActionPointsData - 1)
             // The type of action point
             // Value passed to the entity's ProcessPoint routine
