@@ -420,10 +420,10 @@ a16()
     jsr     Resources.Init
 
 
-    lda.w   #MetaTiles.TilesetList.MetaTileRenderTest
+    lda.w   #Project.MetaTileTilesetList.MetaTileRenderTest
     jsr     MetaTiles.LoadTileset
 
-    lda.w   #Resources.PaletteList.MetaTileRenderTest
+    lda.w   #Project.PaletteList.MetaTileRenderTest
     jsr     Resources.Palette.LoadPalette
 
     GenerateMap()
