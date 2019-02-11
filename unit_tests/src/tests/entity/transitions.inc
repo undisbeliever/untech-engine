@@ -17,19 +17,19 @@ function TemporarilyDeactivateEntities {
     jsr     Entity.Spawn
 
     // Add one entity in the last list
-    assert(Entity.N_ENTITY_LISTS == 8)
-    lda.w   #Entities.BlankEntity.EntityDataId_7
+    assert(Entity.N_ENTITY_LISTS == 6)
+    lda.w   #Entities.BlankEntity.EntityDataId_5
     jsr     Entity.Spawn
 
 constant N_ACTIVE_ENTITIES = _SetupCounterTest.N_ACTIVE_ENEMIES + 2
 
     jsr     ProcessEntityGameLoop
 
-    // Ensure last entity list has one entity in it
+    // Ensure last entity list has at least one entity in it
     lda.w   #Entity.N_ENTITY_LISTS - 1
     jsr     Entity.CountEntitiesInList
     cmp.w   #1
-    bne     Fail
+    bcc     Fail
 
     // Ensure activateNextFrame special list is empty before doing test
     jsr     _ActivateNextFrameListLength
@@ -92,7 +92,7 @@ constant N_ENTITIES = InteractiveTests.MetaSpriteInteractiveTest.EntityTable.N_E
     cmp.w   #0
     bne     Fail
 
-    Entity.CountEntitiesInList(PLAYERS)
+    Entity.CountEntitiesInList(Players)
     cmp.w   #N_ENTITIES
     bne     Fail
 

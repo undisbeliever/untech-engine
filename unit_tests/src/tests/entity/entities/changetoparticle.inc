@@ -38,7 +38,7 @@ code()
 function Process {
     // change to particle list
 
-    lda.w   #EntityLists.PARTICLES
+    lda.w   #EntityLists.Particles
     jmp     Entity.ChangeEntityListIdAndGotoNextEntity
 }
 

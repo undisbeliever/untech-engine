@@ -50,35 +50,29 @@ namespace EntityPool {
 
 namespace EntityLists {
     createEnum()
-        // collides with: bosses, enemies, enemy projectiles
-        enum(PLAYERS)
+        // no collisions
+        enum(Particles)
+
+        // collides with: enemies
+        enum(PlayerProjectiles)
 
         // collides with: player
-        enum(BOSSES)
+        enum(EnemyProjectiles)
+
+        // no collisions
+        enum(Platforms)
+
+        // collides with: enemies, enemy projectiles
+        enum(Players)
 
         // collides with: player
-        enum(ENEMIES)
-
-        // no collisions
-        enum(NPCS)
-
-        // no collisions
-        enum(PLATFORMS)
-
-        // no collisions
-        enum(PARTICLES)
-
-        // collides with: bosses enemies
-        enum(PLAYER_PROJECTILES)
-
-        // collides with: player
-        enum(ENEMY_PROJECTILES)
+        enum(Enemies)
     endEnum()
 }
 
 
-define PLAYER_PROJECTILE_ENTITY_LIST = PLAYER_PROJECTILES
-define ENEMY_PROJECTILE_ENTITY_LIST  = ENEMY_PROJECTILES
+define PLAYER_PROJECTILE_ENTITY_LIST = PlayerProjectiles
+define ENEMY_PROJECTILE_ENTITY_LIST  = EnemyProjectiles
 
 
 // MetaTile engine settings

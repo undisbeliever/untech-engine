@@ -65,26 +65,27 @@ SpawnList: {
     define C = Entities.ChangeToParticleEntity.EntityDataId_
     define B = Entities.BlankEntity.EntityDataId_
 
-    dw  {C}0, {C}0, {B}0, {B}0, {B}0    // player
-    dw  {B}1, {C}1, {C}1, {B}1, {B}1    // boss
-    dw  {B}2, {C}2, {B}2, {C}2, {B}2    // enemy
-    dw  {B}3, {B}3, {B}3, {C}3, {C}3    // npc
-    dw  {C}4, {C}4, {C}4, {C}4, {C}4    // platform
-    dw  {B}5, {B}5, {B}5, {B}5, {B}5    // particle
+    assert(EntityLists.Particles == 0)
+    assert(Entity.N_ENTITY_LISTS == 6)
+
+    dw  {C}0, {C}0, {B}0, {B}0, {B}0    // particles
+    dw  {B}1, {C}1, {C}1, {B}1, {B}1
+    dw  {B}2, {C}2, {B}2, {C}2, {B}2
+    dw  {B}3, {B}3, {B}3, {C}3, {C}3
+    dw  {C}4, {C}4, {C}4, {C}4, {C}4    // Change all to particles
+    dw  {B}5, {B}5, {B}5, {B}5, {B}5    // Change none
 
     constant SpawnList.size = pc() - SpawnList
     assert(SpawnList.size/2 <= Entity.N_ENTITIES)
 }
 
 ExpectedSizes: {
-    dw  3                   // player
-    dw  3                   // boss
-    dw  3                   // enemy
-    dw  3                   // npc
-    dw  0                   // platform
-    dw  (6 * 5) - (3 * 4)   // particle
-    dw  0                   // playerprojectiles
-    dw  0                   // enemyprojectiles
+    dw  (5 * 5) - (3 * 3)   // particles
+    dw  3
+    dw  3
+    dw  3
+    dw  0                   // Change all to particles
+    dw  5                   // Change none
 
     constant ExpectedSizes.size = pc() - ExpectedSizes
     assert(ExpectedSizes.size / 2 == Entity.N_ENTITY_LISTS)
@@ -486,30 +487,26 @@ function SpawnEntity_XY {
 }
 
 namespace OldBehaviourTestEntities {
-    assert(Entity.N_ENTITY_LISTS == 8)
+    assert(Entity.N_ENTITY_LISTS == 6)
 
     rodata(EN_EntityDataList)
     constant firstId = (pc() - Entity.Data.EntityDataList) / 2
-        dw  Entities.BlankEntity.RomData0               // player list
-        dw  Entities.BlankEntity.RomData1               // boss list
-        dw  Entities.DeactivateIfOutsideEntity.RomData2 // enemy list
-        dw  Entities.DeactivateIfOutsideEntity.RomData3 // npc list
-        dw  Entities.DeactivateIfOutsideEntity.RomData4 // platform list
-        dw  Entities.BlankEntity.RomData5               // particle list
-        dw  Entities.DeleteIfOutsideEntity.RomData6     // playerProjectile list
-        dw  Entities.DeleteIfOutsideEntity.RomData7     // enemyProjectile list
+        dw  Entities.BlankEntity.RomData0               // particles list
+        dw  Entities.DeleteIfOutsideEntity.RomData1     // playerProjectiles list
+        dw  Entities.DeleteIfOutsideEntity.RomData2     // enemyProjectiles list
+        dw  Entities.DeactivateIfOutsideEntity.RomData3 // platforms list
+        dw  Entities.BlankEntity.RomData4               // players list
+        dw  Entities.DeactivateIfOutsideEntity.RomData5 // enemies list
 }
 
 rodata(rom0)
 InitialExpectedSizes: {
-    dw  4   // player
-    dw  4   // boss
-    dw  1   // enemy
-    dw  1   // npc
-    dw  1   // platform
-    dw  4   // particle
-    dw  1   // player projectile
-    dw  1   // enemy projectile
+    dw  4   // particles
+    dw  1   // player projectiles
+    dw  1   // enemy projectiles
+    dw  1   // platforms
+    dw  4   // players
+    dw  1   // enemies
 
     assert((pc() - InitialExpectedSizes) / 2 == Entity.N_ENTITY_LISTS)
 }
@@ -518,17 +515,15 @@ rodata(rom0)
 MoveCameraTable: {
     macro _row(xPos, yPos, e, activated, deactivated) {
         dw  {xPos}, {yPos}
-        dw  {activated} * 3
-        dw  {deactivated} * 3
+        dw  {activated} * 2
+        dw  {deactivated} * 2
 
-        dw  4   // player
-        dw  4   // boss
-        dw  {e} // enemy
-        dw  {e} // npc
-        dw  {e} // platform
-        dw  4   // particle
-        dw  0   // player projectile
-        dw  0   // enemy projectile
+        dw  4   // particles
+        dw  0   // player projectiles
+        dw  0   // enemy projectiles
+        dw  {e} // platforms
+        dw  4   // players
+        dw  {e} // enemies
     }
 
     //   xPos    yPos    count  activated   deactivated

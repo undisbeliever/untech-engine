@@ -173,6 +173,9 @@ function MenuRoutine0 {
     rts
 }
 
+// Test last list
+assert(EntityLists.Enemies == Entity.N_ENTITY_LISTS - 1)
+
 
 rodata(rom0)
 MenuText1:
@@ -183,7 +186,7 @@ a16()
 i16()
 code()
 function MenuRoutine1 {
-    ldx.w   {Entity.listAddress(ENEMIES)}
+    ldx.w   {Entity.listAddress(Enemies)}
     beq     Fail
 
     jmp     _CreateInfiniteLoop_Y
@@ -203,7 +206,7 @@ a16()
 i16()
 code()
 function MenuRoutine2 {
-    ldx.w   {Entity.listAddress(ENEMIES)}
+    ldx.w   {Entity.listAddress(Enemies)}
     beq     Fail
 
     ldy.b   BaseEntity.next,x
@@ -243,11 +246,11 @@ code()
 function MenuRoutine4 {
     // enemy->first = enemy->first->next
 
-    ldx.w   {Entity.listAddress(ENEMIES)}
+    ldx.w   {Entity.listAddress(Enemies)}
     beq     Fail
 
     lda.b   BaseEntity.next,x
-    sta.w   {Entity.listAddress(ENEMIES)}
+    sta.w   {Entity.listAddress(Enemies)}
 
     rts
 
@@ -284,21 +287,21 @@ Fail:
 
 rodata(rom0)
 MenuText6:
-    db  "Deactivated in boss list", 0
+    db  "Deactivated in platforms", 0
 
 // REQUITES: 16 bit A, 16 bit Index, DB = 0x7e, DP = 0
 a16()
 i16()
 code()
 function MenuRoutine6 {
-    sta.w   {Entity.listAddress(BOSSES)}
+    sta.w   {Entity.listAddress(Platforms)}
     beq     Fail
 
     // bosses->first = deactivated->first
     // deactivated->first = null
 
     lda.w   Entity.specialLists.deactivated
-    sta.w   {Entity.listAddress(BOSSES)}
+    sta.w   {Entity.listAddress(Platforms)}
 
     stz.w   Entity.specialLists.deactivated
 
@@ -312,7 +315,7 @@ Fail:
 
 rodata(rom0)
 MenuText7:
-    db  "Acti in activateNextFrame", 0
+    db  "Actv in activateNextFrame", 0
 
 // REQUITES: 16 bit A, 16 bit Index, DB = 0x7e, DP = 0
 a16()
@@ -328,8 +331,8 @@ function MenuRoutine7 {
     ldy.w   Entity.specialLists.activateNextFrame
     bne     Fail
 
-    lda.w   {Entity.listAddress(ENEMIES)}
-    sty.w   {Entity.listAddress(ENEMIES)}
+    lda.w   {Entity.listAddress(Enemies)}
+    sty.w   {Entity.listAddress(Enemies)}
 
     sta.w   Entity.specialLists.activateNextFrame
 
@@ -350,9 +353,9 @@ a16()
 i16()
 code()
 function MenuRoutine8 {
-    // enemies->next->listId = EntityLists.PLAYERS
+    // enemies->next->listId = EntityLists.Players
 
-    ldy.w   {Entity.listAddress(PLAYERS)}
+    ldy.w   {Entity.listAddress(Players)}
     beq     Fail
 
     ldx.b   BaseEntity.next,y
@@ -362,7 +365,7 @@ function MenuRoutine8 {
 
     sep     #$20
 a8()
-    lda.b   #EntityLists.PLAYERS
+    lda.b   #EntityLists.Players
     sta.b   BaseEntity.listId,x
 
     rep     #$30
@@ -397,10 +400,10 @@ function MenuRoutine9 {
         bne     Loop
 
     // X = last item in free list
-    lda.w   {Entity.listAddress(ENEMIES)}
+    lda.w   {Entity.listAddress(Enemies)}
     sta.b   BaseEntity.next,x
 
-    stz.w   {Entity.listAddress(ENEMIES)}
+    stz.w   {Entity.listAddress(Enemies)}
 
     rts
 
@@ -551,7 +554,7 @@ code()
 function MenuRoutine15 {
     // enemies.first->next->entityId++
 
-    ldy.w   {Entity.listAddress(ENEMIES)}
+    ldy.w   {Entity.listAddress(Enemies)}
     beq     Fail
 
     ldx.w   BaseEntity.next,y
@@ -582,7 +585,7 @@ code()
 function MenuRoutine16 {
     // enemies.first->next->entityId = enemies.first->entityId
 
-    ldx.w   {Entity.listAddress(ENEMIES)}
+    ldx.w   {Entity.listAddress(Enemies)}
     beq     Fail
 
     ldy.w   BaseEntity.next,x
