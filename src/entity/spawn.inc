@@ -282,7 +282,10 @@ Return:
 
 
 
-// Spawns one or more enemy projectiles from an ActionPoint type/location
+// Spawns one or more enemy projectiles from an ActionPoint type/location.
+//
+// The entity(s) will be spawned in the entity list defined by
+// `ENEMY_PROJECTILE_ENTITY_LIST`.
 //
 // When entities are spawned the value `MetaSprite.ActionPoint.address`
 // will be set to the address of the current Action Point.
@@ -300,11 +303,14 @@ a16()
 i16()
 code()
 function SpawnEnemyProjectileFromActionPoint {
-    ldx.w   #EntityLists.ENEMY_PROJECTILES
+    ldx.w   #EntityLists.{ENEMY_PROJECTILE_ENTITY_LIST}
     bra     _SpawnProjectileFromActionPoint
 }
 
-// Spawns one or more player projectiles from an ActionPoint type/location
+// Spawns one or more player projectiles from an ActionPoint type/location.
+//
+// The entity(s) will be spawned in the entity list defined by
+// `PLAYER_PROJECTILE_ENTITY_LIST`.
 //
 // When entities are spawned the value `MetaSprite.ActionPoint.address`
 // will be set to the address of the current Action Point.
@@ -322,8 +328,8 @@ a16()
 i16()
 code()
 function SpawnPlayerProjectileFromActionPoint {
-    ldx.w   #EntityLists.PLAYER_PROJECTILES
-_fallthrough:
+    ldx.w   #EntityLists.{PLAYER_PROJECTILE_ENTITY_LIST}
+FallThrough:
 }
 
 
@@ -332,7 +338,7 @@ _fallthrough:
 // INPUT: DP = entity
 //        Y = projectile Id
 //        A = type to match
-//        X = list Id (ListId.PLAYER_PROJECTILE or ListId.ENEMY_PROJECTILE)
+//        X = list Id (Must be valid)
 a16()
 i16()
 code()
@@ -342,7 +348,7 @@ allocateTmpWord(tmp_compare)
 allocateTmpWord(tmp_projectileDataPtr)
 allocateTmpWord(tmp_entityDoingSpawning)
 
-    assert(SpawnPlayerProjectileFromActionPoint._fallthrough == pc())
+    assert(SpawnPlayerProjectileFromActionPoint.FallThrough == pc())
 
     cpy.w   #Entity.Data.ProjectileListCount
     bcc     +

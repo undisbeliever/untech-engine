@@ -77,6 +77,9 @@ namespace EntityLists {
 }
 
 
+define PLAYER_PROJECTILE_ENTITY_LIST = PLAYER_PROJECTILES
+define ENEMY_PROJECTILE_ENTITY_LIST  = ENEMY_PROJECTILES
+
 
 // MetaTile engine settings
 // ========================
