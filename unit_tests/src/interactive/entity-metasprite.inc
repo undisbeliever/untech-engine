@@ -18,14 +18,17 @@ namespace ShowAllFramesEntity {
         endstruct()
     }
 
-    // IN: A = parameter (frameDelay)
+    // IN: A = frameSet to render (entity parameter)
     // OUT: C set = always activate entity
     a16()
     i16()
     code()
     function Init {
+        ldy.b   EntityStruct.MetaSprite.palette
+        jsr     MetaSpriteTest._InitEntity
+
+        lda.w   #10
         sta.b   EntityStruct.frameDelay
-        sta.b   EntityStruct.frameCount
 
         lda.w   #-1
         sta.b   EntityStruct.frameCount
@@ -114,56 +117,46 @@ namespace ShowAllFramesEntity {
     }
 
 
-    inline BuildEntityData(name) {
-        rodata(EN_RomData)
-        RomData_{name}:
-            dw  FunctionTable
-            db  EntityLists.Players     // initialListId
-            db  0                       // defaultPalette
-            dw  MSFS.{name}             // frameSetId
+    rodata(EN_RomData)
+    RomData:
+        dw  FunctionTable
+        db  EntityLists.Players     // initialListId
+        db  0                       // defaultPalette
+        dw  MSFS.FST_OneTile        // frameSetId
 
-        rodata(EN_EntityDataList)
-        constant {name}_entityDataId = (pc() - Entity.Data.EntityDataList) / 2
-            dw  RomData_{name}
-    }
-    BuildEntityData(Man)
-    BuildEntityData(SpikedWalker)
-    BuildEntityData(Woman)
-    BuildEntityData(FST_OneTileFixed)
-    BuildEntityData(FST_TwoTilesFixed)
-    BuildEntityData(FST_OneTile)
-    BuildEntityData(FST_TwoTiles)
-    BuildEntityData(FST_TwoRows)
+    rodata(EN_EntityDataList)
+    constant EntityDataId = (pc() - Entity.Data.EntityDataList) / 2
+        dw  RomData
 }
 
 rodata(rom0)
 namespace EntityTable {
     struct(pc())
-        field(entityDataId, 2)
-        field(parameter, 2)
+        field(frameSet, 2)
+        field(delay, 2)
         field(xPos, 2)
         field(yPos, 2)
     endstruct()
 
-    macro data(eName, frameDelay, xPos, yPos) {
-        dw  ShowAllFramesEntity.{eName}_entityDataId
+    macro data(frameSet, frameDelay, xPos, yPos) {
+        dw  MSFS.{frameSet}
         dw  {frameDelay}
         dw  {xPos} + Camera.ORIGIN
         dw  {yPos} + Camera.ORIGIN
     }
 
 Data:
-    data(Man, 10, 50, 200)
-    data(SpikedWalker, 10, 128, 200)
-    data(Woman, 10, 256 - 50, 200)
+    data(Man,               10,     50,         200)
+    data(SpikedWalker,      10,     128,        200)
+    data(Woman,             10,     256 - 50,   200)
 
-    data(FST_OneTileFixed, 40, 40, 150)
-    data(FST_TwoTilesFixed, 40, 256 - 40, 150)
+    data(FST_OneTileFixed,  40,     40,         150)
+    data(FST_TwoTilesFixed, 40,     256 - 40,   150)
 
-    data(FST_OneTile, 150, 40, 100)
-    data(FST_TwoTiles, 150, 256 - 40, 100)
+    data(FST_OneTile,       150,    40,         100)
+    data(FST_TwoTiles,      150,    256 - 40,   100)
 
-    data(FST_TwoRows, 200, 256 / 2, 45)
+    data(FST_TwoRows,       200,    256 / 2,    45)
 
     constant N_ENTITIES = (pc() - Data) / EntityTable.size
 }
@@ -188,14 +181,21 @@ constant tmp_index = Test.tmp
         lda.l   EntityTable.yPos,x
         sta.w   Entity.Spawn.yPos
 
-        lda.l   EntityTable.parameter,x
+        lda.l   EntityTable.frameSet,x
         tay
-        lda.l   EntityTable.entityDataId,x
+
+        lda.w   #ShowAllFramesEntity.EntityDataId
 
         jsr     Entity.Spawn
         bcc     Fail
 
-        lda.w   tmp_index
+        // Update frame delay
+        // Y = newly spawned entity
+        ldx.w   tmp_index
+        lda.l   EntityTable.delay,x
+        sta.w   ShowAllFramesEntity.EntityStruct.frameDelay,y
+
+        txa
         clc
         adc.w   #EntityTable.size
         tax
