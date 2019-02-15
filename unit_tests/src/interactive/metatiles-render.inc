@@ -2,9 +2,6 @@
 // Copyright (c) 2016 - 2017, Marcus Rowe <undisbeliever@gmail.com>.
 // Distributed under The MIT License: https://opensource.org/licenses/MIT
 
-namespace InteractiveTests {
-namespace MetaTileRenderTest {
-
 // Tests:
 //  * MetaTile.Render
 //  * MetaTile.LoadTileset
@@ -12,32 +9,10 @@ namespace MetaTileRenderTest {
 //  * Resources.AnimatedTileset
 //  * Resource palette animations
 
+namespace Entities {
 
-constant MAP_WIDTH = 84
-constant MAP_HEIGHT = 75
-
-constant MAP_GRID_WIDTH = 3
-constant MAP_GRID_HEIGHT = 3
-constant MAP_GRID_TILE_OFFSET = 3
-constant MAP_REPEAT_HORIZONTAL = 24
-constant MAP_REPEAT_VERTICAL = 21
-
-assert(MAP_GRID_WIDTH * MAP_REPEAT_HORIZONTAL <= MAP_WIDTH)
-assert(MAP_GRID_HEIGHT * MAP_REPEAT_VERTICAL <= MAP_HEIGHT)
-assert(MAP_WIDTH * MAP_HEIGHT < MetaTiles.MAP_SIZE)
-
-constant MIN_CAMERA_X = 0x1000
-constant MIN_CAMERA_Y = 0x8000
-
-constant MAX_CAMERA_X = MIN_CAMERA_X + MAP_WIDTH * 16 - Camera.DISPLAY_WIDTH
-constant MAX_CAMERA_Y = MIN_CAMERA_Y + MAP_HEIGHT * 16 - Camera.DISPLAY_HEIGHT
-
-constant CAMERA_START_X = MIN_CAMERA_X + (MAX_CAMERA_X - MIN_CAMERA_X) / 2 - 7
-constant CAMERA_START_Y = MIN_CAMERA_Y + (MAX_CAMERA_Y - MIN_CAMERA_Y) / 2 + 13
-
-
-namespace MapCursorEntity {
-    buildFunctionTable(BaseEntityFunctionTable, MapCursorEntity)
+namespace MapCursor {
+    buildFunctionTable(BaseEntityFunctionTable, MapCursor)
 
     namespace EntityStruct {
         childstruct(BaseEntity)
@@ -236,6 +211,34 @@ namespace MapCursorEntity {
     constant ENTITY_DATA_ID = (pc() - Entity.Data.EntityDataList) / 2
         dw  RomData
 }
+
+}
+
+
+namespace InteractiveTests {
+namespace MetaTileRenderTest {
+
+constant MAP_WIDTH = 84
+constant MAP_HEIGHT = 75
+
+constant MAP_GRID_WIDTH = 3
+constant MAP_GRID_HEIGHT = 3
+constant MAP_GRID_TILE_OFFSET = 3
+constant MAP_REPEAT_HORIZONTAL = 24
+constant MAP_REPEAT_VERTICAL = 21
+
+assert(MAP_GRID_WIDTH * MAP_REPEAT_HORIZONTAL <= MAP_WIDTH)
+assert(MAP_GRID_HEIGHT * MAP_REPEAT_VERTICAL <= MAP_HEIGHT)
+assert(MAP_WIDTH * MAP_HEIGHT < MetaTiles.MAP_SIZE)
+
+constant MIN_CAMERA_X = 0x1000
+constant MIN_CAMERA_Y = 0x8000
+
+constant MAX_CAMERA_X = MIN_CAMERA_X + MAP_WIDTH * 16 - Camera.DISPLAY_WIDTH
+constant MAX_CAMERA_Y = MIN_CAMERA_Y + MAP_HEIGHT * 16 - Camera.DISPLAY_HEIGHT
+
+constant CAMERA_START_X = MIN_CAMERA_X + (MAX_CAMERA_X - MIN_CAMERA_X) / 2 - 7
+constant CAMERA_START_Y = MIN_CAMERA_Y + (MAX_CAMERA_Y - MIN_CAMERA_Y) / 2 + 13
 
 
 // Initializes the screen and loads tiles/palette to PPU
@@ -441,7 +444,7 @@ a16()
     lda.w   #CAMERA_START_Y + Camera.DISPLAY_HEIGHT / 2
     sta.w   Entity.Spawn.yPos
 
-    lda.w   #MapCursorEntity.ENTITY_DATA_ID
+    lda.w   #Entities.MapCursor.ENTITY_DATA_ID
     jsr     Entity.Spawn
     bcs     +
         rts

@@ -62,8 +62,8 @@ Fail:
 
 rodata(rom0)
 SpawnList: {
-    define C = Entities.ChangeToParticleEntity.EntityDataId_
-    define B = Entities.BlankEntity.EntityDataId_
+    define C = Entities.ChangeToParticle.EntityDataId_
+    define B = Entities.Blank.EntityDataId_
 
     assert(EntityLists.Particles == 0)
     assert(Entity.N_ENTITY_LISTS == 6)
@@ -111,7 +111,7 @@ constant tmp = Test.tmp
 
     // spawn 3 entities per list
     // these entities will delete themselves after Y frames
-    lda.w   #Entities.DeleteAfterDelayEntity.EntityDataId_0
+    lda.w   #Entities.DeleteAfterDelay.EntityDataId_0
     Loop:
         sta.w   tmp
 
@@ -136,7 +136,7 @@ constant tmp = Test.tmp
 
         lda.w   tmp
         inc
-        cmp.w   #Entities.DeleteAfterDelayEntity.EntityDataId_0 + Entity.N_ENTITY_LISTS
+        cmp.w   #Entities.DeleteAfterDelay.EntityDataId_0 + Entity.N_ENTITY_LISTS
         bcc     Loop
 
     // Test list lengths
@@ -204,7 +204,7 @@ constant tmp = Test.tmp
 
         assert(Entity.N_ENTITIES >= Entity.N_ENTITY_LISTS)
 
-        lda.w   #Entities.DeleteAfterDelayEntity.EntityDataId_0
+        lda.w   #Entities.DeleteAfterDelay.EntityDataId_0
         Loop:
             sta.w   tmp
 
@@ -214,7 +214,7 @@ constant tmp = Test.tmp
 
             lda.w   tmp
             inc
-            cmp.w   #Entities.DeleteAfterDelayEntity.EntityDataId_0 + Entity.N_ENTITY_LISTS
+            cmp.w   #Entities.DeleteAfterDelay.EntityDataId_0 + Entity.N_ENTITY_LISTS
             bcc     Loop
 
 
@@ -308,7 +308,7 @@ constant firstFrame   = Test.tmp + 2
     //   then draws frame2 for two display frames
     //   then deletes itself on the fifth frame
 
-    lda.w   #Entities.DeleteIfAnimationEndsEntity.EntityDataId
+    lda.w   #Entities.DeleteIfAnimationEnds.EntityDataId
     jsr     Entity.Spawn
     sty.w   entityAddress
 
@@ -437,8 +437,8 @@ constant tmp_listId = Test.tmp + 2
             sta.w   Camera.yPos
 
 
-            stz.w   Entities.DeactivateIfOutsideEntity.activatedCount
-            stz.w   Entities.DeactivateIfOutsideEntity.deactivatedCount
+            stz.w   Entities.DeactivateIfOutside.activatedCount
+            stz.w   Entities.DeactivateIfOutside.deactivatedCount
 
             jsr     ProcessEntityGameLoop
 
@@ -446,11 +446,11 @@ constant tmp_listId = Test.tmp + 2
             // test activatedCount and deactivatedCount
             ldx.w   tmp_index
 
-            lda.w   Entities.DeactivateIfOutsideEntity.activatedCount
+            lda.w   Entities.DeactivateIfOutside.activatedCount
             cmp.l   MoveCameraTable + 4,x
             bne     Fail
 
-            lda.w   Entities.DeactivateIfOutsideEntity.deactivatedCount
+            lda.w   Entities.DeactivateIfOutside.deactivatedCount
             cmp.l   MoveCameraTable + 6,x
             bne     Fail
 
@@ -491,12 +491,12 @@ namespace OldBehaviourTestEntities {
 
     rodata(EN_EntityDataList)
     constant firstId = (pc() - Entity.Data.EntityDataList) / 2
-        dw  Entities.BlankEntity.RomData0               // particles list
-        dw  Entities.DeleteIfOutsideEntity.RomData1     // playerProjectiles list
-        dw  Entities.DeleteIfOutsideEntity.RomData2     // enemyProjectiles list
-        dw  Entities.DeactivateIfOutsideEntity.RomData3 // platforms list
-        dw  Entities.BlankEntity.RomData4               // players list
-        dw  Entities.DeactivateIfOutsideEntity.RomData5 // enemies list
+        dw  Entities.Blank.RomData0                 // particles list
+        dw  Entities.DeleteIfOutside.RomData1       // playerProjectiles list
+        dw  Entities.DeleteIfOutside.RomData2       // enemyProjectiles list
+        dw  Entities.DeactivateIfOutside.RomData3   // platforms list
+        dw  Entities.Blank.RomData4                 // players list
+        dw  Entities.DeactivateIfOutside.RomData5   // enemies list
 }
 
 rodata(rom0)
@@ -560,7 +560,7 @@ constant _loopsLeft = Test.dpTmp + 0
     SpawnLoop:
         phy
             // Y = listId to spawn entity in
-            lda.w   #SpawnAndChangeListTestEntity.EntityDataId
+            lda.w   #Entities.SpawnAndChangeList.EntityDataId
 
             jsr     Entity.Spawn
             bcc     Fail
@@ -591,122 +591,6 @@ constant _loopsLeft = Test.dpTmp + 0
 Fail:
     clc
     rts
-
-
-namespace SpawnAndChangeListTestEntity {
-    buildFunctionTable(BaseEntityFunctionTable, SpawnAndChangeListTestEntity)
-
-    constant DELETE_DELAY = 2
-
-
-    // IN: A = entity parameter = entity list id
-    // OUT: C set = always activate entity
-    a16()
-    i16()
-    code()
-    function Init {
-        sep     #$20
-    a8()
-        sta.b   BaseEntity.listId
-
-        rep     #$30
-    a16()
-
-        // always activate
-        sec
-        rts
-    }
-
-
-    a16()
-    i16()
-    code()
-    function Process {
-        // This entity spawns 3 entities:
-        //  * DeleteAfterDelayEntity with listId = listId
-        //  * DeleteAfterDelayEntity with lidtId = listId - 1
-        //  * DeleteAfterDelayEntity with listId = listId + 1
-        //
-        // then changes its entity list to the previous list.
-
-        lda.b   BaseEntity.listId
-        and.w   #0xff
-        jsr     SpawnDeleteEntity
-
-
-        lda.b   BaseEntity.listId
-        and.w   #0xff
-        dec
-        jsr     SpawnDeleteEntity
-
-
-        lda.b   BaseEntity.listId
-        and.w   #0xff
-        inc
-        jsr     SpawnDeleteEntity
-
-
-        lda.b   BaseEntity.listId
-        and.w   #0xff
-        dec
-        bpl     +
-            lda.w   #Entity.N_ENTITY_LISTS - 1
-        +
-        jmp     Entity.ChangeEntityListIdAndGotoNextEntity
-    }
-
-
-    // IN: A = listId to spawn DeleteAfterDelayEntity in.
-    a16()
-    i16()
-    code()
-    function SpawnDeleteEntity {
-        // ensure entity is spawned
-        ldx.w   Camera.xPos
-        stx.w   Entity.Spawn.xPos
-        ldx.w   Camera.yPos
-        stx.w   Entity.Spawn.yPos
-
-        // wrap list id if necessary
-        tay
-        bpl     +
-            // A < 0
-            lda.w   #Entity.N_ENTITY_LISTS - 1
-        +
-        cmp.w   #Entity.N_ENTITY_LISTS
-        bcc     +
-            lda.w   #0
-        +
-
-        clc
-        adc.w   #Entities.DeleteAfterDelayEntity.EntityDataId_0
-        ldy.w   #DELETE_DELAY
-        jmp     Entity.Spawn
-    }
-
-
-    a16()
-    i16()
-    code()
-    Destructor:
-    Deactivated:
-    ProcessCollision:
-    function NULL {
-        rts
-    }
-
-
-    rodata(EN_RomData)
-    RomData:
-        dw  FunctionTable
-        db  0               // initialListId
-        db  0               // defaultPalette
-        dw  0               // frameSetId
-
-    rodata(EN_EntityDataList)
-    constant EntityDataId = (pc() - Entity.Data.EntityDataList) / 2
-        dw  RomData
-}
 }
 
 }

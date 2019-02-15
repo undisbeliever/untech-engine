@@ -2,9 +2,6 @@
 // Copyright (c) 2016 - 2017, Marcus Rowe <undisbeliever@gmail.com>.
 // Distributed under The MIT License: https://opensource.org/licenses/MIT
 
-namespace InteractiveTests {
-namespace ActionPointSpawnerTest {
-
 // Tests:
 //  * EntityLoop
 //  * Entity.SpawnPlayerProjectileFromActionPoint
@@ -15,8 +12,10 @@ namespace ActionPointSpawnerTest {
 //  * ENTITY_POOL_EMPTY warning
 
 
-namespace ProjectileEntity {
-    buildFunctionTable(BaseEntityFunctionTable, ProjectileEntity)
+namespace Entities {
+
+namespace EightDirectionProjectile {
+    buildFunctionTable(BaseEntityFunctionTable, EightDirectionProjectile)
 
     // Slow speed to exhaust entity pool.
     constant VELOCITY = 0x8000
@@ -171,8 +170,8 @@ namespace ProjectileEntity {
 
 
 
-namespace SpawnerEntity {
-    buildFunctionTable(BaseEntityFunctionTable, SpawnerEntity)
+namespace ActionPointSpawner {
+    buildFunctionTable(BaseEntityFunctionTable, ActionPointSpawner)
 
     constant FRAME_DELAY = 5
     constant N_SPAWN_POINTS = 8
@@ -284,7 +283,7 @@ namespace SpawnerEntity {
     i16()
     code()
     function SpawnPlayerProjectileAtAp {
-        ldy.w   #ProjectileEntity.PROJECTILE_ID
+        ldy.w   #Entities.EightDirectionProjectile.PROJECTILE_ID
         jmp     Entity.SpawnPlayerProjectileFromActionPoint
     }
 
@@ -292,7 +291,7 @@ namespace SpawnerEntity {
     i16()
     code()
     function SpawnEnemyProjectileAtAp {
-        ldy.w   #ProjectileEntity.PROJECTILE_ID
+        ldy.w   #Entities.EightDirectionProjectile.PROJECTILE_ID
         jmp     Entity.SpawnEnemyProjectileFromActionPoint
     }
 
@@ -300,7 +299,7 @@ namespace SpawnerEntity {
     i16()
     code()
     function SpawnEntityAtAp {
-        ldy.w   #ProjectileEntity.ENTITY_DATA_ID
+        ldy.w   #Entities.EightDirectionProjectile.ENTITY_DATA_ID
         jmp     Entity.SpawnAtActionPoint
     }
 
@@ -317,7 +316,11 @@ namespace SpawnerEntity {
         dw  RomData
 }
 
+}
 
+
+namespace InteractiveTests {
+namespace ActionPointSpawnerTest {
 
 // Prints the list statistics to screen
 macro PrintListSizes() {
@@ -364,7 +367,7 @@ function Test {
     lda.w   #Camera.ORIGIN + Camera.DISPLAY_HEIGHT / 2
     sta.w   Entity.Spawn.yPos
 
-    lda.w   #SpawnerEntity.ENTITY_DATA_ID
+    lda.w   #Entities.ActionPointSpawner.ENTITY_DATA_ID
 
     jsr     Entity.Spawn
     bcc     Fail

@@ -11,14 +11,14 @@ Test.add("Entity.Spawn")
 function Spawn {
     jsr     Entity.Init
 
-    stz.w   Entities.BlankEntity.parameterSum
+    stz.w   Entities.Blank.parameterSum
 
     lda.w   #0x1234
     sta.w   Entity.Spawn.xPos
     lda.w   #0x5678
     sta.w   Entity.Spawn.yPos
 
-    lda.w   #Entities.BlankEntity.EntityDataId_0
+    lda.w   #Entities.Blank.EntityDataId_0
     ldy.w   #0x1337
     jsr     Entity.Spawn
     bcc     Fail
@@ -33,7 +33,7 @@ function Spawn {
     bne     Fail
 
     // test parameter worked
-    lda.w   Entities.BlankEntity.parameterSum
+    lda.w   Entities.Blank.parameterSum
     cmp.w   #0x1337
     bne     Fail
 
@@ -67,14 +67,14 @@ constant tmp = Test.tmp
 
     jsr     Entity.Init
 
-    stz.w   Entities.BlankEntity.parameterSum
+    stz.w   Entities.Blank.parameterSum
 
     ldx.w   #Entity.N_ENTITIES
 
     Loop:
         stx.w   tmp
 
-        lda.w   #Entities.BlankEntity.EntityDataId_0
+        lda.w   #Entities.Blank.EntityDataId_0
         ldy.w   #5
         jsr     Entity.Spawn
         bcc     Fail
@@ -88,7 +88,7 @@ constant tmp = Test.tmp
     bcc     Fail
 
     // Test cannot make new entity
-    lda.w   #Entities.BlankEntity.EntityDataId_0
+    lda.w   #Entities.Blank.EntityDataId_0
     jsr     Entity.Spawn
     bcs     Fail
 
@@ -106,7 +106,7 @@ constant tmp = Test.tmp
     bne     Fail
 
     // Test parameter Sum is correct value
-    lda.w   Entities.BlankEntity.parameterSum
+    lda.w   Entities.Blank.parameterSum
     cmp.w   #5 * Entity.N_ENTITIES
     bne     Fail
 
@@ -132,7 +132,7 @@ constant tmp = Test.tmp
 
     jsr     Entity.Init
 
-    stz.w   Entities.BlankEntity.parameterSum
+    stz.w   Entities.Blank.parameterSum
 
     lda.w   #0x1000
     sta.w   Entity.Spawn.xPos
@@ -141,7 +141,7 @@ constant tmp = Test.tmp
     assert(Entity.N_ENTITIES >= Entity.N_ENTITY_LISTS * 2)
 
     // spawn 2 entities per list
-    lda.w   #Entities.BlankEntity.EntityDataId_0
+    lda.w   #Entities.Blank.EntityDataId_0
     Loop:
         sta.w   tmp
 
@@ -156,12 +156,12 @@ constant tmp = Test.tmp
 
         lda.w   tmp
         inc
-        cmp.w   #Entities.BlankEntity.EntityDataId_0 + Entity.N_ENTITY_LISTS
+        cmp.w   #Entities.Blank.EntityDataId_0 + Entity.N_ENTITY_LISTS
         bcc     Loop
 
 
     // Test parameter Sum is correct value
-    lda.w   Entities.BlankEntity.parameterSum
+    lda.w   Entities.Blank.parameterSum
     cmp.w   #2 * Entity.N_ENTITY_LISTS
     bne     Fail
 
@@ -198,10 +198,10 @@ Fail:
 
 
 // For the first {N_LISTS_TESTED} lists, spawn
-//   * 2 onscreen BlankEntity
-//   * 2 onscreen DeactivateIfOutsideEntity
-//   * 4 offscreen BlankEntity
-//   * 4 offscreen DeactivateIfOutsideEntity
+//   * 2 onscreen Blank
+//   * 2 onscreen DeactivateIfOutside
+//   * 4 offscreen Blank
+//   * 4 offscreen DeactivateIfOutside
 a16()
 i16()
 code()
@@ -276,13 +276,13 @@ function SpawnEntities_XY {
 
     lda.w   tmp_listId
     clc
-    adc.w   #Entities.BlankEntity.EntityDataId_0
+    adc.w   #Entities.Blank.EntityDataId_0
     jsr     Entity.Spawn
     bcc     Return
 
     lda.w   tmp_listId
     clc
-    adc.w   #Entities.DeactivateIfOutsideEntity.EntityDataId_0
+    adc.w   #Entities.DeactivateIfOutside.EntityDataId_0
     jsr     Entity.Spawn
 
 Return:

@@ -17,7 +17,7 @@ constant entityAddr = Test.tmp + 2
     lda.w   Entity.currentEntityId
     sta.w   oldCurrent
 
-    lda.w   #Entities.BlankEntity.EntityDataId_0
+    lda.w   #Entities.Blank.EntityDataId_0
     jsr     Entity.Spawn
     bcc     Fail
 
@@ -74,7 +74,7 @@ constant entityAddr = Test.tmp + 2
     lda.w   Entity.currentEntityId
     sta.w   oldCurrent
 
-    lda.w   #Entities.BlankEntity.EntityDataId_0
+    lda.w   #Entities.Blank.EntityDataId_0
     jsr     Entity.Spawn
     bcc     Fail
 
@@ -158,7 +158,7 @@ _AfterInit:
     BlankEntitySpawnLoop:
         // Delete entity after deleteDelay frames
         // Y = deleteDelay
-        lda.w   #Entities.DeleteAfterDelayEntity.EntityDataId_0
+        lda.w   #Entities.DeleteAfterDelay.EntityDataId_0
         jsr     Entity.Spawn
         bcc     Fail
 
@@ -170,7 +170,7 @@ _AfterInit:
     OuterLoop:
         lda.w   #ENTITIES_PER_GAMELOOP - 1
         sta.w   spawnLoopCounter
-    
+
         SpawnLoop:
             // adjust deleteDelay on every spawn
             // This will (badly) shuffle the entityPool and entityIds
@@ -184,7 +184,7 @@ _AfterInit:
 
             // Delete entity after deleteDelay frames
             // Y = deleteDelay
-            lda.w   #Entities.DeleteAfterDelayEntity.EntityDataId_0
+            lda.w   #Entities.DeleteAfterDelay.EntityDataId_0
             jsr     Entity.Spawn
             bcc     Fail
 

@@ -13,12 +13,12 @@ function TemporarilyDeactivateEntities {
     jsr     _SetupCounterTest
 
     // Add one entity in the first list
-    lda.w   #Entities.BlankEntity.EntityDataId_0
+    lda.w   #Entities.Blank.EntityDataId_0
     jsr     Entity.Spawn
 
     // Add one entity in the last list
     assert(Entity.N_ENTITY_LISTS == 6)
-    lda.w   #Entities.BlankEntity.EntityDataId_5
+    lda.w   #Entities.Blank.EntityDataId_5
     jsr     Entity.Spawn
 
 constant N_ACTIVE_ENTITIES = _SetupCounterTest.N_ACTIVE_ENEMIES + 2

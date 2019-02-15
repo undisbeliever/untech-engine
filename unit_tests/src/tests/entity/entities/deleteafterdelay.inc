@@ -2,12 +2,11 @@
 // Copyright (c) 2016 - 2017, Marcus Rowe <undisbeliever@gmail.com>.
 // Distributed under The MIT License: https://opensource.org/licenses/MIT
 
-namespace EntityTest {
 namespace Entities {
 
-namespace DeleteAfterDelayEntity {
+namespace DeleteAfterDelay {
 
-    buildFunctionTable(BaseEntityFunctionTable, DeleteAfterDelayEntity)
+    buildFunctionTable(BaseEntityFunctionTable, DeleteAfterDelay)
 
     namespace EntityStruct {
         childstruct(BaseEntity)
@@ -73,7 +72,6 @@ while {n} < Entity.N_ENTITY_LISTS {
 code()
 }
 
-}
 }
 
 // vim: ft=bass-65816 ts=4 sw=4 et:

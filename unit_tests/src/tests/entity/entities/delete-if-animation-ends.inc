@@ -2,12 +2,11 @@
 // Copyright (c) 2016 - 2017, Marcus Rowe <undisbeliever@gmail.com>.
 // Distributed under The MIT License: https://opensource.org/licenses/MIT
 
-namespace EntityTest {
 namespace Entities {
 
-namespace DeleteIfAnimationEndsEntity {
+namespace DeleteIfAnimationEnds {
 
-    buildFunctionTable(BaseEntityFunctionTable, DeleteIfAnimationEndsEntity)
+    buildFunctionTable(BaseEntityFunctionTable, DeleteIfAnimationEnds)
 
 allocateTmpWord(parameterSum)
 
@@ -59,7 +58,6 @@ constant EntityDataId = (pc() - Entity.Data.EntityDataList) / 2
 code()
 }
 
-}
 }
 
 // vim: ft=bass-65816 ts=4 sw=4 et:

@@ -2,11 +2,10 @@
 // Copyright (c) 2016 - 2017, Marcus Rowe <undisbeliever@gmail.com>.
 // Distributed under The MIT License: https://opensource.org/licenses/MIT
 
-namespace InteractiveTests {
-namespace MetaSpriteInteractiveTest {
+namespace Entities {
 
-namespace ShowAllFramesEntity {
-    buildFunctionTable(BaseEntityFunctionTable, ShowAllFramesEntity)
+namespace ShowAllFrames {
+    buildFunctionTable(BaseEntityFunctionTable, ShowAllFrames)
 
     namespace EntityStruct {
         childstruct(BaseEntity)
@@ -128,6 +127,10 @@ namespace ShowAllFramesEntity {
     constant EntityDataId = (pc() - Entity.Data.EntityDataList) / 2
         dw  RomData
 }
+}
+
+namespace InteractiveTests {
+namespace MetaSpriteInteractiveTest {
 
 rodata(rom0)
 namespace EntityTable {
@@ -161,6 +164,7 @@ Data:
     constant N_ENTITIES = (pc() - Data) / EntityTable.size
 }
 
+
 // Spawns the entities used by the test
 // OUTPUT: c set if successful
 a16()
@@ -184,7 +188,7 @@ constant tmp_index = Test.tmp
         lda.l   EntityTable.frameSet,x
         tay
 
-        lda.w   #ShowAllFramesEntity.EntityDataId
+        lda.w   #Entities.ShowAllFrames.EntityDataId
 
         jsr     Entity.Spawn
         bcc     Fail
@@ -193,7 +197,7 @@ constant tmp_index = Test.tmp
         // Y = newly spawned entity
         ldx.w   tmp_index
         lda.l   EntityTable.delay,x
-        sta.w   ShowAllFramesEntity.EntityStruct.frameDelay,y
+        sta.w   Entities.ShowAllFrames.EntityStruct.frameDelay,y
 
         txa
         clc
