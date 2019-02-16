@@ -378,17 +378,17 @@ code()
 Test.add("GameLoop (Move Camera)")
 function GameLoop_MoveCamera {
 constant tmp_index = Test.tmp
-constant tmp_listId = Test.tmp + 2
+constant tmp_spawnIndex = Test.tmp + 2
 
     jsr     Entity.Init
 
     // Spawn 4 entities at different point on the screen
     assert(Entity.N_ENTITIES >= Entity.N_ENTITY_LISTS * 4)
 
-    lda.w   #OldBehaviourTestEntities.firstId
-    Loop:
-        sta.w   tmp_listId
+    lda.w   #Entity.N_ENTITY_LISTS - 1
+    sta.w   tmp_spawnIndex
 
+    Loop:
         macro spawn(xPos, yPos) {
             ldx.w   #{xPos}
             ldy.w   #{yPos}
@@ -401,10 +401,8 @@ constant tmp_listId = Test.tmp + 2
         spawn(0x2000 - 40, 0x1000 + 40)
         spawn(0x2000 + 40, 0x1000 + Camera.DISPLAY_HEIGHT + Entity.ACTIVE_WINDOW_EXTEND_VERTICAL + 1)
 
-        lda.w   tmp_listId
-        inc
-        cmp.w   #OldBehaviourTestEntities.firstId + Entity.N_ENTITY_LISTS
-        bcc     Loop
+        dec.w   tmp_spawnIndex
+        bpl     Loop
 
 
     // Test Initial Entity counts
@@ -482,24 +480,27 @@ constant tmp_listId = Test.tmp + 2
 function SpawnEntity_XY {
     stx.w   Entity.Spawn.xPos
     sty.w   Entity.Spawn.yPos
-    lda.w   tmp_listId
+
+    ldx.w   tmp_spawnIndex
+    lda.l   SpawnTable,x
+    and.w   #0xff
+
     jmp     Entity.Spawn
 }
 
-namespace OldBehaviourTestEntities {
-    assert(Entity.N_ENTITY_LISTS == 6)
-
-    rodata(EN_EntityDataList)
-    constant firstId = (pc() - Entity.Data.EntityDataList) / 2
-        dw  Entities.Blank.RomData0                 // particles list
-        dw  Entities.DeleteIfOutside.RomData1       // playerProjectiles list
-        dw  Entities.DeleteIfOutside.RomData2       // enemyProjectiles list
-        dw  Entities.DeactivateIfOutside.RomData3   // platforms list
-        dw  Entities.Blank.RomData4                 // players list
-        dw  Entities.DeactivateIfOutside.RomData5   // enemies list
-}
-
 rodata(rom0)
+
+SpawnTable:
+    db  Entities.Blank.EntityDataId_0               // particles list
+    db  Entities.DeleteIfOutside.EntityDataId_1     // playerProjectiles list
+    db  Entities.DeleteIfOutside.EntityDataId_2     // enemyProjectiles list
+    db  Entities.DeactivateIfOutside.EntityDataId_3 // platforms list
+    db  Entities.Blank.EntityDataId_4               // players list
+    db  Entities.DeactivateIfOutside.EntityDataId_5 // enemies list
+
+constant SpawnTable.size = pc() - SpawnTable
+assert(SpawnTable.size == Entity.N_ENTITY_LISTS)
+
 InitialExpectedSizes: {
     dw  4   // particles
     dw  1   // player projectiles
