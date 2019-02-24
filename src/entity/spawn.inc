@@ -112,10 +112,10 @@ allocateTmpWord(yPos)
         MetaSprite._InitEntity()
 
 
-        // Assign an new entityId to the entity
+        // Assign an new instanceId to the entity
         sep     #$10
     i8()
-        Entity._EntityIdTable.AssignEntityId()
+        Entity._InstanceIdTable.AssignInstanceId()
         rep     #$30
     i16()
 

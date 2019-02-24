@@ -14,7 +14,7 @@ constant entityAddr = Test.tmp + 2
 
     jsr     Entity.Init
 
-    lda.w   Entity.currentEntityId
+    lda.w   Entity.currentInstanceId
     sta.w   oldCurrent
 
     lda.w   #Entities.Blank.EntityDataId_0
@@ -29,8 +29,8 @@ constant entityAddr = Test.tmp + 2
     sep     #$20
 a8()
 
-    // Test currentEntityId changed
-    lda.w   Entity.currentEntityId
+    // Test currentInstanceId changed
+    lda.w   Entity.currentInstanceId
     cmp.w   oldCurrent
     beq     Fail
 
@@ -39,14 +39,14 @@ a16()
 
     // Test GetEntityWithIdOrBranchIfEmpty_Y returns this entity
     // Y = entityAddr
-    lda.w   BaseEntity.entityId,y
+    lda.w   BaseEntity.instanceId,y
     Entity.GetEntityWithIdOrBranchIfEmpty_Y(Fail)
     cpy.w   entityAddr
     bne     Fail
 
     // Test GetEntityWithIdOrBranchIfEmpty_X returns this entity
     ldy.w   entityAddr
-    lda.w   BaseEntity.entityId,y
+    lda.w   BaseEntity.instanceId,y
     Entity.GetEntityWithIdOrBranchIfEmpty_X(Fail)
     cpx.w   entityAddr
     bne     Fail
@@ -71,7 +71,7 @@ constant entityAddr = Test.tmp + 2
 
     jsr     Entity.Init
 
-    lda.w   Entity.currentEntityId
+    lda.w   Entity.currentInstanceId
     sta.w   oldCurrent
 
     lda.w   #Entities.Blank.EntityDataId_0
@@ -86,21 +86,21 @@ constant entityAddr = Test.tmp + 2
     sep     #$20
 a8()
 
-    // Test currentEntityId changed
-    lda.w   Entity.currentEntityId
+    // Test currentInstanceId changed
+    lda.w   Entity.currentInstanceId
     cmp.w   oldCurrent
     beq     Fail
 
     // Test GetEntityWithIdOrBranchIfEmpty_A8Y returns this entity
     // Y = entityAddr
-    lda.w   BaseEntity.entityId,y
+    lda.w   BaseEntity.instanceId,y
     Entity.GetEntityWithIdOrBranchIfEmpty_A8Y(Fail)
     cpy.w   entityAddr
     bne     Fail
 
     // Test GetEntityWithIdOrBranchIfEmpty_A8X returns this entity
     ldy.w   entityAddr
-    lda.w   BaseEntity.entityId,y
+    lda.w   BaseEntity.instanceId,y
     Entity.GetEntityWithIdOrBranchIfEmpty_A8X(Fail)
     cpx.w   entityAddr
     bne     Fail
@@ -117,14 +117,14 @@ Fail:
 
 
 // Spawn a few hundred entities, testing that the
-//   * entityId is valid
-//   * entityIdTable is valid
+//   * instanceId is valid
+//   * instanceIdTable is valid
 //   * The Entity.ValidateEntityLists does not raise an error
 a16()
 i16()
 code()
-Test.add("Entity.EntityId loop")
-function EntityIdLoopTest {
+Test.add("Entity.InstanceId loop")
+function InstanceIdLoopTest {
 constant outerLoopCounter = Test.tmp
 constant spawnLoopCounter = Test.tmp + 2
 constant entityAddr       = Test.tmp + 4
@@ -134,7 +134,7 @@ constant N_BLANK_ENTITIES = 12
 constant ENTITIES_PER_GAMELOOP = 12
 constant N_GAMELOOPS = 60
 
-assert(N_GAMELOOPS * ENTITIES_PER_GAMELOOP > 4 * (Entity.MAX_ENTITY_ID >> 1))
+assert(N_GAMELOOPS * ENTITIES_PER_GAMELOOP > 4 * (Entity.MAX_INSTANCE_ID >> 1))
 assert(N_GAMELOOPS * ENTITIES_PER_GAMELOOP > 10 * Entity.N_ENTITIES)
 assert(ENTITIES_PER_GAMELOOP * 4 + N_BLANK_ENTITIES < Entity.N_ENTITIES)
 
@@ -150,7 +150,7 @@ _AfterInit:
 
 
     // Spawn 10 Blank entities
-    // (This tests the system skips over used entityIds)
+    // (This tests the system skips over used instanceIds)
 
     lda.w   #N_BLANK_ENTITIES
     sta.w   spawnLoopCounter
@@ -173,7 +173,7 @@ _AfterInit:
 
         SpawnLoop:
             // adjust deleteDelay on every spawn
-            // This will (badly) shuffle the entityPool and entityIds
+            // This will (badly) shuffle the entityPool and instanceIds
             ldy.w   deleteDelay
             dey
             cpy.w   #2
@@ -192,20 +192,20 @@ _AfterInit:
             sty.w   entityAddr
 
 
-            // Test entityId not zero and >= Entity.minimumEntityId
+            // Test instanceId not zero and >= Entity.minimumInstanceId
             sep     #$20
         a8()
-            lda.w   BaseEntity.entityId,y
+            lda.w   BaseEntity.instanceId,y
             beq     Fail
 
-            cmp.w   Entity.minimumEntityId
+            cmp.w   Entity.minimumInstanceId
             bcc     Fail
 
             rep     #$30
         a16()
 
 
-            // Test entityIdTable value is correct
+            // Test instanceIdTable value is correct
             Entity.GetEntityWithIdOrBranchIfEmpty_Y(Fail)
             cpy.w   entityAddr
             bne     Fail
@@ -230,21 +230,21 @@ Fail:
     rts
 }
 
-// Run the EntityIdLoopTest again, this time with `minimumEntityId` set
+// Run the InstanceIdLoopTest again, this time with `minimumInstanceId` set
 a16()
 i16()
 code()
-Test.add("Entity.EntityId loop (min)")
-function EntityIdLoopTest_Min {
-constant MIN_ENTITYID = Entity.MAX_ENTITY_ID - Entity.N_ENTITIES * 2
-assert(MIN_ENTITYID & 1 == 0)
+Test.add("Entity.InstanceId loop (min)")
+function InstanceIdLoopTest_Min {
+constant MIN_INSTANCE_ID = Entity.MAX_INSTANCE_ID - Entity.N_ENTITIES * 2
+assert(MIN_INSTANCE_ID & 1 == 0)
 
     jsr     Entity.Init
 
-    lda.w   #MIN_ENTITYID
-    sta.w   Entity.minimumEntityId
+    lda.w   #MIN_INSTANCE_ID
+    sta.w   Entity.minimumInstanceId
 
-    bra     EntityIdLoopTest._AfterInit
+    bra     InstanceIdLoopTest._AfterInit
 }
 
 }

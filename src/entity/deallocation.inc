@@ -37,7 +37,7 @@ function __EntityDestructor {
 
     sep     #$10
 i8()
-    _EntityIdTable.RemoveEntity()
+    _InstanceIdTable.RemoveEntity()
     rep     #$30
 i16()
 a16()
@@ -52,8 +52,8 @@ a16()
         lda.w   #0xdead
         evaluate n = 4
         while {n} < ENTITY_SIZE {
-            if {n} == BaseEntity.entityId & ~1 {
-                // do nothing, cleared by _EntityIdTable.RemoveEntity
+            if {n} == BaseEntity.instanceId & ~1 {
+                // do nothing, cleared by _InstanceIdTable.RemoveEntity
             } else if {n} == BaseEntity.MetaSprite.status & ~1 {
                 // do nothing, cleared by MetaSprite.EntityDestructor
             } else {
@@ -65,8 +65,8 @@ a16()
 
     rts
 
-InvalidEntityId:
-    break(ENTITYID_INVALID)
+InvalidInstanceId:
+    break(INSTANCE_ID_INVALID)
 }
 
 

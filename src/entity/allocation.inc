@@ -65,7 +65,7 @@ a16()
 
     Loop:
         sta.b   BaseEntity.next,x
-        stz.b   BaseEntity.entityId,x
+        stz.b   BaseEntity.instanceId,x
         stz.b   BaseEntity.MetaSprite.status,x
 
         // Y = #InvalidEntityFunctionTable
@@ -79,7 +79,7 @@ a16()
         bcc     Loop
 
     stz.w   BaseEntity.next + entityPool + ENTITY_SIZE * (N_ENTITIES - 1)
-    stz.w   BaseEntity.entityId + entityPool + ENTITY_SIZE * (N_ENTITIES - 1)
+    stz.w   BaseEntity.instanceId + entityPool + ENTITY_SIZE * (N_ENTITIES - 1)
     stz.w   BaseEntity.MetaSprite.status + entityPool + ENTITY_SIZE * (N_ENTITIES - 1)
 
     sty.w   BaseEntity.functionTable + entityPool + ENTITY_SIZE * (N_ENTITIES - 1)
@@ -106,7 +106,7 @@ a16()
         bpl     -
 
 
-    _EntityIdTable.Init()
+    _InstanceIdTable.Init()
 
     rts
 }

@@ -176,7 +176,7 @@ function _ProcessActivateNextFrameList {
             rts
 
 
-        InvalidEntityId:
+        InvalidEntityListId:
             // This should not happen
             break(INVALID_ENTITY_LIST_ID)
 
@@ -188,7 +188,7 @@ function _ProcessActivateNextFrameList {
             lda.b   BaseEntity.listId
             and.w   #0xff
             cmp.w   #Entity.N_ENTITY_LISTS
-            bcs     InvalidEntityId
+            bcs     InvalidEntityListId
 
             asl
             tay
@@ -259,7 +259,7 @@ macro _ProcessActiveWindow() {
                     bra     _ChangeEntityList_Y
 
 
-                InvalidEntityId:
+                InvalidEntityListId:
                     // This should not happen
                     break(INVALID_ENTITY_LIST_ID)
 
@@ -271,7 +271,7 @@ macro _ProcessActiveWindow() {
                     lda.b   BaseEntity.listId
                     and.w   #0xff
                     cmp.w   #Entity.N_ENTITY_LISTS
-                    bcs     InvalidEntityId
+                    bcs     InvalidEntityListId
 
                     asl
                     tay
@@ -827,7 +827,7 @@ i8()
     beq     ListIdUnchanged
 
     cmp.b   #N_ENTITY_LISTS
-    bcs     InvalidEntityId
+    bcs     InvalidEntityListId
 
     sta.b   BaseEntity.listId
 
@@ -851,7 +851,7 @@ a16()
 i16()
     bra     GotoNextEntity
 
-InvalidEntityId:
+InvalidEntityListId:
     break(INVALID_ENTITY_LIST_ID)
 }
 

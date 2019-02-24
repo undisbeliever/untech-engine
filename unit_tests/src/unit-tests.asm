@@ -49,10 +49,10 @@ include "tests/entity/entities/spawn-and-change-list.inc"
 
 include "tests/entity/_common.inc"
 include "tests/entity/allocation.inc"
-include "tests/entity/deallocation.inc"
 include "tests/entity/counters.inc"
-include "tests/entity/entityidtable.inc"
+include "tests/entity/deallocation.inc"
 include "tests/entity/gameloop.inc"
+include "tests/entity/instanceidtable.inc"
 include "tests/entity/spawn.inc"
 include "tests/entity/transitions.inc"
 

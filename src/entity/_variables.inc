@@ -11,11 +11,11 @@
 
 // NOTE: There are three types of ids used by the entity subsystem:
 //
-//   * `entityId`: An 8 bit identifier used to uniquely identify entity
-//                 instances.  This value is assigned at Spawn and should
-//                 be unique for each stage.  Entity Id's can be converted to
-//                 entity address using the `GetEntityWithIdOrBranchIfEmpty*`
-//                 macros.
+//   * `instanceId`: An 8 bit identifier used to uniquely identify entity
+//                   instances.  This value is assigned at Spawn and should
+//                   be unique for each stage, but reuse may occur.
+//                   Instance Id's can be converted to entity address using
+//                   the `GetEntityWithIdOrBranchIfEmpty*` macros.
 //
 //   * `entityDataId`: An array index (NOT a multiple of two) within
 //                     `Entity.Data.EntityDataList` that points to a
@@ -54,14 +54,14 @@ namespace BaseEntity {
         // (word addr)
         field(romPtr, 2)
 
-        // EntityIdTable identifier for the current entity.
+        // InstanceIdTable identifier for the current entity.
         //
-        // If zero then the entity is not in the `entityIdTable`.
+        // If zero then the entity is not in the `instanceIdTable`.
         //
-        // NOTE: projectile entities will not be given an entityId.
+        // NOTE: projectile entities will not be given an instanceId.
         //
         // (byte index)
-        field(entityId, 1)
+        field(instanceId, 1)
 
         // Entity List Id for the current entity
         //
@@ -208,48 +208,48 @@ namespace Entity {
 
 
 
-    // Entity Table
-    // ============
+    // Instance Id Table
+    // =================
 
-    // The largest valid entityId
+    // The largest valid instanceId
     // NOTE: bit 0 of this value must be clear
-    constant MAX_ENTITY_ID = 127 * 2
+    constant MAX_INSTANCE_ID = 127 * 2
 
-    // Mapping of entity ids to addresses
-    // If the entity id does not exist it points to `_emptyEntity`
+    // Mapping of `instanceId`s to addresses
+    // If the instanceId does not exist it points to `_emptyEntity`
     // (addr table)
-    allocate(entityIdTable, wram7e, MAX_ENTITY_ID + 2)
+    allocate(instanceIdTable, wram7e, MAX_INSTANCE_ID + 2)
 
-    // Placeholder for the unused entity Ids.
+    // Placeholder for the unused instance ids.
     //
     // It exists in ROM space (address > 0x8000) for two reasons:
-    //   1) Bad code that writes to an unused entity Id will not clobber
+    //   1) Bad code that writes to an unused instance Id will not clobber
     //      zero-page.
-    //   2) Testing if an entityId is unused can be done with the `n`
+    //   2) Testing if an instanceId is unused can be done with the `n`
     //      status flag.
     allocate(_unusedEntity, wram7e, ENTITY_SIZE)
     assert(_unusedEntity > 0x8000)
 
-    // The cursor position in the entityIdTable.
+    // The cursor position in the instanceIdTable.
     //
     // This value MUST BE:
-    //  * Less than or equal to MAX_ENTITY_ID
+    //  * Less than or equal to MAX_INSTANCE_ID
     //  * Have bit 0 clear
     // (byte index)
-    allocate(currentEntityId, wram7e, 1)
+    allocate(currentInstanceId, wram7e, 1)
 
-    // The minimum allowed entityId when Spawning a new entity
+    // The minimum allowed instanceId when Spawning a new entity
     //
     // This value will be set to the number of entities in the
     // level.
     //
     // This value must be:
     //  * Non-zero
-    //  * Less than MAX_ENTITY_ID
+    //  * Less than MAX_INSTANCE_ID
     //  * Have bit 0 clear
     //
     // (byte index)
-    allocate(minimumEntityId, wram7e, 1)
+    allocate(minimumInstanceId, wram7e, 1)
 }
 
 // vim: ft=bass-65816 ts=4 sw=4 et:

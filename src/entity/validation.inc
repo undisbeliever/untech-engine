@@ -14,10 +14,10 @@ RegisterBreakId(INFINITE_LOOP)
 RegisterBreakId(ENTITY_IS_NOT_ACTIVATED)
 RegisterBreakId(ENTITY_IS_NOT_DEACTIVATED)
 RegisterBreakId(FREE_ENTITY_FUNC_TABLE_INVALID)
-RegisterBreakId(FREE_ENTITY_ID_NOT_ZERO)
+RegisterBreakId(FREE_INSTANCE_ID_NOT_ZERO)
 RegisterBreakId(LAST_FREE_ENTITY_CORRUPT)
-RegisterBreakId(ENTITYID_INVALID)
-RegisterBreakId(ENTITYID_TABLE_INVALID)
+RegisterBreakId(INSTANCE_ID_INVALID)
+RegisterBreakId(INSTANCE_ID_TABLE_INVALID)
 
 
 namespace Entity {
@@ -122,32 +122,32 @@ macro __ValidateEntityLists() {
 
 
 
-// Tests that an entity's entityId value is correct
+// Tests that an entity's instanceId value is correct
 //
 // REQUIRES: 16 bit A, 16 bit Index, DB = 0x7e
 // INPUT: dp = entity
-// BRANCH: `EntityIdInvalid` if the entity's entityId is invalid
-macro __TestEntity_EntityId() {
-    //  if entityId != 0:
-    //      if entityId & 1 != 0: goto EntityIdInvalid
-    //      if entityId > MAX_ENTITY_ID: goto EntityIdInvalid
-    //      if entityIdTable[entityId] != entity: goto EntityIdInvalid
+// BRANCH: `InstanceIdInvalid` if the entity's instanceId is invalid
+macro __TestEntity_InstanceId() {
+    //  if instanceId != 0:
+    //      if instanceId & 1 != 0: goto InstanceIdInvalid
+    //      if instanceId > MAX_INSTANCE_ID: goto InstanceIdInvalid
+    //      if instanceIdTable[instanceId] != entity: goto InstanceIdInvalid
 
     assert16a()
     assert8i()
 
-    ldx.b   BaseEntity.entityId
+    ldx.b   BaseEntity.instanceId
     beq     EndTest
         txa
         lsr
-        bcs     EntityIdInvalid
+        bcs     InstanceIdInvalid
 
-        assert(MAX_ENTITY_ID + 1 < 256)
-        cpx.b   #MAX_ENTITY_ID + 1
-        bcs     EntityIdInvalid
+        assert(MAX_INSTANCE_ID + 1 < 256)
+        cpx.b   #MAX_INSTANCE_ID + 1
+        bcs     InstanceIdInvalid
 
         tdc
-        cmp.w   entityIdTable,x
+        cmp.w   instanceIdTable,x
         beq     EndTest
 
     EndTest:
@@ -169,7 +169,7 @@ macro __TestEntity_EntityId() {
 //
 // BRANCH: `EntityIsNotActivated` if an entity was not activated
 // BRANCH: `InvalidEntityListId` if the entity's `listId` is invalid
-// BRANCH: `EntityIdInvalid` if the entity's entityId is invalid
+// BRANCH: `InstanceIdInvalid` if the entity's instanceId is invalid
 macro __ValidateNormalEntityLists() {
 allocateTmpWord(_currentListIndex)
 
@@ -205,7 +205,7 @@ allocateTmpWord(_currentListIndex)
             phx
                 sep     #$10
             i8()
-                __TestEntity_EntityId()
+                __TestEntity_InstanceId()
                 rep     #$30
             i16()
             plx
@@ -236,7 +236,7 @@ allocateTmpWord(_currentListIndex)
 // MODIFIES: DP
 //
 // BRANCH: `EntityIsNotDeactivated` if an entity was activated
-// BRANCH: `EntityIdInvalid` if the entity's entityId is invalid
+// BRANCH: `InstanceIdInvalid` if the entity's instanceId is invalid
 macro __ValidateSpecialEntityLists() {
 
     assert16a()
@@ -265,7 +265,7 @@ macro __ValidateSpecialEntityLists() {
             phx
                 sep     #$10
             i8()
-                __TestEntity_EntityId()
+                __TestEntity_InstanceId()
                 rep     #$30
             i16()
             plx
@@ -303,7 +303,7 @@ macro __ValidateSpecialEntityLists() {
 // BRANCH: `EntityIsNotDeactivated` if an entity was activated
 // BRANCH: `FreeEntityFunctionTableInvalid` if the function table was incorrect
 // BRANCH: `LastFreeEntityCorrupt` if `lastFreeEntity` is not the last entity in the free list.
-// BRANCH: `FreeEntityIdNotZero` if the `BaseEntity.entityId` is not zero
+// BRANCH: `FreeInstanceIdNotZero` if the `BaseEntity.instanceId` is not zero
 macro __ValidateFreeList() {
 
     assert16a()
@@ -329,10 +329,10 @@ macro __ValidateFreeList() {
             cpx.b   BaseEntity.functionTable
             bne     FreeEntityFunctionTableInvalid
 
-            // test entityId is zero
-            lda.b   BaseEntity.entityId
+            // test instanceId is zero
+            lda.b   BaseEntity.instanceId
             and.w   #0xff
-            bne     FreeEntityIdNotZero
+            bne     FreeInstanceIdNotZero
 
             lda.b   BaseEntity.next
             bne     Loop
@@ -349,28 +349,28 @@ macro __ValidateFreeList() {
 
 
 
-// Validate the entityIdTable
+// Validate the instanceIdTable
 //
 // REQUIRES: 16 bit A, 16 bit Index, DB = 0x7e
 //
-// BRANCH: `EntityIdTableInvalid` if a value in the entityIdTable is invalid
-// BRANCH: `EntityIdInvalid` if an entity's entityId does not match the entityIdTable value
-macro __ValidateEntityIdTable() {
+// BRANCH: `InstanceIdTableInvalid` if a value in the instanceIdTable is invalid
+// BRANCH: `InstanceIdInvalid` if an entity's instanceId does not match the instanceIdTable value
+macro __ValidateInstanceIdTable() {
 
     assert16a()
     assert16i()
 
-    // entityId 0 MUST BE unused
-    lda.w   entityIdTable
+    // instanceId 0 MUST BE unused
+    lda.w   instanceIdTable
     cmp.w   #_unusedEntity
-    bne     EntityIdTableInvalid
+    bne     InstanceIdTableInvalid
 
 
     ldx.w   #2
     Loop:
-        // X = entityIdTable index
+        // X = instanceIdTable index
 
-        lda.w   entityIdTable,x
+        lda.w   instanceIdTable,x
         cmp.w   #_unusedEntity
         beq     UnusedEntity
             tay
@@ -378,27 +378,27 @@ macro __ValidateEntityIdTable() {
 
             // test entity address is valid
             cmp.w   #entityPool
-            bcc     EntityIdTableInvalid
+            bcc     InstanceIdTableInvalid
             cmp.w   #entityPool + ENTITY_SIZE * N_ENTITIES
-            bcs     EntityIdTableInvalid
+            bcs     InstanceIdTableInvalid
 
             assertPowerOfTwo(ENTITY_SIZE)
             and.w   #(ENTITY_SIZE - 1)
-            bne     EntityIdTableInvalid
+            bne     InstanceIdTableInvalid
 
-            // Test BaseEntity.entityId is valid
+            // Test BaseEntity.instanceId is valid
             txa
             sep     #$20
         a8()
-            cmp.w   BaseEntity.entityId,y
+            cmp.w   BaseEntity.instanceId,y
             rep     #$30
         a16()
-            bne     EntityIdInvalid
+            bne     InstanceIdInvalid
 
     UnusedEntity:
         inx
         inx
-        cpx.w   #MAX_ENTITY_ID + 1
+        cpx.w   #MAX_INSTANCE_ID + 1
         bcc     Loop
 }
 
@@ -439,12 +439,12 @@ EntityIsNotActivated:
 //    special list but has an active MetaSprite palette or tileset.
 //  * Breaks with `FREE_ENTITY_FUNC_TABLE_INVALID` if a free entity's
 //    functionTable is not InvalidEntityFunctionTable.
-//  * Breaks with `FREE_ENTITY_ID_NOT_ZERO` if a free entity's entityId is not
+//  * Breaks with `FREE_INSTANCE_ID_NOT_ZERO` if a free entity's instanceId is not
 //    zero.
 //  * Breaks with `LAST_FREE_ENTITY_CORRUPT` if `lastFreeEntity` does not
 //    point to the last entity in the free list.
-//  * Breaks with `ENTITYID_INVALID` if an entity's entityId valus is invalid
-//  * Breaks with `ENTITYID_TABLE_INVALID` if the entityIdTable is invalid
+//  * Breaks with `INSTANCE_ID_INVALID` if an entity's instanceId valus is invalid
+//  * Breaks with `INSTANCE_ID_TABLE_INVALID` if the instanceIdTable is invalid
 //
 // This routine should be called intermittently throughout the game.
 // If you call it too often you get lag, not enough and you might
@@ -476,26 +476,26 @@ function ValidateEntityLists {
             // X = expected function table
             break(FREE_ENTITY_FUNC_TABLE_INVALID)
 
-        FreeEntityIdNotZero:
+        FreeInstanceIdNotZero:
             // DP = entity
-            // A = entityId
-            break(FREE_ENTITY_ID_NOT_ZERO)
+            // A = instanceId
+            break(FREE_INSTANCE_ID_NOT_ZERO)
 
         LastFreeEntityCorrupt:
             break(LAST_FREE_ENTITY_CORRUPT)
 
-        EntityIdTableInvalid:
-            // X = entityIdTable index
+        InstanceIdTableInvalid:
+            // X = instanceIdTable index
             // Y = value of table cell
-            break(ENTITYID_TABLE_INVALID)
+            break(INSTANCE_ID_TABLE_INVALID)
 
-        EntityIdInvalid:
-            break(ENTITYID_INVALID)
+        InstanceIdInvalid:
+            break(INSTANCE_ID_INVALID)
     +
 
     __ValidateFreeList()
 
-    __ValidateEntityIdTable()
+    __ValidateInstanceIdTable()
 
     lda.w   #0
     tcd
