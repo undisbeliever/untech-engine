@@ -62,18 +62,26 @@ Fail:
 
 rodata(rom0)
 SpawnList: {
-    define C = Entities.ChangeToParticle.EntityDataId_
-    define B = Entities.Blank.EntityDataId_
+    define C = Project.EntityIds.ChangeToParticle_
+    define B = Project.EntityIds.Blank_
 
     assert(EntityLists.Particles == 0)
     assert(Entity.N_ENTITY_LISTS == 6)
 
-    dw  {C}0, {C}0, {B}0, {B}0, {B}0    // particles
-    dw  {B}1, {C}1, {C}1, {B}1, {B}1
-    dw  {B}2, {C}2, {B}2, {C}2, {B}2
-    dw  {B}3, {B}3, {B}3, {C}3, {C}3
-    dw  {C}4, {C}4, {C}4, {C}4, {C}4    // Change all to particles
-    dw  {B}5, {B}5, {B}5, {B}5, {B}5    // Change none
+    evaluate currentList = 0
+    inline row(listName, suffix, a, b, c, d, e) {
+        assert(EntityLists.{listName} == {currentList})
+        evaluate currentList = {currentList} + 1
+
+        dw {a}{suffix}, {b}{suffix}, {c}{suffix}, {d}{suffix}, {e}{suffix}
+    }
+
+    row(Particles,          Particle,           {C}, {C}, {B}, {B}, {B})
+    row(PlayerProjectiles,  PlayerProjectile,   {B}, {C}, {C}, {B}, {B}) 
+    row(EnemyProjectiles,   EnemyProjectile,    {B}, {C}, {B}, {C}, {B})
+    row(Platforms,          Platform,           {B}, {B}, {B}, {C}, {C})
+    row(Players,            Player,             {C}, {C}, {C}, {C}, {C})    // change all
+    row(Enemies,            Enemy,              {B}, {B}, {B}, {B}, {B})    // change none
 
     constant SpawnList.size = pc() - SpawnList
     assert(SpawnList.size/2 <= Entity.N_ENTITIES)
@@ -101,9 +109,14 @@ Test.add("Entity.GameLoop (Delete)")
 function GameLoop_Delete {
 constant tmp = Test.tmp
 
-    jsr     Entity.Init
+assert(Entity.N_ENTITY_LISTS * 3 <= Entity.N_ENTITIES)
 
-    assert(Entity.N_ENTITY_LISTS * 3 <= Entity.N_ENTITIES)
+assert(EntityLists.Particles == 0)
+constant FIRST_ENTITY_ID = Project.EntityIds.DeleteAfterDelay_Particle
+assert(EntityLists.Enemies == Entity.N_ENTITY_LISTS - 1)
+constant LAST_ENTITY_ID = Project.EntityIds.DeleteAfterDelay_Enemy
+
+    jsr     Entity.Init
 
     lda.w   #0x1000
     sta.w   Entity.Spawn.xPos
@@ -111,7 +124,7 @@ constant tmp = Test.tmp
 
     // spawn 3 entities per list
     // these entities will delete themselves after Y frames
-    lda.w   #Entities.DeleteAfterDelay.EntityDataId_0
+    lda.w   #FIRST_ENTITY_ID
     Loop:
         sta.w   tmp
 
@@ -136,7 +149,7 @@ constant tmp = Test.tmp
 
         lda.w   tmp
         inc
-        cmp.w   #Entities.DeleteAfterDelay.EntityDataId_0 + Entity.N_ENTITY_LISTS
+        cmp.w   #LAST_ENTITY_ID + 1
         bcc     Loop
 
     // Test list lengths
@@ -191,6 +204,11 @@ Test.add("Entity.GameLoop.ActivateNextFrame")
 function GameLoop_ActivateNextFrame {
 constant tmp = Test.tmp
 
+assert(EntityLists.Particles == 0)
+constant FIRST_ENTITY_ID = Project.EntityIds.DeleteAfterDelay_Particle
+assert(EntityLists.Enemies == Entity.N_ENTITY_LISTS - 1)
+constant LAST_ENTITY_ID = Project.EntityIds.DeleteAfterDelay_Enemy
+
     jsr     Entity.Init
 
     // Prevent the entities from spawning
@@ -204,7 +222,7 @@ constant tmp = Test.tmp
 
         assert(Entity.N_ENTITIES >= Entity.N_ENTITY_LISTS)
 
-        lda.w   #Entities.DeleteAfterDelay.EntityDataId_0
+        lda.w   #FIRST_ENTITY_ID
         Loop:
             sta.w   tmp
 
@@ -214,7 +232,7 @@ constant tmp = Test.tmp
 
             lda.w   tmp
             inc
-            cmp.w   #Entities.DeleteAfterDelay.EntityDataId_0 + Entity.N_ENTITY_LISTS
+            cmp.w   #LAST_ENTITY_ID + 1
             bcc     Loop
 
 
@@ -302,13 +320,13 @@ constant firstFrame   = Test.tmp + 2
 
     assert(Entity.N_ENTITY_LISTS * 3 <= Entity.N_ENTITIES)
 
-    // Spawn a DeleteIfAnimationEndsEntity
+    // Spawn a DeleteIfAnimationEnds Entity
     // This entity has a single animation
     //   which draws frame1 for two display frames
     //   then draws frame2 for two display frames
     //   then deletes itself on the fifth frame
 
-    lda.w   #Entities.DeleteIfAnimationEnds.EntityDataId
+    lda.w   #Project.EntityIds.DeleteIfAnimationEnds
     jsr     Entity.Spawn
     sty.w   entityAddress
 
@@ -491,12 +509,12 @@ function SpawnEntity_XY {
 rodata(rom0)
 
 SpawnTable:
-    db  Entities.Blank.EntityDataId_0               // particles list
-    db  Entities.DeleteIfOutside.EntityDataId_1     // playerProjectiles list
-    db  Entities.DeleteIfOutside.EntityDataId_2     // enemyProjectiles list
-    db  Entities.DeactivateIfOutside.EntityDataId_3 // platforms list
-    db  Entities.Blank.EntityDataId_4               // players list
-    db  Entities.DeactivateIfOutside.EntityDataId_5 // enemies list
+    db  Project.EntityIds.Blank_Particle
+    db  Project.EntityIds.DeleteIfOutside_PlayerProjectile
+    db  Project.EntityIds.DeleteIfOutside_EnemyProjectile
+    db  Project.EntityIds.DeactivateIfOutside_Platform
+    db  Project.EntityIds.Blank_Player
+    db  Project.EntityIds.DeactivateIfOutside_Enemy
 
 constant SpawnTable.size = pc() - SpawnTable
 assert(SpawnTable.size == Entity.N_ENTITY_LISTS)
@@ -561,7 +579,7 @@ constant _loopsLeft = Test.dpTmp + 0
     SpawnLoop:
         phy
             // Y = listId to spawn entity in
-            lda.w   #Entities.SpawnAndChangeList.EntityDataId
+            lda.w   #Project.EntityIds.SpawnAndChangeList
 
             jsr     Entity.Spawn
             bcc     Fail

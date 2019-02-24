@@ -15,12 +15,9 @@ createDataBlock(RES_Block2,             0xc14000, 0xc15fff)
 createDataBlock(RES_Block3,             0xc16000, 0xc17fff)
 createDataBlock(RES_Block4,             0xc18000, 0xc19fff)
 createDataBlock(RES_Block5,             0xc1a000, 0xc1bfff)
+createDataBlock(RES_Block6,             0xc1c000, 0xc1dfff)
 
-createDataBlock(EN_EntityDataList,      0xc1c000, 0xc1c07f)
-createDataBlock(EN_ProjectileList,      0xc1c080, 0xc1c0ff)
-createDataBlock(EN_RomData,             0xc1c100, 0xc1cfff)
-
-createDataBlock(testNameBlock,          0xc1f000, 0xc1ffff)
+createDataBlock(testNameBlock,          0xc1e000, 0xc1ffff)
 
 
 createRamBlock(dp,          0x000000, 0x0000ff)
@@ -47,29 +44,6 @@ namespace EntityPool {
         evaluate n = {n} + 1
     }
 }
-
-namespace EntityLists {
-    createEnum()
-        // no collisions
-        enum(Particles)
-
-        // collides with: enemies
-        enum(PlayerProjectiles)
-
-        // collides with: player
-        enum(EnemyProjectiles)
-
-        // no collisions
-        enum(Platforms)
-
-        // collides with: enemies, enemy projectiles
-        enum(Players)
-
-        // collides with: player
-        enum(Enemies)
-    endEnum()
-}
-
 
 define PLAYER_PROJECTILE_ENTITY_LIST = PlayerProjectiles
 define ENEMY_PROJECTILE_ENTITY_LIST  = EnemyProjectiles

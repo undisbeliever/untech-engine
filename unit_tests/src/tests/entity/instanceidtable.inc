@@ -17,7 +17,7 @@ constant entityAddr = Test.tmp + 2
     lda.w   Entity.currentInstanceId
     sta.w   oldCurrent
 
-    lda.w   #Entities.Blank.EntityDataId_0
+    lda.w   #Project.EntityIds.Blank_Particle
     jsr     Entity.Spawn
     bcc     Fail
 
@@ -74,7 +74,7 @@ constant entityAddr = Test.tmp + 2
     lda.w   Entity.currentInstanceId
     sta.w   oldCurrent
 
-    lda.w   #Entities.Blank.EntityDataId_0
+    lda.w   #Project.EntityIds.Blank_Particle
     jsr     Entity.Spawn
     bcc     Fail
 
@@ -158,7 +158,7 @@ _AfterInit:
     BlankEntitySpawnLoop:
         // Delete entity after deleteDelay frames
         // Y = deleteDelay
-        lda.w   #Entities.DeleteAfterDelay.EntityDataId_0
+        lda.w   #Project.EntityIds.DeleteAfterDelay_Particle
         jsr     Entity.Spawn
         bcc     Fail
 
@@ -184,7 +184,7 @@ _AfterInit:
 
             // Delete entity after deleteDelay frames
             // Y = deleteDelay
-            lda.w   #Entities.DeleteAfterDelay.EntityDataId_0
+            lda.w   #Project.EntityIds.DeleteAfterDelay_Particle
             jsr     Entity.Spawn
             bcc     Fail
 

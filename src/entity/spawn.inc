@@ -50,7 +50,7 @@ function Spawn {
 allocateTmpWord(xPos)
 allocateTmpWord(yPos)
 
-    cmp.w   #Entity.Data.EntityDataListCount
+    cmp.w   #Entity.Data.EntityRomDataListCount
     bcc     +
         break(INVALID_ENTITY_ID)
     +
@@ -76,14 +76,14 @@ allocateTmpWord(yPos)
 
         // Get Entity ROM Data
 
-        lda.l   Entity.Data.EntityDataList,x
+        lda.l   Entity.Data.EntityRomDataList,x
         tax
         stx.b   BaseEntity.romPtr
 
 
         // Setup BaseEntity
 
-        lda.l   BaseEntityData.functionTable,x
+        lda.l   BaseEntityRomStruct.functionTable,x
         sta.b   BaseEntity.functionTable
 
         lda.w   xPos
@@ -99,15 +99,15 @@ allocateTmpWord(yPos)
         stz.b   BaseEntity.yVecl
         stz.b   BaseEntity.yVecl + 2
 
-        lda.l   BaseEntityData.initialListId,x
+        lda.l   BaseEntityRomStruct.initialListId,x
         sta.b   BaseEntity.listId
         // check if was safe to do a 16 bit write to listId
         assert(BaseEntity.listId + 1 == BaseEntity.MetaSprite.frameSet)
 
-        assert(BaseEntityData.initialListId + 1 == BaseEntityData.defaultPalette)
+        assert(BaseEntityRomStruct.initialListId + 1 == BaseEntityRomStruct.defaultPalette)
         xba
         tay
-        lda.l   BaseEntityData.frameSetId,x
+        lda.l   BaseEntityRomStruct.frameSetId,x
 
         MetaSprite._InitEntity()
 
@@ -213,7 +213,7 @@ function SpawnAtActionPoint {
 allocateTmpWord(tmp_compare)
 allocateTmpWord(tmp_entityToSpawn)
 
-    cpy.w   #Entity.Data.EntityDataListCount
+    cpy.w   #Entity.Data.EntityRomDataListCount
     bcc     +
         break(INVALID_ENTITY_ID)
     +
@@ -350,7 +350,7 @@ allocateTmpWord(tmp_entityDoingSpawning)
 
     assert(SpawnPlayerProjectileFromActionPoint.FallThrough == pc())
 
-    cpy.w   #Entity.Data.ProjectileListCount
+    cpy.w   #Entity.Data.ProjectileRomDataListCount
     bcc     +
         break(INVALID_PROJECTILE_ID)
     +
@@ -369,7 +369,7 @@ allocateTmpWord(tmp_entityDoingSpawning)
 
     asl
     tax
-    lda.l   Entity.Data.ProjectileList,x
+    lda.l   Entity.Data.ProjectileRomDataList,x
     sta.w   tmp_projectileDataPtr
 
     tyx
@@ -463,13 +463,13 @@ SpawnProjectile:
         ldx.w   tmp_projectileDataPtr
         stx.b   BaseEntity.romPtr
 
-        lda.l   BaseEntityData.functionTable,x
+        lda.l   BaseEntityRomStruct.functionTable,x
         sta.b   BaseEntity.functionTable
 
         // Initiate the MetaSprite
-        lda.l   BaseEntityData.defaultPalette,x
+        lda.l   BaseEntityRomStruct.defaultPalette,x
         tay
-        lda.l   BaseEntityData.frameSetId,x
+        lda.l   BaseEntityRomStruct.frameSetId,x
         MetaSprite._InitEntity()
 
         // Call Entity Init function

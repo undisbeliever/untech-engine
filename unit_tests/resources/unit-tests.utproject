@@ -3,6 +3,72 @@
 <project>
   <block-settings block-size="8192" block-count="2"/>
   <metatile-engine-settings max-map-size="8192" n-metatiles="512"/>
+  <entity-rom-data>
+    <listid name="Particles"/>
+    <listid name="PlayerProjectiles"/>
+    <listid name="EnemyProjectiles"/>
+    <listid name="Platforms"/>
+    <listid name="Players"/>
+    <listid name="Enemies"/>
+    <function-table name="Blank" export-order="OneFrame" parameter-type="unused"/>
+    <function-table name="ChangeToParticle" export-order="OneFrame" parameter-type="unused"/>
+    <function-table name="DeactivateIfOutside" export-order="OneFrame" parameter-type="unused"/>
+    <function-table name="DeleteIfOutside" export-order="OneFrame" parameter-type="unused"/>
+    <function-table name="DeleteAfterDelay" export-order="OneFrame" parameter-type="word" comment="parameter is delay in frames"/>
+    <function-table name="DeleteIfAnimationEnds" export-order="DeleteIfAnimationEnds" parameter-type="unused"/>
+    <function-table name="SpawnAndChangeList" export-order="OneFrame" parameter-type="unused"/>
+    <function-table name="ShowAllFrames" export-order="OneFrame" parameter-type="word" comment="exportOrder ignored, Parameter is frameSet to display"/>
+    <function-table name="ActionPointSpawner" export-order="OneFrame" parameter-type="unused"/>
+    <function-table name="EightDirectionProjectile" export-order="OneFrame" parameter-type="unused"/>
+    <function-table name="EhCollisionTest_Player" export-order="EhCollisionTest_Player" parameter-type="unused"/>
+    <function-table name="EhCollisionTest_Enemy" export-order="EhCollisionTest_Enemy" parameter-type="unused"/>
+    <function-table name="EhCollisionTest_CollisionCentre" export-order="OneFrame" parameter-type="unused"/>
+    <function-table name="MapCursor" export-order="OneFrame" parameter-type="unused"/>
+    <entities>
+      <entry name="Blank_Particle" function-table="Blank" listid="Particles" frameset="FST_OneTileFixed1" frame="frame" palette="0"/>
+      <entry name="Blank_PlayerProjectile" function-table="Blank" listid="PlayerProjectiles" frameset="FST_OneTileFixed1" frame="frame" palette="0"/>
+      <entry name="Blank_EnemyProjectile" function-table="Blank" listid="EnemyProjectiles" frameset="FST_OneTileFixed1" frame="frame" palette="0"/>
+      <entry name="Blank_Platform" function-table="Blank" listid="Platforms" frameset="FST_OneTileFixed1" frame="frame" palette="0"/>
+      <entry name="Blank_Player" function-table="Blank" listid="Players" frameset="FST_OneTileFixed1" frame="frame" palette="0"/>
+      <entry name="Blank_Enemy" function-table="Blank" listid="Enemies" frameset="FST_OneTileFixed1" frame="frame" palette="0"/>
+      <entry name="ChangeToParticle_Particle" function-table="ChangeToParticle" listid="Particles" frameset="FST_OneTileFixed1" frame="frame" palette="0"/>
+      <entry name="ChangeToParticle_PlayerProjectile" function-table="ChangeToParticle" listid="PlayerProjectiles" frameset="FST_OneTileFixed1" frame="frame" palette="0"/>
+      <entry name="ChangeToParticle_EnemyProjectile" function-table="ChangeToParticle" listid="EnemyProjectiles" frameset="FST_OneTileFixed1" frame="frame" palette="0"/>
+      <entry name="ChangeToParticle_Platform" function-table="ChangeToParticle" listid="Platforms" frameset="FST_OneTileFixed1" frame="frame" palette="0"/>
+      <entry name="ChangeToParticle_Player" function-table="ChangeToParticle" listid="Players" frameset="FST_OneTileFixed1" frame="frame" palette="0"/>
+      <entry name="ChangeToParticle_Enemy" function-table="ChangeToParticle" listid="Enemies" frameset="FST_OneTileFixed1" frame="frame" palette="0"/>
+      <entry name="DeactivateIfOutside_Particle" function-table="DeactivateIfOutside" listid="Particles" frameset="FST_OneTileFixed1" frame="frame" palette="0"/>
+      <entry name="DeactivateIfOutside_PlayerProjectile" function-table="DeactivateIfOutside" listid="PlayerProjectiles" frameset="FST_OneTileFixed1" frame="frame" palette="0"/>
+      <entry name="DeactivateIfOutside_EnemyProjectile" function-table="DeactivateIfOutside" listid="EnemyProjectiles" frameset="FST_OneTileFixed1" frame="frame" palette="0"/>
+      <entry name="DeactivateIfOutside_Platform" function-table="DeactivateIfOutside" listid="Platforms" frameset="FST_OneTileFixed1" frame="frame" palette="0"/>
+      <entry name="DeactivateIfOutside_Player" function-table="DeactivateIfOutside" listid="Players" frameset="FST_OneTileFixed1" frame="frame" palette="0"/>
+      <entry name="DeactivateIfOutside_Enemy" function-table="DeactivateIfOutside" listid="Enemies" frameset="FST_OneTileFixed1" frame="frame" palette="0"/>
+      <entry name="DeleteIfOutside_Particle" function-table="DeleteIfOutside" listid="Particles" frameset="FST_OneTileFixed1" frame="frame" palette="0"/>
+      <entry name="DeleteIfOutside_PlayerProjectile" function-table="DeleteIfOutside" listid="PlayerProjectiles" frameset="FST_OneTileFixed1" frame="frame" palette="0"/>
+      <entry name="DeleteIfOutside_EnemyProjectile" function-table="DeleteIfOutside" listid="EnemyProjectiles" frameset="FST_OneTileFixed1" frame="frame" palette="0"/>
+      <entry name="DeleteIfOutside_Platform" function-table="DeleteIfOutside" listid="Platforms" frameset="FST_OneTileFixed1" frame="frame" palette="0"/>
+      <entry name="DeleteIfOutside_Player" function-table="DeleteIfOutside" listid="Players" frameset="FST_OneTileFixed1" frame="frame" palette="0"/>
+      <entry name="DeleteIfOutside_Enemy" function-table="DeleteIfOutside" listid="Enemies" frameset="FST_OneTileFixed1" frame="frame" palette="0"/>
+      <entry name="DeleteAfterDelay_Particle" function-table="DeleteAfterDelay" listid="Particles" frameset="FST_OneTileFixed1" frame="frame" palette="0"/>
+      <entry name="DeleteAfterDelay_PlayerProjectile" function-table="DeleteAfterDelay" listid="PlayerProjectiles" frameset="FST_OneTileFixed1" frame="frame" palette="0"/>
+      <entry name="DeleteAfterDelay_EnemyProjectile" function-table="DeleteAfterDelay" listid="EnemyProjectiles" frameset="FST_OneTileFixed1" frame="frame" palette="0"/>
+      <entry name="DeleteAfterDelay_Platform" function-table="DeleteAfterDelay" listid="Platforms" frameset="FST_OneTileFixed1" frame="frame" palette="0"/>
+      <entry name="DeleteAfterDelay_Player" function-table="DeleteAfterDelay" listid="Players" frameset="FST_OneTileFixed1" frame="frame" palette="0"/>
+      <entry name="DeleteAfterDelay_Enemy" function-table="DeleteAfterDelay" listid="Enemies" frameset="FST_OneTileFixed1" frame="frame" palette="0"/>
+      <entry name="DeleteIfAnimationEnds" function-table="DeleteIfAnimationEnds" listid="Particles" frameset="DeleteIfAnimationEnds" frame="frame1" palette="0"/>
+      <entry name="SpawnAndChangeList" function-table="SpawnAndChangeList" listid="Particles" frameset="FST_OneTileFixed1" frame="frame" palette="0"/>
+      <entry name="ShowAllFrames" function-table="ShowAllFrames" listid="Players" frameset="FST_OneTileFixed1" frame="frame" palette="0"/>
+      <entry name="ActionPointSpawner" function-table="ActionPointSpawner" listid="Enemies" frameset="ActionPointSpawner" frame="frame" palette="0"/>
+      <entry name="EightDirectionProjectile" function-table="EightDirectionProjectile" listid="Particles" frameset="Projectile" frame="frame" palette="0"/>
+      <entry name="EhCollisionTest_Player" function-table="EhCollisionTest_Player" listid="Players" frameset="EhCollisionTest_Player" frame="frame1" palette="0"/>
+      <entry name="EhCollisionTest_Enemy" function-table="EhCollisionTest_Enemy" listid="Enemies" frameset="EhCollisionTest_Enemy" frame="box" palette="0"/>
+      <entry name="EhCollisionTest_CollisionCentre" function-table="EhCollisionTest_CollisionCentre" listid="Particles" frameset="EhCollisionTest_Centre" frame="frame" palette="0"/>
+      <entry name="MapCursor" function-table="MapCursor" listid="Particles" frameset="Cursor" frame="frame" palette="0"/>
+    </entities>
+    <projectiles>
+      <entry name="EightDirectionProjectile" function-table="EightDirectionProjectile" listid="PlayerProjectiles" frameset="Projectile" frame="frame" palette="0"/>
+    </projectiles>
+  </entity-rom-data>
   <exportorder src="metasprite/formats/Human.utfseo"/>
   <exportorder src="metasprite/formats/Walker.utfseo"/>
   <exportorder src="metasprite/formats/OneFrame.utfseo"/>

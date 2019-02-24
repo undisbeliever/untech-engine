@@ -16,7 +16,7 @@ a16()
 i16()
 code()
 function Init {
-    lda.w   #MSEO.DeleteIfAnimationEnds.Animations.animation
+    lda.w   #{EntityStruct}.Animations.animation
     jsr     MetaSprite.SetAnimation
 
     // always activate
@@ -42,20 +42,6 @@ code()
 function Process {
     jmp     Entity.DeleteIfAnimationEndsOrDrawAndGotoNextEntity
 }
-
-
-rodata(EN_RomData)
-RomData:
-    dw  FunctionTable
-    db  0                            // initialListId
-    db  0                            // defaultPalette
-    dw  MSFS.DeleteIfAnimationEnds   // frameSetId
-
-rodata(EN_EntityDataList)
-constant EntityDataId = (pc() - Entity.Data.EntityDataList) / 2
-    dw  RomData
-
-code()
 }
 
 }

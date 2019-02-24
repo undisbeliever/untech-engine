@@ -26,8 +26,12 @@ constant tmp = Test.tmp
     sta.w   Entity.Spawn.yPos
 
     assert(Entity.N_ENTITIES >= Entity.N_ENTITY_LISTS)
+    assert(EntityLists.Particles == 0)
+    constant FIRST_ENTITY_ID = Project.EntityIds.Blank_Particle
+    assert(EntityLists.Enemies == Entity.N_ENTITY_LISTS - 1)
+    constant LAST_ENTITY_ID = Project.EntityIds.Blank_Enemy
 
-    lda.w   #Entities.Blank.EntityDataId_0
+    lda.w   #FIRST_ENTITY_ID
     Loop:
         sta.w   tmp
 
@@ -36,7 +40,7 @@ constant tmp = Test.tmp
 
         lda.w   tmp
         inc
-        cmp.w   #Entities.Blank.EntityDataId_0 + Entity.N_ENTITY_LISTS
+        cmp.w   #LAST_ENTITY_ID + 1
         bcc     Loop
 
 
@@ -94,7 +98,7 @@ assert(N_ENTITIES_TO_SPAWN < Entity.N_ENTITIES + 2)
         sta.w   Entity.Spawn.xPos
         sta.w   Entity.Spawn.yPos
 
-        lda.w   #Entities.DeactivateIfOutside.EntityDataId_0
+        lda.w   #Project.EntityIds.DeactivateIfOutside_Particle
         jsr     Entity.Spawn
         bcc     Fail
 
@@ -137,6 +141,10 @@ constant TEST_LIST_ID = 2
 assert(Entity.N_ENTITY_LISTS * ENTITIES_PER_LIST < Entity.N_ENTITIES + 2)
 assert(Entity.N_ENTITY_LISTS > 2)
 
+assert(EntityLists.Particles == 0)
+constant FIRST_ENTITY_ID = Project.EntityIds.Blank_Particle
+assert(EntityLists.Enemies == Entity.N_ENTITY_LISTS - 1)
+constant LAST_ENTITY_ID = Project.EntityIds.Blank_Enemy
 
     jsr     Entity.Init
 
@@ -146,7 +154,7 @@ assert(Entity.N_ENTITY_LISTS > 2)
     sta.w   Entity.Spawn.xPos
     sta.w   Entity.Spawn.yPos
 
-    lda.w   #Entities.Blank.EntityDataId_0
+    lda.w   #FIRST_ENTITY_ID
     Loop:
         sta.w   tmp
 
@@ -165,7 +173,7 @@ assert(Entity.N_ENTITY_LISTS > 2)
 
         lda.w   tmp
         inc
-        cmp.w   #Entities.Blank.EntityDataId_0 + Entity.N_ENTITY_LISTS
+        cmp.w   #LAST_ENTITY_ID + 1
         bcc     Loop
 
 

@@ -26,8 +26,8 @@ function _SetupCounterTest {
     constant N_ACTIVE_ENEMIES = N_ONSCREEN_DIO_ENTITIES + N_DAD_ENTITIES
 
     assert(EntityLists.Enemies == 5)
-    constant DIO_ENTITY_DATA_ID = Entities.DeactivateIfOutside.EntityDataId_5
-    constant DAD_ENTITY_DATA_ID = Entities.DeleteAfterDelay.EntityDataId_5
+    constant DIO_ENTITY_DATA_ID = Project.EntityIds.DeactivateIfOutside_Enemy
+    constant DAD_ENTITY_DATA_ID = Project.EntityIds.DeleteAfterDelay_Enemy
 
     jsr     Entity.Init
     bcc     Fail

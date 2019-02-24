@@ -13,12 +13,12 @@ function TemporarilyDeactivateEntities {
     jsr     _SetupCounterTest
 
     // Add one entity in the first list
-    lda.w   #Entities.Blank.EntityDataId_0
+    lda.w   #Project.EntityIds.Blank_Particle
     jsr     Entity.Spawn
 
     // Add one entity in the last list
-    assert(Entity.N_ENTITY_LISTS == 6)
-    lda.w   #Entities.Blank.EntityDataId_5
+    assert(EntityLists.Enemies == Entity.N_ENTITY_LISTS - 1)
+    lda.w   #Project.EntityIds.Blank_Enemy
     jsr     Entity.Spawn
 
 constant N_ACTIVE_ENTITIES = _SetupCounterTest.N_ACTIVE_ENEMIES + 2
@@ -85,7 +85,6 @@ constant N_ENTITIES = InteractiveTests.MetaSpriteInteractiveTest.EntityTable.N_E
         pla
         dec
         bne     Loop
-
 
     // Ensure All entities are active
     jsr     _ActivateNextFrameListLength

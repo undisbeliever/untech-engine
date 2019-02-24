@@ -85,7 +85,7 @@ namespace EhCollisionTest_Player {
         jsr     InteractiveTests.EntityHitboxCollisionsTest.PrintProcessCollisionArgs
 
         // Spawn the CollisionCentre
-        lda.w   #Entities.EhCollisionTest_CollisionCentre.ENTITY_DATA_ID
+        lda.w   #Project.EntityIds.EhCollisionTest_CollisionCentre
         jmp     Entity.SpawnAtMetaSpriteCollisionCentre
     }
 
@@ -132,18 +132,6 @@ namespace EhCollisionTest_Player {
 
         jmp     Entity.DrawAndGotoNextEntity
     }
-
-
-    rodata(EN_RomData)
-    RomData:
-        dw  FunctionTable
-        db  EntityLists.Players         // initialListId
-        db  0                           // defaultPalette
-        dw  MSFS.EhCollisionTest_Player // frameSetId
-
-    rodata(EN_EntityDataList)
-    constant ENTITY_DATA_ID = (pc() - Entity.Data.EntityDataList) / 2
-        dw  RomData
 }
 
 
@@ -201,18 +189,6 @@ namespace EhCollisionTest_Enemy {
 
         jmp     Entity.DrawAndGotoNextEntity
     }
-
-
-    rodata(EN_RomData)
-    RomData:
-        dw  FunctionTable
-        db  EntityLists.Enemies         // initialListId
-        db  0                           // defaultPalette
-        dw  MSFS.EhCollisionTest_Enemy  // frameSetId
-
-    rodata(EN_EntityDataList)
-    constant ENTITY_DATA_ID = (pc() - Entity.Data.EntityDataList) / 2
-        dw  RomData
 }
 
 
@@ -276,17 +252,6 @@ namespace EhCollisionTest_CollisionCentre {
 
         jmp     Entity.DrawAndGotoNextEntity
     }
-
-    rodata(EN_RomData)
-    RomData:
-        dw  FunctionTable
-        db  EntityLists.Particles       // initialListId
-        db  0                           // defaultPalette
-        dw  MSFS.EhCollisionTest_Centre // frameSetId
-
-    rodata(EN_EntityDataList)
-    constant ENTITY_DATA_ID = (pc() - Entity.Data.EntityDataList) / 2
-        dw  RomData
 }
 }
 
@@ -409,9 +374,9 @@ constant X_CENTER = Camera.ORIGIN + Camera.DISPLAY_WIDTH / 2
 
 evaluate EN_ID = EntityLists.Enemies
 
-constant PLAYER = Entities.EhCollisionTest_Player.ENTITY_DATA_ID
-constant ENEMY  = Entities.EhCollisionTest_Enemy.ENTITY_DATA_ID
-constant BLANK  = Entities.Blank.EntityDataId_{EN_ID}
+constant PLAYER = Project.EntityIds.EhCollisionTest_Player
+constant ENEMY  = Project.EntityIds.EhCollisionTest_Enemy
+constant BLANK  = Project.EntityIds.Blank_Enemy
 
 
 Data:

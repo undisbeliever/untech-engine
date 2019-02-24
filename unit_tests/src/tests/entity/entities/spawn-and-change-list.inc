@@ -90,7 +90,7 @@ namespace SpawnAndChangeList {
         +
 
         clc
-        adc.w   #Entities.DeleteAfterDelay.EntityDataId_0
+        adc.w   #Project.EntityIds.DeleteAfterDelay_Particle
         ldy.w   #DELETE_DELAY
         jmp     Entity.Spawn
     }
@@ -105,18 +105,6 @@ namespace SpawnAndChangeList {
     function NULL {
         rts
     }
-
-
-    rodata(EN_RomData)
-    RomData:
-        dw  FunctionTable
-        db  0               // initialListId
-        db  0               // defaultPalette
-        dw  0               // frameSetId
-
-    rodata(EN_EntityDataList)
-    constant EntityDataId = (pc() - Entity.Data.EntityDataList) / 2
-        dw  RomData
 }
 }
 

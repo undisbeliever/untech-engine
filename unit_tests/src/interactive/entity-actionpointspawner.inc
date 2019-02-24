@@ -151,21 +151,6 @@ namespace EightDirectionProjectile {
 
         jmp     Entity.DeleteIfOutsideOrDrawAndGotoNextEntity
     }
-
-    rodata(EN_RomData)
-    RomData:
-        dw  FunctionTable
-        db  EntityLists.Particles   // initialListId
-        db  0                       // defaultPalette
-        dw  MSFS.Projectile         // frameSetId
-
-    rodata(EN_ProjectileList)
-    constant PROJECTILE_ID = (pc() - Entity.Data.ProjectileList) / 2
-        dw  RomData
-
-    rodata(EN_EntityDataList)
-    constant ENTITY_DATA_ID = (pc() - Entity.Data.EntityDataList) / 2
-        dw  RomData
 }
 
 
@@ -283,7 +268,7 @@ namespace ActionPointSpawner {
     i16()
     code()
     function SpawnPlayerProjectileAtAp {
-        ldy.w   #Entities.EightDirectionProjectile.PROJECTILE_ID
+        ldy.w   #Project.ProjectileIds.EightDirectionProjectile
         jmp     Entity.SpawnPlayerProjectileFromActionPoint
     }
 
@@ -291,7 +276,7 @@ namespace ActionPointSpawner {
     i16()
     code()
     function SpawnEnemyProjectileAtAp {
-        ldy.w   #Entities.EightDirectionProjectile.PROJECTILE_ID
+        ldy.w   #Project.ProjectileIds.EightDirectionProjectile
         jmp     Entity.SpawnEnemyProjectileFromActionPoint
     }
 
@@ -299,23 +284,10 @@ namespace ActionPointSpawner {
     i16()
     code()
     function SpawnEntityAtAp {
-        ldy.w   #Entities.EightDirectionProjectile.ENTITY_DATA_ID
+        ldy.w   #Project.EntityIds.EightDirectionProjectile
         jmp     Entity.SpawnAtActionPoint
     }
-
-
-    rodata(EN_RomData)
-    RomData:
-        dw  FunctionTable
-        db  EntityLists.Enemies     // initialListId
-        db  0                       // defaultPalette
-        dw  MSFS.ActionPointSpawner // frameSetId
-
-    rodata(EN_EntityDataList)
-    constant ENTITY_DATA_ID = (pc() - Entity.Data.EntityDataList) / 2
-        dw  RomData
 }
-
 }
 
 
@@ -367,7 +339,7 @@ function Test {
     lda.w   #Camera.ORIGIN + Camera.DISPLAY_HEIGHT / 2
     sta.w   Entity.Spawn.yPos
 
-    lda.w   #Entities.ActionPointSpawner.ENTITY_DATA_ID
+    lda.w   #Project.EntityIds.ActionPointSpawner
 
     jsr     Entity.Spawn
     bcc     Fail

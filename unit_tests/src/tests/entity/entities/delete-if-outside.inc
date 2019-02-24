@@ -37,25 +37,6 @@ code()
 function Process {
     jmp     Entity.DeleteIfOutsideAndGotoNextEntity
 }
-
-
-evaluate n = 0
-while {n} < Entity.N_ENTITY_LISTS {
-    rodata(EN_RomData)
-    RomData{n}:
-        dw  FunctionTable
-        db  {n}             // initialListId
-        db  0               // defaultPalette
-        dw  0               // frameSetId
-
-    rodata(EN_EntityDataList)
-    constant EntityDataId_{n} = (pc() - Entity.Data.EntityDataList) / 2
-        dw  RomData{n}
-
-    evaluate n = {n} + 1
-}
-
-code()
 }
 
 }

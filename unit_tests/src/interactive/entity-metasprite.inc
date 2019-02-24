@@ -114,18 +114,6 @@ namespace ShowAllFrames {
 
         jmp     Entity.DrawAndGotoNextEntity
     }
-
-
-    rodata(EN_RomData)
-    RomData:
-        dw  FunctionTable
-        db  EntityLists.Players     // initialListId
-        db  0                       // defaultPalette
-        dw  MSFS.FST_OneTile        // frameSetId
-
-    rodata(EN_EntityDataList)
-    constant EntityDataId = (pc() - Entity.Data.EntityDataList) / 2
-        dw  RomData
 }
 }
 
@@ -188,7 +176,7 @@ constant tmp_index = Test.tmp
         lda.l   EntityTable.frameSet,x
         tay
 
-        lda.w   #Entities.ShowAllFrames.EntityDataId
+        lda.w   #Project.EntityIds.ShowAllFrames
 
         jsr     Entity.Spawn
         bcc     Fail

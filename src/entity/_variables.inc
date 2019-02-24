@@ -18,8 +18,8 @@
 //                   the `GetEntityWithIdOrBranchIfEmpty*` macros.
 //
 //   * `entityDataId`: An array index (NOT a multiple of two) within
-//                     `Entity.Data.EntityDataList` that points to a
-//                     `BaseEntityData` block contained in the ROM.
+//                     `Entity.Data.EntityRomDataList` that points to a
+//                     `BaseEntityRomStruct` block contained in the ROM.
 //
 //   * `listId`: The `EntityLists` value, which represents the entity list the
 //               entity is in.
@@ -50,8 +50,8 @@ namespace BaseEntity {
         // (word addr)
         field(functionTable, 2)
 
-        // pointer to the ROM data used by the entity code
-        // (word addr)
+        // index to the ROM data used by the entity code
+        // (word index)
         field(romPtr, 2)
 
         // InstanceIdTable identifier for the current entity.
@@ -65,7 +65,7 @@ namespace BaseEntity {
 
         // Entity List Id for the current entity
         //
-        // Set to `BaseEntityData.initialListId` before entity's
+        // Set to `Entity.BaseEntityRomStruct.initialListId` before the entity's
         // `BaseEntityFunctionTable.Init` call.  The entity is ONLY ALLOWED to
         // modify the `listId` variable in the entity's `Init` method.
         //

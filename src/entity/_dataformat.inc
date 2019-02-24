@@ -9,35 +9,35 @@
 // Distributed under The MIT License: https://opensource.org/licenses/MIT
 
 
-namespace Entity {
-
-namespace Data {
-    // List of entity data blocks.
-    // Addresses point to the BaseEntityData struct in the EN_RomData.
-    // (list of addr)
-    storeBlockStart(EntityDataList,      EN_EntityDataList)
-    storeBlockCount(EntityDataListCount, EN_EntityDataList, 2)
-
-    // List of projectiles.
-    // Addresses point to the BaseEntityData struct in the EN_RomData.
-    // (list of addr)
-    storeBlockStart(ProjectileList,      EN_ProjectileList)
-    storeBlockCount(ProjectileListCount, EN_ProjectileList, 2)
-
-    rodata(EN_RomData)
-        constant Offset = pc() & 0xff0000
-
-    code()
+// Data format may be subject to changes
+if Entity.Data.ENTITY_FORMAT_VERSION != 2 {
+    error "Invalid UnTech Entity Format"
 }
 
+namespace Entity {
+namespace Data {
+    // List of entities
+    // Word indexes within the EntityRomData data
+    constant EntityRomDataList = Project.EntityRomDataList
+
+    // Number of entities in the EntityRomDataList
+    constant EntityRomDataListCount = Project.EntityIds.count
+
+    // List of projectiles
+    // Word indexes within the EntityRomData data
+    constant ProjectileRomDataList = Project.ProjectileRomDataList
+
+    // Number of entities in the ProjectileRomDataList
+    constant ProjectileRomDataListCount = Project.ProjectileIds.count
+}
 }
 
 // Read only data used by the entity.
 //
-// These structs are extendible and will be used to store entity
-// parameters.
-namespace BaseEntityData {
-    basestruct_offset(Entity.Data.Offset)
+// These structs are extendible (by untech-editor) and will be used to
+// store entity parameters.
+namespace BaseEntityRomStruct {
+    basestruct_offset(Project.EntityRomData)
         // Location of the entity's `functionPtr` table
         // (word addr - code bank)
         field(functionTable, 2)
