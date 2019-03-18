@@ -16,7 +16,7 @@ a16()
 i16()
 code()
 function Init {
-    lda.w   #{EntityStruct}.Animations.animation
+    lda.w   #{ExportOrder}.Animations.animation
     jsr     MetaSprite.SetAnimation
 
     // always activate
