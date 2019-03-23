@@ -35,14 +35,12 @@ namespace EightDirectionProjectile {
         sep     #$20
     a8()
 
-        ldx.w   MetaSprite.ActionPoint.address
-
         // Determine if projectile is diagonal or orthogonal
-        lda.l   MetaSprite.Format.ActionPoints.xPos,x
+        lda.w   MetaSprite.ActionPoint.positionPair.xPos
         cmp.b   #INT_MS8_OFFSET
         beq     Orthogonal
 
-        lda.l   MetaSprite.Format.ActionPoints.yPos,x
+        lda.w   MetaSprite.ActionPoint.positionPair.yPos
         cmp.b   #INT_MS8_OFFSET
         beq     Orthogonal
 
@@ -68,8 +66,10 @@ namespace EightDirectionProjectile {
         macro _SetVelocity(c) {
             namespace {c} {
                 // Set Projectile Velocity
-                lda.l   MetaSprite.Format.ActionPoints.{c}Pos,x
-                and.w   #0xff
+                lda.w   MetaSprite.ActionPoint.positionPair.{c}Pos
+                if '{c}' == 'x' {
+                    and.w   #0xff
+                }
                 cmp.w   #INT_MS8_OFFSET
                 beq     Zero
                 bcs     Positive

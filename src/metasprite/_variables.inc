@@ -265,13 +265,29 @@ namespace MetaSprite {
     }
 
     namespace ActionPoint {
-        // The address of the last action Point that was processed.
+        // The position of the current action point.
         //
         // Exposed so an Entity Init routine can determine location of
         // action point (ie, for direction information)
         //
-        // (index, MUST NOT be modified outside ActionPoint routines)
-        allocateTmpWord(address)
+        // The third byte is always zero to allow for efficient retrieval of the
+        // yPos in 16 bit accumulator mode.
+        // For example (16 bit A):
+        //  * xPos: `lda.w MetaSprite.ActionPoint.positionPair.xPos ; and.w #0xff`
+        //  * yPos: `lda.w MetaSprite.ActionPoint.positionPair.yPos`
+        //
+        // NOTE: This variable is only set when an entity or projectile
+        //       is spawned at an action point.
+        //
+        // (int_ms8 pair)
+        allocate(positionPair, wram7e, 3)
+
+        // (int_ms8 byte)
+        constant positionPair.xPos = positionPair
+        // (int_ms8 word)
+        constant positionPair.yPos = positionPair + 1
+
+        assert(MetaSprite.Format.ActionPoints.yPos == MetaSprite.Format.ActionPoints.xPos + 1)
     }
 }
 

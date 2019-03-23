@@ -77,6 +77,11 @@ namespace BaseEntityFunctionTable {
         //       or `SpawnPlayerProjectileFromActionPoint` then it will always
         //       be activated, regardless of the Init routine output.
         //
+        // NOTE: If the entity was spawned from an action point, then
+        //       the variable `MetaSprite.ActionPoint.positionPair` will
+        //       contain the action point position as a int_ms8 pair
+        //       (which is useful for choosing the entity's direction).
+        //
         // REGS: 16 bit A, 16 bit Index, DB = $7e
         // INPUT: dp: entity
         //         A: parameter

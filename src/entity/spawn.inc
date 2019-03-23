@@ -197,8 +197,9 @@ function SpawnAtMetaSpriteCollisionCentre {
 //
 // This routine may spawn multiple entities.
 //
-// When entities are spawned the value `MetaSprite.ActionPoint.address`
-// will be set to the address of the current Action Point.
+// When an entity is spawned the action point position is stored in the
+// variable `MetaSprite.ActionPoint.positionPair` (as a int_ms8 pair)
+// and can be accessed by the entity's `Init` routine.
 //
 // REQUIRES: 16 bit A, 16 bit Index, DB = 0x7e
 // MUST NOT BE CALLED IN ENTITY CONSTRUCTOR
@@ -241,6 +242,7 @@ a8()
             rep     #$31
         a16()
             lda.l   MetaSprite.Format.ActionPoints.xPos,x
+            sta.w   MetaSprite.ActionPoint.positionPair
             and.w   #0x00ff
             // carry clear, will set carry on overflow (thus the -1)
             adc.w   #-INT_MS8_OFFSET - 1
@@ -248,20 +250,19 @@ a8()
             sta.w   Entity.Spawn.xPos
 
             clc
-            lda.l   MetaSprite.Format.ActionPoints.yPos,x
-            and.w   #0x00ff
+            lda.w   MetaSprite.ActionPoint.positionPair + 1
+            // no masking required, third byte of positionPair is always zero
             // carry clear, will set carry on overflow (thus the -1)
             adc.w   #-INT_MS8_OFFSET - 1
             adc.b   BaseEntity.yPos.px
             sta.w   Entity.Spawn.yPos
 
-            stx.w   MetaSprite.ActionPoint.address
-            tdc
-            tay
-            lda.w   tmp_entityToSpawn
-            jsr     Entity.Spawn
-
-            ldx.w   MetaSprite.ActionPoint.address
+            phx
+                tdc
+                tay
+                lda.w   tmp_entityToSpawn
+                jsr     Entity.Spawn
+            plx
 
             sep     #$20
         a8()
@@ -287,8 +288,9 @@ Return:
 // The entity(s) will be spawned in the entity list defined by
 // `ENEMY_PROJECTILE_ENTITY_LIST`.
 //
-// When entities are spawned the value `MetaSprite.ActionPoint.address`
-// will be set to the address of the current Action Point.
+// When a projectile is spawned the action point position is stored in the
+// variable `MetaSprite.ActionPoint.positionPair` (as a int_ms8 pair)
+// and can be accessed by the projectile's `Init` routine.
 //
 // This routine will always activate the entity, regardless of the output of
 // the entity's Init routine.
@@ -312,8 +314,9 @@ function SpawnEnemyProjectileFromActionPoint {
 // The entity(s) will be spawned in the entity list defined by
 // `PLAYER_PROJECTILE_ENTITY_LIST`.
 //
-// When entities are spawned the value `MetaSprite.ActionPoint.address`
-// will be set to the address of the current Action Point.
+// When a projectile is spawned the action point position is stored in the
+// variable `MetaSprite.ActionPoint.positionPair` (as a int_ms8 pair)
+// and can be accessed by the projectile's `Init` routine.
 //
 // This routine will always activate the entity, regardless of the output of
 // the entity's Init routine.
@@ -416,7 +419,7 @@ SpawnProjectile:
         lda.w   Entity.specialLists.free
         beq     EntityPoolEmpty
 
-        stx.w   MetaSprite.ActionPoint.address
+        phx
 
         // remove entity from free list
         tcd
@@ -438,6 +441,7 @@ SpawnProjectile:
 
         // carry clear (NO INSTRUCTION ABOVE MODIFIES CARRY)
         lda.l   MetaSprite.Format.ActionPoints.xPos,x
+        sta.w   MetaSprite.ActionPoint.positionPair
         and.w   #0x00ff
         // carry clear, will set carry on overflow (thus the -1)
         adc.w   #-INT_MS8_OFFSET - 1
@@ -446,8 +450,8 @@ SpawnProjectile:
         stz.b   BaseEntity.xPos.sx
 
         clc
-        lda.l   MetaSprite.Format.ActionPoints.yPos,x
-        and.w   #0x00ff
+        lda.w   MetaSprite.ActionPoint.positionPair + 1
+        // no masking required, third byte of positionPair is always zero
         // carry clear, will set carry on overflow (thus the -1)
         adc.w   #-INT_MS8_OFFSET - 1
         adc.w   BaseEntity.yPos.px,y
@@ -488,7 +492,7 @@ SpawnProjectile:
         tdc
         sta.w   specialLists.activateNextFrame
 
-        ldx.w   MetaSprite.ActionPoint.address
+        plx
 
         sep     #$20
     a8()
