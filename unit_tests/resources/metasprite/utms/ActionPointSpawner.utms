@@ -1,26 +1,330 @@
 <?xml version="1.0" encoding="UTF_8"?>
 <!DOCTYPE untech>
-<metasprite id="ActionPointSpawner" tilesettype="ONE_TILE_FIXED" exportorder="OneFrame">
+<metasprite id="ActionPointSpawner" tilesettype="TWO_TILES_FIXED" exportorder="SingleAnimation">
+  <smalltileset>
+    AAAAAAAAGBgYGAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+    AAAAAAAAGAAYAAAAAAAAAAAAAAAAABgAGAAAAAAAAAAAAAAAAAAYABgAAAAAAAAA
+  </smalltileset>
   <largetileset>
     AAAAAAAAAAADAAQDCAcIBwAAAAAAAAAAAAAAAAAAAAADAAYBBAMEAwQDhANEgyTD
     AAAAAAAAAAAAAAAAAAAAAAQDAgEBAAAAAAB/AIB/gH8AAAAAAAAAAAAAAAAAAAAA
     FOMM8wT7gH9AP+AfAP8A/wAAAAAAAAAAAAAAAAAAAAA=
   </largetileset>
   <palette>
-    jEJECK5hAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=
+    jEJECK5h6CMfIfgDAAAAAAAAAAAAAAAAAAAAAAAAAAA=
   </palette>
-  <frame id="frame" order="2">
+  <frame id="playerProjectile0" order="2">
+    <object size="small" x="-4" y="-18" tile="0"/>
     <object size="large" x="-16" y="-16" tile="0"/>
     <object size="large" x="0" y="-16" tile="0" hflip="true"/>
     <object size="large" x="-16" y="0" tile="0" vflip="true"/>
     <object size="large" x="0" y="0" tile="0" hflip="true" vflip="true"/>
-    <actionpoint parameter="1" x="0" y="-15"/>
-    <actionpoint parameter="2" x="10" y="-10"/>
-    <actionpoint parameter="3" x="15" y="0"/>
-    <actionpoint parameter="4" x="10" y="10"/>
-    <actionpoint parameter="5" x="0" y="15"/>
-    <actionpoint parameter="6" x="-10" y="10"/>
-    <actionpoint parameter="7" x="-15" y="0"/>
-    <actionpoint parameter="8" x="-10" y="-10"/>
+    <actionpoint type="PlayerProjectile" x="0" y="-15"/>
+    <actionpoint type="ManualEnemyProjectile" x="10" y="-10"/>
+    <actionpoint type="ManualEnemyProjectile" x="10" y="10"/>
+    <actionpoint type="ManualEnemyProjectile" x="-10" y="10"/>
+    <actionpoint type="ManualEnemyProjectile" x="-10" y="-10"/>
   </frame>
+  <frame id="playerProjectile1" order="2">
+    <object size="small" x="5" y="-13" tile="0"/>
+    <object size="large" x="-16" y="-16" tile="0"/>
+    <object size="large" x="0" y="-16" tile="0" hflip="true"/>
+    <object size="large" x="-16" y="0" tile="0" vflip="true"/>
+    <object size="large" x="0" y="0" tile="0" hflip="true" vflip="true"/>
+    <actionpoint type="ManualEnemyProjectile" x="10" y="-10"/>
+    <actionpoint type="PlayerProjectile" x="10" y="-10"/>
+    <actionpoint type="ManualEnemyProjectile" x="10" y="10"/>
+    <actionpoint type="ManualEnemyProjectile" x="-10" y="10"/>
+    <actionpoint type="ManualEnemyProjectile" x="-10" y="-10"/>
+  </frame>
+  <frame id="playerProjectile2" order="2">
+    <object size="small" x="10" y="-4" tile="0"/>
+    <object size="large" x="-16" y="-16" tile="0"/>
+    <object size="large" x="0" y="-16" tile="0" hflip="true"/>
+    <object size="large" x="-16" y="0" tile="0" vflip="true"/>
+    <object size="large" x="0" y="0" tile="0" hflip="true" vflip="true"/>
+    <actionpoint type="ManualEnemyProjectile" x="10" y="-10"/>
+    <actionpoint type="ManualEnemyProjectile" x="10" y="10"/>
+    <actionpoint type="PlayerProjectile" x="14" y="0"/>
+    <actionpoint type="ManualEnemyProjectile" x="-10" y="10"/>
+    <actionpoint type="ManualEnemyProjectile" x="-10" y="-10"/>
+  </frame>
+  <frame id="playerProjectile3" order="2">
+    <object size="small" x="5" y="5" tile="0"/>
+    <object size="large" x="-16" y="-16" tile="0"/>
+    <object size="large" x="0" y="-16" tile="0" hflip="true"/>
+    <object size="large" x="-16" y="0" tile="0" vflip="true"/>
+    <object size="large" x="0" y="0" tile="0" hflip="true" vflip="true"/>
+    <actionpoint type="ManualEnemyProjectile" x="10" y="-10"/>
+    <actionpoint type="ManualEnemyProjectile" x="10" y="10"/>
+    <actionpoint type="ManualEnemyProjectile" x="-10" y="10"/>
+    <actionpoint type="PlayerProjectile" x="10" y="10"/>
+    <actionpoint type="ManualEnemyProjectile" x="-10" y="-10"/>
+  </frame>
+  <frame id="playerProjectile4" order="2">
+    <object size="small" x="-4" y="10" tile="0"/>
+    <object size="large" x="-16" y="-16" tile="0"/>
+    <object size="large" x="0" y="-16" tile="0" hflip="true"/>
+    <object size="large" x="-16" y="0" tile="0" vflip="true"/>
+    <object size="large" x="0" y="0" tile="0" hflip="true" vflip="true"/>
+    <actionpoint type="ManualEnemyProjectile" x="10" y="-10"/>
+    <actionpoint type="ManualEnemyProjectile" x="10" y="10"/>
+    <actionpoint type="ManualEnemyProjectile" x="-10" y="10"/>
+    <actionpoint type="ManualEnemyProjectile" x="-10" y="-10"/>
+    <actionpoint type="PlayerProjectile" x="0" y="14"/>
+  </frame>
+  <frame id="playerProjectile5" order="2">
+    <object size="small" x="-13" y="5" tile="0"/>
+    <object size="large" x="-16" y="-16" tile="0"/>
+    <object size="large" x="0" y="-16" tile="0" hflip="true"/>
+    <object size="large" x="-16" y="0" tile="0" vflip="true"/>
+    <object size="large" x="0" y="0" tile="0" hflip="true" vflip="true"/>
+    <actionpoint type="ManualEnemyProjectile" x="10" y="-10"/>
+    <actionpoint type="ManualEnemyProjectile" x="10" y="10"/>
+    <actionpoint type="ManualEnemyProjectile" x="-10" y="10"/>
+    <actionpoint type="ManualEnemyProjectile" x="-10" y="-10"/>
+    <actionpoint type="PlayerProjectile" x="-10" y="10"/>
+  </frame>
+  <frame id="playerProjectile6" order="2">
+    <object size="small" x="-18" y="-4" tile="0"/>
+    <object size="large" x="-16" y="-16" tile="0"/>
+    <object size="large" x="0" y="-16" tile="0" hflip="true"/>
+    <object size="large" x="-16" y="0" tile="0" vflip="true"/>
+    <object size="large" x="0" y="0" tile="0" hflip="true" vflip="true"/>
+    <actionpoint type="ManualEnemyProjectile" x="10" y="-10"/>
+    <actionpoint type="ManualEnemyProjectile" x="10" y="10"/>
+    <actionpoint type="ManualEnemyProjectile" x="-10" y="10"/>
+    <actionpoint type="ManualEnemyProjectile" x="-10" y="-10"/>
+    <actionpoint type="PlayerProjectile" x="-15" y="0"/>
+  </frame>
+  <frame id="playerProjectile7" order="2">
+    <object size="small" x="-13" y="-13" tile="0"/>
+    <object size="large" x="-16" y="-16" tile="0"/>
+    <object size="large" x="0" y="-16" tile="0" hflip="true"/>
+    <object size="large" x="-16" y="0" tile="0" vflip="true"/>
+    <object size="large" x="0" y="0" tile="0" hflip="true" vflip="true"/>
+    <actionpoint type="ManualEnemyProjectile" x="10" y="-10"/>
+    <actionpoint type="ManualEnemyProjectile" x="10" y="10"/>
+    <actionpoint type="ManualEnemyProjectile" x="-10" y="10"/>
+    <actionpoint type="ManualEnemyProjectile" x="-10" y="-10"/>
+    <actionpoint type="PlayerProjectile" x="-10" y="-10"/>
+  </frame>
+  <frame id="enemyProjectile0" order="2">
+    <object size="small" x="-4" y="-18" tile="1"/>
+    <object size="large" x="-16" y="-16" tile="0"/>
+    <object size="large" x="0" y="-16" tile="0" hflip="true"/>
+    <object size="large" x="-16" y="0" tile="0" vflip="true"/>
+    <object size="large" x="0" y="0" tile="0" hflip="true" vflip="true"/>
+    <actionpoint type="EnemyProjectile" x="0" y="-15"/>
+    <actionpoint type="ManualEnemyProjectile" x="10" y="-10"/>
+    <actionpoint type="ManualEnemyProjectile" x="10" y="10"/>
+    <actionpoint type="ManualEnemyProjectile" x="-10" y="10"/>
+    <actionpoint type="ManualEnemyProjectile" x="-10" y="-10"/>
+  </frame>
+  <frame id="enemyProjectile1" order="2">
+    <object size="small" x="5" y="-13" tile="1"/>
+    <object size="large" x="-16" y="-16" tile="0"/>
+    <object size="large" x="0" y="-16" tile="0" hflip="true"/>
+    <object size="large" x="-16" y="0" tile="0" vflip="true"/>
+    <object size="large" x="0" y="0" tile="0" hflip="true" vflip="true"/>
+    <actionpoint type="ManualEnemyProjectile" x="10" y="-10"/>
+    <actionpoint type="EnemyProjectile" x="10" y="-10"/>
+    <actionpoint type="ManualEnemyProjectile" x="10" y="10"/>
+    <actionpoint type="ManualEnemyProjectile" x="-10" y="10"/>
+    <actionpoint type="ManualEnemyProjectile" x="-10" y="-10"/>
+  </frame>
+  <frame id="enemyProjectile2" order="2">
+    <object size="small" x="10" y="-4" tile="1"/>
+    <object size="large" x="-16" y="-16" tile="0"/>
+    <object size="large" x="0" y="-16" tile="0" hflip="true"/>
+    <object size="large" x="-16" y="0" tile="0" vflip="true"/>
+    <object size="large" x="0" y="0" tile="0" hflip="true" vflip="true"/>
+    <actionpoint type="ManualEnemyProjectile" x="10" y="-10"/>
+    <actionpoint type="ManualEnemyProjectile" x="10" y="10"/>
+    <actionpoint type="EnemyProjectile" x="14" y="0"/>
+    <actionpoint type="ManualEnemyProjectile" x="-10" y="10"/>
+    <actionpoint type="ManualEnemyProjectile" x="-10" y="-10"/>
+  </frame>
+  <frame id="enemyProjectile3" order="2">
+    <object size="small" x="5" y="5" tile="1"/>
+    <object size="large" x="-16" y="-16" tile="0"/>
+    <object size="large" x="0" y="-16" tile="0" hflip="true"/>
+    <object size="large" x="-16" y="0" tile="0" vflip="true"/>
+    <object size="large" x="0" y="0" tile="0" hflip="true" vflip="true"/>
+    <actionpoint type="ManualEnemyProjectile" x="10" y="-10"/>
+    <actionpoint type="ManualEnemyProjectile" x="10" y="10"/>
+    <actionpoint type="ManualEnemyProjectile" x="-10" y="10"/>
+    <actionpoint type="EnemyProjectile" x="10" y="10"/>
+    <actionpoint type="ManualEnemyProjectile" x="-10" y="-10"/>
+  </frame>
+  <frame id="enemyProjectile4" order="2">
+    <object size="small" x="-4" y="10" tile="1"/>
+    <object size="large" x="-16" y="-16" tile="0"/>
+    <object size="large" x="0" y="-16" tile="0" hflip="true"/>
+    <object size="large" x="-16" y="0" tile="0" vflip="true"/>
+    <object size="large" x="0" y="0" tile="0" hflip="true" vflip="true"/>
+    <actionpoint type="ManualEnemyProjectile" x="10" y="-10"/>
+    <actionpoint type="ManualEnemyProjectile" x="10" y="10"/>
+    <actionpoint type="ManualEnemyProjectile" x="-10" y="10"/>
+    <actionpoint type="ManualEnemyProjectile" x="-10" y="-10"/>
+    <actionpoint type="EnemyProjectile" x="0" y="14"/>
+  </frame>
+  <frame id="enemyProjectile5" order="2">
+    <object size="small" x="-13" y="5" tile="1"/>
+    <object size="large" x="-16" y="-16" tile="0"/>
+    <object size="large" x="0" y="-16" tile="0" hflip="true"/>
+    <object size="large" x="-16" y="0" tile="0" vflip="true"/>
+    <object size="large" x="0" y="0" tile="0" hflip="true" vflip="true"/>
+    <actionpoint type="ManualEnemyProjectile" x="10" y="-10"/>
+    <actionpoint type="ManualEnemyProjectile" x="10" y="10"/>
+    <actionpoint type="ManualEnemyProjectile" x="-10" y="10"/>
+    <actionpoint type="ManualEnemyProjectile" x="-10" y="-10"/>
+    <actionpoint type="EnemyProjectile" x="-10" y="10"/>
+  </frame>
+  <frame id="enemyProjectile6" order="2">
+    <object size="small" x="-18" y="-4" tile="1"/>
+    <object size="large" x="-16" y="-16" tile="0"/>
+    <object size="large" x="0" y="-16" tile="0" hflip="true"/>
+    <object size="large" x="-16" y="0" tile="0" vflip="true"/>
+    <object size="large" x="0" y="0" tile="0" hflip="true" vflip="true"/>
+    <actionpoint type="ManualEnemyProjectile" x="10" y="-10"/>
+    <actionpoint type="ManualEnemyProjectile" x="10" y="10"/>
+    <actionpoint type="ManualEnemyProjectile" x="-10" y="10"/>
+    <actionpoint type="ManualEnemyProjectile" x="-10" y="-10"/>
+    <actionpoint type="EnemyProjectile" x="-15" y="0"/>
+  </frame>
+  <frame id="enemyProjectile7" order="2">
+    <object size="small" x="-13" y="-13" tile="1"/>
+    <object size="large" x="-16" y="-16" tile="0"/>
+    <object size="large" x="0" y="-16" tile="0" hflip="true"/>
+    <object size="large" x="-16" y="0" tile="0" vflip="true"/>
+    <object size="large" x="0" y="0" tile="0" hflip="true" vflip="true"/>
+    <actionpoint type="ManualEnemyProjectile" x="10" y="-10"/>
+    <actionpoint type="ManualEnemyProjectile" x="10" y="10"/>
+    <actionpoint type="ManualEnemyProjectile" x="-10" y="10"/>
+    <actionpoint type="ManualEnemyProjectile" x="-10" y="-10"/>
+    <actionpoint type="EnemyProjectile" x="-10" y="-10"/>
+  </frame>
+  <frame id="entityProjectile0" order="2">
+    <object size="small" x="-4" y="-18" tile="2"/>
+    <object size="large" x="-16" y="-16" tile="0"/>
+    <object size="large" x="0" y="-16" tile="0" hflip="true"/>
+    <object size="large" x="-16" y="0" tile="0" vflip="true"/>
+    <object size="large" x="0" y="0" tile="0" hflip="true" vflip="true"/>
+    <actionpoint type="SpawnEightDirectionParticle" x="0" y="-15"/>
+    <actionpoint type="ManualEnemyProjectile" x="10" y="-10"/>
+    <actionpoint type="ManualEnemyProjectile" x="10" y="10"/>
+    <actionpoint type="ManualEnemyProjectile" x="-10" y="10"/>
+    <actionpoint type="ManualEnemyProjectile" x="-10" y="-10"/>
+  </frame>
+  <frame id="entityProjectile1" order="2">
+    <object size="small" x="5" y="-13" tile="2"/>
+    <object size="large" x="-16" y="-16" tile="0"/>
+    <object size="large" x="0" y="-16" tile="0" hflip="true"/>
+    <object size="large" x="-16" y="0" tile="0" vflip="true"/>
+    <object size="large" x="0" y="0" tile="0" hflip="true" vflip="true"/>
+    <actionpoint type="ManualEnemyProjectile" x="10" y="-10"/>
+    <actionpoint type="SpawnEightDirectionParticle" x="10" y="-10"/>
+    <actionpoint type="ManualEnemyProjectile" x="10" y="10"/>
+    <actionpoint type="ManualEnemyProjectile" x="-10" y="10"/>
+    <actionpoint type="ManualEnemyProjectile" x="-10" y="-10"/>
+  </frame>
+  <frame id="entityProjectile2" order="2">
+    <object size="small" x="10" y="-4" tile="2"/>
+    <object size="large" x="-16" y="-16" tile="0"/>
+    <object size="large" x="0" y="-16" tile="0" hflip="true"/>
+    <object size="large" x="-16" y="0" tile="0" vflip="true"/>
+    <object size="large" x="0" y="0" tile="0" hflip="true" vflip="true"/>
+    <actionpoint type="ManualEnemyProjectile" x="10" y="-10"/>
+    <actionpoint type="ManualEnemyProjectile" x="10" y="10"/>
+    <actionpoint type="SpawnEightDirectionParticle" x="14" y="0"/>
+    <actionpoint type="ManualEnemyProjectile" x="-10" y="10"/>
+    <actionpoint type="ManualEnemyProjectile" x="-10" y="-10"/>
+  </frame>
+  <frame id="entityProjectile3" order="2">
+    <object size="small" x="5" y="5" tile="2"/>
+    <object size="large" x="-16" y="-16" tile="0"/>
+    <object size="large" x="0" y="-16" tile="0" hflip="true"/>
+    <object size="large" x="-16" y="0" tile="0" vflip="true"/>
+    <object size="large" x="0" y="0" tile="0" hflip="true" vflip="true"/>
+    <actionpoint type="ManualEnemyProjectile" x="10" y="-10"/>
+    <actionpoint type="ManualEnemyProjectile" x="10" y="10"/>
+    <actionpoint type="ManualEnemyProjectile" x="-10" y="10"/>
+    <actionpoint type="SpawnEightDirectionParticle" x="10" y="10"/>
+    <actionpoint type="ManualEnemyProjectile" x="-10" y="-10"/>
+  </frame>
+  <frame id="entityProjectile4" order="2">
+    <object size="small" x="-4" y="10" tile="2"/>
+    <object size="large" x="-16" y="-16" tile="0"/>
+    <object size="large" x="0" y="-16" tile="0" hflip="true"/>
+    <object size="large" x="-16" y="0" tile="0" vflip="true"/>
+    <object size="large" x="0" y="0" tile="0" hflip="true" vflip="true"/>
+    <actionpoint type="ManualEnemyProjectile" x="10" y="-10"/>
+    <actionpoint type="ManualEnemyProjectile" x="10" y="10"/>
+    <actionpoint type="ManualEnemyProjectile" x="-10" y="10"/>
+    <actionpoint type="ManualEnemyProjectile" x="-10" y="-10"/>
+    <actionpoint type="SpawnEightDirectionParticle" x="0" y="14"/>
+  </frame>
+  <frame id="entityProjectile5" order="2">
+    <object size="small" x="-13" y="5" tile="2"/>
+    <object size="large" x="-16" y="-16" tile="0"/>
+    <object size="large" x="0" y="-16" tile="0" hflip="true"/>
+    <object size="large" x="-16" y="0" tile="0" vflip="true"/>
+    <object size="large" x="0" y="0" tile="0" hflip="true" vflip="true"/>
+    <actionpoint type="ManualEnemyProjectile" x="10" y="-10"/>
+    <actionpoint type="ManualEnemyProjectile" x="10" y="10"/>
+    <actionpoint type="ManualEnemyProjectile" x="-10" y="10"/>
+    <actionpoint type="ManualEnemyProjectile" x="-10" y="-10"/>
+    <actionpoint type="SpawnEightDirectionParticle" x="-10" y="10"/>
+  </frame>
+  <frame id="entityProjectile6" order="2">
+    <object size="small" x="-18" y="-4" tile="2"/>
+    <object size="large" x="-16" y="-16" tile="0"/>
+    <object size="large" x="0" y="-16" tile="0" hflip="true"/>
+    <object size="large" x="-16" y="0" tile="0" vflip="true"/>
+    <object size="large" x="0" y="0" tile="0" hflip="true" vflip="true"/>
+    <actionpoint type="ManualEnemyProjectile" x="10" y="-10"/>
+    <actionpoint type="ManualEnemyProjectile" x="10" y="10"/>
+    <actionpoint type="ManualEnemyProjectile" x="-10" y="10"/>
+    <actionpoint type="ManualEnemyProjectile" x="-10" y="-10"/>
+    <actionpoint type="SpawnEightDirectionParticle" x="-15" y="0"/>
+  </frame>
+  <frame id="entityProjectile7" order="2">
+    <object size="small" x="-13" y="-13" tile="2"/>
+    <object size="large" x="-16" y="-16" tile="0"/>
+    <object size="large" x="0" y="-16" tile="0" hflip="true"/>
+    <object size="large" x="-16" y="0" tile="0" vflip="true"/>
+    <object size="large" x="0" y="0" tile="0" hflip="true" vflip="true"/>
+    <actionpoint type="ManualEnemyProjectile" x="10" y="-10"/>
+    <actionpoint type="ManualEnemyProjectile" x="10" y="10"/>
+    <actionpoint type="ManualEnemyProjectile" x="-10" y="10"/>
+    <actionpoint type="ManualEnemyProjectile" x="-10" y="-10"/>
+    <actionpoint type="SpawnEightDirectionParticle" x="-10" y="-10"/>
+  </frame>
+  <animation id="animation" durationformat="FRAME">
+    <aframe frame="playerProjectile0" duration="15"/>
+    <aframe frame="playerProjectile1" duration="15"/>
+    <aframe frame="playerProjectile2" duration="15"/>
+    <aframe frame="playerProjectile3" duration="15"/>
+    <aframe frame="playerProjectile4" duration="15"/>
+    <aframe frame="playerProjectile5" duration="15"/>
+    <aframe frame="playerProjectile6" duration="15"/>
+    <aframe frame="playerProjectile7" duration="15"/>
+    <aframe frame="enemyProjectile0" duration="15"/>
+    <aframe frame="enemyProjectile1" duration="15"/>
+    <aframe frame="enemyProjectile2" duration="15"/>
+    <aframe frame="enemyProjectile3" duration="15"/>
+    <aframe frame="enemyProjectile4" duration="15"/>
+    <aframe frame="enemyProjectile5" duration="15"/>
+    <aframe frame="enemyProjectile6" duration="15"/>
+    <aframe frame="enemyProjectile7" duration="15"/>
+    <aframe frame="entityProjectile0" duration="15"/>
+    <aframe frame="entityProjectile1" duration="15"/>
+    <aframe frame="entityProjectile2" duration="15"/>
+    <aframe frame="entityProjectile3" duration="15"/>
+    <aframe frame="entityProjectile4" duration="15"/>
+    <aframe frame="entityProjectile5" duration="15"/>
+    <aframe frame="entityProjectile6" duration="15"/>
+    <aframe frame="entityProjectile7" duration="15"/>
+  </animation>
 </metasprite>

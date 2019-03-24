@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF_8"?>
 <!DOCTYPE untech>
-<metasprite id="DeleteIfAnimationEnds" tilesettype="ONE_TILE_FIXED" exportorder="DeleteIfAnimationEnds">
+<metasprite id="DeleteIfAnimationEnds" tilesettype="ONE_TILE_FIXED" exportorder="SingleAnimation">
   <smalltileset>
     AAAIABgACAAIAAgAHAAAAAAAAAAAAAAAAAAAAAAAAAAAABgAJAAEAAgAEAA8AAAA
     AAAAAAAAAAAAAAAAAAAAAA==

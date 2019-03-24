@@ -217,11 +217,17 @@ constant DisableAnimation = Animation.DisableAnimation
 // If the frame is active and has a dynamic tileset then a new tileset
 // is loaded into vram.
 //
+// If the MetaSprite Frame was changed successfully then all the action points
+// within the frame will be executed.
+//
 // This routine will fail IF:
 //      * entity has not FrameSet
 //      * frameId is invalid
 //      * FrameSet uses a dynamic tileset and there is not enough dma
 //        time to upload the tileset in the next VBlank.
+//
+// NOTE: This routine may invalidate `MetaSprite.ActionPoint.positionPair`.
+//       DO NOT access `positionPair` after calling this function.
 //
 // REQUIRES: 16 bit A, 16 bit Index, DB = $7e
 //
@@ -251,14 +257,15 @@ a16()
         adc.l   MetaSprite.Format.FrameSet.frameTable,x
         tax
         lda.l   MetaSprite.Data.FrameList,x
+        tax
 
-        sta.b   BaseEntity.MetaSprite.currentFrame
+        stx.b   BaseEntity.MetaSprite.currentFrame
 
-        sec
-        rts
+        bra     ProcessActionPoints
 
 ReturnFalse:
     rep     #$31
+Return:
     rts
 
 
@@ -270,16 +277,44 @@ DynamicTileset:
         adc.l   MetaSprite.Format.FrameSet.frameTable,x
         tax
         lda.l   MetaSprite.Data.FrameList,x
-
-        pha
         tax
+
+        phx
             jsr     Vram._UploadDynamicTileset.GivenFrame
-        pla
+        plx
         bcc     Return
 
-        sta.b   BaseEntity.MetaSprite.currentFrame
+        stx.b   BaseEntity.MetaSprite.currentFrame
 
-Return:
+
+ProcessActionPoints:
+    // Process all action point functions
+    // X = frame index
+
+    lda.l   MetaSprite.Format.Frame.actionPoints,x
+    beq     NoActionPoints
+    tax
+
+    lda.l   MetaSprite.Format.ActionPoints.type,x
+    and.w   #Project.ActionPoints.MASK
+
+    Loop:
+        tay
+        lda.l   MetaSprite.Format.ActionPoints.positionPair,x
+        phx
+            tyx
+            jsr     (Project.ActionPoints,x)
+        plx
+        inx
+        inx
+        inx
+
+        lda.l   MetaSprite.Format.ActionPoints.type,x
+        and.w   #Project.ActionPoints.MASK
+        bne     Loop
+
+NoActionPoints:
+    sec
     rts
 }
 

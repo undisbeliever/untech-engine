@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF_8"?>
 <!DOCTYPE untech>
 <project>
-  <block-settings block-size="8192" block-count="2"/>
+  <block-settings block-size="8192" block-count="7"/>
   <metatile-engine-settings max-map-size="8192" n-metatiles="512"/>
   <entity-rom-data>
     <listid name="Particles"/>
@@ -15,10 +15,10 @@
     <function-table name="DeactivateIfOutside" export-order="OneFrame" parameter-type="unused"/>
     <function-table name="DeleteIfOutside" export-order="OneFrame" parameter-type="unused"/>
     <function-table name="DeleteAfterDelay" export-order="OneFrame" parameter-type="word" comment="parameter is delay in frames"/>
-    <function-table name="DeleteIfAnimationEnds" export-order="DeleteIfAnimationEnds" parameter-type="unused"/>
+    <function-table name="DeleteIfAnimationEnds" export-order="SingleAnimation" parameter-type="unused"/>
     <function-table name="SpawnAndChangeList" export-order="OneFrame" parameter-type="unused"/>
     <function-table name="ShowAllFrames" export-order="OneFrame" parameter-type="word" comment="exportOrder ignored, Parameter is frameSet to display"/>
-    <function-table name="ActionPointSpawner" export-order="OneFrame" parameter-type="unused"/>
+    <function-table name="ActionPointSpawner" export-order="SingleAnimation" parameter-type="unused"/>
     <function-table name="EightDirectionProjectile" export-order="OneFrame" parameter-type="unused"/>
     <function-table name="EhCollisionTest_Player" export-order="EhCollisionTest_Player" parameter-type="unused"/>
     <function-table name="EhCollisionTest_Enemy" export-order="EhCollisionTest_Enemy" parameter-type="unused"/>
@@ -58,7 +58,7 @@
       <entry name="DeleteIfAnimationEnds" function-table="DeleteIfAnimationEnds" listid="Particles" frameset="DeleteIfAnimationEnds" frame="frame1" palette="0"/>
       <entry name="SpawnAndChangeList" function-table="SpawnAndChangeList" listid="Particles" frameset="FST_OneTileFixed1" frame="frame" palette="0"/>
       <entry name="ShowAllFrames" function-table="ShowAllFrames" listid="Players" frameset="FST_OneTileFixed1" frame="frame" palette="0"/>
-      <entry name="ActionPointSpawner" function-table="ActionPointSpawner" listid="Enemies" frameset="ActionPointSpawner" frame="frame" palette="0"/>
+      <entry name="ActionPointSpawner" function-table="ActionPointSpawner" listid="Enemies" frameset="ActionPointSpawner" frame="playerProjectile0" palette="0"/>
       <entry name="EightDirectionProjectile" function-table="EightDirectionProjectile" listid="Particles" frameset="Projectile" frame="frame" palette="0"/>
       <entry name="EhCollisionTest_Player" function-table="EhCollisionTest_Player" listid="Players" frameset="EhCollisionTest_Player" frame="frame1" palette="0"/>
       <entry name="EhCollisionTest_Enemy" function-table="EhCollisionTest_Enemy" listid="Enemies" frameset="EhCollisionTest_Enemy" frame="box" palette="0"/>
@@ -67,8 +67,13 @@
     </entities>
     <projectiles>
       <entry name="EightDirectionProjectile" function-table="EightDirectionProjectile" listid="PlayerProjectiles" frameset="Projectile" frame="frame" palette="0"/>
+      <entry name="EightDirectionGreenProjectile" function-table="EightDirectionProjectile" listid="PlayerProjectiles" frameset="Projectile" frame="frame" palette="1"/>
     </projectiles>
   </entity-rom-data>
+  <action-point-function name="PlayerProjectile"/>
+  <action-point-function name="EnemyProjectile"/>
+  <action-point-function name="ManualEnemyProjectile" manually-invoked="true"/>
+  <action-point-function name="SpawnEightDirectionParticle"/>
   <exportorder src="metasprite/formats/Human.utfseo"/>
   <exportorder src="metasprite/formats/Walker.utfseo"/>
   <exportorder src="metasprite/formats/OneFrame.utfseo"/>
@@ -77,7 +82,7 @@
   <exportorder src="metasprite/formats/AnimationTest.utfseo"/>
   <exportorder src="metasprite/formats/EhCollisionTest_Player.utfseo"/>
   <exportorder src="metasprite/formats/EhCollisionTest_Enemy.utfseo"/>
-  <exportorder src="metasprite/formats/DeleteIfAnimationEnds.utfseo"/>
+  <exportorder src="metasprite/formats/SingleAnimation.utfseo"/>
   <frameset src="metasprite/utsi/Cursor.utsi" type="spriteimporter"/>
   <frameset src="metasprite/utms/FST_10Palettes.utms" type="metasprite"/>
   <frameset src="metasprite/utms/FST_OneTileFixed1.utms" type="metasprite"/>

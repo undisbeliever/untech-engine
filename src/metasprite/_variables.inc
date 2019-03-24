@@ -286,8 +286,6 @@ namespace MetaSprite {
         constant positionPair.xPos = positionPair
         // (int_ms8 word)
         constant positionPair.yPos = positionPair + 1
-
-        assert(MetaSprite.Format.ActionPoints.yPos == MetaSprite.Format.ActionPoints.xPos + 1)
     }
 }
 

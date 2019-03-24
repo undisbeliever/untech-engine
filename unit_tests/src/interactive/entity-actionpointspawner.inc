@@ -4,12 +4,14 @@
 
 // Tests:
 //  * EntityLoop
-//  * Entity.SpawnPlayerProjectileFromActionPoint
-//  * Entity.SpawnEnemyProjectileFromActionPoint
-//  * Entity.SpawnAtActionPoint
+//  * MetaSprite ActionPoints
+//  * ActionPoints.PlayerProjectiles
+//  * ActionPoints.EnemyProjectiles
+//  * ActionPoints.SpawnEntityFunction
+//  * ActionPoints.ManualEnemyProjectile
+//  * Entity.SpawnManualEnemyProjectiles
 //  * Entity.DeleteIfOutsideAndGotoNextEntity
 //  * Entity.CountEntitiesInList
-//  * ENTITY_POOL_EMPTY warning
 
 
 namespace Entities {
@@ -161,28 +163,22 @@ namespace ActionPointSpawner {
     constant FRAME_DELAY = 5
     constant N_SPAWN_POINTS = 8
 
-    namespace EntityStruct {
-        childstruct(BaseEntity)
-            field(frameDelay, 2)
-            field(spawnPoint, 2)
-            field(spawnRoutine, 2)
-
-            // used to test if an entity spawned or not
-            field(_freeListValue, 2)
-        endstruct()
-    }
-
     // OUT: C set = always activate entity
     a16()
     i16()
     code()
     function Init {
-        stz.b   EntityStruct.frameDelay
-        stz.b   EntityStruct.spawnPoint
-        stz.b   EntityStruct.spawnRoutine
+        // ::TODO move into untech-editor::
+        sep     #$20
+    a8()
+        lda.b   #Project.ProjectileIds.EightDirectionProjectile
+        sta.b   BaseEntity.projectileId
 
-        lda.w   #0
-        jsr     MetaSprite.SetFrame
+        rep     #$30
+    a16()
+
+        lda.w   #{ExportOrder}.Animations.animation
+        jsr     MetaSprite.SetAnimation
 
         // always activate
         sec
@@ -208,84 +204,29 @@ namespace ActionPointSpawner {
     function Process {
         assertPowerOfTwo(N_SPAWN_POINTS)
 
-        lda.b   EntityStruct.frameDelay
-        dec
-        bpl     SkipSpawn
+        lda.w   Controller.Joy1.pressed
+        and.w   #JOY.sholder
+        beq     +
+            // When L or R is pressed spawn 4 green projectiles
 
-            lda.w   Entity.specialLists.free
-            sta.b   EntityStruct._freeListValue
+            sep     #$20
+        a8()
+            lda.b   #Project.ProjectileIds.EightDirectionGreenProjectile
+            sta.b   BaseEntity.projectileId
+            rep     #$30
+        a16()
 
+            jsr     Entity.SpawnManualEnemyProjectiles
 
-            lda.b   EntityStruct.spawnPoint
-            inc
-
-            ldx.b   EntityStruct.spawnRoutine
-            jsr     (SpawnRoutineTable,x)
-
-
-            lda.w   Entity.specialLists.free
-            cmp.b   EntityStruct._freeListValue
-            beq     NoEntitySpawned
-
-                lda.b   EntityStruct.spawnPoint
-                inc
-                and.w   #N_SPAWN_POINTS - 1
-                sta.b   EntityStruct.spawnPoint
-                bne     SkipChangeSpawner
-
-                    ldx.b   EntityStruct.spawnRoutine
-                    inx
-                    inx
-                    cpx.w   #N_SPAWN_ROUTINES * 2
-                    bcc     +
-                        ldx.w   #0
-                    +
-                    stx.b   EntityStruct.spawnRoutine
-
-            SkipChangeSpawner:
-                lda.w   #FRAME_DELAY - 1
-
-        NoEntitySpawned:
-
-    SkipSpawn:
-        sta.b   EntityStruct.frameDelay
+            sep     #$20
+        a8()
+            lda.b   #Project.ProjectileIds.EightDirectionProjectile
+            sta.b   BaseEntity.projectileId
+            rep     #$30
+        a16()
+        +
 
         jmp     Entity.DrawAndGotoNextEntity
-    }
-
-
-    // INPUT: A = spawn point
-    //        DP = entity
-    // REQUIRES: 16 bit A, 16 bit Index, DB = 0x7e
-    code()
-    SpawnRoutineTable:
-        dw  SpawnPlayerProjectileAtAp
-        dw  SpawnEnemyProjectileAtAp
-        dw  SpawnEntityAtAp
-    constant N_SPAWN_ROUTINES = (pc() - SpawnRoutineTable) / 2
-
-    a16()
-    i16()
-    code()
-    function SpawnPlayerProjectileAtAp {
-        ldy.w   #Project.ProjectileIds.EightDirectionProjectile
-        jmp     Entity.SpawnPlayerProjectileFromActionPoint
-    }
-
-    a16()
-    i16()
-    code()
-    function SpawnEnemyProjectileAtAp {
-        ldy.w   #Project.ProjectileIds.EightDirectionProjectile
-        jmp     Entity.SpawnEnemyProjectileFromActionPoint
-    }
-
-    a16()
-    i16()
-    code()
-    function SpawnEntityAtAp {
-        ldy.w   #Project.EntityIds.EightDirectionProjectile
-        jmp     Entity.SpawnAtActionPoint
     }
 }
 }
@@ -321,10 +262,13 @@ macro PrintListSizes() {
 a16()
 i16()
 code()
-Test.add("Spawn At Action Point Test")
+Test.add("ActionPointSpawner Test")
 function Test {
     Text.Console.SetCursor(0, 4)
     Text.Console.PrintConstString("Also tests:\n  DeleteAndGotoNextEntity")
+
+    Text.Console.SetCursor(0, 7)
+    Text.Console.PrintConstString("Press L/R to spawn\n  Manual Projectiles")
 
     jsr     EntityLoop.Init
 

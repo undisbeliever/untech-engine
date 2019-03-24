@@ -35,6 +35,7 @@ function SuccessTest {
     rts
 }
 
+include "actionpoints.inc"
 
 include "tests/dma/obj-palette.inc"
 include "tests/dma/tile16.inc"

@@ -54,6 +54,15 @@ namespace BaseEntity {
         // (word index)
         field(romPtr, 2)
 
+        // The projectile to spawn when a projectile ActionPoint is encountered.
+        //
+        // If id >= ProjectileRomDataListCount then no projectile will be spawned
+        //
+        // NOTE: This variable is above `instanceId` to make it easy to detect
+        //       if the developer accidentally wrote to this variable with a 16 bit index.
+        // (byte)
+        field(projectileId, 1)
+
         // InstanceIdTable identifier for the current entity.
         //
         // If zero then the entity is not in the `instanceIdTable`.

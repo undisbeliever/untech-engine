@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF_8"?>
 <!DOCTYPE untech>
-<fsexportorder name="DeleteIfAnimationEnds">
+<fsexportorder name="SingleAnimation">
   <animation id="animation"/>
 </fsexportorder>

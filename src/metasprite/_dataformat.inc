@@ -10,7 +10,7 @@
 
 
 // Data format may be subject to changes
-if MetaSprite.Data.METASPRITE_FORMAT_VERSION != 34 {
+if MetaSprite.Data.METASPRITE_FORMAT_VERSION != 35 {
     error "Invalid UnTech MetaSprite Format"
 }
 
@@ -321,13 +321,20 @@ namespace Format {
         assert(Data.ActionPointsData & 0xffff != 0)
         struct(Data.ActionPointsData - 1)
             // The type of action point
-            // Value passed to the entity's ProcessPoint routine
             //
-            // MUST NOT BE 0. If Parameter is 0, the loop is terminated
-            field(parameter, 1)
+            // See Project.ActionPoints function table
+            //
+            // MUST NOT BE 0. If type is 0, the loop is terminated
+            //
+            // (function table byte index)
+            field(type, 1)
 
-            field(xPos, 1)  // int_ms8
-            field(yPos, 1) // int_ms8
+            // Position of the action point.
+            //
+            // This field is the argument given to the ActionPoint function.
+            //
+            // (int_ms8 pair, xPos then yPos)
+            field(positionPair, 2)
         endstruct()
     }
 
