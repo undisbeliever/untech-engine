@@ -99,13 +99,16 @@ allocateTmpWord(yPos)
         stz.b   BaseEntity.yVecl
         stz.b   BaseEntity.yVecl + 2
 
-        lda.l   BaseEntityRomStruct.initialListId,x
-        sta.b   BaseEntity.listId
-        // check if was safe to do a 16 bit write to listId
-        assert(BaseEntity.listId + 1 == BaseEntity.MetaSprite.frameSet)
 
-        assert(BaseEntityRomStruct.initialListId + 1 == BaseEntityRomStruct.defaultPalette)
-        xba
+        // Set projectileId and listId
+        assert(BaseEntity.projectileId + 1 == BaseEntity.listId)
+        assert(BaseEntityRomStruct.initialProjectileId + 1 == BaseEntityRomStruct.initialListId)
+        lda.l   BaseEntityRomStruct.initialProjectileId,x
+        sta.b   BaseEntity.projectileId
+
+
+        // Initiate the MetaSprite
+        lda.l   BaseEntityRomStruct.defaultPalette,x
         tay
         lda.l   BaseEntityRomStruct.frameSetId,x
 
@@ -479,18 +482,30 @@ function __SpawnAtActionPoint {
         stz.b   BaseEntity.yVecl + 2
 
 
-        // Get Entity ROM data
+        // Initiate entity data
         // X = EntityRomData address
         stx.b   BaseEntity.romPtr
 
         lda.l   BaseEntityRomStruct.functionTable,x
         sta.b   BaseEntity.functionTable
 
-        // Initiate the MetaSprite
+        assert(BaseEntityRomStruct.defaultPalette + 1 == BaseEntityRomStruct.initialProjectileId)
         lda.l   BaseEntityRomStruct.defaultPalette,x
         tay
+        // Y = defaultPalette
+        // hiword A = initialProjectileId
+
+        // Clear instanceId and set projectileId
+        assert(BaseEntity.instanceId + 1 == BaseEntity.projectileId)
+        lda.w   #0xff00
+        sta.b   BaseEntity.instanceId
+
+
+        // Initiate the MetaSprite
         lda.l   BaseEntityRomStruct.frameSetId,x
+        // Y = defaultPalette
         MetaSprite._InitEntity()
+
 
         // Call Entity Init function
         ldx.b   BaseEntity.functionTable

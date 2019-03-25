@@ -54,15 +54,6 @@ namespace BaseEntity {
         // (word index)
         field(romPtr, 2)
 
-        // The projectile to spawn when a projectile ActionPoint is encountered.
-        //
-        // If id >= ProjectileRomDataListCount then no projectile will be spawned
-        //
-        // NOTE: This variable is above `instanceId` to make it easy to detect
-        //       if the developer accidentally wrote to this variable with a 16 bit index.
-        // (byte)
-        field(projectileId, 1)
-
         // InstanceIdTable identifier for the current entity.
         //
         // If zero then the entity is not in the `instanceIdTable`.
@@ -71,6 +62,16 @@ namespace BaseEntity {
         //
         // (byte index)
         field(instanceId, 1)
+
+        // The projectile to spawn when a projectile ActionPoint is encountered.
+        //
+        // If id >= ProjectileRomDataListCount then no projectile will be spawned
+        //
+        // NOTE: This variable is between `instanceId` and `listId` so
+        //       `Entity.ValidateEntityLists` can easily detect if the developer
+        //       accidentally wrote to this variable with a 16 bit value.
+        // (byte)
+        field(projectileId, 1)
 
         // Entity List Id for the current entity
         //

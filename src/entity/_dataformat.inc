@@ -10,7 +10,7 @@
 
 
 // Data format may be subject to changes
-if Entity.Data.ENTITY_FORMAT_VERSION != 2 {
+if Entity.Data.ENTITY_FORMAT_VERSION != 3 {
     error "Invalid UnTech Entity Format"
 }
 
@@ -42,14 +42,20 @@ namespace BaseEntityRomStruct {
         // (word addr - code bank)
         field(functionTable, 2)
 
-        // Initial list to store the entity in
-        // (see `BaseEntity.listId`)
-        // (byte)
-        field(initialListId, 1)
-
         // Initial palette of the entity
         // (byte)
         field(defaultPalette, 1)
+
+        // Initial projetileId for the entity
+        // (Should be set to 0xff if the entity has no initial projectile)
+        // (byte)
+        field(initialProjectileId, 1)
+
+        // Initial list to store the entity in
+        // (Ignored if the entity is spawned as a projectile)
+        // (see `BaseEntity.listId`)
+        // (byte)
+        field(initialListId, 1)
 
         // MS FrameSet Id
         // (word)

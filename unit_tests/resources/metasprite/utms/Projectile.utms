@@ -10,6 +10,9 @@
   <palette>
     7CIAAwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=
   </palette>
+  <palette>
+    7CIYAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=
+  </palette>
   <frame id="frame" order="2">
     <tilehitbox x="-1" y="-1" width="3" height="3"/>
     <object size="small" x="-4" y="-4" tile="0"/>

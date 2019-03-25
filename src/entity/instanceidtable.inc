@@ -123,7 +123,8 @@ macro RemoveEntity() {
         lda.w   #_unusedEntity
         sta.w   instanceIdTable,x
 
-        assert(BaseEntity.instanceId + 1 == BaseEntity.listId)
+        // test if safe to do a 16 bit write
+        assert(BaseEntity.instanceId + 1 == BaseEntity.projectileId)
         stz.b   BaseEntity.instanceId
 
 SkipRemoveEntity:

@@ -9,6 +9,7 @@
 //  * ActionPoints.EnemyProjectiles
 //  * ActionPoints.SpawnEntityFunction
 //  * ActionPoints.ManualEnemyProjectile
+//  * Entity.BaseEntityRomStruct.initialProjectileId
 //  * Entity.SpawnManualEnemyProjectiles
 //  * Entity.DeleteIfOutsideAndGotoNextEntity
 //  * Entity.CountEntitiesInList
@@ -36,6 +37,13 @@ namespace EightDirectionProjectile {
     function Init {
         sep     #$20
     a8()
+
+        // Ensure initialProjectileId is 0xff (unused)
+        lda.b   EntityStruct.projectileId
+        cmp.b   #0xff
+        beq     +
+            break(ASSERT_FAILURE)
+        +
 
         // Determine if projectile is diagonal or orthogonal
         lda.w   MetaSprite.ActionPoint.positionPair.xPos
@@ -160,25 +168,22 @@ namespace EightDirectionProjectile {
 namespace ActionPointSpawner {
     buildFunctionTable(BaseEntityFunctionTable, ActionPointSpawner)
 
-    constant FRAME_DELAY = 5
-    constant N_SPAWN_POINTS = 8
-
     // OUT: C set = always activate entity
     a16()
     i16()
     code()
     function Init {
-        // ::TODO move into untech-editor::
-        sep     #$20
-    a8()
-        lda.b   #Project.ProjectileIds.EightDirectionProjectile
-        sta.b   BaseEntity.projectileId
-
-        rep     #$30
-    a16()
-
         lda.w   #{ExportOrder}.Animations.animation
         jsr     MetaSprite.SetAnimation
+
+        // Ensure initialProjectileId is EightDirectionRedProjectile
+        assert(Project.ProjectileIds.EightDirectionRedProjectile != 0)
+        lda.b   BaseEntity.projectileId
+        and.w   #0xff
+        cmp.w   #Project.ProjectileIds.EightDirectionRedProjectile
+        beq     +
+            break(ASSERT_FAILURE)
+        +
 
         // always activate
         sec
@@ -220,7 +225,7 @@ namespace ActionPointSpawner {
 
             sep     #$20
         a8()
-            lda.b   #Project.ProjectileIds.EightDirectionProjectile
+            lda.b   #Project.ProjectileIds.EightDirectionRedProjectile
             sta.b   BaseEntity.projectileId
             rep     #$30
         a16()
