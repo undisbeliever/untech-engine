@@ -207,8 +207,6 @@ namespace ActionPointSpawner {
     i16()
     code()
     function Process {
-        assertPowerOfTwo(N_SPAWN_POINTS)
-
         lda.w   Controller.Joy1.pressed
         and.w   #JOY.sholder
         beq     +

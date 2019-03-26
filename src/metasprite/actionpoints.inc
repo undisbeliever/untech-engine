@@ -85,7 +85,7 @@ inline SpawnEntityFunction(name, entityName) {
     code()
     function {name} {
         ldy.w   #Project.EntityIds.{entityName}
-        jmp     Entity.__SpawnEntityAtActionPoint
+        jmp     Entity.SpawnEntityAtActionPoint
     }
 }
 

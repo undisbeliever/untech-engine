@@ -318,7 +318,7 @@ function SpawnManualEnemyProjectiles {
 // INPUT: DP - entity
 //         Y - Entity RomData Id
 //         A - action point positionPair (int_ms8 pair)
-function __SpawnEntityAtActionPoint {
+function SpawnEntityAtActionPoint {
 
     cpy.w   #Entity.Data.EntityRomDataListCount
     bcc     +
