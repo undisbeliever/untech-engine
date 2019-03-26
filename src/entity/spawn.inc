@@ -497,7 +497,7 @@ function __SpawnAtActionPoint {
 
         // Clear instanceId and set projectileId
         assert(BaseEntity.instanceId + 1 == BaseEntity.projectileId)
-        lda.w   #0xff00
+        and.w   #0xff00
         sta.b   BaseEntity.instanceId
 
 
