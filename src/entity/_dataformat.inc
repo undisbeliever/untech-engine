@@ -61,6 +61,14 @@ namespace BaseEntityRomStruct {
         // (word)
         field(frameSetId, 2)
     endstruct()
+
+    // Ensure untech-editor BaseEntityRomStruct matches untech-engine BaseEntityRomStruct
+    assert(BaseEntityRomStruct.functionTable == Project.EntityRomStructs.BaseEntityRomStruct.functionTable)
+    assert(BaseEntityRomStruct.defaultPalette == Project.EntityRomStructs.BaseEntityRomStruct.defaultPalette)
+    assert(BaseEntityRomStruct.initialProjectileId == Project.EntityRomStructs.BaseEntityRomStruct.initialProjectileId)
+    assert(BaseEntityRomStruct.initialListId == Project.EntityRomStructs.BaseEntityRomStruct.initialListId)
+    assert(BaseEntityRomStruct.frameSetId == Project.EntityRomStructs.BaseEntityRomStruct.frameSetId)
+    assert(BaseEntityRomStruct.size == Project.EntityRomStructs.BaseEntityRomStruct.size)
 }
 
 // Base Entity Function Table
