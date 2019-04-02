@@ -100,7 +100,7 @@ $(foreach d, $(TABLE_DIRS), $(eval $(call TABLE_template, $d)))
 
 
 .INTERMEDIATE: project-data
-project-data: $(call rwildcard_all, $(dir $(PROJECT_INC))) $(PROJECT_FILE)
+project-data: $(call rwildcard_all, $(dir $(PROJECT_FILE))) $(PROJECT_FILE)
 	$(untech-compiler) --output-bin "$(PROJECT_BIN)" --output-inc "$(PROJECT_INC)" "$(PROJECT_FILE)"
 
 $(PROJECT_BIN) $(PROJECT_INC): project-data
