@@ -24,7 +24,7 @@
     <aframe frame="frame1" duration="1"/>
     <aframe frame="frame2" duration="1"/>
   </animation>
-  <animation id="ChangeAnimation2" durationformat="FRAME">
+  <animation id="ChangeAnimation2" durationformat="FRAME" oneshot="true">
     <aframe frame="frame1" duration="1"/>
     <aframe frame="frame2" duration="1"/>
   </animation>

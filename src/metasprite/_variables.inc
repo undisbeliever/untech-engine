@@ -43,6 +43,19 @@ namespace MetaSprite {
         // Offset between frame object data and the OAM charattr data (second block)
         field(MetaSprite.blockTwoCharAttrOffset, 2)
 
+        // The next animation to execute when the current animation ends.
+        //
+        // Will be set to `MetaSprite.Format.Animation.nextAnimation`
+        // whenever the animation changes.
+        //
+        // May be set by the project at any time.  When the current animation
+        // ends the animation  stored in `nextAnimation` will be processed.
+        //
+        // If set to `0xff` then the current animation will stop when ended.
+        //
+        // (byte)
+        field(MetaSprite.Animation.nextAnimation, 1)
+
         // The AnimationDurationFormat for the current animation frame
         // (see MetaSprite.Format.AnimationDurationFormat)
         field(MetaSprite.Animation.durationFormat, 1)

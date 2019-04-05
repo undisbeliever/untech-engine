@@ -10,7 +10,7 @@
 
 
 // Data format may be subject to changes
-if MetaSprite.Data.METASPRITE_FORMAT_VERSION != 35 {
+if MetaSprite.Data.METASPRITE_FORMAT_VERSION != 36 {
     error "Invalid UnTech MetaSprite Format"
 }
 
@@ -342,14 +342,14 @@ namespace Format {
     // The animation data
     namespace Animation {
         struct(Data.AnimationData)
-            // The format of the `Animation.Frames.duration` field
-            // (DurationFormat uint8 value)
-            field(durationFormat, 1)
-
             // The animation to execute when all frames have been rendered
             // If >= FrameSet.nAnimations then the animation stops
             // (byte)
             field(nextAnimation, 1)
+
+            // The format of the `Animation.Frames.duration` field
+            // (DurationFormat uint8 value)
+            field(durationFormat, 1)
 
             // The size of the Frames table.
             // (byte - MUST BE <= 0xfd)

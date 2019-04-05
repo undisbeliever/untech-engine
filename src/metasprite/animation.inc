@@ -35,6 +35,44 @@ macro _Init() {
 }
 
 
+// Loads animation data into the BaseEntity struct.
+//
+// NOTE: Does not set BaseEntity.MetaSprite.Animation.nextFrameTime
+//
+// REQUIRES: 16 bit A, 16 bit Index
+//
+// INPUT: dp: entity
+//         X: frameSet id
+//         A: animation Id (must be valid)
+//
+// OUTPUT: X: animation data index
+macro __LoadAnimationData() {
+    assert16a()
+    assert16i()
+
+    // Set animation.Id to A and animation.pos to 0
+    assert(BaseEntity.MetaSprite.Animation.id + 1 == BaseEntity.MetaSprite.Animation.pos)
+    and.w   #0xff
+    sta.b   BaseEntity.MetaSprite.Animation.id
+
+    // get animation ptr
+    // A = animationId
+    // X = frameSet
+    asl
+    // c clear
+    adc.l   MetaSprite.Format.FrameSet.animationTable,x
+    tax
+    lda.l   MetaSprite.Data.AnimationList,x
+    tax
+
+    // Set nextAnimation and durationFormat
+    assert(MetaSprite.Format.Animation.nextAnimation + 1 == MetaSprite.Format.Animation.durationFormat)
+    assert(BaseEntity.MetaSprite.Animation.nextAnimation + 1 == BaseEntity.MetaSprite.Animation.durationFormat)
+    lda.l   MetaSprite.Format.Animation.nextAnimation,x
+    sta.b   BaseEntity.MetaSprite.Animation.nextAnimation
+}
+
+
 
 // Sets the entity's animation.
 //
@@ -61,43 +99,28 @@ a8()
 
     rep     #$30
 a16()
-    and.w   #0xff
-
-    // Set animation.Id to A and animation.pos to 0
-    assert(BaseEntity.MetaSprite.Animation.id + 1 == BaseEntity.MetaSprite.Animation.pos)
-    sta.b   BaseEntity.MetaSprite.Animation.id
-
-
-    // get animation ptr
-    // A = animationId
-    // X = frameSet
-    asl
-    // c clear
-    adc.l   MetaSprite.Format.FrameSet.animationTable,x
-    tax
-    lda.l   MetaSprite.Data.AnimationList,x
-    tax
-
-    sep     #$20
-a8()
-    lda.l   MetaSprite.Format.Animation.durationFormat,x
-    sta.b   BaseEntity.MetaSprite.Animation.durationFormat
+    __LoadAnimationData()
 
     // Upload frame on next MetaSprite.Animation.Process call
-    lda.b   #0xff
-    sta.b   BaseEntity.MetaSprite.Animation.nextFrameTime + 1
+    lda.w   #0xffff
+    sta.b   BaseEntity.MetaSprite.Animation.nextFrameTime
+
+    sec
+    rts
 
 
+a8()
 AnimationUnchanged:
     rep     #$30
 a16()
     sec
     rts
 
+a8()
 InvalidAnimation:
     rep     #$31
-a16()
 
+a16()
 DisableAnimation:
     // Disable animation
     lda.w   #0xffff
@@ -357,44 +380,27 @@ UnableToSetFrame:
 // MODIFIES: 16 bit A
 //
 // INPUT: dp = entity
-//         X = MetaSprite Animation ptr
 a8()
 i16()
 code()
 function _GotoNextAnimation {
-    lda.l   MetaSprite.Format.Animation.nextAnimation,x
-
     ldx.b   BaseEntity.MetaSprite.frameSet
-    beq     InvalidAnimation
 
+    lda.b   BaseEntity.MetaSprite.Animation.nextAnimation
     cmp.l   MetaSprite.Format.FrameSet.nAnimations,x
     bcs     InvalidAnimation
 
-    sta.b   BaseEntity.MetaSprite.Animation.id
-    stz.b   BaseEntity.MetaSprite.Animation.pos
-
-
-    rep     #$30
+    rep     #$20
 a16()
-    // get new Animation ptr
-    // A = new animation id
-    // X = frameSet
-    and.w   #0x00ff
-    asl
-    // c clear
-    adc.l   MetaSprite.Format.FrameSet.animationTable,x
-    tax
-    lda.l   MetaSprite.Data.AnimationList,x
-    tax
+
+    __LoadAnimationData()
 
     sep     #$20
 a8()
-    lda.l   MetaSprite.Format.Animation.durationFormat,x
-    sta.b   BaseEntity.MetaSprite.Animation.durationFormat
-
     bra     _LoadAnimationFrame
 
 
+a8()
 InvalidAnimation:
     // Disable animation
     lda.b   #0xff
