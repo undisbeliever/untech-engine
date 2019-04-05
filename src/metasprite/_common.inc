@@ -200,14 +200,12 @@ a16()
 //
 // INPUT: dp = Entity
 // INPUT: A = animation Id
-// OUTPUT: C set on success
 constant SetAnimation = Animation.SetAnimationId
 
 
 // Disables the entity's animation.
 //
-// REQUIRES: 16 bit A, 16 bit Index
-//
+// REQUIRES: 16 bit A
 // INPUT: dp = Entity
 constant DisableAnimation = Animation.DisableAnimation
 

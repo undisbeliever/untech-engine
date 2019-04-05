@@ -82,7 +82,6 @@ macro __LoadAnimationData() {
 //
 // INPUT: dp = Entity
 // INPUT: A = animation Id
-// OUTPUT: C set on success
 a16()
 i16()
 code()
@@ -105,7 +104,6 @@ a16()
     lda.w   #0xffff
     sta.b   BaseEntity.MetaSprite.Animation.nextFrameTime
 
-    sec
     rts
 
 
@@ -113,31 +111,32 @@ a8()
 AnimationUnchanged:
     rep     #$30
 a16()
-    sec
     rts
 
 a8()
 InvalidAnimation:
     rep     #$31
 
-a16()
-DisableAnimation:
-    // Disable animation
-    lda.w   #0xffff
-    sta.b   BaseEntity.MetaSprite.Animation.id
-
-    // carry clear
-    rts
+FallThrough:
 }
 
 
 
 // Disables the entity's animation.
 //
-// REQUIRES: 16 bit A, 16 bit Index
-//
-// INPUT: dp = Entity
-constant DisableAnimation = SetAnimationId.DisableAnimation
+// REQUIRES: 16 bit A
+// INPUT: dp: Entity
+a16()
+iu()
+code()
+function DisableAnimation {
+    assert(pc() == SetAnimationId.FallThrough)
+
+    lda.w   #0xffff
+    sta.b   BaseEntity.MetaSprite.Animation.id
+
+    rts
+}
 
 
 

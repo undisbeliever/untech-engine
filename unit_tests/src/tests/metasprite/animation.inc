@@ -344,18 +344,26 @@ constant tmp_nextAnimation = Test.tmp + 2
 
     lda.w   tmp_animation
     jsr     MetaSprite.SetAnimation
-    bcc     Fail
+
+    sep     #$20
+a8()
+    lda.b   BaseEntity.MetaSprite.Animation.id
+    cmp.w   tmp_animation
+    bne     Fail
 
     lda.b   BaseEntity.MetaSprite.Animation.nextAnimation
-    and.w   #0xff
     cmp.w   tmp_nextAnimation
     bne     Fail
+
+    rep     #$30
+a16()
 
     sec
     rts
 
 Fail:
-    clc
+    rep     #$31
+    // c clear
     rts
 }
 
