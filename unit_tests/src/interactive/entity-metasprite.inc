@@ -87,13 +87,13 @@ namespace ShowAllFrames {
             and.w   #$00ff
             pha
             phy
-                jsr     MetaSprite.SetFrame
+                SetFrame_A()
                 bcc     RestoreStack
 
                 sep     #$20
             a8()
                 lda     1,s
-                jsr     MetaSprite.Palette.SetPalette
+                SetPalette_A()
 
                 rep     #$30
             a16()

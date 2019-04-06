@@ -39,10 +39,10 @@ namespace EhCollisionTest_Player {
     i16()
     code()
     function Init {
-        stz.b   EntityStruct.selectedFrame
-
         lda.w   #0
-        jsr     MetaSprite.SetFrame
+        sta.b   EntityStruct.selectedFrame
+
+        SetFrame_A()
 
         // always activate
         sec
@@ -126,7 +126,7 @@ namespace EhCollisionTest_Player {
                 lda.w   #0
             +
             sta.b   EntityStruct.selectedFrame
-            jsr     MetaSprite.SetFrame
+            SetFrame_A()
 
         EndIf:
 
@@ -150,7 +150,7 @@ namespace EhCollisionTest_Enemy {
     i16()
     code()
     function Init {
-        jsr     MetaSprite.SetFrame
+        SetFrame_A()
 
         // always activate
         sec
@@ -215,8 +215,7 @@ namespace EhCollisionTest_CollisionCentre {
         lda.w   #1
         sta.b   EntityStruct.framesLeft
 
-        lda.w   #0
-        jsr     MetaSprite.SetFrame
+        SetFrame(frame)
 
         // always activate
         sec

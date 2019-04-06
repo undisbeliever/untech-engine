@@ -116,9 +116,7 @@ namespace EightDirectionProjectile {
         _SetVelocity(x)
         _SetVelocity(y)
 
-
-        lda.w   #0
-        jsr     MetaSprite.SetFrame
+        SetFrame(frame)
 
         // always activate
         sec
@@ -173,14 +171,14 @@ namespace ActionPointSpawner {
     i16()
     code()
     function Init {
-        lda.w   #{ExportOrder}.Animations.animation
-        jsr     MetaSprite.SetAnimation
+        SetAnimation(animation)
 
         // Ensure initialProjectileId is EightDirectionRedProjectile
-        assert(Project.ProjectileIds.EightDirectionRedProjectile != 0)
+        assert({GetProjectileId(EightDirectionRedProjectile)} == Project.ProjectileIds.EightDirectionRedProjectile)
+        assert({GetProjectileId(EightDirectionRedProjectile)} != 0)
         lda.b   BaseEntity.projectileId
         and.w   #0xff
-        cmp.w   #Project.ProjectileIds.EightDirectionRedProjectile
+        cmp.w   #{GetProjectileId(EightDirectionRedProjectile)}
         beq     +
             break(ASSERT_FAILURE)
         +
@@ -214,19 +212,19 @@ namespace ActionPointSpawner {
 
             sep     #$20
         a8()
-            lda.b   #Project.ProjectileIds.EightDirectionGreenProjectile
-            sta.b   BaseEntity.projectileId
+            SetProjectileId(EightDirectionGreenProjectile)
+
             rep     #$30
         a16()
 
-            jsr     Entity.SpawnManualEnemyProjectiles
+            SpawnManualEnemyProjectiles()
 
-            sep     #$20
-        a8()
-            lda.b   #Project.ProjectileIds.EightDirectionRedProjectile
-            sta.b   BaseEntity.projectileId
+            sep     #$10
+        i8()
+            SetProjectileId(EightDirectionRedProjectile)
+
             rep     #$30
-        a16()
+        i16()
         +
 
         jmp     Entity.DrawAndGotoNextEntity

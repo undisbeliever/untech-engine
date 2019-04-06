@@ -92,5 +92,7 @@ include "entity/validation.inc"
 
 include "metasprite/actionpoints.inc"
 
+include "entity/macros.inc"
+
 // vim: ft=bass-65816 ts=4 sw=4 et:
 

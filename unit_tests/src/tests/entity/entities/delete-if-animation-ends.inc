@@ -16,8 +16,7 @@ a16()
 i16()
 code()
 function Init {
-    lda.w   #{ExportOrder}.Animations.animation
-    jsr     MetaSprite.SetAnimation
+    SetAnimation(animation)
 
     // always activate
     sec

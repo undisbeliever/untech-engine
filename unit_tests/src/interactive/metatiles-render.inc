@@ -28,8 +28,7 @@ namespace MapCursor {
     i16()
     code()
     function Init {
-        lda.w   #0
-        jsr     MetaSprite.SetFrame
+        SetFrame(frame)
 
         // always activate
         sec
