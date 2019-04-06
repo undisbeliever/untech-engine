@@ -192,24 +192,6 @@ a16()
 }
 
 
-// Sets the entity's animation.
-//
-// Will not reset the animation if the animation Id is unchanged.
-//
-// REQUIRES: 16 bit A, 16 bit Index
-//
-// INPUT: dp = Entity
-// INPUT: A = animation Id
-constant SetAnimation = Animation.SetAnimationId
-
-
-// Disables the entity's animation.
-//
-// REQUIRES: 16 bit A
-// INPUT: dp = Entity
-constant DisableAnimation = Animation.DisableAnimation
-
-
 // Sets the entity's metasprite frame.
 //
 // If the frame is active and has a dynamic tileset then a new tileset

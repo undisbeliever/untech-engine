@@ -343,7 +343,7 @@ constant tmp_nextAnimation = Test.tmp + 2
     bcc     Fail
 
     lda.w   tmp_animation
-    jsr     MetaSprite.SetAnimation
+    jsr     MetaSprite.Animation.SetAnimationId
 
     sep     #$20
 a8()
