@@ -230,7 +230,7 @@ macro SetProjectileId_X() {
 
 
 
-// Spawn new entity
+// Spawn new entity.
 //
 // REQUIRES: 16 bit A, 16 bit Index, DB = $7E
 //
@@ -253,7 +253,7 @@ constant SpawnEntity.yPos = Entity.Spawn.yPos
 
 
 
-// Spawns a given entity at the MetaSprite Collision centre.
+// Spawn a new entity at the MetaSprite Collision centre.
 //
 // REQUIRES: 16 bit A, 16 bit Index, DB = 0x7e
 //

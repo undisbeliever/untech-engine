@@ -31,7 +31,15 @@ EntityPoolEmpty:
     rts
 }
 
-// Spawns a new entity and inserts it into its default list
+// Spawn a new entity.
+//
+// The newly created entity will be placed in either the:
+//
+//   * `activateNextFrame` special list if the Entity Init function
+//      returns carry set **or** the entity is inside the active window.
+//
+//   * `deactivated` special list if the Entity Init function returns
+//      carry clear and the entity is outside the active window.
 //
 // REQUIRES: 16 bit A, 16 bit Index, DB = $7E
 //
@@ -175,7 +183,7 @@ allocateTmpWord(yPos)
 
 
 
-// Spawns a given entity at the MetaSprite Collision Centre.
+// Spawn a new entity at the MetaSprite Collision Centre.
 //
 // REQUIRES: 16 bit A, 16 bit Index, DB = 0x7e
 //
@@ -196,15 +204,16 @@ function SpawnAtMetaSpriteCollisionCentre {
 
 
 
-// Spawns a projectile at all {ap} action points in the current MetaSprite
+// Spawn a projectile at all {ap} action points in the current MetaSprite
 // frame.
 //
 // When a projectile is spawned the action point position is stored in the
 // variable `MetaSprite.ActionPoint.positionPair` (as a int_ms8 pair)
 // and can be accessed by the projectile's `Init` routine.
 //
-// This routine will always activate the projectile, regardless of the output of
-// the projectile's Init routine.
+// This routine will always place the newly created projectile in the
+// `activateNextFrame` special list, regardless of the output of the
+// projectile's Init routine.
 //
 // NOTE: This routine will invalidate `MetaSprite.ActionPoint.positionPair`.
 //       DO NOT access `positionPair` after calling this function.
@@ -251,15 +260,16 @@ Return:
 
 
 if {defined Project.ActionPoints.ManualPlayerProjectile} {
-// Spawns a player projectile at all `ManualPlayerProjectile` Action Points in
+// Spawn a player projectile at all `ManualPlayerProjectile` Action Points in
 // the current MetaSprite Frame.
 //
 // When a projectile is spawned the action point position is stored in the
 // variable `MetaSprite.ActionPoint.positionPair` (as a int_ms8 pair)
 // and can be accessed by the projectile's `Init` routine.
 //
-// This routine will always activate the projectile, regardless of the output of
-// the projectile's Init routine.
+// This routine will always place the newly created projectile in the
+// `activateNextFrame` special list, regardless of the output of the
+// projectile's Init routine.
 //
 // NOTE: This routine will invalidate `MetaSprite.ActionPoint.positionPair`.
 //       DO NOT access `positionPair` after calling this function.
@@ -280,15 +290,16 @@ function SpawnManualPlayerProjectiles {
 
 
 if {defined Project.ActionPoints.ManualEnemyProjectile} {
-// Spawns an enemy projectile at all `ManualEnemyProjectile` Action Points in
+// Spawn an enemy projectile at all `ManualEnemyProjectile` Action Points in
 // the current MetaSprite Frame.
 //
 // When a projectile is spawned the action point position is stored in the
 // variable `MetaSprite.ActionPoint.positionPair` (as a int_ms8 pair)
 // and can be accessed by the projectile's `Init` routine.
 //
-// This routine will always activate the projectile, regardless of the output of
-// the projectile's Init routine.
+// This routine will always place the newly created projectile in the
+// `activateNextFrame` special list, regardless of the output of the
+// projectile's Init routine.
 //
 // NOTE: This routine will invalidate `MetaSprite.ActionPoint.positionPair`.
 //       DO NOT access `positionPair` after calling this function.
@@ -308,10 +319,11 @@ function SpawnManualEnemyProjectiles {
 
 
 
-// Spawns an entity at a given action point.
+// Spawn an entity at a given action point.
 //
-// This routine will always activate the entity, regardless of
-// the output of the entity's Init routine.
+// This routine will always place the newly created entity in the
+// `activateNextFrame` special list, regardless of the output of the
+// projectile's Init routine.
 //
 // REQUIRES: 16 bit A, 16 bit Index, DB = 0x7e
 //
@@ -413,8 +425,12 @@ FallThrough:
 // variable `MetaSprite.ActionPoint.positionPair` (as a int_ms8 pair)
 // and can be accessed by the projectile's `Init` routine.
 //
-// This routine will always activate the entity, regardless of
-// the output of the entity's Init routine.
+// This routine will always place the newly created entity in the
+// `activateNextFrame` special list, regardless of the output of the
+// projectile's Init routine.
+//
+// This routine will override the `BaseEntityRomStruct.initialListId`
+// with the value of the Y register.
 //
 // REQUIRES: 16 bit A, 16 bit Index, DB = 0x7e
 // INPUT: DP - entity
