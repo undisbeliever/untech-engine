@@ -70,7 +70,7 @@ namespace BaseEntity {
         // NOTE: This variable is between `instanceId` and `listId` so
         //       `Entity.ValidateEntityLists` can easily detect if the developer
         //       accidentally wrote to this variable with a 16 bit value.
-        // (byte)
+        // (byte, project editable)
         field(projectileId, 1)
 
         // Entity List Id for the current entity
@@ -92,14 +92,14 @@ namespace BaseEntity {
         MetaSprite.EntityData()
 
         // position of entities relative to map
-        // (2 x 0:16:16 fixed point)
+        // (2 x 0:16:16 fixed point, project editable)
         field(xPos.sx, 2)   // subpixel position
         field(xPos.px, 2)   // pixel position
         field(yPos.sx, 2)   // subpixel position
         field(yPos.px, 2)   // pixel position
 
         // velocity of entity
-        // (2 x 1:15:16 fixed point - pixels/display frame)
+        // (2 x 1:15:16 fixed point - pixels/display frame, project editable)
         field(xVecl, 4)
         field(yVecl, 4)
     endstruct()

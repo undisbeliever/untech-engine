@@ -53,7 +53,7 @@ namespace MetaSprite {
         //
         // If set to `0xff` then the current animation will stop when ended.
         //
-        // (byte)
+        // (byte, project editable)
         field(MetaSprite.Animation.nextAnimation, 1)
 
         // The AnimationDurationFormat for the current animation frame
@@ -114,11 +114,11 @@ namespace MetaSprite {
 
 
         // argument for `MetaSprite.Render functions`
-        // (word value - INT_MS8_OFFSET)
+        // (word value - INT_MS8_OFFSET, project editable)
         allocateTmpWord(xPos)
 
         // argument for `MetaSprite.Render functions`
-        // (word value - INT_MS8_OFFSET)
+        // (word value - INT_MS8_OFFSET, project editable)
         allocateTmpWord(yPos)
     }
 

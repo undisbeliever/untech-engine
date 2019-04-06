@@ -24,7 +24,7 @@ namespace Camera {
     constant DISPLAY_WIDTH = 256
 
     // Camera position
-    // (2x uint16)
+    // (2x uint16, project editable)
     allocate(xPos, wram7e, 2)
     allocate(yPos, wram7e, 2)
 }
