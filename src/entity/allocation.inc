@@ -106,7 +106,7 @@ a16()
         bpl     -
 
 
-    _InstanceIdTable.Init()
+    _InstanceIdTable._Init()
 
     rts
 }

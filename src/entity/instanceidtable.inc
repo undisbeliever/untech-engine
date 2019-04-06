@@ -22,7 +22,7 @@ assert(MAX_INSTANCE_ID > N_ENTITIES)
 // Initializes the instanceIdTable and _unusedEntity
 //
 // REQUIRES: 16 bit A, 16 bit Index, DB = 0x7e
-macro Init() {
+macro _Init() {
     assert16a()
     assert16i()
 
@@ -63,7 +63,7 @@ macro Init() {
 // ASSUMES: the entity does not have an instanceId.
 // REQUIRES: 16 bit A, 8 bit Index, DB = 0x7e
 // INPUT: dp = entity
-macro AssignInstanceId() {
+macro _AssignInstanceId() {
     assert16a()
     assert8i()
 
@@ -109,7 +109,7 @@ macro AssignInstanceId() {
 // REQUITES: 16 bit A, 8 bit Index, DB = 0x7e
 // INPUT: dp = entity
 // BRANCH: InvalidInstanceId if the instanceId is invalid
-macro RemoveEntity() {
+macro _RemoveEntity() {
     assert16a()
     assert8i()
 

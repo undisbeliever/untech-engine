@@ -37,7 +37,7 @@ function __EntityDestructor {
 
     sep     #$10
 i8()
-    _InstanceIdTable.RemoveEntity()
+    _InstanceIdTable._RemoveEntity()
     rep     #$30
 i16()
 a16()

@@ -154,7 +154,7 @@ allocateTmpWord(yPos)
         // Assign an new instanceId to the entity
         sep     #$10
     i8()
-        Entity._InstanceIdTable.AssignInstanceId()
+        Entity._InstanceIdTable._AssignInstanceId()
         rep     #$30
     i16()
 
