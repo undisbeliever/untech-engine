@@ -31,6 +31,32 @@ EntityPoolEmpty:
     rts
 }
 
+
+
+// Spawn a new entity at the MetaSprite Collision Centre.
+//
+// REQUIRES: 16 bit A, 16 bit Index, DB = 0x7e
+//
+// INPUT: A - Entity Data Id
+//        Y - entity parameter (passed to entity init function)
+//
+// OUTPUT: Y - address of new entity
+//         C - set if entity created successfully
+a16()
+i16()
+code()
+function SpawnAtMetaSpriteCollisionCentre {
+    ldx.w   MetaSprite.Collision.xPos
+    stx.w   Entity.Spawn.xPos
+
+    ldx.w   MetaSprite.Collision.yPos
+    stx.w   Entity.Spawn.yPos
+
+FallThrough:
+}
+
+
+
 // Spawn a new entity.
 //
 // The newly created entity will be placed in either the:
@@ -57,6 +83,8 @@ function Spawn {
 
 allocateTmpWord(xPos)
 allocateTmpWord(yPos)
+
+    assert(pc() == SpawnAtMetaSpriteCollisionCentre.FallThrough)
 
     cmp.w   #Entity.Data.EntityRomDataListCount
     bcc     +
@@ -179,27 +207,6 @@ allocateTmpWord(yPos)
 
     sec
     rts
-}
-
-
-
-// Spawn a new entity at the MetaSprite Collision Centre.
-//
-// REQUIRES: 16 bit A, 16 bit Index, DB = 0x7e
-//
-// INPUT: A - Entity Data Id
-//        Y - entity parameter (passed to entity init function)
-//
-// OUTPUT: Y - address of new entity
-//         C - set if entity created successfully
-function SpawnAtMetaSpriteCollisionCentre {
-    ldx.w   MetaSprite.Collision.xPos
-    stx.w   Entity.Spawn.xPos
-
-    ldx.w   MetaSprite.Collision.yPos
-    stx.w   Entity.Spawn.yPos
-
-    jmp     Entity.Spawn
 }
 
 
