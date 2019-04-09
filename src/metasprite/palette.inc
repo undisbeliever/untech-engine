@@ -139,11 +139,10 @@ a8()
 i16()
 code()
 function SetPalette {
-    ldx.b   BaseEntity.MetaSprite.frameSet
-    beq     ReturnFalse
-
     cmp.b   BaseEntity.MetaSprite.palette
     beq     Return      // c set on return
+
+    ldx.b   BaseEntity.MetaSprite.frameSet
 
     cmp.l   MetaSprite.Format.FrameSet.nPalettes,x
     bcs     ReturnFalse
