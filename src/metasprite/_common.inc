@@ -69,13 +69,11 @@ macro _InitEntity() {
     asl
     adc.b   BaseEntity.MetaSprite.frameSet
     sta.b   BaseEntity.MetaSprite.frameSet
-    tax
 
-    // Set currentFrame to frame 0
-    lda.l   MetaSprite.Format.FrameSet.frameTable,x
-    tax
-    lda.l   MetaSprite.Data.FrameList,x
-    sta.b   BaseEntity.MetaSprite.currentFrame
+    // By setting currentFrame to 0 we have a consistent and obvious
+    // failure mode for any entity that does not call SetFrame or
+    // SetAnimation before the entity is rendered.
+    stz.b   BaseEntity.MetaSprite.currentFrame
 
     sep     #$10
 i8()

@@ -138,6 +138,10 @@ inline _ActivateDynamicTest(FrameSet, nSlots, staticUploads) {
         lda.w   #MSFS.{FrameSet}
         jsr     _InitEntity0Palette
 
+        lda.w   #0
+        jsr     MetaSprite.SetFrame
+        bcc     Fail
+
         jsr     MetaSprite.Activate
         bcc     Fail
 
