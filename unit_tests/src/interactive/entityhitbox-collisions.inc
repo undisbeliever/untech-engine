@@ -85,8 +85,9 @@ namespace EhCollisionTest_Player {
         jsr     InteractiveTests.EntityHitboxCollisionsTest.PrintProcessCollisionArgs
 
         // Spawn the CollisionCentre
-        lda.w   #Project.EntityIds.EhCollisionTest_CollisionCentre
-        jmp     Entity.SpawnAtMetaSpriteCollisionCentre
+        SpawnEntityAtMetaSpriteCollisionCentre(EhCollisionTest_CollisionCentre)
+
+        rts
     }
 
 
