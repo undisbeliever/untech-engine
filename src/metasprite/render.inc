@@ -148,21 +148,6 @@ constant Return = InitLoop.Return
     ldy.w   bufferPos
 
     Loop:
-        clc
-        lda.l   MetaSprite.Format.FrameObjects.Object.charAttr,x
-        bit.w   #MetaSprite.Format.FrameObjects.Object.charAttr.blockBit
-        beq     +
-            and.w   #MetaSprite.Format.FrameObjects.Object.charAttr.mask
-            // carry clear
-            adc.b   BaseEntity.MetaSprite.blockTwoCharAttrOffset
-            bra     ++
-        +
-            and.w   #MetaSprite.Format.FrameObjects.Object.charAttr.mask
-            // carry clear
-            adc.b   BaseEntity.MetaSprite.blockOneCharAttrOffset
-        +
-        sta.w   oamBuffer.charAttr,y
-
         lda.l   MetaSprite.Format.FrameObjects.Object.xOffset,x
         and.w   #0x00ff
         clc
@@ -198,9 +183,24 @@ constant Return = InitLoop.Return
             bcs     SkipSprite
         +
 
-        sep     #$20
-    a8()
         sta.w   oamBuffer.yPos,y
+
+
+        clc
+        lda.l   MetaSprite.Format.FrameObjects.Object.charAttr,x
+        bit.w   #MetaSprite.Format.FrameObjects.Object.charAttr.blockBit
+        beq     +
+            and.w   #MetaSprite.Format.FrameObjects.Object.charAttr.mask
+            // carry clear
+            adc.b   BaseEntity.MetaSprite.blockTwoCharAttrOffset
+            bra     ++
+        +
+            and.w   #MetaSprite.Format.FrameObjects.Object.charAttr.mask
+            // carry clear
+            adc.b   BaseEntity.MetaSprite.blockOneCharAttrOffset
+        +
+        sta.w   oamBuffer.charAttr,y
+
 
         iny
         iny
@@ -214,8 +214,6 @@ constant Return = InitLoop.Return
         inx
 
         dec.w   nObjectsLeft
-        rep     #$30
-    a16()
         bpl     Loop
 
     sty.w   bufferPos
