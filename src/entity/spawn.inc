@@ -15,7 +15,6 @@
 
 RegisterBreakId(INVALID_ENTITY_ID)
 RegisterBreakId(INVALID_ENTITY_LIST_ID)
-RegisterBreakId(INVALID_PROJECTILE_ID)
 Warnings.Register(ENTITY_POOL_EMPTY, 31, 0, 31)
 
 namespace Entity {
