@@ -8,16 +8,26 @@ a16()
 i16()
 code()
 function _SetupCounterTest {
-    // Spawns 3 enemies on-screen, 5 off-screen
-    // Four of the entities are BlankEntity
+    // Spawns 8 entities.
+    //    * 2 onscreen DeactivateIfOutsideEntity
+    //    * 1 onscreen DeleteAfterDelayEntity
+    //    * 2 offscreen DeactivateIfOutsideEntity
+    //    * 3 offscreen DeleteAfterDelayEntity
 
-    constant N_ACTIVE_ENEMIES = 3
-    constant N_BLANK_ENTITIES = 4
-    constant N_DEACTIVATED_ENTITIES = 5
+    constant N_ONSCREEN_DIO_ENTITIES = 2
+    constant N_ONSCREEN_DAD_ENTITIES = 1
 
-    assert(Entity.ListId.ENEMY == 2 * 2)
-    constant BLANK_ENTITY_ID = Entities.BlankEntity.EntityId_2
-    constant DELETE_DELAY_ENTITY_ID = Entities.DeleteAfterDelayEntity.EntityId_2
+    constant N_OFFSCREEN_DIO_ENTITIES = 2
+    constant N_OFFSCREEN_DAD_ENTITIES = 3
+
+    constant N_DIO_ENTITIES = N_ONSCREEN_DIO_ENTITIES + N_OFFSCREEN_DIO_ENTITIES
+    constant N_DAD_ENTITIES = N_ONSCREEN_DAD_ENTITIES + N_OFFSCREEN_DAD_ENTITIES
+
+    constant N_ACTIVE_ENEMIES = N_ONSCREEN_DIO_ENTITIES + N_DAD_ENTITIES
+
+    assert(EntityLists.Enemies == 5)
+    constant DIO_ENTITY_DATA_ID = Project.EntityIds.DeactivateIfOutside_Enemy
+    constant DAD_ENTITY_DATA_ID = Project.EntityIds.DeleteAfterDelay_Enemy
 
     jsr     Entity.Init
     bcc     Fail
@@ -28,15 +38,15 @@ function _SetupCounterTest {
     sta.w   Camera.xPos
     sta.w   Camera.yPos
 
-    lda.w   #BLANK_ENTITY_ID
+    lda.w   #DIO_ENTITY_DATA_ID
     jsr     Entity.Spawn
     bcc     Fail
 
-    lda.w   #DELETE_DELAY_ENTITY_ID
+    lda.w   #DAD_ENTITY_DATA_ID
     jsr     Entity.Spawn
     bcc     Fail
 
-    lda.w   #BLANK_ENTITY_ID
+    lda.w   #DIO_ENTITY_DATA_ID
     jsr     Entity.Spawn
     bcc     Fail
 
@@ -46,25 +56,27 @@ function _SetupCounterTest {
     sta.w   Entity.Spawn.xPos
     sta.w   Entity.Spawn.yPos
 
-    lda.w   #BLANK_ENTITY_ID
+    lda.w   #DIO_ENTITY_DATA_ID
     jsr     Entity.Spawn
     bcc     Fail
 
-    lda.w   #BLANK_ENTITY_ID
+    lda.w   #DIO_ENTITY_DATA_ID
     jsr     Entity.Spawn
     bcc     Fail
 
-    lda.w   #DELETE_DELAY_ENTITY_ID
+    lda.w   #DAD_ENTITY_DATA_ID
     jsr     Entity.Spawn
     bcc     Fail
 
-    lda.w   #DELETE_DELAY_ENTITY_ID
+    lda.w   #DAD_ENTITY_DATA_ID
     jsr     Entity.Spawn
     bcc     Fail
 
-    lda.w   #DELETE_DELAY_ENTITY_ID
+    lda.w   #DAD_ENTITY_DATA_ID
     jsr     Entity.Spawn
     bcc     Fail
+
+    jsr     ProcessEntityGameLoop
 
     sec
     rts
@@ -78,34 +90,12 @@ Fail:
 a16()
 i16()
 code()
-Test.add("Entity.CountEnemiesWithId")
-function CountEnemiesWithId {
+Test.add("Entity.CountEntitiesInList (macro)")
+function CountEntitiesInList_Macro {
     jsr     _SetupCounterTest
     bcc     Fail
 
-    lda.w   #_SetupCounterTest.BLANK_ENTITY_ID
-    jsr     Entity.CountEnemiesWithId
-    cmp.w   #_SetupCounterTest.N_BLANK_ENTITIES
-    bne     Fail
-
-    sec
-    rts
-
-Fail:
-    clc
-    rts
-}
-
-
-a16()
-i16()
-code()
-Test.add("Entity.CountActiveEnemies")
-function CountActiveEnemies {
-    jsr     _SetupCounterTest
-    bcc     Fail
-
-    jsr     Entity.CountActiveEnemies
+    Entity.CountEntitiesInList(Enemies)
     cmp.w   #_SetupCounterTest.N_ACTIVE_ENEMIES
     bne     Fail
 
@@ -121,18 +111,36 @@ Fail:
 a16()
 i16()
 code()
-Test.add("Entity.CountEntitiesInList")
-function CountEntitiesInList {
+Test.add("Entity.CountEntitiesInList (enemies)")
+function CountEntitiesInList_Enemies {
     jsr     _SetupCounterTest
     bcc     Fail
 
-    Entity.CountEntitiesInList(deactivated)
-    cmp.w   #_SetupCounterTest.N_DEACTIVATED_ENTITIES
-    bne     Fail
-
-    ldx.w   #Entity.lists.enemies
+    lda.w   #EntityLists.Enemies
     jsr     Entity.CountEntitiesInList
     cmp.w   #_SetupCounterTest.N_ACTIVE_ENEMIES
+    bne     Fail
+
+    sec
+    rts
+
+Fail:
+    clc
+    rts
+}
+
+
+a16()
+i16()
+code()
+Test.add("Entity.CountEntitiesInList (players)")
+function CountEntitiesInList_Players {
+    jsr     _SetupCounterTest
+    bcc     Fail
+
+    lda.w   #EntityLists.Players
+    jsr     Entity.CountEntitiesInList
+    cmp.w   #0
     bne     Fail
 
     sec

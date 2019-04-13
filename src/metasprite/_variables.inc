@@ -15,6 +15,8 @@ namespace MetaSprite {
     // MUST BE called inside the BaseEntity struct
     inline EntityData() {
         // The frameSet that the metasprite belongs to
+        // MUST NOT BE NULL
+        // (word index)
         field(MetaSprite.frameSet, 2)
 
         // The state of the MetaSprite's VRAM/Palette allocations
@@ -30,7 +32,9 @@ namespace MetaSprite {
         // Palette id
         field(MetaSprite.palette, 1)
 
-        // Frame address
+        // Current frame to display/process
+        // MUST NOT BE NULL
+        // (word index)
         field(MetaSprite.currentFrame, 2)
 
         // Offset between frame object data and the OAM charattr data
@@ -38,6 +42,19 @@ namespace MetaSprite {
 
         // Offset between frame object data and the OAM charattr data (second block)
         field(MetaSprite.blockTwoCharAttrOffset, 2)
+
+        // The next animation to execute when the current animation ends.
+        //
+        // Will be set to `MetaSprite.Format.Animation.nextAnimation`
+        // whenever the animation changes.
+        //
+        // May be set by the project at any time.  When the current animation
+        // ends the animation  stored in `nextAnimation` will be processed.
+        //
+        // If set to `0xff` then the current animation will stop when ended.
+        //
+        // (byte, project editable)
+        field(MetaSprite.Animation.nextAnimation, 1)
 
         // The AnimationDurationFormat for the current animation frame
         // (see MetaSprite.Format.AnimationDurationFormat)
@@ -64,6 +81,9 @@ namespace MetaSprite {
         constant paletteSet = 0x80
         constant dynamicTileset = 0x40
         constant vramSlotMask = 0x3e
+
+        // The entity has a VRAM slot assigned to it
+        // (NOTE: does not signify the entity's tiles are uploaded to VRAM)
         constant vramSet = 0x01
     }
 
@@ -94,11 +114,11 @@ namespace MetaSprite {
 
 
         // argument for `MetaSprite.Render functions`
-        // (word value - INT_MS8_OFFSET)
+        // (word value - INT_MS8_OFFSET, project editable)
         allocateTmpWord(xPos)
 
         // argument for `MetaSprite.Render functions`
-        // (word value - INT_MS8_OFFSET)
+        // (word value - INT_MS8_OFFSET, project editable)
         allocateTmpWord(yPos)
     }
 
@@ -258,13 +278,27 @@ namespace MetaSprite {
     }
 
     namespace ActionPoint {
-        // The address of the last action Point that was processed.
+        // The position of the current action point.
         //
         // Exposed so an Entity Init routine can determine location of
         // action point (ie, for direction information)
         //
-        // (index, MUST NOT be modified outside ActionPoint routines)
-        allocateTmpWord(address)
+        // The third byte is always zero to allow for efficient retrieval of the
+        // yPos in 16 bit accumulator mode.
+        // For example (16 bit A):
+        //  * xPos: `lda.w MetaSprite.ActionPoint.positionPair.xPos ; and.w #0xff`
+        //  * yPos: `lda.w MetaSprite.ActionPoint.positionPair.yPos`
+        //
+        // NOTE: This variable is only set when an entity or projectile
+        //       is spawned at an action point.
+        //
+        // (int_ms8 pair)
+        allocate(positionPair, wram7e, 3)
+
+        // (int_ms8 byte)
+        constant positionPair.xPos = positionPair
+        // (int_ms8 word)
+        constant positionPair.yPos = positionPair + 1
     }
 }
 

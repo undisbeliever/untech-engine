@@ -75,11 +75,11 @@ Return:
 //
 // ASSUMES: Entity has a frameSet
 //          Entity has a tileset and palette loaded into the PPU
+//          Camera is active
 //          Screen is `SCREEN_HEIGHT` pixels tall
 //
 // INPUT: DP: Entity
-//        xPos: entity xPos - INT_MS8_OFFSET
-//        yPos: entity yPos - INT_MS8_OFFSET
+//        Camera.xPos/Camera.yPos : Camera position
 a16()
 i16()
 code()
@@ -87,13 +87,26 @@ function RenderEntity {
 constant Return = InitLoop.Return
 
     ldx.b   BaseEntity.MetaSprite.currentFrame
-    beq     Return
+
+    lda.b   BaseEntity.xPos.px
+    sec
+    sbc.w   #INT_MS8_OFFSET
+    sec
+    sbc.w   Camera.xPos
+    sta.w   MetaSprite.Render.xPos
+
+    lda.b   BaseEntity.yPos.px
+    sec
+    sbc.w   #INT_MS8_OFFSET
+    sec
+    sbc.w   Camera.yPos
+    sta.w   MetaSprite.Render.yPos
 
 End:
 }
 
 
-// Render a specific frame in a fixed tileset Entity.
+// Render an entity with a given frame at a given screen position.
 //
 // ASSUMES: Entity has a frameSet
 //          Entity has the frame's tileset loaded in VRAM
@@ -109,7 +122,7 @@ End:
 a16()
 i16()
 code()
-function RenderEntityFrame {
+function RenderEntityFrameAndPos {
     assert(pc() == RenderEntity.End)
 
 allocateTmpWord(nObjectsLeft)
@@ -135,21 +148,6 @@ constant Return = InitLoop.Return
     ldy.w   bufferPos
 
     Loop:
-        clc
-        lda.l   MetaSprite.Format.FrameObjects.Object.charAttr,x
-        bit.w   #MetaSprite.Format.FrameObjects.Object.charAttr.blockBit
-        beq     +
-            and.w   #MetaSprite.Format.FrameObjects.Object.charAttr.mask
-            // carry clear
-            adc.b   BaseEntity.MetaSprite.blockTwoCharAttrOffset
-            bra     ++
-        +
-            and.w   #MetaSprite.Format.FrameObjects.Object.charAttr.mask
-            // carry clear
-            adc.b   BaseEntity.MetaSprite.blockOneCharAttrOffset
-        +
-        sta.w   oamBuffer.charAttr,y
-
         lda.l   MetaSprite.Format.FrameObjects.Object.xOffset,x
         and.w   #0x00ff
         clc
@@ -185,9 +183,24 @@ constant Return = InitLoop.Return
             bcs     SkipSprite
         +
 
-        sep     #$20
-    a8()
         sta.w   oamBuffer.yPos,y
+
+
+        clc
+        lda.l   MetaSprite.Format.FrameObjects.Object.charAttr,x
+        bit.w   #MetaSprite.Format.FrameObjects.Object.charAttr.blockBit
+        beq     +
+            and.w   #MetaSprite.Format.FrameObjects.Object.charAttr.mask
+            // carry clear
+            adc.b   BaseEntity.MetaSprite.blockTwoCharAttrOffset
+            bra     ++
+        +
+            and.w   #MetaSprite.Format.FrameObjects.Object.charAttr.mask
+            // carry clear
+            adc.b   BaseEntity.MetaSprite.blockOneCharAttrOffset
+        +
+        sta.w   oamBuffer.charAttr,y
+
 
         iny
         iny
@@ -201,8 +214,6 @@ constant Return = InitLoop.Return
         inx
 
         dec.w   nObjectsLeft
-        rep     #$30
-    a16()
         bpl     Loop
 
     sty.w   bufferPos

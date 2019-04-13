@@ -11,7 +11,7 @@
 
 // Buffer of the INIDISP register
 // The MSB of this register should only be set by ForceBlank
-// (byte - shadow)
+// (byte - shadow, project editable)
 allocate(inidispBuffer, shadow, 1)
 
 namespace NmiHandler {

@@ -15,14 +15,18 @@
 namespace Dma {
 namespace Tile16 {
 
-rodata(DMA_Tile16Data)
+constant TileListData = Project.DMA_Tile16Data
 
     // Tile list format:
     //    byte: number of tiles
     //    word: (tileAddress >> 7) * nTiles
-
+    //
+    // NOTE: This data format is to be accessed with
+    //       a `Index+1` index.
+    //       (see `src/metasprite/_dataformat.inc`)
     namespace TileListData {
-        struct(pc() & 0xff0000)
+        assert(TileListData & 0xffff != 0)
+        struct(TileListData - 1)
             field(count, 1)
             field(addr, 2)
             constant addr.h = addr + 1

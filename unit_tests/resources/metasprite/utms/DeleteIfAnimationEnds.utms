@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF_8"?>
+<!DOCTYPE untech>
+<metasprite id="DeleteIfAnimationEnds" tilesettype="ONE_TILE_FIXED" exportorder="SingleAnimation">
+  <smalltileset>
+    AAAIABgACAAIAAgAHAAAAAAAAAAAAAAAAAAAAAAAAAAAABgAJAAEAAgAEAA8AAAA
+    AAAAAAAAAAAAAAAAAAAAAA==
+  </smalltileset>
+  <palette>
+    8H4AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=
+  </palette>
+  <frame id="frame1" order="2">
+    <object size="small" x="-4" y="-4" tile="0"/>
+  </frame>
+  <frame id="frame2" order="2">
+    <object size="small" x="-4" y="-4" tile="1"/>
+  </frame>
+  <animation id="animation" durationformat="FRAME" oneshot="true">
+    <aframe frame="frame1" duration="2"/>
+    <aframe frame="frame2" duration="2"/>
+  </animation>
+</metasprite>

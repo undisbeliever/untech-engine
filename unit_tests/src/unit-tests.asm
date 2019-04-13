@@ -35,6 +35,7 @@ function SuccessTest {
     rts
 }
 
+include "actionpoints.inc"
 
 include "tests/dma/obj-palette.inc"
 include "tests/dma/tile16.inc"
@@ -42,12 +43,19 @@ include "tests/dma/tile16.inc"
 include "tests/entity/entities/blank.inc"
 include "tests/entity/entities/changetoparticle.inc"
 include "tests/entity/entities/deleteafterdelay.inc"
+include "tests/entity/entities/deactivate-if-outside.inc"
+include "tests/entity/entities/delete-if-outside.inc"
+include "tests/entity/entities/delete-if-animation-ends.inc"
+include "tests/entity/entities/spawn-and-change-list.inc"
 
 include "tests/entity/_common.inc"
 include "tests/entity/allocation.inc"
 include "tests/entity/counters.inc"
+include "tests/entity/deallocation.inc"
 include "tests/entity/gameloop.inc"
+include "tests/entity/instanceidtable.inc"
 include "tests/entity/spawn.inc"
+include "tests/entity/transitions.inc"
 
 include "tests/math/_common.inc"
 include "tests/math/division.inc"
@@ -64,6 +72,7 @@ include "tests/text/string.inc"
 
 include "tests/util/lz4.inc"
 
+include "interactive/entity-validation.inc"
 include "interactive/entityhitbox-collisions.inc"
 include "interactive/metatiles-render.inc"
 include "interactive/entity-metasprite.inc"

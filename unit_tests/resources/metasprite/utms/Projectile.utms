@@ -2,14 +2,20 @@
 <!DOCTYPE untech>
 <metasprite id="Projectile" tilesettype="ONE_TILE_FIXED" exportorder="OneFrame">
   <smalltileset>
-    AAAAABgAPAA8ABgAAAAAAAAAAAAAAAAAAAAAAAAAAAA=
+    AAAAABwAPgA+AD4AHAAAAAAAAAAAAAAAAAAAAAAAAAA=
   </smalltileset>
   <palette>
     7CIzWQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=
   </palette>
+  <palette>
+    7CIAAwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=
+  </palette>
+  <palette>
+    7CIYAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=
+  </palette>
   <frame id="frame" order="2">
-    <tilehitbox x="-1" y="-1" width="2" height="2"/>
+    <tilehitbox x="-1" y="-1" width="3" height="3"/>
     <object size="small" x="-4" y="-4" tile="0"/>
-    <entityhitbox type="BODY_ATTACK" x="-2" y="-2" width="4" height="4"/>
+    <entityhitbox type="--AB" x="-2" y="-2" width="5" height="5"/>
   </frame>
 </metasprite>

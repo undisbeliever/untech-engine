@@ -11,14 +11,14 @@ Test.add("Entity.Spawn")
 function Spawn {
     jsr     Entity.Init
 
-    stz.w   Entities.BlankEntity.parameterSum
+    stz.w   Entities.Blank.parameterSum
 
     lda.w   #0x1234
     sta.w   Entity.Spawn.xPos
     lda.w   #0x5678
     sta.w   Entity.Spawn.yPos
 
-    lda.w   #Entities.BlankEntity.EntityId_0
+    lda.w   #Project.EntityIds.Blank_Particle
     ldy.w   #0x1337
     jsr     Entity.Spawn
     bcc     Fail
@@ -33,7 +33,7 @@ function Spawn {
     bne     Fail
 
     // test parameter worked
-    lda.w   Entities.BlankEntity.parameterSum
+    lda.w   Entities.Blank.parameterSum
     cmp.w   #0x1337
     bne     Fail
 
@@ -41,6 +41,9 @@ function Spawn {
     jsr     _FreeListLength
     cmp.w   #Entity.N_ENTITIES - 1
     bne     Fail
+
+    // Must process the game loop to move the new entity into the entity list
+    jsr     ProcessEntityGameLoop
 
     // Test first list length
     jsr     _FirstListLength
@@ -64,14 +67,14 @@ constant tmp = Test.tmp
 
     jsr     Entity.Init
 
-    stz.w   Entities.BlankEntity.parameterSum
+    stz.w   Entities.Blank.parameterSum
 
     ldx.w   #Entity.N_ENTITIES
 
     Loop:
         stx.w   tmp
 
-        lda.w   #Entities.BlankEntity.EntityId_0
+        lda.w   #Project.EntityIds.Blank_Particle
         ldy.w   #5
         jsr     Entity.Spawn
         bcc     Fail
@@ -81,8 +84,11 @@ constant tmp = Test.tmp
         bne     Loop
 
 
+    jsr     _TestEntityListsValid
+    bcc     Fail
+
     // Test cannot make new entity
-    lda.w   #Entities.BlankEntity.EntityId_0
+    lda.w   #Project.EntityIds.Blank_Particle
     jsr     Entity.Spawn
     bcs     Fail
 
@@ -92,12 +98,15 @@ constant tmp = Test.tmp
     bne     Fail
     stz.w   Warnings.current
 
+    // Must process the game loop to move the new entities into their entity lists
+    jsr     ProcessEntityGameLoop
+
     // Test free list is 0
     jsr     _FreeListLength
     bne     Fail
 
     // Test parameter Sum is correct value
-    lda.w   Entities.BlankEntity.parameterSum
+    lda.w   Entities.Blank.parameterSum
     cmp.w   #5 * Entity.N_ENTITIES
     bne     Fail
 
@@ -123,16 +132,16 @@ constant tmp = Test.tmp
 
     jsr     Entity.Init
 
-    stz.w   Entities.BlankEntity.parameterSum
+    stz.w   Entities.Blank.parameterSum
 
     lda.w   #0x1000
     sta.w   Entity.Spawn.xPos
     sta.w   Entity.Spawn.yPos
 
-    assert(Entity.N_ENTITIES >= Entity.lists.N_LISTS * 2)
+    assert(Entity.N_ENTITIES >= Entity.N_ENTITY_LISTS * 2)
 
     // spawn 2 entities per list
-    lda.w   #Entities.BlankEntity.EntityId_0
+    lda.w   #Project.EntityIds.Blank_Particle
     Loop:
         sta.w   tmp
 
@@ -147,33 +156,37 @@ constant tmp = Test.tmp
 
         lda.w   tmp
         inc
-        cmp.w   #Entities.BlankEntity.EntityId_0 + Entity.lists.N_LISTS
+        cmp.w   #Project.EntityIds.Blank_Particle + Entity.N_ENTITY_LISTS
         bcc     Loop
 
 
     // Test parameter Sum is correct value
-    lda.w   Entities.BlankEntity.parameterSum
-    cmp.w   #2 * Entity.lists.N_LISTS
+    lda.w   Entities.Blank.parameterSum
+    cmp.w   #2 * Entity.N_ENTITY_LISTS
     bne     Fail
 
+
+    // Must process the game loop to move the new entities into their entity lists
+    jsr     ProcessEntityGameLoop
 
     // test list decreased by N_LISTS
     jsr     _FreeListLength
-    cmp.w   #Entity.N_ENTITIES - Entity.lists.N_LISTS * 2
+    cmp.w   #Entity.N_ENTITIES - Entity.N_ENTITY_LISTS * 2
     bne     Fail
 
     // Test each list length
-    ldy.w   #0
+    lda.w   #0
     ListLoop:
-        phy
-            jsr     _ListLength_Y
+        pha
+            jsr     Entity.CountEntitiesInList
         ply
 
         cmp.w   #2
         bne     Fail
 
-        iny
-        cpy.w   #Entity.lists.N_LISTS
+        tya
+        inc
+        cmp.w   #Entity.N_ENTITY_LISTS
         bcc     ListLoop
 
     jmp     _TestEntityListsValid
@@ -184,29 +197,42 @@ Fail:
 }
 
 
+// For the first {N_LISTS_TESTED} lists, spawn
+//   * 2 onscreen Blank
+//   * 2 onscreen DeactivateIfOutside
+//   * 4 offscreen Blank
+//   * 4 offscreen DeactivateIfOutside
 a16()
 i16()
 code()
 Test.add("Entity.Spawn (Offscreen)")
 function Spawn_Offscreen {
+
 constant tmp_listId = Test.tmp
 
 constant ONSCREEN = 0x1080
 
+constant ACTIVE_PER_LIST = 8
+constant DEACTIVATED_PER_LIST = 4
+
+// There are not enough entities to do this test on all the entity lists.
+// Therefore we are only preforming this test on as many lists as we can while
+// still leaving some free.
+evaluate N_LISTS_TESTED = (Entity.N_ENTITIES - 2) / (ACTIVE_PER_LIST + DEACTIVATED_PER_LIST)
+assert({N_LISTS_TESTED} > 3)
+if {N_LISTS_TESTED} > Entity.N_ENTITY_LISTS {
+    evaluate N_LISTS_TESTED = Entity.N_ENTITY_LISTS
+}
+
     jsr     Entity.Init
 
-    // spawn 2 entities on-screen and 4 entities off-screen per entity list
-
-    assert(Entity.N_ENTITIES >= Entity.lists.N_LISTS * 6)
-
-    lda.w   #Entities.BlankEntity.EntityId_0
+    lda.w   #{N_LISTS_TESTED} - 1
+    sta.w   tmp_listId
     Loop:
-        sta.w   tmp_listId
-
         macro spawn(xPos, yPos) {
             ldx.w   #{xPos}
             ldy.w   #{yPos}
-            jsr     SpawnEntity_XY
+            jsr     SpawnEntities_XY
             bcc     Fail
         }
 
@@ -217,13 +243,13 @@ constant ONSCREEN = 0x1080
         spawn(ONSCREEN - 0x200, ONSCREEN)
         spawn(ONSCREEN, ONSCREEN - 0x200)
 
-        lda.w   tmp_listId
-        inc
-        cmp.w   #Entities.BlankEntity.EntityId_0 + Entity.lists.N_LISTS
-        bcc     Loop
+        dec.w   tmp_listId
+        bpl     Loop
+
+    // Must process the game loop to move the new entities into their entity lists
+    jsr     ProcessEntityGameLoop
 
     // Verify list sizes
-
     jsr     _FreeListLength
     cmp.w   #ExpectedSizes.FREE
     bne     Fail
@@ -244,30 +270,46 @@ Fail:
     clc
     rts
 
-function SpawnEntity_XY {
+function SpawnEntities_XY {
     stx.w   Entity.Spawn.xPos
     sty.w   Entity.Spawn.yPos
+
     lda.w   tmp_listId
-    jmp     Entity.Spawn
+    clc
+    adc.w   #Project.EntityIds.Blank_Particle
+    jsr     Entity.Spawn
+    bcc     Return
+
+    lda.w   tmp_listId
+    clc
+    adc.w   #Project.EntityIds.DeactivateIfOutside_Particle
+    jsr     Entity.Spawn
+
+Return:
+    rts
 }
 
 rodata(rom0)
 ExpectedSizes:
 namespace ExpectedSizes {
-// NOTE: projectiles are always spawned, even if offscreen
-    dw  6   // player
-    dw  6   // boss
-    dw  2   // enemy
-    dw  2   // npc
-    dw  2   // platform
-    dw  6   // particle
+    evaluate n = 0
+    while {n} < Entity.N_ENTITY_LISTS {
+        if {n} < {N_LISTS_TESTED} {
+            dw  ACTIVE_PER_LIST
+        } else {
+            dw  0
+        }
+        evaluate n = {n} + 1
+    }
 
-    constant ALIVE = 6 * 3 + 2 * 3
-    constant DEACTIVATED = 4 * 3
-    constant FREE = Entity.N_ENTITIES - ALIVE - DEACTIVATED
+    constant ACTIVE = ACTIVE_PER_LIST * {N_LISTS_TESTED}
+    constant DEACTIVATED = DEACTIVATED_PER_LIST * {N_LISTS_TESTED}
+
+    constant FREE = Entity.N_ENTITIES - ACTIVE - DEACTIVATED
+    assert(FREE > 0)
 
     constant size = pc() - ExpectedSizes
-    assert(size / 2 == Entity.lists.N_LISTS)
+    assert(size / 2 == Entity.N_ENTITY_LISTS)
 }
 }
 

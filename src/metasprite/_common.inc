@@ -53,23 +53,35 @@ macro _InitEntity() {
     assert16i()
 
     stz.b   BaseEntity.MetaSprite.status
-    stz.b   BaseEntity.MetaSprite.currentFrame
 
-    // Determine FrameSet address
+    // Determine FrameSet index
     cmp.w   #MetaSprite.Data.FrameSetListCount
     bcc     +
         lda.w   #0
     +
 
+    // frameSet = frameSetId * MetaSprite.Format.FrameSet.size
+    assert(MetaSprite.Format.FrameSet.size == 12)
+    assert(MetaSprite.Data.FrameSetListCount < (0xffff >> 3))
     asl
-    tax
-    lda.l   MetaSprite.Data.FrameSetList,x
+    asl
     sta.b   BaseEntity.MetaSprite.frameSet
-    tax
+    asl
+    adc.b   BaseEntity.MetaSprite.frameSet
+    sta.b   BaseEntity.MetaSprite.frameSet
+
+    // By setting currentFrame to 0 we have a consistent and obvious
+    // failure mode for any entity that does not call SetFrame or
+    // SetAnimation before the entity is rendered.
+    stz.b   BaseEntity.MetaSprite.currentFrame
 
     sep     #$10
 i8()
     sty.b   BaseEntity.MetaSprite.palette
+
+    // Clear OBJ attribute bytes
+    stz.b   BaseEntity.MetaSprite.blockOneCharAttrOffset + 1
+    stz.b   BaseEntity.MetaSprite.blockTwoCharAttrOffset + 1
 
     // Disable animation
     ldx.b   #0xff
@@ -91,8 +103,6 @@ macro EntityDestructor() {
     assert16i()
 
     jsr     MetaSprite.Deactivate
-    stz.b   BaseEntity.MetaSprite.frameSet
-    stz.b   BaseEntity.MetaSprite.currentFrame
 
     // Disable animation
     ldx.w   #0xffff
@@ -101,18 +111,30 @@ macro EntityDestructor() {
 
 
 
-// Activates an entity, allocating resources to it
+// Activates an entity, allocating resources to it.
 //
+// NOTE: This routine will return true if the VRAM was activated
+//       but the palette was not.
+//       When the engine runs out of palettes, the newly activated
+//       MetaSprite will have a glitched palette.
+//
+// NOTE: If the entity uses a dynamic tileset this routine will always try to
+//       upload the dynamic tiles to VRAM.
+//
+// NOTE: FrameSets with a dynamic tileset can fail if the static tiles were
+//       uploaded to VRAM but the system ran out of time/space to upload the
+//       static tiles.
+//
+// ASSUMES: The entity has not been activated
 // REQUIRES: 16 bit A, 16 bit Index, DB = $7E
 //
 // INPUT: DP = Entity
-// OUTPUT: C set if successful
+// OUTPUT: C set if there is no frameSet or activating VRAM is successful
 a16()
 i16()
 code()
 function Activate {
     ldx.b   BaseEntity.MetaSprite.frameSet
-    beq     Return
 
     sep     #$20
 a8()
@@ -127,12 +149,12 @@ i16()
 
     ldx.b   BaseEntity.MetaSprite.frameSet
     jsr     MetaSprite.Palette._ProcessSlots
-    // c = return
 
     rep     #$30
 a16()
 i16()
 Return:
+    sec
     rts
 
 ReturnFailure:
@@ -168,36 +190,22 @@ a16()
 }
 
 
-// Sets the entity's animation.
-//
-// Will not reset the animation if the animation Id is unchanged.
-//
-// REQUIRES: 16 bit A, 16 bit Index
-//
-// INPUT: dp = Entity
-// INPUT: A = animation Id
-// OUTPUT: C set on success
-constant SetAnimation = Animation.SetAnimationId
-
-
-// Disables the entity's animation.
-//
-// REQUIRES: 16 bit A, 16 bit Index
-//
-// INPUT: dp = Entity
-constant DisableAnimation = Animation.DisableAnimation
-
-
 // Sets the entity's metasprite frame.
 //
 // If the frame is active and has a dynamic tileset then a new tileset
 // is loaded into vram.
+//
+// If the MetaSprite Frame was changed successfully then all the action points
+// within the frame will be executed.
 //
 // This routine will fail IF:
 //      * entity has not FrameSet
 //      * frameId is invalid
 //      * FrameSet uses a dynamic tileset and there is not enough dma
 //        time to upload the tileset in the next VBlank.
+//
+// NOTE: This routine may invalidate `MetaSprite.ActionPoint.positionPair`.
+//       DO NOT access `positionPair` after calling this function.
 //
 // REQUIRES: 16 bit A, 16 bit Index, DB = $7e
 //
@@ -209,7 +217,6 @@ i16()
 code()
 function SetFrame {
     ldx.b   BaseEntity.MetaSprite.frameSet
-    beq     ReturnFalse
 
     sep     #$20
 a8()
@@ -228,14 +235,15 @@ a16()
         adc.l   MetaSprite.Format.FrameSet.frameTable,x
         tax
         lda.l   MetaSprite.Data.FrameList,x
+        tax
 
-        sta.b   BaseEntity.MetaSprite.currentFrame
+        stx.b   BaseEntity.MetaSprite.currentFrame
 
-        sec
-        rts
+        bra     ProcessActionPoints
 
 ReturnFalse:
     rep     #$31
+Return:
     rts
 
 
@@ -247,16 +255,44 @@ DynamicTileset:
         adc.l   MetaSprite.Format.FrameSet.frameTable,x
         tax
         lda.l   MetaSprite.Data.FrameList,x
-
-        pha
         tax
+
+        phx
             jsr     Vram._UploadDynamicTileset.GivenFrame
-        pla
+        plx
         bcc     Return
 
-        sta.b   BaseEntity.MetaSprite.currentFrame
+        stx.b   BaseEntity.MetaSprite.currentFrame
 
-Return:
+
+ProcessActionPoints:
+    // Process all action point functions
+    // X = frame index
+
+    lda.l   MetaSprite.Format.Frame.actionPoints,x
+    beq     NoActionPoints
+    tax
+
+    lda.l   MetaSprite.Format.ActionPoints.type,x
+    and.w   #Project.ActionPoints.MASK
+
+    Loop:
+        tay
+        lda.l   MetaSprite.Format.ActionPoints.positionPair,x
+        phx
+            tyx
+            jsr     (Project.ActionPoints,x)
+        plx
+        inx
+        inx
+        inx
+
+        lda.l   MetaSprite.Format.ActionPoints.type,x
+        and.w   #Project.ActionPoints.MASK
+        bne     Loop
+
+NoActionPoints:
+    sec
     rts
 }
 

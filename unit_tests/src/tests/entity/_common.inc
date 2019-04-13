@@ -4,59 +4,61 @@
 
 namespace EntityTest {
 
+// Process the entity lists and special lists
+//
+// REQUIRES: 16 bit A, 16 bit Index, DB = 0x7e, DP = 0
+a16()
+i16()
+code()
+function ProcessEntityGameLoop {
+    lda.w   #0
+    tcd
+
+    Entity.ProcessSpecialLists()
+    Entity.ProcessEntityLists()
+
+    jmp     Entity.ValidateEntityLists
+}
+
+// REQUIRES: 16 bit A, 16 bit Index, DB = 0x7e
 // OUT: A = number of entities in free list
-// MODIFIES: DP
 a16()
 i16()
 code()
 function _FreeListLength {
-    ldx.w   #Entity.lists.free
-    jmp     Entity.CountEntitiesInList
+    ldx.w   #Entity.specialLists.FREE_INDEX
+    jmp     Entity._CountEntitiesInListIndexX
 }
 
+// REQUIRES: 16 bit A, 16 bit Index, DB = 0x7e
 // OUT: A = number of entities in deactivated list
-// MODIFIES: DP
 a16()
 i16()
 code()
 function _DeactivatedListLength {
-    ldx.w   #Entity.lists.deactivated
-    jmp     Entity.CountEntitiesInList
+    ldx.w   #Entity.specialLists.DEACTIVATED_INDEX
+    jmp     Entity._CountEntitiesInListIndexX
 }
 
-// OUT: A = number of entities in the tryToActivateAgain list
-// MODIFIES: DP
+// REQUIRES: 16 bit A, 16 bit Index, DB = 0x7e
+// OUT: A = number of entities in the activateNextFrame list
 a16()
 i16()
 code()
-function _TryToActivateAgainListLength {
-    ldx.w   #Entity.lists.tryToActivateAgain
-    jmp     Entity.CountEntitiesInList
+function _ActivateNextFrameListLength {
+    ldx.w   #Entity.specialLists.ACTIVATE_NEXT_FRAME_INDEX
+    jmp     Entity._CountEntitiesInListIndexX
 }
 
+
+// REQUIRES: 16 bit A, 16 bit Index, DB = 0x7e
 // OUT: A = number of entities in player list
-// MODIFIES: DP
 a16()
 i16()
 code()
 function _FirstListLength {
-    ldx.w   #Entity.lists.FIRST
-    jmp     Entity.CountEntitiesInList
-}
-
-// IN: Y = list id
-// OUT: A = number of entities in player list
-// MODIFIES: DP
-a16()
-i16()
-code()
-function _ListLength_Y {
-    tya
-    asl
-    clc
-    adc.w   #Entity.lists.FIRST
-    tax
-    jmp     Entity.CountEntitiesInList
+    ldx.w   #0
+    jmp     Entity._CountEntitiesInListIndexX
 }
 
 
@@ -65,8 +67,10 @@ function _ListLength_Y {
 //  * deactivated lists have no metasprite data
 //  * active lists have metasprite data
 //  * total number of entities in all lists == Entity.N_ENTITIES
+//
+// REQUIRES: 16 bit A, 16 bit Index, DP = 0, DB = 0x7e
+//
 // OUT: C set if entity list OK
-// MODIFIES: DP
 a16()
 i16()
 code()
@@ -76,10 +80,10 @@ allocateTmpWord(tmp_count)
 
     stz.w   tmp_count
 
-    // test deactivated entity is not active
-    macro _TestDeactivated(list) {
+    // test that entities in the given special list are not active
+    macro _TestSpecialListsDeactivated(list) {
         namespace {list} {
-            lda.w   Entity.lists.{list}
+            lda.w   Entity.specialLists.{list}
             beq     Skip
 
             Loop:
@@ -98,8 +102,8 @@ allocateTmpWord(tmp_count)
         }
     }
 
-    _TestDeactivated(deactivated)
-    _TestDeactivated(tryToActivateAgain)
+    _TestSpecialListsDeactivated(deactivated)
+    _TestSpecialListsDeactivated(activateNextFrame)
 
 
     // test all other entities are active
@@ -132,17 +136,17 @@ allocateTmpWord(tmp_count)
     }
 
 
-    Entity.CountEntitiesInList(toDelete)
-    clc
-    adc.w   tmp_count
-    sta.w   tmp_count
-
+    // restore DP
+    lda.w   #0
+    tcd
 
     jsr     _FreeListLength
     clc
     adc.w   tmp_count
     cmp.w   #Entity.N_ENTITIES
     bne     Fail
+
+    jsr     Entity.ValidateEntityLists
 
     sec
     rts
@@ -155,9 +159,11 @@ Fail:
 
 // Tests the entity list lengths against a
 // list table.
+//
+// REQUIRES: 16 bit A, 16 bit Index, DP = 0, DB = 0x7e
+//
 // IN: X - address of list table (list of words, in rom0 data block)
 // OUT: C set if entity list == table
-// MODIFIES: DP
 a16()
 i16()
 code()
@@ -165,12 +171,12 @@ function _TestListLengthTable {
 allocateTmpWord(tmp_index)
 allocateTmpWord(tmp_listId)
 
-    ldy.w   #0
+    lda.w   #0
     ListSizeLoop:
         stx.w   tmp_index
-        sty.w   tmp_listId
+        sta.w   tmp_listId
 
-        jsr     _ListLength_Y
+        jsr     Entity.CountEntitiesInList
 
         ldx.w   tmp_index
         cmp.l   Table,x
@@ -179,9 +185,9 @@ allocateTmpWord(tmp_listId)
         inx
         inx
 
-        ldy.w   tmp_listId
-        iny
-        cpy.w   #Entity.lists.N_LISTS
+        lda.w   tmp_listId
+        inc
+        cmp.w   #Entity.N_ENTITY_LISTS
         bcc     ListSizeLoop
 
     sec

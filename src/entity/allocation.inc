@@ -21,27 +21,55 @@ namespace Entity {
 //   * Camera module
 //
 // REQUIRES: 16 bit A, 16 bit Index, DB = $7E
+// MODIFIES: Sets ForceBlank
 a16()
 i16()
 code()
 function Init {
+    sep     #$20
+a8()
+    pea     (0x7e << 8) | REGISTER_DB
+    plb
+    // DB = REGISTER_DB
+
+    jsr     ForceBlank
+
+    // Dirty all entity memory
+    Dma.ForceBlank.DirtyWram(entityPool, ENTITY_SIZE * N_ENTITIES)
+
+    plb
+    // DB = 0x7e
+
+    rep     #$30
+a16()
+
     jsr     Dma.Init
     jsr     MetaSprite.Init
     jsr     Camera.Init
     jsr     _UpdateActiveWindows
+
+
+    lda.w   #0
+    tcd
 
     // create and chain the free linked list
 
     assert(N_ENTITIES > 2)
 
     ldx.w   #entityPool
-    stx.w   lists.free
+    stx.w   specialLists.free
 
+
+    ldy.w   #InvalidEntityFunctionTable
     lda.w   #entityPool + ENTITY_SIZE
 
     Loop:
-        sta.w   BaseEntity.next,x
-        stz.w   BaseEntity.functionTable,x
+        sta.b   BaseEntity.next,x
+        stz.b   BaseEntity.instanceId,x
+        stz.b   BaseEntity.MetaSprite.status,x
+
+        // Y = #InvalidEntityFunctionTable
+        sty.b   BaseEntity.functionTable,x
 
         tax
 
@@ -51,60 +79,35 @@ function Init {
         bcc     Loop
 
     stz.w   BaseEntity.next + entityPool + ENTITY_SIZE * (N_ENTITIES - 1)
+    stz.w   BaseEntity.instanceId + entityPool + ENTITY_SIZE * (N_ENTITIES - 1)
+    stz.w   BaseEntity.MetaSprite.status + entityPool + ENTITY_SIZE * (N_ENTITIES - 1)
+
+    sty.w   BaseEntity.functionTable + entityPool + ENTITY_SIZE * (N_ENTITIES - 1)
+
+
+    // set lastFreeEntity to the last entity in the free list
+    lda.w   #entityPool + ENTITY_SIZE * (N_ENTITIES - 1)
+    sta.w   lastFreeEntity
 
 
     // clear the other lists
-    ldx.w   #lists.LAST - lists.deactivated
+    // free list is the last one
+
+    // Ensure free list is the last one
+    assert(specialLists.deactivated < specialLists.free)
+    assert(specialLists.activateNextFrame < specialLists.free)
+    assert(lists.LAST < specialLists.free)
+
+    ldx.w   #specialLists.FREE_INDEX - 2
     -
-        stz.w   lists.deactivated,x
+        stz.w   lists.FIRST,x
         dex
         dex
         bpl     -
 
-    rts
-}
 
+    _InstanceIdTable._Init()
 
-
-// Clear the TryToActivateAgain entity list
-//
-// Should be called at the start of each level
-//
-// REQUIRES: 16 bit A, 16 bit Index, DB = 0x7e, DP = 0
-a16()
-i16()
-code()
-function ClearTryToActivateAgainList {
-    lda.w   lists.tryToActivateAgain
-    beq     Return
-
-    Loop:
-        tcd
-
-        ldx.b   BaseEntity.romPtr
-        lda.l   BaseEntityData.functionTable,x
-        tax
-        jsr     (BaseEntityFunctionTable.Destructor,x)
-
-        lda.b   BaseEntity.next
-        bne     Loop
-
-
-    // Move the tryToActivateAgain list into the free list
-
-    lda.w   lists.free
-    sta.b   BaseEntity.next
-
-    lda.w   lists.tryToActivateAgain
-    sta.w   lists.free
-
-    stz.w   lists.tryToActivateAgain
-
-
-    lda.w   #0
-    tcd
-
-Return:
     rts
 }
 

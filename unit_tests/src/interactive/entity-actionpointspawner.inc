@@ -2,22 +2,23 @@
 // Copyright (c) 2016 - 2017, Marcus Rowe <undisbeliever@gmail.com>.
 // Distributed under The MIT License: https://opensource.org/licenses/MIT
 
-namespace InteractiveTests {
-namespace ActionPointSpawnerTest {
-
 // Tests:
 //  * EntityLoop
-//  * Entity.SpawnPlayerProjectileFromActionPoint
-//  * Entity.SpawnEnemyProjectileFromActionPoint
-//  * Entity.SpawnAtActionPoint
-//  * Entity.DeleteOffscreenEntities
+//  * MetaSprite ActionPoints
+//  * ActionPoints.PlayerProjectiles
+//  * ActionPoints.EnemyProjectiles
+//  * ActionPoints.SpawnEntityFunction
+//  * ActionPoints.ManualEnemyProjectile
+//  * Entity.BaseEntityRomStruct.initialProjectileId
+//  * Entity.SpawnManualEnemyProjectiles
+//  * Entity.DeleteIfOutsideAndGotoNextEntity
 //  * Entity.CountEntitiesInList
-//  * ENTITY_POOL_EMPTY warning
 
 
-namespace ProjectileEntity {
-    buildFunctionTable(BaseEntityFunctionTable, ProjectileEntity)
-    Entity.useDefaultRenderer()
+namespace Entities {
+
+namespace EightDirectionProjectile {
+    buildFunctionTable(BaseEntityFunctionTable, EightDirectionProjectile)
 
     // Slow speed to exhaust entity pool.
     constant VELOCITY = 0x8000
@@ -29,6 +30,7 @@ namespace ProjectileEntity {
         endstruct()
     }
 
+    // OUT: C set = always activate entity
     a16()
     i16()
     code()
@@ -36,14 +38,19 @@ namespace ProjectileEntity {
         sep     #$20
     a8()
 
-        ldx.w   MetaSprite.ActionPoint.address
+        // Ensure initialProjectileId is 0xff (unused)
+        lda.b   EntityStruct.projectileId
+        cmp.b   #0xff
+        beq     +
+            break(ASSERT_FAILURE)
+        +
 
         // Determine if projectile is diagonal or orthogonal
-        lda.l   MetaSprite.Format.ActionPoints.xPos,x
+        lda.w   MetaSprite.ActionPoint.positionPair.xPos
         cmp.b   #INT_MS8_OFFSET
         beq     Orthogonal
 
-        lda.l   MetaSprite.Format.ActionPoints.yPos,x
+        lda.w   MetaSprite.ActionPoint.positionPair.yPos
         cmp.b   #INT_MS8_OFFSET
         beq     Orthogonal
 
@@ -69,8 +76,10 @@ namespace ProjectileEntity {
         macro _SetVelocity(c) {
             namespace {c} {
                 // Set Projectile Velocity
-                lda.l   MetaSprite.Format.ActionPoints.{c}Pos,x
-                and.w   #0xff
+                lda.w   MetaSprite.ActionPoint.positionPair.{c}Pos
+                if '{c}' == 'x' {
+                    and.w   #0xff
+                }
                 cmp.w   #INT_MS8_OFFSET
                 beq     Zero
                 bcs     Positive
@@ -107,21 +116,19 @@ namespace ProjectileEntity {
         _SetVelocity(x)
         _SetVelocity(y)
 
+        SetFrame(frame)
 
-        lda.w   #0
-        jmp     MetaSprite.SetFrame
+        // always activate
+        sec
+        rts
     }
 
     a16()
     i16()
     code()
     Destructor:
+    Deactivated:
     ProcessCollision:
-    TakeDamageFromEntity:
-    CollideWithBody:
-    CollideWithShield:
-    BlockWithShield:
-    CalculateAttackValue:
     function Null {
         rts
     }
@@ -133,8 +140,8 @@ namespace ProjectileEntity {
         macro _addVelocity(c) {
             clc
             lda.b   BaseEntity.{c}Vecl
-            adc.b   BaseEntity.{c}Pos
-            sta.b   BaseEntity.{c}Pos
+            adc.b   BaseEntity.{c}Pos.sx
+            sta.b   BaseEntity.{c}Pos.sx
 
             lda.b   BaseEntity.{c}Vecl + 1
             xba
@@ -144,66 +151,48 @@ namespace ProjectileEntity {
             +
                 and.w   #$00ff
             +
-            adc.b   BaseEntity.{c}Pos + 2
-            sta.b   BaseEntity.{c}Pos + 2
+            adc.b   BaseEntity.{c}Pos.px
+            sta.b   BaseEntity.{c}Pos.px
         }
         _addVelocity(x)
         _addVelocity(y)
 
-        rts
+        jmp     Entity.DeleteIfOutsideOrDrawAndGotoNextEntity
     }
-
-    rodata(EN_RomData)
-    RomData:
-        dw  FunctionTable
-        db  Entity.ListId.NPC   // initial List
-        dw  MSFS.Projectile     // frameSetId
-        db  0                   // defaultPalette
-
-    rodata(EN_ProjectileList)
-    constant PROJECTILE_ID = (pc() - Entity.Data.ProjectileList) / 2
-        dw  RomData
-
-    rodata(EN_EntityList)
-    constant ENTITY_ID = (pc() - Entity.Data.EntityList) / 2
-        dw  RomData
 }
 
 
 
-namespace SpawnerEntity {
-    buildFunctionTable(BaseEntityFunctionTable, SpawnerEntity)
-    Entity.useDefaultRenderer()
+namespace ActionPointSpawner {
+    buildFunctionTable(BaseEntityFunctionTable, ActionPointSpawner)
 
-    constant FRAME_DELAY = 5
-    constant N_SPAWN_POINTS = 8
-
-    namespace EntityStruct {
-        childstruct(BaseEntity)
-            field(frameDelay, 2)
-            field(spawnPoint, 2)
-            field(spawnRoutine, 2)
-
-            field(freeListCount, 2)
-        endstruct()
-    }
-
+    // OUT: C set = always activate entity
     a16()
     i16()
     code()
     function Init {
-        stz.b   EntityStruct.frameDelay
-        stz.b   EntityStruct.spawnPoint
-        stz.b   EntityStruct.spawnRoutine
+        SetAnimation(animation)
 
-        lda.w   #0
-        jmp     MetaSprite.SetFrame
+        // Ensure initialProjectileId is EightDirectionRedProjectile
+        assert({GetProjectileId(EightDirectionRedProjectile)} == Project.ProjectileIds.EightDirectionRedProjectile)
+        assert({GetProjectileId(EightDirectionRedProjectile)} != 0)
+        lda.b   BaseEntity.projectileId
+        and.w   #0xff
+        cmp.w   #{GetProjectileId(EightDirectionRedProjectile)}
+        beq     +
+            break(ASSERT_FAILURE)
+        +
+
+        // always activate
+        sec
+        rts
     }
 
     a16()
     i16()
     code()
     Destructor:
+    Deactivated:
     ProcessCollision:
     function Null {
         rts
@@ -216,102 +205,36 @@ namespace SpawnerEntity {
     i16()
     code()
     function Process {
-        assertPowerOfTwo(N_SPAWN_POINTS)
+        lda.w   Controller.Joy1.pressed
+        and.w   #JOY.sholder
+        beq     +
+            // When L or R is pressed spawn 4 green projectiles
 
-        lda.b   EntityStruct.frameDelay
-        dec
-        bpl     SkipSpawn
+            sep     #$20
+        a8()
+            SetProjectileId(EightDirectionGreenProjectile)
 
-            Entity.CountEntitiesInList(free)
-            sta.b   EntityStruct.freeListCount
+            rep     #$30
+        a16()
 
+            SpawnManualEnemyProjectiles()
 
-            lda.b   EntityStruct.spawnPoint
-            inc
+            sep     #$10
+        i8()
+            SetProjectileId(EightDirectionRedProjectile)
 
-            ldx.b   EntityStruct.spawnRoutine
-            jsr     (SpawnRoutineTable,x)
+            rep     #$30
+        i16()
+        +
 
-
-            Entity.CountEntitiesInList(free)
-            cmp.b   EntityStruct.freeListCount
-            beq     NoEntitySpawned
-
-                lda.b   EntityStruct.spawnPoint
-                inc
-                and.w   #N_SPAWN_POINTS - 1
-                sta.b   EntityStruct.spawnPoint
-                bne     SkipChangeSpawner
-
-                    ldx.b   EntityStruct.spawnRoutine
-                    inx
-                    inx
-                    cpx.w   #N_SPAWN_ROUTINES * 2
-                    bcc     +
-                        ldx.w   #0
-                    +
-                    stx.b   EntityStruct.spawnRoutine
-
-            SkipChangeSpawner:
-                lda.w   #FRAME_DELAY - 1
-
-        NoEntitySpawned:
-
-    SkipSpawn:
-        sta.b   EntityStruct.frameDelay
-
-        rts
+        jmp     Entity.DrawAndGotoNextEntity
     }
-
-
-    // INPUT: A = spawn point
-    //        DP = entity
-    // REQUIRES: 16 bit A, 16 bit Index, DB = 0x7e
-    code()
-    SpawnRoutineTable:
-        dw  SpawnPlayerProjectileAtAp
-        dw  SpawnEnemyProjectileAtAp
-        dw  SpawnEntityAtAp
-    constant N_SPAWN_ROUTINES = (pc() - SpawnRoutineTable) / 2
-
-    a16()
-    i16()
-    code()
-    function SpawnPlayerProjectileAtAp {
-        ldy.w   #ProjectileEntity.PROJECTILE_ID
-        jmp     Entity.SpawnPlayerProjectileFromActionPoint
-    }
-
-    a16()
-    i16()
-    code()
-    function SpawnEnemyProjectileAtAp {
-        ldy.w   #ProjectileEntity.PROJECTILE_ID
-        jmp     Entity.SpawnEnemyProjectileFromActionPoint
-    }
-
-    a16()
-    i16()
-    code()
-    function SpawnEntityAtAp {
-        ldy.w   #ProjectileEntity.ENTITY_ID
-        jmp     Entity.SpawnAtActionPoint
-    }
-
-
-    rodata(EN_RomData)
-    RomData:
-        dw  FunctionTable
-        db  Entity.ListId.BOSS      // initial List
-        dw  MSFS.ActionPointSpawner // frameSetId
-        db  0                       // defaultPalette
-
-    rodata(EN_EntityList)
-    constant ENTITY_ID = (pc() - Entity.Data.EntityList) / 2
-        dw  RomData
+}
 }
 
 
+namespace InteractiveTests {
+namespace ActionPointSpawnerTest {
 
 // Prints the list statistics to screen
 macro PrintListSizes() {
@@ -321,17 +244,17 @@ macro PrintListSizes() {
     Text.Console.SetCursor(0, 20)
     Text.Console.PrintConstString("\nPlayer Projectiles: ")
 
-    Entity.CountEntitiesInList(playerProjectiles)
+    Entity.CountEntitiesInList(PlayerProjectiles)
     jsr     Text.Console.PrintU16A
 
     Text.Console.PrintConstString("\nEnemy Projectiles:  ")
 
-    Entity.CountEntitiesInList(enemyProjectiles)
+    Entity.CountEntitiesInList(EnemyProjectiles)
     jsr     Text.Console.PrintU16A
 
-    Text.Console.PrintConstString("\nNPC Entities:       ")
+    Text.Console.PrintConstString("\nParticle Entities:  ")
 
-    Entity.CountEntitiesInList(npcs)
+    Entity.CountEntitiesInList(Particles)
     jsr     Text.Console.PrintU16A
 }
 
@@ -340,9 +263,18 @@ macro PrintListSizes() {
 a16()
 i16()
 code()
-Test.add("Spawn At Action Point Test")
+Test.add("ActionPointSpawner Test")
 function Test {
+    Text.Console.SetCursor(0, 4)
+    Text.Console.PrintConstString("Also tests:\n  DeleteAndGotoNextEntity")
+
+    Text.Console.SetCursor(0, 7)
+    Text.Console.PrintConstString("Press L/R to spawn\n  Manual Projectiles")
+
     jsr     EntityLoop.Init
+
+    jsr     EnableDisplay_Full
+
 
     // Load the entity
 
@@ -352,7 +284,7 @@ function Test {
     lda.w   #Camera.ORIGIN + Camera.DISPLAY_HEIGHT / 2
     sta.w   Entity.Spawn.yPos
 
-    lda.w   #SpawnerEntity.ENTITY_ID
+    lda.w   #Project.EntityIds.ActionPointSpawner
 
     jsr     Entity.Spawn
     bcc     Fail
@@ -363,7 +295,6 @@ function Test {
 
     GameLoop:
         jsr     EntityLoop.ProcessFrame
-        jsr     Entity.DeleteDeactivatedEntities
 
         PrintListSizes()
 

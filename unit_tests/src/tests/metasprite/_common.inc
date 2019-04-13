@@ -12,8 +12,6 @@ function _Init_MetaSpriteModule {
     jsr     Dma.Init
     jsr     MetaSprite.Init
 
-    stz.w   Dma.ObjPalette.dirty
-
     rts
 }
 

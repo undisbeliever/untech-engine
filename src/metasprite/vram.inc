@@ -95,7 +95,17 @@ macro _Deallocate() {
 
 
 
-// Activates the given entity's vram table
+// Activates the given entity's VRAM slot, uploading tiles to VRAM if
+// necessary.
+//
+// NOTE: If the entity uses a dynamic tileset this macro will always try to
+//       upload the dynamic tiles to VRAM.
+//
+// NOTE: FrameSets with a dynamic tileset can fail if the static tiles were
+//       uploaded but the system ran out of time/space to upload the static
+//       tiles.
+//
+// ASSUMES: The entity has not been activated.
 // REQUIRES: 8 bit A, 16 bit Index, DB = 0x7e
 // INPUT: X = frameSet
 // BRANCH: ReturnFailure on failure
@@ -108,7 +118,7 @@ macro _Activate() {
 
     lda.b	BaseEntity.MetaSprite.status
     lsr
-    bcs     AlreadyActive
+    bcs     VramSet
         // X = frameset
         lda.l   MetaSprite.Format.FrameSet.tilesetType,x
 
@@ -122,8 +132,20 @@ macro _Activate() {
         tyx
         jmp     (MetaSprite.Vram._ActivateTable,x)
 
+
+    VramSet:
+        bit.b   #MetaSprite.StatusFlags.dynamicTileset >> 1
+        beq     Success
+            // This frameSet uses a dynamicTileset and the static tiles have
+            // been uploaded to VRAM but there was not enough time/space to upload
+            // the dynamic tiles in the previous frame.
+
+            rep     #$30
+        a16()
+            jsr     MetaSprite.Vram._UploadDynamicTileset
+            bcc     ReturnFailure
+
     Success:
-    AlreadyActive:
 }
 
 code()
@@ -269,7 +291,6 @@ i16()
 code()
 function _UploadDynamicTileset {
     ldx.b   BaseEntity.MetaSprite.currentFrame
-    beq     ReturnTrue
 
 GivenFrame:
     lda.l   MetaSprite.Format.Frame.tileset,x

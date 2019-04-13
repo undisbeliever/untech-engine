@@ -2,7 +2,6 @@
 // Copyright (c) 2016 - 2017, Marcus Rowe <undisbeliever@gmail.com>.
 // Distributed under The MIT License: https://opensource.org/licenses/MIT
 
-namespace InteractiveTests {
 
 // EntityHitbox Interactive Collisions Test.
 //
@@ -18,13 +17,252 @@ namespace InteractiveTests {
 //  * EntityLoop
 //  * MetaSprite EntityHitbox Collisions
 //  * Entity.SpawnAtMetaSpriteCollisionCentre
+
+namespace Entities {
+
+namespace EhCollisionTest_Player {
+    buildFunctionTable(BaseEntityFunctionTable, EhCollisionTest_Player)
+
+    constant N_FRAMES = 8
+
+    namespace EntityStruct {
+        childstruct(BaseEntity)
+            field(selectedFrame, 2)
+        endstruct()
+    }
+
+
+    // REQUIRES: 16 bit A, 16 bit Index, DB = 0x7e
+    // INPUT: DP = entity
+    // OUTPUT: C set = always activate entity
+    a16()
+    i16()
+    code()
+    function Init {
+        lda.w   #0
+        sta.b   EntityStruct.selectedFrame
+
+        SetFrame_A()
+
+        // always activate
+        sec
+        rts
+    }
+
+
+    // REQUIRES: 16 bit A, 16 bit Index, DB = 0x7e
+    // INPUT: DP = entity
+    a16()
+    i16()
+    code()
+    function Destructor {
+        Text.Console.PrintConstString("Player.Destructor\n")
+        rts
+    }
+
+
+    // REQUIRES: 16 bit A, 16 bit Index, DB = 0x7e
+    // INPUT: DP = entity
+    a16()
+    i16()
+    code()
+    function Deactivated {
+        Text.Console.PrintConstString("Player.Deactivated\n")
+        rts
+    }
+
+
+    // Print the Move the entity's position with D-PAD, change the entity type on SELECT.
+    //
+    // REQUIRES: 16 bit A, 16 bit Index, DB = 0x7e
+    // INPUT: DP = entity
+    // INPUT:  A = MetaSprite.Collision.bits
+    // INPUT:  A = MetaSprite.Collision.bits
+    a16()
+    i16()
+    code()
+    function ProcessCollision {
+        jsr     InteractiveTests.EntityHitboxCollisionsTest.PrintProcessCollisionArgs
+
+        // Spawn the CollisionCentre
+        SpawnEntityAtMetaSpriteCollisionCentre(EhCollisionTest_CollisionCentre)
+
+        rts
+    }
+
+
+    // Move the entity's position with the D-PAD, change the entity type on SELECT.
+    //
+    // REQUIRES: 16 bit A, 16 bit Index, DB = 0x7e
+    // INPUT: DP = entity
+    a16()
+    i16()
+    code()
+    function Process {
+        lda.w   Controller.Joy1.current
+        bit.w   #JOY.left
+        beq     +
+            dec.b   EntityStruct.xPos.px
+        +
+        bit.w   #JOY.right
+        beq     +
+            inc.b   EntityStruct.xPos.px
+        +
+        bit.w   #JOY.up
+        beq     +
+            dec.b   EntityStruct.yPos.px
+        +
+        bit.w   #JOY.down
+        beq     +
+            inc.b   EntityStruct.yPos.px
+        +
+
+        lda.w   Controller.Joy1.pressed
+        and.w   #JOY.select
+        beq     EndIf
+            lda.b   EntityStruct.selectedFrame
+            inc
+            cmp.w   #N_FRAMES
+            bcc     +
+                lda.w   #0
+            +
+            sta.b   EntityStruct.selectedFrame
+            SetFrame_A()
+
+        EndIf:
+
+        jmp     Entity.DrawAndGotoNextEntity
+    }
+}
+
+
+
+namespace EhCollisionTest_Enemy {
+    constant ProcessCollision = InteractiveTests.EntityHitboxCollisionsTest.PrintProcessCollisionArgs
+
+    buildFunctionTable(BaseEntityFunctionTable, EhCollisionTest_Enemy)
+
+
+    // REQUIRES: 16 bit A, 16 bit Index, DB = 0x7e
+    // INPUT: DP = entity
+    //         A = frameId
+    // OUTPUT: C set = always activate entity
+    a16()
+    i16()
+    code()
+    function Init {
+        SetFrame_A()
+
+        // always activate
+        sec
+        rts
+    }
+
+
+    // REQUIRES: 16 bit A, 16 bit Index, DB = 0x7e
+    // INPUT: DP = entity
+    a16()
+    i16()
+    code()
+    function Destructor {
+        Text.Console.PrintConstString("E.Destructor\n")
+        rts
+    }
+
+
+    // REQUIRES: 16 bit A, 16 bit Index, DB = 0x7e
+    // INPUT: DP = entity
+    a16()
+    i16()
+    code()
+    function Deactivated {
+        Text.Console.PrintConstString("E.Deactivated\n")
+        rts
+    }
+
+
+    // REQUIRES: 16 bit A, 16 bit Index, DB = 0x7e
+    // INPUT: DP = entity
+    a16()
+    i16()
+    code()
+    function Process {
+
+        jmp     Entity.DrawAndGotoNextEntity
+    }
+}
+
+
+
+// Shows the cursor sprite at the centre of the collision
+// Deletes itself on the next frame
+namespace EhCollisionTest_CollisionCentre {
+    buildFunctionTable(BaseEntityFunctionTable, EhCollisionTest_CollisionCentre)
+
+    namespace EntityStruct {
+        childstruct(BaseEntity)
+            field(framesLeft, 2)
+        endstruct()
+    }
+
+
+    // REQUIRES: 16 bit A, 16 bit Index, DB = 0x7e
+    // INPUT: DP = entity
+    // OUTPUT: C set = always activate entity
+    a16()
+    i16()
+    code()
+    function Init {
+        lda.w   #1
+        sta.b   EntityStruct.framesLeft
+
+        SetFrame(frame)
+
+        // always activate
+        sec
+        rts
+    }
+
+
+    // REQUIRES: 16 bit A, 16 bit Index, DB = 0x7e
+    // INPUT: DP = entity
+    a16()
+    i16()
+    code()
+    Destructor:
+    Deactivated:
+    ProcessCollision:
+    function Null {
+        rts
+    }
+
+
+    // Moves the entity to the toDelete list after `framesLeft` frames.
+    //
+    // REQUIRES: 16 bit A, 16 bit Index, DB = 0x7e
+    // INPUT: DP = entity
+    a16()
+    i16()
+    code()
+    function Process {
+        dec.b   EntityStruct.framesLeft
+        bpl     +
+            jmp     Entity.DeleteAndGotoNextEntity
+        +
+
+        jmp     Entity.DrawAndGotoNextEntity
+    }
+}
+}
+
+
+namespace InteractiveTests {
 namespace EntityHitboxCollisionsTest {
 
 constant _waitCount                   = Test.tmp
 constant _tmp_index                   = Test.tmp + 2
 constant _collisionBits               = Test.tmp + 4
 constant _processCollisionArgumentsOk = Test.tmp + 6
-
 
 // Prints the ProcessCollision arguments to screen.
 //
@@ -117,241 +355,6 @@ BitsString:
 
 
 
-namespace PlayerEntity {
-    buildFunctionTable(BaseEntityFunctionTable, PlayerEntity)
-    Entity.useDefaultRenderer()
-
-    constant N_FRAMES = 8
-
-    namespace EntityStruct {
-        childstruct(BaseEntity)
-            field(selectedFrame, 2)
-        endstruct()
-    }
-
-
-    // REQUIRES: 16 bit A, 16 bit Index, DB = 0x7e
-    // INPUT: DP = entity
-    a16()
-    i16()
-    code()
-    function Init {
-        stz.b   EntityStruct.selectedFrame
-
-        lda.w   #0
-        jmp     MetaSprite.SetFrame
-    }
-
-
-    // REQUIRES: 16 bit A, 16 bit Index, DB = 0x7e
-    // INPUT: DP = entity
-    a16()
-    i16()
-    code()
-    function Destructor {
-        Text.Console.PrintConstString("Player.Destructor\n")
-        rts
-    }
-
-
-    // Print the Move the entity's position with D-PAD, change the entity type on SELECT.
-    //
-    // REQUIRES: 16 bit A, 16 bit Index, DB = 0x7e
-    // INPUT: DP = entity
-    // INPUT:  A = MetaSprite.Collision.bits
-    // INPUT:  A = MetaSprite.Collision.bits
-    a16()
-    i16()
-    code()
-    function ProcessCollision {
-        jsr     PrintProcessCollisionArgs
-
-        // Spawn the CollisionCentreEntity
-        lda.w   #CollisionCentreEntity.ENTITY_ID
-        jmp     Entity.SpawnAtMetaSpriteCollisionCentre
-    }
-
-
-    // Move the entity's position with the D-PAD, change the entity type on SELECT.
-    //
-    // REQUIRES: 16 bit A, 16 bit Index, DB = 0x7e
-    // INPUT: DP = entity
-    a16()
-    i16()
-    code()
-    function Process {
-        lda.w   Controller.Joy1.current
-        bit.w   #JOY.left
-        beq     +
-            dec.b   EntityStruct.xPos.px
-        +
-        bit.w   #JOY.right
-        beq     +
-            inc.b   EntityStruct.xPos.px
-        +
-        bit.w   #JOY.up
-        beq     +
-            dec.b   EntityStruct.yPos.px
-        +
-        bit.w   #JOY.down
-        beq     +
-            inc.b   EntityStruct.yPos.px
-        +
-
-        lda.w   Controller.Joy1.pressed
-        and.w   #JOY.select
-        beq     EndIf
-            lda.b   EntityStruct.selectedFrame
-            inc
-            cmp.w   #N_FRAMES
-            bcc     +
-                lda.w   #0
-            +
-            sta.b   EntityStruct.selectedFrame
-            jsr     MetaSprite.SetFrame
-
-        EndIf:
-
-        rts
-    }
-
-
-    rodata(EN_RomData)
-    RomData:
-        dw  FunctionTable
-        db  Entity.ListId.PLAYER        // initial List
-        dw  MSFS.EhCollisionTest_Player // frameSetId
-        db  0                           // defaultPalette
-
-    rodata(EN_EntityList)
-    constant ENTITY_ID = (pc() - Entity.Data.EntityList) / 2
-        dw  RomData
-}
-
-
-
-namespace EnemyEntity {
-    buildFunctionTable(BaseEntityFunctionTable, EnemyEntity)
-    Entity.useDefaultRenderer()
-
-    // REQUIRES: 16 bit A, 16 bit Index, DB = 0x7e
-    // INPUT: DP = entity
-    //         A = frameId
-    a16()
-    i16()
-    code()
-    function Init {
-        jmp     MetaSprite.SetFrame
-    }
-
-
-    // REQUIRES: 16 bit A, 16 bit Index, DB = 0x7e
-    // INPUT: DP = entity
-    a16()
-    i16()
-    code()
-    function Destructor {
-        Text.Console.PrintConstString("E.Destructor\n")
-        rts
-    }
-
-
-    // REQUIRES: 16 bit A, 16 bit Index, DB = 0x7e
-    // INPUT: DP = entity
-    a16()
-    i16()
-    code()
-    function Process {
-        rts
-    }
-
-
-    constant ProcessCollision = PrintProcessCollisionArgs
-
-
-    rodata(EN_RomData)
-    RomData:
-        dw  FunctionTable
-        db  Entity.ListId.ENEMY         // initial List
-        dw  MSFS.EhCollisionTest_Enemy  // frameSetId
-        db  0                           // defaultPalette
-
-    rodata(EN_EntityList)
-    constant ENTITY_ID = (pc() - Entity.Data.EntityList) / 2
-        dw  RomData
-}
-
-
-
-// Shows the cursor sprite at the centre of the collision
-// Deletes itself on the next frame
-namespace CollisionCentreEntity {
-    buildFunctionTable(BaseEntityFunctionTable, CollisionCentreEntity)
-    Entity.useDefaultRenderer()
-
-    namespace EntityStruct {
-        childstruct(BaseEntity)
-            field(framesLeft, 2)
-        endstruct()
-    }
-
-
-    // REQUIRES: 16 bit A, 16 bit Index, DB = 0x7e
-    // INPUT: DP = entity
-    a16()
-    i16()
-    code()
-    function Init {
-        lda.w   #1
-        sta.b   EntityStruct.framesLeft
-
-        lda.w   #0
-        jmp     MetaSprite.SetFrame
-    }
-
-
-    // REQUIRES: 16 bit A, 16 bit Index, DB = 0x7e
-    // INPUT: DP = entity
-    a16()
-    i16()
-    code()
-    Destructor:
-    ProcessCollision:
-    function Null {
-        rts
-    }
-
-
-    // Moves the entity to the toDelete list after `framesLeft` frames.
-    //
-    // REQUIRES: 16 bit A, 16 bit Index, DB = 0x7e
-    // INPUT: DP = entity
-    a16()
-    i16()
-    code()
-    function Process {
-        dec.b   EntityStruct.framesLeft
-        bpl     +
-            lda.w   #Entity.lists.toDelete
-            sta.w   Entity.changeList
-        +
-        rts
-    }
-
-    rodata(EN_RomData)
-    RomData:
-        dw  FunctionTable
-        db  Entity.ListId.PARTICLE      // initial List
-        dw  MSFS.EhCollisionTest_Centre // frameSetId
-        db  0                           // defaultPalette
-
-    rodata(EN_EntityList)
-    constant ENTITY_ID = (pc() - Entity.Data.EntityList) / 2
-        dw  RomData
-}
-
-
-
 rodata(rom0)
 namespace EnemyTable {
 constant Y_DELTA = 20
@@ -363,17 +366,17 @@ constant X_RIGHT = Camera.ORIGIN + Camera.DISPLAY_WIDTH / 2 + 10
 constant X_CENTER = Camera.ORIGIN + Camera.DISPLAY_WIDTH / 2
 
     struct(pc())
-        field(entityId, 2)
+        field(entityDataId, 2)
         field(xPos, 2)
         field(yPos, 2)
         field(parameter, 2)
     endstruct()
 
-evaluate EN_ID = Entity.ListId.ENEMY
+evaluate EN_ID = EntityLists.Enemies
 
-constant PLAYER = PlayerEntity.ENTITY_ID
-constant ENEMY  = EnemyEntity.ENTITY_ID
-constant BLANK  = EntityTest.Entities.BlankEntity.EntityId_{EN_ID}
+constant PLAYER = Project.EntityIds.EhCollisionTest_Player
+constant ENEMY  = Project.EntityIds.EhCollisionTest_Enemy
+constant BLANK  = Project.EntityIds.Blank_Enemy
 
 
 Data:
@@ -425,6 +428,9 @@ function Test {
 
     jsr     EntityLoop.Init
 
+    jsr     EnableDisplay_Full
+
+
     // Load the entities
 
     ldx.w   #0
@@ -440,7 +446,7 @@ function Test {
         lda.l   EnemyTable.parameter,x
         tay
 
-        lda.l   EnemyTable.entityId,x
+        lda.l   EnemyTable.entityDataId,x
 
         jsr     Entity.Spawn
         bcc     Fail

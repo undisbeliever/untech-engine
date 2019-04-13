@@ -134,16 +134,15 @@ function _RemoveSlot {
 // REQUIRES: 8 bit A, 16 bit Index, DB = 0x7e
 // INPUT: A: Palette Id
 // INPUT: DP: BaseEntity
-// OUTPUT:: carry set if succeeded
+// OUTPUT: carry set if palette was successfully changed
 a8()
 i16()
 code()
 function SetPalette {
-    ldx.b   BaseEntity.MetaSprite.frameSet
-    beq     ReturnFalse
-
     cmp.b   BaseEntity.MetaSprite.palette
     beq     Return      // c set on return
+
+    ldx.b   BaseEntity.MetaSprite.frameSet
 
     cmp.l   MetaSprite.Format.FrameSet.nPalettes,x
     bcs     ReturnFalse
@@ -186,7 +185,7 @@ NoSlotsFound:
 // REQUIRES: 8 bit A, 16 bit Index, DB = 0x7e
 // INPUT: DP: BaseEntity - must be active
 //         X: MetaSprite frameset address
-// OUTPUT:: carry set if successful
+// OUTPUT: carry set if successful
 a8()
 i16()
 code()

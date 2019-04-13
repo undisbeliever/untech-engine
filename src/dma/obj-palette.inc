@@ -17,15 +17,17 @@ namespace ObjPalette {
 constant buffer.size = 128 * 2
 allocate(buffer, wram7e, buffer.size)
 
-allocateTmpWord(dirty)
+// If zero then the buffer will be transferred to CGRAM on the next VBlank.
+// (shadow word)
+allocate(transferOnZero, shadow, 1)
 
 
 // Initialize the tables/variables
 macro _Init() {
-    assert16a()
-    assert16i()
+    assert8a()
 
-    stz.w   Dma.ObjPalette.dirty
+    lda.b   #1
+    sta.w   Dma.ObjPalette.transferOnZero
 }
 
 
@@ -37,8 +39,8 @@ macro _VBlank() {
     assert16a()
     assert8i()
 
-    ldy.w   Dma.ObjPalette.dirty
-    beq     EndIf
+    ldy.w   Dma.ObjPalette.transferOnZero
+    bne     EndIf
         ldy.b   #128
         sty.w   CGADD
 
@@ -56,12 +58,13 @@ macro _VBlank() {
         ldy.b   #MDMAEN.dma0
         sty.w   MDMAEN
 
-        stz.w   Dma.ObjPalette.dirty
+        // Y is non-zero
+        sty.w   Dma.ObjPalette.transferOnZero
     EndIf:
 }
 
 // cpu of cycles (excluding dma) used in the _VBlank macro
-constant VBLANK_CYCLES = 43
+constant VBLANK_CYCLES = 42
 
 
 // Marks the object palette buffer as dirty
@@ -74,8 +77,8 @@ constant VBLANK_CYCLES = 43
 macro MarkDirty() {
     assert8a()
 
-    lda.w   Dma.ObjPalette.dirty
-    bne     AlreadyDirty{#}
+    lda.w   Dma.ObjPalette.transferOnZero
+    beq     AlreadyMarkedDirty{#}
 
         lda.w   Dma.transfersLeft
         sec
@@ -85,10 +88,9 @@ macro MarkDirty() {
     NoUnderflow{#}:
         sta.w   Dma.transfersLeft
 
-        lda.b   #1
-        sta.w   Dma.ObjPalette.dirty
+        stz.w   Dma.ObjPalette.transferOnZero
 
-AlreadyDirty{#}:
+AlreadyMarkedDirty{#}:
 }
 
 }

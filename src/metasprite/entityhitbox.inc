@@ -83,7 +83,7 @@ macro TestCollisions(aList, bList) {
 
     // ::TODO move entity lists to dp::
 
-    lda.l   Entity.lists.{aList}
+    lda.l   {Entity.listAddress({aList})}
     beq     EndIf{#}
 
         MetaSprite.EntityHitbox._TestTwoEntityLists({aList}, {bList}, 1)
@@ -110,7 +110,7 @@ macro TestCollisions(aList, bList1, bList2) {
 
     // ::TODO move entity lists to dp::
 
-    lda.l   Entity.lists.{aList}
+    lda.l   {Entity.listAddress({aList})}
     beq     EndIf{#}
 
         MetaSprite.EntityHitbox._TestTwoEntityLists({aList}, {bList1}, 1)
@@ -124,7 +124,7 @@ macro TestCollisions(aList, bList1, bList2, bList3) {
 
     MetaSprite.EntityHitbox._TestInBlock()
 
-    lda.l   Entity.lists.{aList}
+    lda.l   {Entity.listAddress({aList})}
     beq     EndIf{#}
 
         MetaSprite.EntityHitbox._TestTwoEntityLists({aList}, {bList1}, 1)
@@ -139,7 +139,7 @@ macro TestCollisions(aList, bList1, bList2, bList3, bList4) {
 
     MetaSprite.EntityHitbox._TestInBlock()
 
-    lda.l   Entity.lists.{aList}
+    lda.l   {Entity.listAddress({aList})}
     beq     EndIf{#}
 
         MetaSprite.EntityHitbox._TestTwoEntityLists({aList}, {bList1}, 1)
@@ -155,7 +155,7 @@ macro TestCollisions(aList, bList1, bList2, bList3, bList4, bList5) {
 
     MetaSprite.EntityHitbox._TestInBlock()
 
-    lda.l   Entity.lists.{aList}
+    lda.l   {Entity.listAddress({aList})}
     beq     EndIf{#}
 
         MetaSprite.EntityHitbox._TestTwoEntityLists({aList}, {bList1}, 1)
@@ -176,7 +176,8 @@ EndIf{#}:
 variable __EH_BLOCK = 0
 
 // Data bank containing the EntityHitbox data
-constant EntityHitboxBank = Data.EntityHitboxOffset >> 16
+constant EntityHitboxBank = Data.EntityHitboxData >> 16
+
 
 // Temporary store for the offset/size pair from EntityHitbox struct
 // Used to convert width/height from uint8 to uint16
@@ -283,18 +284,18 @@ inline _TestTwoEntityLists(aList, bList, evaluate isFirst) {
     assert16a()
     assert16i()
 
-    if Entity.lists.{aList} == Entity.lists.{bList} {
+    if {Entity.listAddress({aList})} == {Entity.listAddress({bList})} {
         error "Cannot preform a collision test between the same list ({aList} and {bList})"
     }
 
     // ::TODO move entity lists to dp::
 
-    lda.l   Entity.lists.{bList}
+    lda.l   {Entity.listAddress({bList})}
     beq     EndIf{#}
         tay
-        lda.l   Entity.lists.{aList}
+        lda.l   {Entity.listAddress({aList})}
 //        if {isFirst} == 0 {
-//            lda.l   Entity.lists.{aList}
+//            lda.l   {Entity.listAddress({aList})}
 //        }
         jsr     MetaSprite.EntityHitbox._TestTwoEntityLists
     EndIf{#}:
@@ -725,7 +726,6 @@ function _TestTwoEntityLists {
         // A & Y = entityA
 
         ldx.b   BaseEntity.MetaSprite.currentFrame,y
-        beq     NoHitbox
 
         if Data.FrameList >> 16 == EntityHitboxBank {
             ldy.w   Format.Frame.entityHitbox,x
@@ -808,7 +808,6 @@ START:
         // Y = entityB address
 
         ldx.b   BaseEntity.MetaSprite.currentFrame,y
-        beq     NoEntityOuterCollision_Y
 
         if Data.FrameList >> 16 == EntityHitboxBank {
             lda.w   Format.Frame.entityHitbox,x
@@ -905,7 +904,6 @@ function _TestList_EntityA_MultipleHitboxes {
         // Y = entityB
 
         ldx.b   BaseEntity.MetaSprite.currentFrame,y
-        beq     NoEntityOuterCollision_Y
 
         if Data.FrameList >> 16 == EntityHitboxBank {
             lda.w   Format.Frame.entityHitbox,x

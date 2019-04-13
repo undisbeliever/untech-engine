@@ -79,13 +79,20 @@ include "metasprite/vram.inc"
 include "metasprite/render.inc"
 include "metasprite/_common.inc"
 
+include "entity/instanceidtable.inc"
 include "entity/activewindow.inc"
 include "entity/allocation.inc"
 include "entity/counters.inc"
 include "entity/deallocation.inc"
 include "entity/gameloop.inc"
-include "entity/render.inc"
+include "entity/invalid-entity.inc"
 include "entity/spawn.inc"
+include "entity/transitions.inc"
+include "entity/validation.inc"
+
+include "metasprite/actionpoints.inc"
+
+include "entity/macros.inc"
 
 // vim: ft=bass-65816 ts=4 sw=4 et:
 

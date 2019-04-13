@@ -61,18 +61,24 @@ macro VBlank() {
 }
 
 
-// Initializes the dma module.
+// Initializes the DMA module.
 //
-// This MUST be called before using this module.
+// This MUST be called before using the DMA module.
 //
 // REQUIRES: 16 bit A, 16 bit Index, DB = $7E
 a16()
 i16()
 code()
 function Init {
+    sep     #$20
+a8()
+
     MetaTiles._Init()
     ObjPalette._Init()
     Resources._Init()
+
+    rep     #$30
+a16()
     Tile16._Init()
 
     Dma.ResetTransfersLeft()

@@ -24,40 +24,27 @@ namespace manyObjEntity {
 constant SCREEN_WIDTH = 256
 constant SCREEN_HEIGHT = 224
 
+constant MS_SCREEN_XPOS = SCREEN_WIDTH / 3;
+constant MS_SCREEN_YPOS = SCREEN_HEIGHT * 2 / 3;
 
-a16()
-i16()
-code()
-Test.add("MetaSprite.RenderEntity (Null)")
-function RenderEntity_Null {
-    jsr     _Init
-    bcc     Fail
+constant CAMERA_XPOS = 0xdead;
+constant CAMERA_YPOS = 0xbeef;
 
-    // Try render a destroyed frameset
-    lda.w   #EntityPool.entity0
-    tcd
-    MetaSprite.EntityDestructor()
-    jsr     _RenderEntityCenter
 
-    // Then a metasprite with no frame
-    lda.w   #EntityPool.entity1
-    tcd
-    stz.b   BaseEntity.MetaSprite.currentFrame
-    jsr     _RenderEntityCenter
+// Moves the current entity to a given screen position and renders it.
+// REQUIRES: 16 bit A, 16 bit Index, DB = 0x7E
+// INPUT: dp = entity
+// PARAM: xPos/yPos - screen position to render the entity
+macro _MoveAndRenderEntity(evaluate xPos, evaluate yPos) {
+    assert16a()
+    assert16i()
 
-    jsr     MetaSprite.Render.EndLoop
+    lda.w   #CAMERA_XPOS + {xPos}
+    sta.b   BaseEntity.xPos.px
+    lda.w   #CAMERA_YPOS + {yPos}
+    sta.b   BaseEntity.yPos.px
 
-    // Check that bufferPos is 0
-    lda.w   MetaSprite.Render.bufferPos
-    bne     Fail
-
-    // Check all sprites offscreen
-    lda.w   #0
-    jmp     _CheckSpritesOffscreen
-
-Fail:
-    clc
-    rts
+    jsr     MetaSprite.Render.RenderEntity
 }
 
 
@@ -71,7 +58,7 @@ function RenderEntity_OneSmall {
 
     lda.w   #oneSmallObjEntity
     tcd
-    jsr     _RenderEntityCenter
+    jsr     MetaSprite.Render.RenderEntity
 
     jsr     MetaSprite.Render.EndLoop
 
@@ -84,11 +71,11 @@ function RenderEntity_OneSmall {
     sep     #$20
 a8()
     lda.w   MetaSprite.Render.oamBuffer.xPos
-    cmp.b   #(SCREEN_WIDTH - 8) / 2
+    cmp.b   #MS_SCREEN_XPOS - 8 / 2
     bne     Fail
 
     lda.w   MetaSprite.Render.oamBuffer.yPos
-    cmp.b   #(SCREEN_HEIGHT - 8) / 2
+    cmp.b   #MS_SCREEN_YPOS - 8 / 2
     bne     Fail
 
     lda.w   MetaSprite.Render.oamHiBuffer
@@ -117,7 +104,7 @@ function RenderEntity_OneLarge {
 
     lda.w   #oneLargeObjEntity
     tcd
-    jsr     _RenderEntityCenter
+    jsr     MetaSprite.Render.RenderEntity
 
     jsr     MetaSprite.Render.EndLoop
 
@@ -130,11 +117,11 @@ function RenderEntity_OneLarge {
     sep     #$20
 a8()
     lda.w   MetaSprite.Render.oamBuffer.xPos
-    cmp.b   #(SCREEN_WIDTH - 16) / 2
+    cmp.b   #MS_SCREEN_XPOS - 16 / 2
     bne     Fail
 
     lda.w   MetaSprite.Render.oamBuffer.yPos
-    cmp.b   #(SCREEN_HEIGHT - 16) / 2
+    cmp.b   #MS_SCREEN_YPOS - 16 / 2
     bne     Fail
 
     lda.w   MetaSprite.Render.oamHiBuffer
@@ -164,12 +151,8 @@ function RenderEntity_TopLeft {
 
     lda.w   #oneLargeObjEntity
     tcd
-    lda.w   #-10 + 16 / 2 - INT_MS8_OFFSET
-    sta.w   MetaSprite.Render.xPos
-    lda.w   #-5 + 16 / 2 - INT_MS8_OFFSET
-    sta.w   MetaSprite.Render.yPos
 
-    jsr     MetaSprite.Render.RenderEntity
+    _MoveAndRenderEntity(-10 + 16 / 2, -5 + 16 / 2)
 
     jsr     MetaSprite.Render.EndLoop
 
@@ -218,29 +201,14 @@ function RenderEntity_Offscreen {
 
     lda.w   #oneSmallObjEntity
     tcd
-    lda.w   #SCREEN_WIDTH + 8/2 - INT_MS8_OFFSET
-    sta.w   MetaSprite.Render.xPos
-    lda.w   #128 - INT_MS8_OFFSET
-    sta.w   MetaSprite.Render.yPos
-    jsr     MetaSprite.Render.RenderEntity
 
-    lda.w   #128 - INT_MS8_OFFSET
-    sta.w   MetaSprite.Render.xPos
-    lda.w   #-16 + 8/2 - INT_MS8_OFFSET
-    sta.w   MetaSprite.Render.yPos
-    jsr     MetaSprite.Render.RenderEntity
+    _MoveAndRenderEntity(SCREEN_WIDTH + 8 / 2, 128)
 
-    lda.w   #-16 + 8/2 - INT_MS8_OFFSET
-    sta.w   MetaSprite.Render.xPos
-    lda.w   #128 - INT_MS8_OFFSET
-    sta.w   MetaSprite.Render.yPos
-    jsr     MetaSprite.Render.RenderEntity
+    _MoveAndRenderEntity(128, -16 + 8 / 2)
 
-    lda.w   #128 + INT_MS8_OFFSET
-    sta.w   MetaSprite.Render.xPos
-    lda.w   #SCREEN_HEIGHT + 8/2 - INT_MS8_OFFSET
-    sta.w   MetaSprite.Render.yPos
-    jsr     MetaSprite.Render.RenderEntity
+    _MoveAndRenderEntity(-16 + 8 / 2, 128)
+
+    _MoveAndRenderEntity(128, SCREEN_HEIGHT + 8 / 2)
 
     jsr     MetaSprite.Render.EndLoop
 
@@ -275,7 +243,7 @@ function RenderEntity_Overflow {
     lda.w   #128 / 10
     Loop:
         pha
-            jsr     _RenderEntityCenter
+            jsr     MetaSprite.Render.RenderEntity
         pla
         dec
         bne     Loop
@@ -308,11 +276,11 @@ function RenderEntity_HiTable {
 
     lda.w   #manyObjEntity
     tcd
-    jsr     _RenderEntityCenter
+    jsr     MetaSprite.Render.RenderEntity
 
     lda.w   #oneLargeObjEntity
     tcd
-    jsr     _RenderEntityCenter
+    jsr     MetaSprite.Render.RenderEntity
 
     jsr     MetaSprite.Render.EndLoop
 
@@ -351,27 +319,11 @@ function RenderEntity_HiTableSize {
 
     lda.w   #oneSmallObjEntity
     tcd
-
-    lda.w   #-1 - INT_MS8_OFFSET
-    sta.w   MetaSprite.Render.xPos
-    lda.w   #SCREEN_HEIGHT/2 - INT_MS8_OFFSET
-    sta.w   MetaSprite.Render.yPos
-
-    jsr     MetaSprite.Render.RenderEntity
-
-
+    _MoveAndRenderEntity(-1, SCREEN_HEIGHT / 2)
 
     lda.w   #oneLargeObjEntity
     tcd
-
-    lda.w   #-1 - INT_MS8_OFFSET
-    sta.w   MetaSprite.Render.xPos
-    lda.w   #SCREEN_HEIGHT/2 - INT_MS8_OFFSET
-    sta.w   MetaSprite.Render.yPos
-
-    jsr     MetaSprite.Render.RenderEntity
-
-
+    _MoveAndRenderEntity(-1, SCREEN_HEIGHT / 2)
 
     jsr     MetaSprite.Render.EndLoop
 
@@ -402,7 +354,7 @@ function EndLoop {
 
     lda.w   #oneSmallObjEntity
     tcd
-    jsr     _RenderEntityCenter
+    jsr     MetaSprite.Render.RenderEntity
 
     jsr     MetaSprite.Render.EndLoop
 
@@ -416,11 +368,11 @@ function EndLoop {
 
     lda.w   #manyObjEntity
     tcd
-    jsr     _RenderEntityCenter
+    jsr     MetaSprite.Render.RenderEntity
 
     lda.w   #oneLargeObjEntity
     tcd
-    jsr     _RenderEntityCenter
+    jsr     MetaSprite.Render.RenderEntity
 
     jsr     MetaSprite.Render.EndLoop
 
@@ -434,9 +386,9 @@ function EndLoop {
 
     lda.w   #oneLargeObjEntity
     tcd
-    jsr     _RenderEntityCenter
-    jsr     _RenderEntityCenter
-    jsr     _RenderEntityCenter
+    jsr     MetaSprite.Render.RenderEntity
+    jsr     MetaSprite.Render.RenderEntity
+    jsr     MetaSprite.Render.RenderEntity
 
     jsr     MetaSprite.Render.EndLoop
 
@@ -462,7 +414,8 @@ Fail:
 // Preps the test
 //
 //  * Initializes the Dma/MetaSprite Engines
-//  * Creates sample entities
+//  * Moves the camera to CAMERA_XPOS/CAMERA_YPOS
+//  * Creates sample three entities, all at the screen position MS_SCREEN_XPOS/MS_SCREEN_YPOS
 //     * oneSmallObjEntity (entity0) has one small object
 //     * oneLargeObjEntity (entity1) has one large object
 //     * manyObjectsEntity (entity2) contains many large and small object
@@ -476,31 +429,32 @@ a16()
 i16()
 code()
 function _Init {
+    macro InitEntity(addr, frameSet, frame) {
+        lda.w   #{addr}
+        tcd
+
+        lda.w   #CAMERA_XPOS + MS_SCREEN_XPOS
+        sta.b   BaseEntity.xPos.px
+        lda.w   #CAMERA_YPOS + MS_SCREEN_YPOS
+        sta.b   BaseEntity.yPos.px
+
+        lda.w   #{frameSet}
+        ldx.w   #{frame}
+        ldy.w   #0
+        jsr     _InitEntityFrameActivate
+        bcc     Fail
+    }
+
     jsr     _Init_MetaSpriteModule
 
-    lda.w   #oneSmallObjEntity
-    tcd
-    lda.w   #MSFS.FST_TwoTilesFixed
-    ldx.w   #MSEO.OneSmallAndLarge.Frames.OneSmallObj
-    ldy.w   #0
-    jsr     _InitEntityFrameActivate
-    bcc     Fail
+    lda.w   #CAMERA_XPOS
+    sta.w   Camera.xPos
+    lda.w   #CAMERA_YPOS
+    sta.w   Camera.yPos
 
-    lda.w   #oneLargeObjEntity
-    tcd
-    lda.w   #MSFS.FST_TwoTilesFixed
-    ldx.w   #MSEO.OneSmallAndLarge.Frames.OneLargeObj
-    ldy.w   #0
-    jsr     _InitEntityFrameActivate
-    bcc     Fail
-
-    lda.w   #manyObjEntity
-    tcd
-    lda.w   #manyObjEntity.frameSet
-    ldx.w   #manyObjEntity.frame
-    ldy.w   #0
-    jsr     _InitEntityFrameActivate
-    bcc     Fail
+    InitEntity(oneSmallObjEntity, MSFS.FST_TwoTilesFixed, MSEO.OneSmallAndLarge.Frames.OneSmallObj)
+    InitEntity(oneLargeObjEntity, MSFS.FST_TwoTilesFixed, MSEO.OneSmallAndLarge.Frames.OneLargeObj)
+    InitEntity(manyObjEntity, manyObjEntity.frameSet, manyObjEntity.frame)
 
     jsr     MetaSprite.Render.InitLoop
 
@@ -510,22 +464,6 @@ function _Init {
 Fail:
     clc
     rts
-}
-
-
-// Renders the entity at the center of the screen
-// REQUIRES: 16 bit A, 16 bit Index, DB = 0x7e
-// INPUT: DP = entity
-a16()
-i16()
-code()
-function _RenderEntityCenter {
-    lda.w   #SCREEN_WIDTH/2 - INT_MS8_OFFSET
-    sta.w   MetaSprite.Render.xPos
-    lda.w   #SCREEN_HEIGHT/2 - INT_MS8_OFFSET
-    sta.w   MetaSprite.Render.yPos
-
-    jmp     MetaSprite.Render.RenderEntity
 }
 
 

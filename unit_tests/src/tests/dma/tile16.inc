@@ -607,23 +607,24 @@ Tile7:
     fill 32, 0x11
 
 
-rodata(DMA_Tile16Data)
-TileList2:
+rodata(rom0)
+assert((pc() >> 16) == (Dma.Tile16.TileListData >> 16))
+assert(pc() > Dma.Tile16.TileListData)
+
+constant TileList2 = pc() - Dma.Tile16.TileListData + 1
     db  2
     dw  Tile2 >> 7
     dw  Tile3 >> 7
 
 
-rodata(DMA_Tile16Data)
-TileList3:
+constant TileList3 = pc() - Dma.Tile16.TileListData + 1
     db  3
     dw  Tile4 >> 7
     dw  Tile5 >> 7
     dw  Tile6 >> 7
 
 
-rodata(DMA_Tile16Data)
-TileList5:
+constant TileList5 = pc() - Dma.Tile16.TileListData + 1
     db  5
     dw  Tile0 >> 7
     dw  Tile1 >> 7
@@ -632,8 +633,7 @@ TileList5:
     dw  Tile4 >> 7
 
 
-rodata(DMA_Tile16Data)
-TileList10:
+constant TileList10 = pc() - Dma.Tile16.TileListData + 1
     db  10
     dw  Tile7 >> 7
     dw  Tile6 >> 7

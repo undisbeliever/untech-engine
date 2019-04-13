@@ -15,16 +15,11 @@ namespace MetaTiles {
 
 // Initialize the tables/variables
 //
-// REQUIRES: 16 bit A, DB access shadow
+// REQUIRES: 8 bit A, DB access shadow
 macro _Init() {
-    assert16a()
+    assert8a()
 
-    sep     #$20
-a8()
     stz.w   MetaTiles.bufferState
-
-    rep     #$20
-a16()
 }
 
 

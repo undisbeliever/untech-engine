@@ -6,40 +6,18 @@ createCodeBlock(code,                   0xc08000, 0xc0ffaf)
 createDataBlock(breakIdStrings,         0xc00000, 0xc017ff)
 createDataBlock(testTableBlock,         0xc02000, 0xc03fff)
 
-createDataBlock(MS_FrameSetList,        0xc10000, 0xc100ff)
-createDataBlock(MS_PaletteList,         0xc10100, 0xc101ff)
-createDataBlock(MS_FrameList,           0xc10200, 0xc102ff)
-createDataBlock(MS_AnimationList,       0xc10300, 0xc103ff)
+createDataBlock(RES_Lists,              0xc04000, 0xc04fff)
+createDataBlock(rom0,                   0xc05000, 0xc07fff)
 
-createDataBlock(MS_FrameSetData,        0xc10400, 0xc10fff)
-createDataBlock(MS_FrameData,           0xc11000, 0xc117ff)
-createDataBlock(MS_AnimationData,       0xc11800, 0xc11fff)
-createDataBlock(MS_FrameObjectsData,    0xc12000, 0xc127ff)
-createDataBlock(MS_TileHitboxData,      0xc12800, 0xc12fff)
-createDataBlock(MS_ActionPointsData,    0xc13000, 0xc13fff)
+createDataBlock(RES_Block0,             0xc10000, 0xc11fff)
+createDataBlock(RES_Block1,             0xc12000, 0xc13fff)
+createDataBlock(RES_Block2,             0xc14000, 0xc15fff)
+createDataBlock(RES_Block3,             0xc16000, 0xc17fff)
+createDataBlock(RES_Block4,             0xc18000, 0xc19fff)
+createDataBlock(RES_Block5,             0xc1a000, 0xc1bfff)
+createDataBlock(RES_Block6,             0xc1c000, 0xc1dfff)
 
-// Moving EntityHitbox data to a different data bank then FrameData
-// in order to test the `src/metasprite/entityhitbox.inc` conditionals.
-// (same data bank code is tested by horizontal-shooter)
-createDataBlock(MS_EntityHitboxData,    0xc01800, 0xc01fff)
-
-createDataBlock(MS_PaletteData,         0xc14000, 0xc147ff)
-
-createDataBlock(DMA_Tile16Data,         0xc14800, 0xc14fff)
-
-createDataBlock(MS_TileBlock_0,         0xc15000, 0xc16fff)
-createDataBlock(MS_TileBlock_1,         0xc17000, 0xc18fff)
-
-createDataBlock(EN_EntityList,          0xc19000, 0xc1907f)
-createDataBlock(EN_ProjectileList,      0xc19080, 0xc190ff)
-createDataBlock(EN_RomData,             0xc19100, 0xc19fff)
-
-createDataBlock(RES_Lists,              0xc1a000, 0xc1a0ff)
-createDataBlock(RES_Block0,             0xc04000, 0xc05fff)
-createDataBlock(RES_Block1,             0xc06000, 0xc07fff)
-
-createDataBlock(rom0,                   0xc1a100, 0xc1cfff)
-createDataBlock(testNameBlock,          0xc1d000, 0xc1ffff)
+createDataBlock(testNameBlock,          0xc1e000, 0xc1ffff)
 
 
 createRamBlock(dp,          0x000000, 0x0000ff)
@@ -67,6 +45,8 @@ namespace EntityPool {
     }
 }
 
+define PLAYER_PROJECTILE_ENTITY_LIST = PlayerProjectiles
+define ENEMY_PROJECTILE_ENTITY_LIST  = EnemyProjectiles
 
 
 // MetaTile engine settings

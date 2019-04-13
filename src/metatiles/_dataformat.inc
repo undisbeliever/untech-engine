@@ -10,15 +10,10 @@
 
 namespace MetaTiles {
 
-// The MetaTiles subsystem requires the following to be defined:
-//
-//   MetaTiles.TilesetList
-//      a list of long pointers that point to MetaTiles.Format.Tileset
-//      data.
-//
-//   MetaTiles.TilesetList.count
-//      the number of elements in the TilesetList
-//
+// List of MetaTile Tilesets
+// (Long Addr Table)
+constant TilesetList = Project.MetaTileTilesetList
+constant TilesetList.count = Project.MetaTileTilesetList.count
 
 namespace Format {
     // MetaTile Tileset data format
@@ -31,8 +26,8 @@ namespace Format {
         //      - see Resources.Format.AnimatedTilesetHeader for data format
     }
 
-    if MetaTiles.TILESET_FORMAT_VERSION != 1 {
-        error "Invalid untech-resc MetaTile Tileset Format"
+    if MetaTiles.TILESET_FORMAT_VERSION != 2 {
+        error "Invalid untech-compiler MetaTile Tileset Format"
     }
 }
 

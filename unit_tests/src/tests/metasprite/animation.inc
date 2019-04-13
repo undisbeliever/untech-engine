@@ -17,6 +17,7 @@ function Process_Frame {
 constant tmp_frame = tmp0
 
     lda.w   #MSEO.AnimationTest.Animations.Frame
+    ldy.w   #MSEO.AnimationTest.Animations.Frame
     jsr     _Init
     bcc     Fail
 
@@ -60,6 +61,7 @@ function Process_Time {
 constant tmp_frame = tmp0
 
     lda.w   #MSEO.AnimationTest.Animations.Time
+    ldy.w   #MSEO.AnimationTest.Animations.Time
     jsr     _Init
     bcc     Fail
 
@@ -113,6 +115,7 @@ inline DistanceTest(animation, vecl) {
         // 79 *VECL parameter means >=2.5px travel
 
         lda.w   #MSEO.AnimationTest.Animations.{animation}
+        ldy.w   #MSEO.AnimationTest.Animations.{animation}
         jsr     _Init
         bcc     Fail
 
@@ -179,6 +182,7 @@ code()
 Test.add("MetaSprite.Animation.Process (OneShot)")
 function Process_OneShot {
     lda.w   #MSEO.AnimationTest.Animations.OneShot
+    ldy.w   #0xff
     jsr     _Init
     bcc     Fail
 
@@ -210,6 +214,7 @@ function Process_ChangeAnimation {
     // ChangeAnimation2.
 
     lda.w   #MSEO.AnimationTest.Animations.ChangeAnimation
+    ldy.w   #MSEO.AnimationTest.Animations.ChangeAnimation2
     jsr     _Init
     bcc     Fail
 
@@ -233,6 +238,67 @@ a8()
     cmp.b   #MSEO.AnimationTest.Animations.ChangeAnimation2
     bne     Fail
 
+    // Test that nextAnimation changed (ie, set to 0xff)
+    lda.b   BaseEntity.MetaSprite.Animation.nextAnimation
+    cmp.b   #0xff
+    bne     Fail
+
+    sec
+    rts
+
+Fail:
+    clc
+    rts
+}
+
+
+a16()
+i16()
+code()
+Test.add("BaseEntity.MetaSprite.Animation.nextAnimation")
+function Change_nextAnimation {
+    // Change animation contains 4 single frames, then changes to
+    // ChangeAnimation2.
+
+    lda.w   #MSEO.AnimationTest.Animations.ChangeAnimation
+    ldy.w   #MSEO.AnimationTest.Animations.ChangeAnimation2
+    jsr     _Init
+    bcc     Fail
+
+    // Change nextAnimation to Time Animation
+    sep     #$20
+a8()
+    lda.b   #MSEO.AnimationTest.Animations.Time
+    sta.b   BaseEntity.MetaSprite.Animation.nextAnimation
+
+    rep     #$30
+a16()
+
+    jsr     MetaSprite.Animation.Process
+    jsr     MetaSprite.Animation.Process
+    jsr     MetaSprite.Animation.Process
+    jsr     MetaSprite.Animation.Process
+
+    // Test that the animation id is still ChangeAnimation
+    lda.b   BaseEntity.MetaSprite.Animation.id
+    and.w   #0xff
+    cmp.w   #MSEO.AnimationTest.Animations.ChangeAnimation
+    bne     Fail
+
+    jsr     MetaSprite.Animation.Process
+
+    // Test the animation id changed to Time
+    sep     #$20
+a8()
+    lda.b   BaseEntity.MetaSprite.Animation.id
+    cmp.b   #MSEO.AnimationTest.Animations.Time
+    bne     Fail
+
+    // Test that nextAnimation changed to Time
+    lda.b   BaseEntity.MetaSprite.Animation.nextAnimation
+    cmp.b   #MSEO.AnimationTest.Animations.Time
+    bne     Fail
+
     sec
     rts
 
@@ -246,18 +312,22 @@ Fail:
 //
 //  * Loads the Entity
 //  * Sets the animation
+//  * Tests that nextAnimation is set correctly
 //
 // REQUIRES: 16 bit A, 16 bit Index, DB = 0x7E
 // INPUT:  A = Animation Id
+//         Y = expected nextAnimation
 // OUTPUT: DP = Entity address
 // OUTPUT: C set on success
 a16()
 i16()
 code()
 function _Init {
-constant tmp_animation = Test.tmp
+constant tmp_animation     = Test.tmp
+constant tmp_nextAnimation = Test.tmp + 2
 
     sta.w   tmp_animation
+    sty.w   tmp_nextAnimation
 
     jsr     _Init_MetaSpriteModule
 
@@ -273,14 +343,27 @@ constant tmp_animation = Test.tmp
     bcc     Fail
 
     lda.w   tmp_animation
-    jsr     MetaSprite.SetAnimation
-    bcc     Fail
+    jsr     MetaSprite.Animation.SetAnimationId
+
+    sep     #$20
+a8()
+    lda.b   BaseEntity.MetaSprite.Animation.id
+    cmp.w   tmp_animation
+    bne     Fail
+
+    lda.b   BaseEntity.MetaSprite.Animation.nextAnimation
+    cmp.w   tmp_nextAnimation
+    bne     Fail
+
+    rep     #$30
+a16()
 
     sec
     rts
 
 Fail:
-    clc
+    rep     #$31
+    // c clear
     rts
 }
 

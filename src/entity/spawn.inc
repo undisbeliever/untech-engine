@@ -3,6 +3,10 @@
 //
 // Entity Spawning Routines.
 //
+// NOTE: Newly spawned entities are not immediately activated or added to their
+// entity list when spawned.  Instead the newly spawned entity will be
+// activated and moved to its entity list at the start of the next frame.
+//
 //
 // This file is part of the UnTech Game Engine.
 // Copyright (c) 2016 - 2017, Marcus Rowe <undisbeliever@gmail.com>.
@@ -10,7 +14,7 @@
 
 
 RegisterBreakId(INVALID_ENTITY_ID)
-RegisterBreakId(INVALID_PROJECTILE_ID)
+RegisterBreakId(INVALID_ENTITY_LIST_ID)
 Warnings.Register(ENTITY_POOL_EMPTY, 31, 0, 31)
 
 namespace Entity {
@@ -26,11 +30,45 @@ EntityPoolEmpty:
     rts
 }
 
-// Spawns a new entity and inserts it into its default list
+
+
+// Spawn a new entity at the MetaSprite Collision Centre.
+//
+// REQUIRES: 16 bit A, 16 bit Index, DB = 0x7e
+//
+// INPUT: A - Entity Data Id
+//        Y - entity parameter (passed to entity init function)
+//
+// OUTPUT: Y - address of new entity
+//         C - set if entity created successfully
+a16()
+i16()
+code()
+function SpawnAtMetaSpriteCollisionCentre {
+    ldx.w   MetaSprite.Collision.xPos
+    stx.w   Entity.Spawn.xPos
+
+    ldx.w   MetaSprite.Collision.yPos
+    stx.w   Entity.Spawn.yPos
+
+FallThrough:
+}
+
+
+
+// Spawn a new entity.
+//
+// The newly created entity will be placed in either the:
+//
+//   * `activateNextFrame` special list if the Entity Init function
+//      returns carry set **or** the entity is inside the active window.
+//
+//   * `deactivated` special list if the Entity Init function returns
+//      carry clear and the entity is outside the active window.
 //
 // REQUIRES: 16 bit A, 16 bit Index, DB = $7E
 //
-// INPUT: A - Entity Id
+// INPUT: A - Entity Data Id
 //        Y - entity parameter (passed to entity init function)
 //        Entity.Spawn.xPos - entity x Position (uint16)
 //        Entity.Spawn.yPos - entity y Position (uint16)
@@ -45,7 +83,9 @@ function Spawn {
 allocateTmpWord(xPos)
 allocateTmpWord(yPos)
 
-    cmp.w   #Entity.Data.EntityListCount
+    assert(pc() == SpawnAtMetaSpriteCollisionCentre.FallThrough)
+
+    cmp.w   #Entity.Data.EntityRomDataListCount
     bcc     +
         break(INVALID_ENTITY_ID)
     +
@@ -53,7 +93,7 @@ allocateTmpWord(yPos)
     asl
     tax
 
-    lda.w   lists.free
+    lda.w   specialLists.free
     beq     EntityPoolEmpty
 
     phd
@@ -63,28 +103,31 @@ allocateTmpWord(yPos)
 
         tcd
         lda.b   BaseEntity.next
-        sta.w   lists.free
-
+        sta.w   specialLists.free
+        bne     +
+            // There are no more free entities left, clear lastFreeEntity
+            stz.w   lastFreeEntity
+        +
 
         // Get Entity ROM Data
 
-        lda.l   Entity.Data.EntityList,x
+        lda.l   Entity.Data.EntityRomDataList,x
         tax
         stx.b   BaseEntity.romPtr
 
 
         // Setup BaseEntity
 
-        lda.l   BaseEntityData.functionTable,x
+        lda.l   BaseEntityRomStruct.functionTable,x
         sta.b   BaseEntity.functionTable
 
         lda.w   xPos
         sta.b   BaseEntity.xPos.px
-        stz.b   BaseEntity.xPos
+        stz.b   BaseEntity.xPos.sx
 
         lda.w   yPos
         sta.b   BaseEntity.yPos.px
-        stz.b   BaseEntity.yPos
+        stz.b   BaseEntity.yPos.sx
 
         stz.b   BaseEntity.xVecl
         stz.b   BaseEntity.xVecl + 2
@@ -92,11 +135,27 @@ allocateTmpWord(yPos)
         stz.b   BaseEntity.yVecl + 2
 
 
-        lda.l   BaseEntityData.defaultPalette,x
+        // Set projectileId and listId
+        assert(BaseEntity.projectileId + 1 == BaseEntity.listId)
+        assert(BaseEntityRomStruct.initialProjectileId + 1 == BaseEntityRomStruct.initialListId)
+        lda.l   BaseEntityRomStruct.initialProjectileId,x
+        sta.b   BaseEntity.projectileId
+
+
+        // Initiate the MetaSprite
+        lda.l   BaseEntityRomStruct.defaultPalette,x
         tay
-        lda.l   BaseEntityData.frameSetId,x
+        lda.l   BaseEntityRomStruct.frameSetId,x
 
         MetaSprite._InitEntity()
+
+
+        // Assign an new instanceId to the entity
+        sep     #$10
+    i8()
+        Entity._InstanceIdTable._AssignInstanceId()
+        rep     #$30
+    i16()
 
 
         // Call Entity Init function
@@ -104,409 +163,392 @@ allocateTmpWord(yPos)
         pla
         jsr     (BaseEntityFunctionTable.Init,x)
 
+        // entity is active if, either
+        //   A. The Init function returns carry set, or
+        //   B. entity is inside active window
 
-        // Insert entity into the appropriate list
-
-        namespace ActiveTest {
-            // entity is active if:
-            //   entity list only contains active entities
-            //   OR entity is inside active window
-
-            // get initial list index
-            ldx.b   BaseEntity.romPtr
-            lda.l   BaseEntityData.initialList,x
-            and.w   #0xfe
-            cmp.w   #lists.N_LISTS * 2
-            bcs     MoveToDeleteList
-
-            tax
-            lda.l   EntityAlwaysActiveList,x
-            bne     IsActive
+        bcs     SkipActiveWindowTest
 
             BranchEntityOutsideActiveWindow(IsInactive)
 
-            IsActive:
-                // entity is activate.
-                // Insert into its active list
+            SkipActiveWindowTest:
+                // We cannot move the entity into its entity list while
+                // the entity-loop is running.
+                // Instead we move it to the `activateNextFrame` special list,
+                // where it will be activated and moved to the correct
+                // entity list at the start of the next frame.
 
-                phx
-                    jsr     MetaSprite.Activate
-                plx
-                bcc     CouldNotActivate
-
-                // x = list index
-                lda.w   lists.FIRST,x
+                lda.w   specialLists.activateNextFrame
                 sta.b   BaseEntity.next
                 tdc
-                sta.w   lists.FIRST,x
+                sta.w   specialLists.activateNextFrame
 
                 bra     EndIf
 
-            MoveToDeleteList:
-                // invalid list id, move to delete list
-                ldy.w   #lists.toDelete
-                bra     InsertIntoInactiveList
 
-            CouldNotActivate:
-                ldy.w   #lists.tryToActivateAgain
-                bra     InsertIntoInactiveList
+            InvalidEntityListId:
+                break(INVALID_ENTITY_LIST_ID)
+
 
             IsInactive:
-                ldy.w   #lists.deactivated
+                // Insert the entity into the deactivated list
 
-            InsertIntoInactiveList:
-                // Insert into deactivated list, remembering the list
-                // address for when it is reactivated
-
-                // x = list index
-                // y = deactivated list address
-                txa
-                clc
-                adc.w   #lists.FIRST
-                sta.b   BaseEntity._ft_currentList
-
-                lda.w   0,y
+                lda.w   specialLists.deactivated
                 sta.b   BaseEntity.next
                 tdc
-                sta.w   0,y
+                sta.w   specialLists.deactivated
 
             EndIf:
 
-            // A = DP
-        }
+        // A = DP
         tay
     pld
 
     sec
     rts
-
-rodata(rom0)
-// one if the entity list is always active
-// zero if entity list can be deactivated
-EntityAlwaysActiveList: {
-    dw  1       // players
-    dw  1       // bosses
-    dw  0       // enemies
-    dw  0       // npcs
-    dw  0       // platforms
-    dw  1       // particles
-
-    assert((pc() - EntityAlwaysActiveList) == lists.N_LISTS * 2)
-}
-
-code()
 }
 
 
 
-// Spawns a given entity at the MetaSprite Collision Centre.
+// Spawn a projectile at all {ap} action points in the current MetaSprite
+// frame.
+//
+// When a projectile is spawned the action point position is stored in the
+// variable `MetaSprite.ActionPoint.positionPair` (as a int_ms8 pair)
+// and can be accessed by the projectile's `Init` routine.
+//
+// This routine will always place the newly created projectile in the
+// `activateNextFrame` special list, regardless of the output of the
+// projectile's Init routine.
+//
+// NOTE: This routine will invalidate `MetaSprite.ActionPoint.positionPair`.
+//       DO NOT access `positionPair` after calling this function.
 //
 // REQUIRES: 16 bit A, 16 bit Index, DB = 0x7e
 //
-// INPUT: A - Entity Id
-//        Y - entity parameter (passed to entity init function)
-//
-// OUTPUT: Y - address of new entity
-//         C - set if entity created successfully
-function SpawnAtMetaSpriteCollisionCentre {
-    ldx.w   MetaSprite.Collision.xPos
-    stx.w   Entity.Spawn.xPos
-
-    ldx.w   MetaSprite.Collision.yPos
-    stx.w   Entity.Spawn.yPos
-
-    jmp     Entity.Spawn
-}
-
-
-
-// Spawns a given entity on a given ActionPoint type
-//
-// This routine may spawn multiple entities.
-//
-// When entities are spawned the value `MetaSprite.ActionPoint.address`
-// will be set to the address of the current Action Point.
-//
-// REQUIRES: 16 bit A, 16 bit Index, DB = 0x7e
-// MUST NOT BE CALLED IN ENTITY CONSTRUCTOR
-//
-// INPUT: DP = entity
-//        Y = entityId
-//        A = type to match
-a16()
-i16()
-code()
-function SpawnAtActionPoint {
-allocateTmpWord(tmp_compare)
-allocateTmpWord(tmp_entityToSpawn)
-
-    cpy.w   #Entity.Data.EntityListCount
-    bcc     +
-        break(INVALID_ENTITY_ID)
-    +
-
-    sta.w   tmp_compare
+// INPUT: DP - entity
+macro __SpawnManualProjectiles(ap, listId) {
+    assert16a()
+    assert16i()
 
     ldx.b   BaseEntity.MetaSprite.currentFrame
-    beq     Return
-
     lda.l   MetaSprite.Format.Frame.actionPoints,x
     beq     Return
 
     tax
 
-    sty.w   tmp_entityToSpawn
-
-    sep     #$20
-
-a8()
-    lda.l   MetaSprite.Format.ActionPoints.parameter,x
-    beq     ReturnRep
-
-    Loop:
-        cmp.w   tmp_compare
-        bne     SkipSpawn
-
-            rep     #$31
-        a16()
-            lda.l   MetaSprite.Format.ActionPoints.xPos,x
-            and.w   #0x00ff
-            // carry clear, will set carry on overflow (thus the -1)
-            adc.w   #-INT_MS8_OFFSET - 1
-            adc.b   BaseEntity.xPos.px
-            sta.w   Entity.Spawn.xPos
-
-            clc
-            lda.l   MetaSprite.Format.ActionPoints.yPos,x
-            and.w   #0x00ff
-            // carry clear, will set carry on overflow (thus the -1)
-            adc.w   #-INT_MS8_OFFSET - 1
-            adc.b   BaseEntity.yPos.px
-            sta.w   Entity.Spawn.yPos
-
-            stx.w   MetaSprite.ActionPoint.address
-            tdc
-            tay
-            lda.w   tmp_entityToSpawn
-            jsr     Entity.Spawn
-
-            ldx.w   MetaSprite.ActionPoint.address
-
-            sep     #$20
-        a8()
-
-    SkipSpawn:
-        inx
-        inx
-        inx
-        lda.l   MetaSprite.Format.ActionPoints.parameter,x
-        bne     Loop
-
-ReturnRep:
-    rep     #$30
-a16()
-Return:
-    rts
-}
-
-
-
-// Spawns one or more enemy projectiles from an ActionPoint type/location
-//
-// When entities are spawned the value `MetaSprite.ActionPoint.address`
-// will be set to the address of the current Action Point.
-//
-// Will assume that the MetaSprite will always activate, will ignore
-// out of VRAM/CGRAM errors and glitch out.
-//
-// REQUIRES: 16 bit A, 16 bit Index, DB = 0x7e
-// MUST NOT BE CALLED IN ENTITY CONSTRUCTOR
-//
-// INPUT: DP = entity
-//        Y = projectileId
-//        A = type to match
-a16()
-i16()
-code()
-function SpawnEnemyProjectileFromActionPoint {
-    ldx.w   #lists.enemyProjectiles
-    bra     _SpawnProjectileFromActionPoint
-}
-
-// Spawns one or more player projectiles from an ActionPoint type/location
-//
-// When entities are spawned the value `MetaSprite.ActionPoint.address`
-// will be set to the address of the current Action Point.
-//
-// Will assume that the MetaSprite will always activate, will ignore
-// out of VRAM/CGRAM errors and glitch out.
-//
-// REQUIRES: 16 bit A, 16 bit Index, DB = 0x7e
-// MUST NOT BE CALLED IN ENTITY CONSTRUCTOR
-//
-// INPUT: DP = entity
-//        Y = projectile Id
-//        A = type to match
-a16()
-i16()
-code()
-function SpawnPlayerProjectileFromActionPoint {
-    ldx.w   #lists.playerProjectiles
-_fallthrough:
-}
-
-
-// Spawns a projectile at a given action point type
-//
-// INPUT: DP = entity
-//        Y = projectile Id
-//        A = type to match
-//        X = projectile list address
-a16()
-i16()
-code()
-function _SpawnProjectileFromActionPoint {
-allocateTmpWord(tmp_listAddr)
-allocateTmpWord(tmp_compare)
-allocateTmpWord(tmp_projectileDataPtr)
-allocateTmpWord(tmp_entityDoingSpawning)
-
-    assert(SpawnPlayerProjectileFromActionPoint._fallthrough == pc())
-
-    cpy.w   #Entity.Data.ProjectileListCount
-    bcc     +
-        break(INVALID_PROJECTILE_ID)
-    +
-
-    sta.w   tmp_compare
-    stx.w   tmp_listAddr
-
-    ldx.b   BaseEntity.MetaSprite.currentFrame
+    lda.l   MetaSprite.Format.ActionPoints.type,x
+    and.w   #0xff
     beq     Return
 
-    lda.l   MetaSprite.Format.Frame.actionPoints,x
-    beq     Return
-
-    // A -> X, Y -> A
-    tax
-    tya
-    txy
-
-    asl
-    tax
-    lda.l   Entity.Data.ProjectileList,x
-    sta.w   tmp_projectileDataPtr
-
-    tyx
-
-    tdc
-    sta.w   tmp_entityDoingSpawning
-
-    sep     #$20
-a8()
-    lda.l   MetaSprite.Format.ActionPoints.parameter,x
-    beq     ReturnRepDp
-
     Loop:
-        cmp.w   tmp_compare
-        beq     SpawnProjectile
+        cmp.w   #Project.ActionPoints.{ap}
+        bne     Continue
+
+            phx
+                lda.l   MetaSprite.Format.ActionPoints.positionPair,x
+
+                ldy.w   #EntityLists.{{listId}}
+                jsr     __SpawnProjectileAtActionPoint
+            plx
 
     Continue:
         inx
         inx
         inx
-        lda.l   MetaSprite.Format.ActionPoints.parameter,x
+        lda.l   MetaSprite.Format.ActionPoints.type,x
+        and.w   #0xff
         bne     Loop
 
-ReturnRepDp:
-    rep     #$30
-a16()
-ReturnDp:
-    lda.w   tmp_entityDoingSpawning
-    tcd
-
 Return:
-    rts
+}
 
+
+
+if {defined Project.ActionPoints.ManualPlayerProjectile} {
+// Spawn a player projectile at all `ManualPlayerProjectile` Action Points in
+// the current MetaSprite Frame.
+//
+// When a projectile is spawned the action point position is stored in the
+// variable `MetaSprite.ActionPoint.positionPair` (as a int_ms8 pair)
+// and can be accessed by the projectile's `Init` routine.
+//
+// This routine will always place the newly created projectile in the
+// `activateNextFrame` special list, regardless of the output of the
+// projectile's Init routine.
+//
+// NOTE: This routine will invalidate `MetaSprite.ActionPoint.positionPair`.
+//       DO NOT access `positionPair` after calling this function.
+//
+// REQUIRES: 16 bit A, 16 bit Index, DB = 0x7e
+//
+// INPUT: DP - entity
 a16()
-EntityPoolEmpty:
-    Warnings.Warn(ENTITY_POOL_EMPTY)
-    bra     ReturnDp
+i16()
+code()
+function SpawnManualPlayerProjectiles {
+    __SpawnManualProjectiles(ManualPlayerProjectile, PLAYER_PROJECTILE_ENTITY_LIST)
+
+    rts
+}
+}
 
 
-// Spawns a projectile then continues the loop
-SpawnProjectile:
-        rep     #$31
-    a16()
-        lda.w   Entity.lists.free
-        beq     EntityPoolEmpty
 
-        stx.w   MetaSprite.ActionPoint.address
+if {defined Project.ActionPoints.ManualEnemyProjectile} {
+// Spawn an enemy projectile at all `ManualEnemyProjectile` Action Points in
+// the current MetaSprite Frame.
+//
+// When a projectile is spawned the action point position is stored in the
+// variable `MetaSprite.ActionPoint.positionPair` (as a int_ms8 pair)
+// and can be accessed by the projectile's `Init` routine.
+//
+// This routine will always place the newly created projectile in the
+// `activateNextFrame` special list, regardless of the output of the
+// projectile's Init routine.
+//
+// NOTE: This routine will invalidate `MetaSprite.ActionPoint.positionPair`.
+//       DO NOT access `positionPair` after calling this function.
+//
+// REQUIRES: 16 bit A, 16 bit Index, DB = 0x7e
+//
+// INPUT: DP - entity
+a16()
+i16()
+code()
+function SpawnManualEnemyProjectiles {
+    __SpawnManualProjectiles(ManualEnemyProjectile, ENEMY_PROJECTILE_ENTITY_LIST)
 
+    rts
+}
+}
+
+
+
+// Spawn an entity at a given action point.
+//
+// This routine will always place the newly created entity in the
+// `activateNextFrame` special list, regardless of the output of the
+// projectile's Init routine.
+//
+// REQUIRES: 16 bit A, 16 bit Index, DB = 0x7e
+//
+// INPUT: DP - entity
+//         Y - Entity RomData Id
+//         A - action point positionPair (int_ms8 pair)
+function SpawnEntityAtActionPoint {
+
+    cpy.w   #Entity.Data.EntityRomDataListCount
+    bcc     +
+        break(INVALID_ENTITY_ID)
+    +
+
+    sta.w   MetaSprite.ActionPoint.positionPair
+
+    tya
+    asl
+    tax
+    lda.l   Entity.Data.EntityRomDataList,x
+    tax
+
+    lda.l   BaseEntityRomStruct.initialListId,x
+    tay
+
+    bra     __SpawnAtActionPoint
+}
+
+
+
+code()
+namespace __SpawnProjectileAtActionPoint {
+SkipProjectile:
+    rts
+}
+
+
+
+// Spawn a player projectile at an action point
+//
+// REQUIRES: 16 bit A, 16 bit Index, DB = 0x7e
+// INPUT: DP - entity
+//         A - action point positionPair (int_ms8 pair)
+a16()
+i16()
+code()
+function _SpawnPlayerProjectileAtActionPoint {
+    ldy.w   #EntityLists.{PLAYER_PROJECTILE_ENTITY_LIST}
+    bra     __SpawnProjectileAtActionPoint
+}
+
+
+// Spawn a enemy projectile at an action point
+//
+// REQUIRES: 16 bit A, 16 bit Index, DB = 0x7e
+// INPUT: DP - entity
+//         A - action point positionPair (int_ms8 pair)
+a16()
+i16()
+code()
+function _SpawnEnemyProjectileAtActionPoint {
+    ldy.w   #EntityLists.{ENEMY_PROJECTILE_ENTITY_LIST}
+
+FallThrough:
+}
+
+
+// Spawn an projectile at an action point
+//
+// REQUIRES: 16 bit A, 16 bit Index, DB = 0x7e
+// INPUT: DP - entity
+//         A - action point positionPair (int_ms8 pair)
+//         Y - entity list id
+a16()
+i16()
+code()
+function __SpawnProjectileAtActionPoint {
+    assert(_SpawnEnemyProjectileAtActionPoint.FallThrough == pc())
+
+    sta.w   MetaSprite.ActionPoint.positionPair
+
+    // Do not spawn projectile if projectileId is invalid
+    lda.b   BaseEntity.projectileId
+    and.w   #0xff
+    cmp.w   #Entity.Data.ProjectileRomDataListCount
+    bcs     SkipProjectile
+
+    asl
+    tax
+    lda.l   Entity.Data.ProjectileRomDataList,x
+    tax
+
+FallThrough:
+}
+
+
+// Spawn an entity or projectile at the action point.
+//
+// When a projectile is spawned the action point position is stored in the
+// variable `MetaSprite.ActionPoint.positionPair` (as a int_ms8 pair)
+// and can be accessed by the projectile's `Init` routine.
+//
+// This routine will always place the newly created entity in the
+// `activateNextFrame` special list, regardless of the output of the
+// projectile's Init routine.
+//
+// This routine will override the `BaseEntityRomStruct.initialListId`
+// with the value of the Y register.
+//
+// REQUIRES: 16 bit A, 16 bit Index, DB = 0x7e
+// INPUT: DP - entity
+//         A - action point positionPair (int_ms8 pair)
+//         Y - enemy projectile list id
+//         X - EntityRomData address
+//        MetaSprite.ActionPoint.positionPair = action point position
+a16()
+i16()
+code()
+function __SpawnAtActionPoint {
+    assert(__SpawnProjectileAtActionPoint.FallThrough == pc())
+
+    constant EntityPoolEmpty = __SpawnProjectileAtActionPoint.SkipProjectile
+
+    // Get new entity address
+    lda.w   Entity.specialLists.free
+    beq     EntityPoolEmpty
+
+    phd
         // remove entity from free list
         tcd
         lda.b   BaseEntity.next
-        sta.w   Entity.lists.free
+        sta.w   Entity.specialLists.free
+        bne     +
+            // There are no more free entities left, clear lastFreeEntity
+            stz.w   lastFreeEntity
+        +
 
-        // calculate entity location
-        ldy.w   tmp_entityDoingSpawning
+        // save entity listId
+        // Y = listId
+        sty.b   BaseEntity.listId
+        // check if was safe to do a 16 bit write to listId
+        assert(BaseEntity.listId + 1 == BaseEntity.MetaSprite.frameSet)
 
-        // carry clear (NO INSTRUCTION ABOVE MODIFIES CARRY)
-        lda.l   MetaSprite.Format.ActionPoints.xPos,x
-        and.w   #0x00ff
+
+        // Calculate entity spawn location
+
+        // load original entity address
+        lda     1,s
+        tay
+        // A = original entity as routine argument
+
+        clc
+        lda.w   MetaSprite.ActionPoint.positionPair
+        and.w   #0xff
         // carry clear, will set carry on overflow (thus the -1)
         adc.w   #-INT_MS8_OFFSET - 1
         adc.w   BaseEntity.xPos.px,y
         sta.b   BaseEntity.xPos.px
-        stz.b   BaseEntity.xPos
+        stz.b   BaseEntity.xPos.sx
 
         clc
-        lda.l   MetaSprite.Format.ActionPoints.yPos,x
-        and.w   #0x00ff
+        lda.w   MetaSprite.ActionPoint.positionPair + 1
+        // no masking required, third byte of positionPair is always zero
         // carry clear, will set carry on overflow (thus the -1)
         adc.w   #-INT_MS8_OFFSET - 1
         adc.w   BaseEntity.yPos.px,y
         sta.b   BaseEntity.yPos.px
-        stz.b   BaseEntity.yPos
+        stz.b   BaseEntity.yPos.sx
 
         stz.b   BaseEntity.xVecl
         stz.b   BaseEntity.xVecl + 2
         stz.b   BaseEntity.yVecl
         stz.b   BaseEntity.yVecl + 2
 
-        // Get Entity ROM data
-        ldx.w   tmp_projectileDataPtr
+
+        // Initiate entity data
+        // X = EntityRomData address
         stx.b   BaseEntity.romPtr
 
-        lda.l   BaseEntityData.functionTable,x
+        lda.l   BaseEntityRomStruct.functionTable,x
         sta.b   BaseEntity.functionTable
 
-        // Initiate the MetaSprite
-        lda.l   BaseEntityData.defaultPalette,x
+        assert(BaseEntityRomStruct.defaultPalette + 1 == BaseEntityRomStruct.initialProjectileId)
+        lda.l   BaseEntityRomStruct.defaultPalette,x
         tay
-        lda.l   BaseEntityData.frameSetId,x
+        // Y = defaultPalette
+        // hiword A = initialProjectileId
+
+        // Clear instanceId and set projectileId
+        assert(BaseEntity.instanceId + 1 == BaseEntity.projectileId)
+        and.w   #0xff00
+        sta.b   BaseEntity.instanceId
+
+
+        // Initiate the MetaSprite
+        lda.l   BaseEntityRomStruct.frameSetId,x
+        // Y = defaultPalette
         MetaSprite._InitEntity()
+
 
         // Call Entity Init function
         ldx.b   BaseEntity.functionTable
-        lda.w   tmp_entityDoingSpawning
+        lda     1,s
+        // A = original entity as routine argument
         jsr     (BaseEntityFunctionTable.Init,x)
 
-        // Assume projectiles always activate, even if it causes glitches.
-        jsr     MetaSprite.Activate
+        // We cannot move the entity into its entity list while the
+        // entity-loop is running.
+        // Instead we move it to the `activateNextFrame` special list, where it
+        // will be activated and moved to the correct entity list at the
+        // start of the next frame.
 
-        // insert projectile into projectiles list
-        ldx.w   tmp_listAddr
-        lda.w   0,x
+        lda.w   specialLists.activateNextFrame
         sta.b   BaseEntity.next
         tdc
-        sta.w   0,x
+        sta.w   specialLists.activateNextFrame
 
-        ldx.w   MetaSprite.ActionPoint.address
+    pld
 
-        sep     #$20
-    a8()
-        jmp     Continue
+    rts
 }
 
 }

@@ -24,6 +24,11 @@ namespace Resources {
 constant ANIMATION_TICKS_PER_SECOND = 300
 
 
+// List of palettes
+// (Long Addr Table)
+constant PaletteList = Project.PaletteList
+constant PaletteList.count = Project.PaletteList.count
+
 namespace Format {
 
     // AnimatedTileset resource data format.
@@ -63,7 +68,7 @@ namespace Format {
     }
 
     if Resources.ANIMATED_TILESET_FORMAT_VERSION != 2 {
-        error "Invalid untech-resc Animated Tileset Format"
+        error "Invalid untech-compiler Animated Tileset Format"
     }
 
 
@@ -87,8 +92,8 @@ namespace Format {
         endstruct()
     }
 
-    if Resources.PALETTE_FORMAT_VERSION != 1 {
-        error "Invalid untech-resc Palette Format"
+    if Resources.PALETTE_FORMAT_VERSION != 2 {
+        error "Invalid untech-compiler Palette Format"
     }
 }
 

@@ -2,13 +2,11 @@
 // Copyright (c) 2016 - 2017, Marcus Rowe <undisbeliever@gmail.com>.
 // Distributed under The MIT License: https://opensource.org/licenses/MIT
 
-namespace EntityTest {
 namespace Entities {
 
-namespace DeleteAfterDelayEntity {
+namespace DeleteAfterDelay {
 
-    buildFunctionTable(BaseEntityFunctionTable, DeleteAfterDelayEntity)
-    Entity.useDefaultRenderer()
+    buildFunctionTable(BaseEntityFunctionTable, DeleteAfterDelay)
 
     namespace EntityStruct {
         childstruct(BaseEntity)
@@ -17,11 +15,15 @@ namespace DeleteAfterDelayEntity {
     }
 
 // IN: A = parameter
+// OUT: C set = always activate entity
 a16()
 i16()
 code()
 function Init {
     sta.b   EntityStruct.frames
+
+    // always activate
+    sec
     rts
 }
 
@@ -30,6 +32,7 @@ a16()
 i16()
 code()
 Destructor:
+Deactivated:
 ProcessCollision:
 function Null {
     rts
@@ -42,35 +45,13 @@ code()
 function Process {
     dec.b   EntityStruct.frames
     bne     +
-        lda.w   #Entity.lists.toDelete
-        sta.w   Entity.changeList
+        jmp     Entity.DeleteAndGotoNextEntity
     +
 
-    rts
+    jmp     Entity.GotoNextEntity
+}
 }
 
-
-
-evaluate n = 0
-while {n} < Entity.lists.N_LISTS {
-    rodata(EN_RomData)
-    RomData{n}:
-        dw  FunctionTable
-        db  {n} * 2         // initial List
-        dw  0               // frameSetId
-        db  0               // defaultPalette
-
-    rodata(EN_EntityList)
-    constant EntityId_{n} = (pc() - Entity.Data.EntityList) / 2
-        dw  RomData{n}
-
-    evaluate n = {n} + 1
-}
-
-code()
-}
-
-}
 }
 
 // vim: ft=bass-65816 ts=4 sw=4 et:

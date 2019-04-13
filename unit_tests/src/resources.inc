@@ -2,8 +2,7 @@
 // Copyright (c) 2016 - 2017, Marcus Rowe <undisbeliever@gmail.com>.
 // Distributed under The MIT License: https://opensource.org/licenses/MIT
 
-include "../gen/metasprites.inc"
-include "../gen/resources.inc"
+include "../gen/project.inc"
 include "../resources/text/text.inc"
 
 namespace Text {

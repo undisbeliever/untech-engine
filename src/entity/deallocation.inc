@@ -11,96 +11,157 @@
 
 namespace Entity {
 
-// Deletes all of the entities in the given list
+
+// Entity Destructor
 //
-// Entities in this list will be destructed and have their resources
-// freed.
+// Frees the entity's MetaSprites, calls the entity Destructor routine.
 //
-// REQUIRES: 16 bit A, 16 bit Index, DB = 0x7e
+// if `NO_CLEAR_ENTITY_MEMORY` is not defined the system will override the
+// memory used by the entity to `0xdeaddeaddead...`.
 //
-// MODIFIES: DP
-inline _DeleteAllInList(listId) {
-    assert16a()
-    assert16i()
+// NOTE: This routine does not move the entity to the free list.
+// That is the responsibility of the calling code.
+//
+// REQUITES: 16 bit A, 16 bit Index, DB = 0x7E
+// INPUT: DP = Entity address
+function __EntityDestructor {
+    MetaSprite.EntityDestructor()
 
-    function DeleteEntities_{listId} {
-        lda.w   lists.{listId}
-        beq     NoneToDelete
-
-        Loop:
-            tcd
-
-            MetaSprite.EntityDestructor()
-
-            ldx.b   BaseEntity.functionTable
-            jsr     (BaseEntityFunctionTable.Destructor,x)
-
-            lda.b   BaseEntity.next
-            bne     Loop
+    ldx.b   BaseEntity.functionTable
+    jsr     (BaseEntityFunctionTable.Destructor,x)
 
 
-        // Move the list into the free list
+    lda.w   #InvalidEntityFunctionTable
+    sta.b   BaseEntity.functionTable
 
-        // {listId}.last->next = lists.free
-        // lists.free = lists.{listId}
-        // lists.{listId} = NULL
 
-        lda.w   lists.free
-        sta.b   BaseEntity.next
+    sep     #$10
+i8()
+    _InstanceIdTable._RemoveEntity()
+    rep     #$30
+i16()
+a16()
 
-        lda.w   lists.{listId}
-        sta.w   lists.free
+    if !{defined NO_CLEAR_ENTITY_MEMORY} {
+        // Clear entity memory with 0xdead when deleted
 
-        stz.w   lists.{listId}
+        assert(BaseEntity.next == 0)
+        assert(BaseEntity.functionTable == 2)
+        assert(ENTITY_SIZE % 2 == 0)
 
-    NoneToDelete:
+        lda.w   #0xdead
+        evaluate n = 4
+        while {n} < ENTITY_SIZE {
+            if {n} == BaseEntity.instanceId & ~1 {
+                // do nothing, cleared by _InstanceIdTable.RemoveEntity
+            } else if {n} == BaseEntity.MetaSprite.status & ~1 {
+                // do nothing, cleared by MetaSprite.EntityDestructor
+            } else {
+                sta.b   {n}
+            }
+            evaluate n = {n} + 2
+        }
     }
+
+    rts
+
+InvalidInstanceId:
+    break(INSTANCE_ID_INVALID)
 }
 
 
 
-// Deletes all of the entities in the deactivated list
+// Delete entities in the activateNextFrame entity list.
+//
+// Should be called at the start of each level.
+//
+// REQUIRES: 16 bit A, 16 bit Index, DB = 0x7e, DP = 0
+a16()
+i16()
+code()
+function DeleteEntitiesInActivateNextFrameList {
+    ldx.w   #specialLists.ACTIVATE_NEXT_FRAME_INDEX
+    bra     DeleteEntitiesInList._ListIndexX
+}
+
+
+
+// Deletes all of the entities in the deactivated list.
 //
 // REQUIRES: 16 bit A, 16 bit Index, DB = 0x7e, DP = 0
 a16()
 i16()
 code()
 function DeleteDeactivatedEntities {
-    lda.w   lists.deactivated
+    ldx.w   #specialLists.DEACTIVATED_INDEX
+    bra     DeleteEntitiesInList._ListIndexX
+}
+
+
+
+// Deletes all entities in the given list
+//
+// MUST NOT be called inside an entity routine
+//
+// REQUIRES: 16 bit A, 16 bit Index, DB = 0x7e, DP = 0
+//
+// INPUT: A = entity list Id
+a16()
+i16()
+code()
+function DeleteEntitiesInList {
+    cmp.w   #N_ENTITY_LISTS
+    bcs     InvalidEntityListId
+
+    asl
+    tax
+
+_ListIndexX:
+    lda.w   lists.FIRST,x
     beq     NoneToDelete
 
-    Loop:
-        tcd
+    phx
 
-        MetaSprite.EntityDestructor()
+        Loop:
+            tcd
 
-        // BaseEntity.functionPtr is invalid, retrieve it from romPtr
+            jsr     __EntityDestructor
 
-        ldx.b   BaseEntity.romPtr
-        lda.l   BaseEntityData.functionTable,x
-        tax
-        jsr     (BaseEntityFunctionTable.Destructor,x)
+            lda.b   BaseEntity.next
+            bne     Loop
 
-        lda.b   BaseEntity.next
-        bne     Loop
+    plx
 
 
-    // Move the deactivated list into the free list
+    // Move the entity list to the end of the free list
 
-    lda.w   lists.free
-    sta.b   BaseEntity.next
+    // lastFreeEntity->next = lists[listId].first
+    // lastFreeEntity = lastEntity
+    // lists[listId] = NULL
 
-    lda.w   lists.deactivated
-    sta.w   lists.free
+    // X = list Index
+    // DP = last entity in list
 
-    stz.w   lists.deactivated
+    lda.w   lists.FIRST,x
+    ldy.w   lastFreeEntity
+    sta.w   BaseEntity.next,y
+
+    tdc
+    sta.w   lastFreeEntity
+
+    stz.w   lists.FIRST,x
 
 
     lda.w   #0
     tcd
 
+
 NoneToDelete:
     rts
+
+
+InvalidEntityListId:
+    break(INVALID_ENTITY_LIST_ID)
 }
 
 }
