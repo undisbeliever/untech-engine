@@ -168,7 +168,7 @@ macro UpdateVariables() {
     ldx.b   cursor
 
     lda.w   Controller.Joy1.pressed
-    and.w   #JOY.sholder
+    and.w   #JOY.shoulder
     beq     CursorUnchanged
 
         and.w   #JOY.r

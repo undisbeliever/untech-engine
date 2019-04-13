@@ -206,7 +206,7 @@ namespace ActionPointSpawner {
     code()
     function Process {
         lda.w   Controller.Joy1.pressed
-        and.w   #JOY.sholder
+        and.w   #JOY.shoulder
         beq     +
             // When L or R is pressed spawn 4 green projectiles
 

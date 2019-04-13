@@ -1368,7 +1368,7 @@ namespace JOY {
 
     constant buttons = %1100000011000000
     constant dpad = %0000111100000000
-    constant sholder = %0000000000110000
+    constant shoulder = %0000000000110000
 
     namespace type {
         constant mask = %0000000000001111
