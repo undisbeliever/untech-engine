@@ -20,9 +20,9 @@ namespace ForceBlank {
 // KEEP: A, X, Y
 macro AssertForceBlank() {
     if __CPU__.aSize == 8 {
-        bit.w   inidispBuffer
+        bit.w   inidispAfterWaitFrame
     } else if __CPU__.aSize == 16 {
-        bit.w   inidispBuffer - 1
+        bit.w   inidispAfterWaitFrame - 1
     } else {
         error "Unknown A size"
     }

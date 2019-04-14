@@ -254,7 +254,7 @@ i16()
 
     // Don't use STP, it causes some versions of snes9x to stall
 -
-    wai
+    jsr     WaitFrame
     bra     -
 }
 
@@ -324,14 +324,14 @@ a8()
 
     // Don't use STP, it causes some versions of snes9x to stall
 -
-    wai
+    jsr     WaitFrame
     bra     -
 }
 
 
 // Resets the PPU registers to initial state
 //
-// All tests that change PPU registers MUST call this routine upon clean-up
+// All tests that change PPU registers MUST call this routine upon clean-up.
 //
 // REQUIRES: None
 //
@@ -348,6 +348,8 @@ i16()
     pea     (0x7e << 8) | REGISTER_DB
     plb
 // DB = REGISTER_DB
+
+    jsr     ForceBlank
 
     jsr     ResetRegisters
 

@@ -10,6 +10,9 @@ define REGION = Australia
 define ROM_NAME = "UNTECH UNIT TESTS"
 define VERSION = 0
 
+// count number of free cycles in WaitFrame instead of sleeping
+define COUNT_FREE_CYCLES
+
 include "../../src/common.inc"
 include "memmap.inc"
 
@@ -67,6 +70,8 @@ include "tests/metasprite/palette.inc"
 include "tests/metasprite/vram.inc"
 include "tests/metasprite/render.inc"
 include "tests/metasprite/animation.inc"
+
+include "tests/vblank/vblank.inc"
 
 include "tests/text/string.inc"
 

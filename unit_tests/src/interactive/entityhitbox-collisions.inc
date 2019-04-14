@@ -259,10 +259,9 @@ namespace EhCollisionTest_CollisionCentre {
 namespace InteractiveTests {
 namespace EntityHitboxCollisionsTest {
 
-constant _waitCount                   = Test.tmp
-constant _tmp_index                   = Test.tmp + 2
-constant _collisionBits               = Test.tmp + 4
-constant _processCollisionArgumentsOk = Test.tmp + 6
+constant _tmp_index                   = Test.tmp + 0
+constant _collisionBits               = Test.tmp + 2
+constant _processCollisionArgumentsOk = Test.tmp + 4
 
 // Prints the ProcessCollision arguments to screen.
 //
@@ -470,7 +469,7 @@ function Test {
 
         // Using hex as it is constant time
         Text.Console.SetCursor(Text.Console.TEXT_WIDTH - 5, 5)
-        ldy.w   _waitCount
+        ldy.w   freeCycles
         jsr     Text.Console.PrintHex16Y
 
         Text.Console.SetCursor(0, 7)
@@ -483,8 +482,7 @@ function Test {
         lda.w   _processCollisionArgumentsOk
         beq     Fail
 
-        jsr     WaitFrame_Count
-        sty.w   _waitCount
+        jsr     WaitFrame
 
         lda.l   JOY1
         and.w   #JOY.buttons

@@ -109,8 +109,10 @@ a8()
 // Fills the VRAM and CGRAM with 0 bytes.
 // Moves all of the OAM sprites offscreen.
 //
+// NOTE: This routine immediately sets screen blank
+//
 // REQUIRES: none
-// MODIFIES: Disables Interrupts and HDMA, Forces Screen Blank
+// MODIFIES: Disables Interrupts and HDMA, enables Force Blank
 au()
 iu()
 code()
@@ -125,11 +127,19 @@ function ClearVramOamAndCgram {
 a8()
 i16()
 
-    // Disable interrupts and HDMA
-    stz.w   NMITIMEN
+    // Disable IRQ (keep NMI and autoJoy enabled)
+	lda.b	#NMITIMEN.vBlank | NMITIMEN.autoJoy
+	sta.l	NMITIMEN
+
+    // Disable HDMA
     stz.w   HDMAEN
 
-    jsr     ForceBlank
+    lda.b   #INIDISP.force
+    sta.w   INIDISP
+
+    // Tell engine we are in force blank mode
+    // Required to prevent a NOT_IN_FORCE_BLANK error
+    sta.w   inidispAfterWaitFrame
 
 
     // Fill VRAM with 0 bytes
@@ -202,17 +212,21 @@ a16()
 a8()
 i8()
 
-    // Disable Interrupts and HDMA
+    // Disable HDMA
     // A = 0
-    sta.l   NMITIMEN
     sta.l   HDMAEN
 
-    NmiHandler.InidispBuffer.Init()
+    // Disable IRQ, enable NMI and autoJoy
+	lda.b	#NMITIMEN.vBlank | NMITIMEN.autoJoy
+	sta.l	NMITIMEN
 
 
     // Force Screen Blank
     lda.b   #INIDISP.force
     sta.b   INIDISP
+
+    // Tell engine we are in force blank mode
+    sta.l   inidispAfterWaitFrame
 
     stz.b   OBSEL
 

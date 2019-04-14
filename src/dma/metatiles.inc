@@ -176,14 +176,26 @@ macro _VBlank() {
 
     SkipHorizontalBuffer:
 
-        stz.w   MetaTiles.bufferState
-
     Return:
 }
 
 // cpu of cycles (excluding dma) used in the _VBlank macro
-constant VBLANK_CYCLES_VERTICAL = 87
-constant VBLANK_CYCLES_HORIZONTAL = 92
+constant VBLANK_CYCLES_VERTICAL = 83
+constant VBLANK_CYCLES_HORIZONTAL = 88
+
+
+// Reset the transfer queue in preparation for the next frame.
+//
+// REQUIRES: 16 bit A, 8 bit Index, DB = 0x80, screen active
+// INPUT: X is zero
+// INPUT: Y is non-zero
+// KEEP: A, X, Y
+macro _ResetQueue() {
+    assert8i()
+
+    // X = 0
+    stx.w   MetaTiles.bufferState
+}
 
 }
 }

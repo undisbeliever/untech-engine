@@ -58,13 +58,25 @@ macro _VBlank() {
         ldy.b   #MDMAEN.dma0
         sty.w   MDMAEN
 
-        // Y is non-zero
-        sty.w   Dma.ObjPalette.transferOnZero
     EndIf:
 }
 
 // cpu of cycles (excluding dma) used in the _VBlank macro
-constant VBLANK_CYCLES = 42
+constant VBLANK_CYCLES = 38
+
+
+// Reset the transfer queue in preparation for the next frame.
+//
+// REQUIRES: 16 bit A, 8 bit Index, DB = 0x80, screen active
+// INPUT: X is zero
+// INPUT: Y is non-zero
+// KEEP: A, X, Y
+macro _ResetQueue() {
+    assert8i()
+
+    // Y is non-zero
+    sty.w   Dma.ObjPalette.transferOnZero
+}
 
 
 // Marks the object palette buffer as dirty

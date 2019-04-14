@@ -1,7 +1,7 @@
 // interrupts/nmi_handler.inc
 // ==========================
 //
-// VBlank Interrupt Service Routine.
+// NMI Interrupt Service Routine.
 //
 //
 // This file is part of the UnTech Game Engine.
@@ -13,58 +13,22 @@ au()
 iu()
 code()
 function NmiHandler {
+// Number of NMIs processed since the counter was last reset
+// (byte)
+allocate(counter, shadow, 1)
+
     // Store registers
-    rep     #$30
-a16()
-i16()
+    sep     #$20
+a8()
     pha
-    phx
-    phy
-    phd
-    phb
 
-    phk
-    plb
+    lda.l   counter
+    inc
+    sta.l   counter
 
-    lda.w   #$4300
-    tcd
+    lda.l   RDNMI
 
-    sep     #$10
-i8()
-
-    // Force Blank to prevent PPU corruption if VBlank overruns
-    ldx.b   #INIDISP.force
-    stx.w   INIDISP
-
-    // Reset NMI Flag.
-    ldy.w   RDNMI
-
-    // Disable HDMA
-    ldx.b   #0
-    stx.w   HDMAEN
-
-
-    Dma.VBlank()
-    Hdma.VBlank()
-
-    MetaTiles.Render.DrawMapCell_VBlank()
-
-    Warnings.VBlank()
-    ScrollBuffer.VBlank()
-    FrameCounter.VBlank()
-    Controller.VBlank()
-
-    InidispBuffer.VBlank()
-
-
-    rep     #$30
-
-    plb
-    pld
-    ply
-    plx
     pla
-
     rti
 }
 

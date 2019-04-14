@@ -72,13 +72,25 @@ macro _VBlank() {
 
         ldy.b   #MDMAEN.dma0
         sty.w   MDMAEN
-
-        sty.w   Dma.MetaSprite.transferOnZero
     EndIf:
 }
 
 // cpu of cycles (excluding dma) used in the _VBlank macro
-constant VBLANK_CYCLES = 41
+constant VBLANK_CYCLES = 37
+
+
+// Reset the transfer queue in preparation for the next frame.
+//
+// REQUIRES: 16 bit A, 8 bit Index, DB = 0x80, screen active
+// INPUT: X is zero
+// INPUT: Y is non-zero
+// KEEP: A, X, Y
+macro _ResetQueue() {
+    assert8i()
+
+    // Y is non-zero
+    sty.w   Dma.MetaSprite.transferOnZero
+}
 
 }
 }

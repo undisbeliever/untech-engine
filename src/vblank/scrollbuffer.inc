@@ -1,5 +1,5 @@
-// interrupts/nmi/scrollbuffer.inc
-// ===============================
+// vblank/scrollbuffer.inc
+// =======================
 //
 // VBlank buffer for the scroll registers.
 //

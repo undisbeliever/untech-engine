@@ -59,6 +59,8 @@ constant _mapPtr = tmp0
 constant _columnCount = tmp1
 constant _rowCount = tmp2
 
+    Dma.ForceBlank.AssertForceBlank()
+
     phd
 
     // set DP to registers
@@ -174,9 +176,6 @@ a16()
 
     sep     #$20
 a8()
-    // don't upload buffers during VBlank
-    stz.w   bufferState
-
     lda.b   #VMAIN.incrementMode.high | VMAIN.increment.by1
     sta.b   VMAIN
 

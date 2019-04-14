@@ -488,7 +488,13 @@ code()
 function _CheckTile {
     allocate(tmp, wram7e, 2)
 
-    jsr     ForceBlank
+    phx
+    phy
+
+        jsr     ForceBlank
+
+    ply
+    plx
 
     sty.w   tmp
     tya
@@ -531,7 +537,7 @@ function _CheckTile {
         dey
         bne     -
 
-    jsr     EnableDisplay
+    jsr     EnableDisplay_Full
 
     sec
     rts

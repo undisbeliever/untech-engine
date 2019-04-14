@@ -58,7 +58,7 @@ namespace transferQueue {
     allocate(wordVramAddress, shadow, TRANSFER_QUEUE_SIZE * 2)
 }
 constant TRANSFER_QUEUE_INDEX_END = TRANSFER_QUEUE_SIZE * 2
-allocateTmpWord(transferQueueIndex)
+allocate(transferQueueIndex, shadow, 2)
 
 
 // List of tiles to upload to VRAM
@@ -79,12 +79,12 @@ namespace tileQueue {
     constant TILE_HALF_SIZE = 32 * 2
 }
 constant TILE_QUEUE_INDEX_END = TILE_QUEUE_SIZE * 2
-allocateTmpWord(tileQueueIndex)
+allocate(tileQueueIndex, shadow, 2)
 
 
 
 // Transfers the tiles during VBlank.
-allocate(processVBlankOnZero, shadow, 2)
+allocate(processVBlankOnZero, shadow, 1)
 
 
 allocateTmpWord(tmp0)
@@ -116,28 +116,29 @@ macro _Init() {
         bpl     -
 
     stz.w   Dma.Tile16.tileQueueIndex
-
-    lda.w   #1
-    sta.w   Dma.Tile16.processVBlankOnZero
 }
 
 
 
-// Finalize the transfer queue for the current frame and prep it for VBlank.
+// Finalize the transfer queue for the current frame and reset it for the next one.
 //
-// REQUIRES: 16 bit A, DB unknown
+// REQUIRES: 16 bit A, 8 bit Index, DB = 0x80
 macro _FinalizeFrame() {
     assert16a()
+    assert8i()
 
-    lda.w   #0
-
+    assert(Dma.Tile16.TRANSFER_QUEUE_INDEX_END < 0xff)
     ldx.w   Dma.Tile16.transferQueueIndex
-    sta.l   Dma.Tile16.transferQueue.vblankFunctionAddr,x
+    beq     +
+        // set last vblankFunctionAddr to EndLoopFunction
+        stz.w   Dma.Tile16.transferQueue.vblankFunctionAddr,x
+        ldx.b   #0xff
+    +
+    inx
 
-    sta.l   Dma.Tile16.transferQueueIndex
-    sta.l   Dma.Tile16.tileQueueIndex
-
-    sta.l   Dma.Tile16.processVBlankOnZero
+    // X = 0 if transferQueueIndex is non-zero zero, or
+    //     1 if transferQueueIndex is zero.
+    stx.w   Dma.Tile16.processVBlankOnZero
 }
 
 
@@ -198,16 +199,26 @@ macro _VBlank() {
 
             ldx.w   Dma.Tile16.transferQueue.vblankFunctionAddr,y
             bne     Loop
-            bra     EndLoop
+            bra     Return
 
     EndLoopFunction:
         ply
 
-    EndLoop:
-        ldx.b   #0xff
-        stx.w   Dma.Tile16.processVBlankOnZero
-
     Return:
+}
+
+
+// Reset the transfer queues in preparation for the next frame.
+//
+// REQUIRES: 16 bit A, 8 bit Index, DB = 0x80, screen active
+// INPUT: X is zero
+// INPUT: Y is non-zero
+// KEEP: X, Y
+macro _ResetQueue() {
+    assert16a()
+
+    stz.w   Dma.Tile16.transferQueueIndex
+    stz.w   Dma.Tile16.tileQueueIndex
 }
 
 
@@ -224,8 +235,8 @@ a16()
 i16()
 code()
 namespace _ProcessDMA {
-    constant ContinueLoop = NmiHandler.Dma.VBlank.Dma.Tile16._VBlank.ContinueLoop
-    constant EndLoopFunction = NmiHandler.Dma.VBlank.Dma.Tile16._VBlank.EndLoopFunction
+    constant ContinueLoop = WaitFrame.Dma.VBlank.Dma.Tile16._VBlank.ContinueLoop
+    constant EndLoopFunction = WaitFrame.Dma.VBlank.Dma.Tile16._VBlank.EndLoopFunction
 
     FunctionTable: {
         dw  EndLoopFunction

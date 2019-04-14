@@ -1,5 +1,5 @@
-// interrupts/nmi/controller.inc
-// =============================
+// vblank/controller.inc
+// =====================
 //
 // Controller button State
 //

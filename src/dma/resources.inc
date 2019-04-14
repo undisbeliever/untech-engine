@@ -119,8 +119,6 @@ macro _VBlank() {
         ldx.b   #MDMAEN.dma0
         stx.w   MDMAEN
 
-        stx.w   Dma.Resources.uploadAnimatedTilesetOnZero
-
     SkipAnimatedTilesetUpload:
 
 
@@ -145,13 +143,25 @@ macro _VBlank() {
         ldx.b   #MDMAEN.dma0
         stx.w   MDMAEN
 
-        stx.w   Dma.Resources.uploadPaletteOnZero
-
     SkipPaletteUpload:
 }
 
 // maximum number of cycles (excluding dma) per resource
-constant VBLANK_CYCLES_PER_RESOURCE = 50
+constant VBLANK_CYCLES_PER_RESOURCE = 46
+
+
+// Resets the position of the transfer queues in preparation for the next frame.
+//
+// REQUIRES: 16 bit A, 8 bit Index, DB = 0x80, screen active
+// INPUT: Y is non-zero
+// KEEP: A, X, Y
+macro _ResetQueue() {
+    assert8i()
+
+    // Y is non-zero
+    sty.w   Dma.Resources.uploadAnimatedTilesetOnZero
+    sty.w   Dma.Resources.uploadPaletteOnZero
+}
 
 }
 }

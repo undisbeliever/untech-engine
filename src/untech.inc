@@ -43,16 +43,9 @@ include "hdma/horizontal-trapezium-window.inc"
 include "hdma/triangular-window.inc"
 include "hdma/_common.inc"
 
-include "metatiles/_vblank.inc"
-
 include "interrupts/break_handler.inc"
-include "interrupts/nmi/controller.inc"
-include "interrupts/nmi/framecounter.inc"
-include "interrupts/nmi/inidisp-buffer.inc"
-include "interrupts/nmi/scrollbuffer.inc"
-include "interrupts/nmi_handler.inc"
 include "interrupts/reset_handler.inc"
-
+include "interrupts/nmi_handler.inc"
 
 include "math/division.inc"
 include "math/multiplication.inc"
@@ -71,6 +64,7 @@ include "camera/_common.inc"
 include "metatiles/render.inc"
 include "metatiles/tileset.inc"
 include "metatiles/_common.inc"
+include "metatiles/_vblank.inc"
 
 include "metasprite/animation.inc"
 include "metasprite/entityhitbox.inc"
@@ -91,6 +85,10 @@ include "entity/transitions.inc"
 include "entity/validation.inc"
 
 include "metasprite/actionpoints.inc"
+
+include "vblank/controller.inc"
+include "vblank/scrollbuffer.inc"
+include "vblank/_common.inc"
 
 include "entity/macros.inc"
 
