@@ -139,7 +139,7 @@ a8()
 
         rep     #$30
     a16()
-        jsr     WaitFrame_Print
+        jsr     WaitFrame_PrintFreeCycles
 
 
         lda.l   JOY1

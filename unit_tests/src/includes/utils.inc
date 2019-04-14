@@ -57,7 +57,7 @@ Return:
 //
 // RETURN: Y = number of loops waited
 code()
-function WaitFrame_Print {
+function WaitFrame_PrintFreeCycles {
     Text.Console.SetCursor(Text.Console.TEXT_WIDTH - 5, 0)
 
     // Using hex as it is constant time

@@ -298,7 +298,7 @@ function Test {
 
         PrintListSizes()
 
-        jsr     WaitFrame
+        jsr     WaitFrame_PrintFreeCycles
 
         lda.l   JOY1
         and.w   #JOY.buttons

@@ -66,7 +66,7 @@ a8()
 a16()
 
     Loop:
-        jsr     WaitFrame_Print
+        jsr     WaitFrame_PrintFreeCycles
 
         lda.w   #Camera.DISPLAY_WIDTH / 2
         sta.b   Hdma.RotatedTriangularWindow.xPos

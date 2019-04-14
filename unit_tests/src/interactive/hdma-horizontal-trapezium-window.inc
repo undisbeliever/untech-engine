@@ -337,7 +337,7 @@ a8()
 a16()
 
     Loop:
-        jsr     WaitFrame_Print
+        jsr     WaitFrame_PrintFreeCycles
 
         Controller.UpdateControllerState()
 

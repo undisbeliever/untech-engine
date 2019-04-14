@@ -78,7 +78,7 @@ function ProcessUntilButtonPress {
 
         jsr     ProcessFrame
 
-        jsr     WaitFrame
+        jsr     WaitFrame_PrintFreeCycles
 
         lda.l   JOY1
         and.w   #JOY.buttons

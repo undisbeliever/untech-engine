@@ -451,7 +451,7 @@ a8()
 a16()
 
     Loop:
-        jsr     WaitFrame
+        jsr     WaitFrame_PrintFreeCycles
         jsr     MetaSprite.Render.InitLoop
 
         lda.l   JOY1
