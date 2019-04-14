@@ -196,11 +196,16 @@ i8()
 			// Y = inidispBuffer
 			tya
             eor.w   #7
-            tay
-            sty.w   INIDISP
+            tax
+            stx.w   INIDISP
         +
 
-		ldy.b	#INIDISP.force
+        // Calculate inidispBuffer | INIDISP.force
+        // Y = inidispBuffer
+        tya
+        ora.w   #INIDISP.force
+        tay
+
 
         // Wait until NmiHandler increments NMI counter
 
@@ -253,10 +258,22 @@ SkipWaitForNMI:
     // DB = 0x80
     // DP = 0x4300
 
-    // Y has INIDISP.force bit set
-
     // Force blank to prevent PPU corruption if VBlank overruns.
+	//
+	// 1CHIP consoles may display a glitched a darkened band on the top of the
+	// screen if I set INIDISP to 0x80 here.  To prevent this glitch the
+	// brightness bits of INIDISP should be unchanged when enabling the display
+	// at the end of VBlank.
+    //
+    // Example of the glitch (see Street Fighter 2 pics):
+    //   https://shmups.system11.org/viewtopic.php?p=1287176#p1287176
+	//
+	// Explanation of the glicth:
+	//   https://shmups.system11.org/viewtopic.php?p=1309776#p1309776
+
+    // Y = inidispBuffer | INIDISP.force
     sty.w   INIDISP
+
 
 	// Disable HDMA
 	ldx.b	#0
