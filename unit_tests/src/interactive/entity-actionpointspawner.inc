@@ -300,7 +300,7 @@ function Test {
 
         jsr     WaitFrame_PrintFreeCycles
 
-        lda.l   JOY1
+        lda.w   Controller.Joy1.pressed
         and.w   #JOY.buttons
         beq     GameLoop
 

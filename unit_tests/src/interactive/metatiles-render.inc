@@ -454,7 +454,9 @@ a16()
         jsr     WaitFrame_PrintFreeCycles
         jsr     MetaSprite.Render.InitLoop
 
-        lda.l   JOY1
+        // Flash of black when the map is redrawn is too fast
+        // Constantly redraw the map whenever select is held
+        lda.w   Controller.Joy1.current
         bit.w   #JOY.select
         bne     RedrawMap
 
@@ -473,7 +475,7 @@ a16()
         jsr     MetaSprite.Render.EndLoop
 
 
-        lda.l   JOY1
+        lda.w   Controller.Joy1.pressed
         and.w   #JOY.buttons
         bne     Pass
 

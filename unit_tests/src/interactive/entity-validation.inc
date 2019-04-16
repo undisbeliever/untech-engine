@@ -95,8 +95,6 @@ function Test {
         Loop:
             jsr     WaitFrame
 
-            Controller.UpdateControllerState()
-
             lda.w   Controller.Joy1.pressed
             beq     Loop
 

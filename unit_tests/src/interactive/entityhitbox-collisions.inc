@@ -484,7 +484,7 @@ function Test {
 
         jsr     WaitFrame
 
-        lda.l   JOY1
+        lda.w   Controller.Joy1.pressed
         and.w   #JOY.buttons
         beq     GameLoop
 

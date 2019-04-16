@@ -12,87 +12,76 @@
 namespace Controller {
 
 namespace Joy1 {
-	// The new buttons that were pressed on the current `UpdateControllerState`
-	allocate(pressed, shadow, 2)
-
-	// The currently pressed buttons on the joypad
+	// The state of the joypad for the current frame
+    // (word, shadow)
 	allocate(current, shadow, 2)
 
-	allocate(_invertedPrevious, shadow, 2)
-	allocate(_buffer, shadow, 2)
+	// The new buttons that were pressed for the current frame
+    // (word, shadow)
+	allocate(pressed, shadow, 2)
 }
 
 if {defined CONTROLLER_USE_JOY2} {
 	namespace Joy2 {
-		allocate(pressed, shadow, 2)
 		allocate(current, shadow, 2)
-
-		allocate(_invertedPrevious, shadow, 2)
-		allocate(_buffer, shadow, 2)
+		allocate(pressed, shadow, 2)
 	}
 }
 
-// Update joypad buffer
+
+// Update a single joypad variables
 //
-// REQUIRES: 16 bit A, 8 bit Index, DB = $80
-macro VBlank() {
-	assert16a()
-    assert(HVBJOY.autoJoy == 1)
-
-    -
-        ldx.w	HVBJOY			// MUST do 8 bit read on HVBJOY
-        txa
-        lsr
-        bcs		-
-
-    lda.w   JOY1
-    tsb.w   Controller.Joy1._buffer
-
-    if {defined CONTROLLER_USE_JOY2} {
-        lda.w   JOY2
-        tsb.w   Controller.Joy2._buffer
-	}
-}
-
-// Updates the controller state variables.
-//
-// This should be called in the GameLoop NOT VBlank so inputs are not dropped.
-//
-// REQUIRES: 16 bit A, 16 bit Index, DB access shadow
-macro UpdateControllerState() {
+// REQUIRES: 16 bit A, 16 bit Index, DB = $80
+macro _UpdateState(joyRegister, joyStruct) {
     assert16a()
     assert16i()
 
-	Controller._update(Joy1)
-
-	if {defined CONTROLLER_USE_JOY2} {
-		Controller._update(Joy2)
-	}
-}
-
-macro _update(joy) {
-    assert16a()
-    assert16i()
-
-	// ensure device connected to JOY1 is a controller
+	// Ignore any device that is not a controller
 	assert(JOY.type.controller == 0)
-
-	lda.w	Controller.{joy}._buffer
+    lda.w   {joyRegister}
 	bit.w	#JOY.type.mask
 	beq		+
 		lda.w	#0
 	+
 
-	tay
-	sta.w   Controller.{joy}.current
-	and.w   Controller.{joy}._invertedPrevious
-	sta.w   Controller.{joy}.pressed
+    // invertedPrevious = joyStruct.current ^ 0xffff
+    // joyStruct.current = joyRegister
+    // joyStruct.pressed = invertedPrevious & joyStruct.current
 
-	tya
-	eor.w   #0xffff
-	sta.w   Controller.{joy}._invertedPrevious
+    tay
+    lda.w   {joyStruct}.current
+    eor.w   #0xffff
+    sty.w   {joyStruct}.current
+    and.w   {joyStruct}.current
+    sta.w   {joyStruct}.pressed
+}
 
-	stz.w	Controller.{joy}._buffer
+
+// Update joypad state
+//
+// REQUIRES: 16 bit A, 8 bit Index, DB = $80
+// MODIFIES: 16 bit A, 16 bit Index
+macro VBlank() {
+	assert16a()
+    assert8i()
+
+    // Wait until autoJoy has finished
+    sep     #$20
+a8()
+    -
+        lda.w	HVBJOY			// MUST do 8 bit read on HVBJOY
+        and.b   #HVBJOY.autoJoy
+        bne		-
+
+    rep     #$30
+a16()
+i16()
+
+    Controller._UpdateState(JOY1, Controller.Joy1)
+
+    if {defined CONTROLLER_USE_JOY2} {
+        Controller._UpdateState(JOY2, Controller.Joy2)
+	}
 }
 
 }

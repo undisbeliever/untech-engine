@@ -339,8 +339,6 @@ a16()
     Loop:
         jsr     WaitFrame_PrintFreeCycles
 
-        Controller.UpdateControllerState()
-
         UpdateVariables()
 
         PrintWindowInput()
@@ -357,7 +355,7 @@ a16()
         CopyVar(bottomRight)
         jsr     Hdma.HorizontalTrapeziumWindow
 
-        lda.l   JOY1
+        lda.w   Controller.Joy1.pressed
         and.w   #JOY.buttons
         bne     Pass
 

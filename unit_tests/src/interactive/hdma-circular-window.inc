@@ -95,7 +95,7 @@ a8()
         rep     #$20
     a16()
 
-        lda.l   JOY1
+        lda.w   Controller.Joy1.current
 
         bit.w   #JOY.up
         beq     +
@@ -142,7 +142,7 @@ a8()
         jsr     WaitFrame_PrintFreeCycles
 
 
-        lda.l   JOY1
+        lda.w   Controller.Joy1.pressed
         and.w   #JOY.buttons
         bne     Pass
 

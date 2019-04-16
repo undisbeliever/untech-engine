@@ -74,13 +74,11 @@ i16()
 code()
 function ProcessUntilButtonPress {
     Loop:
-        Controller.UpdateControllerState()
-
         jsr     ProcessFrame
 
         jsr     WaitFrame_PrintFreeCycles
 
-        lda.l   JOY1
+        lda.w   Controller.Joy1.pressed
         and.w   #JOY.buttons
         beq     Loop
 
@@ -100,8 +98,6 @@ a16()
 i16()
 code()
 function ProcessFrame {
-    Controller.UpdateControllerState()
-
     jsr     MetaSprite.Render.InitLoop
 
     Entity.ProcessSpecialLists()

@@ -296,10 +296,13 @@ SkipWaitForNMI:
     ldx.w   inidispBuffer
     stx.w   INIDISP
 
-    Controller.VBlank()
-
     Dma.ResetQueues()
 
+
+    Controller.VBlank()
+
+assert16a()
+assert16i()
 
     pld
 	plb

@@ -162,23 +162,23 @@ i16()
 
         rep     #$30
     a16()
-        WaitForButtonRelease:
-            lda.l   JOY1
-            beq     NoButtonsPressed
-                // Enable CPU usage if start or select if pressed
-                bit.w   #JOY.start | JOY.select
-                beq     +
-                    sep     #$20
-                a8()
-                    lda.b   #0xff
-                    sta.w   showCpuUsageMeter
+        // Run at full speed unless a button is held down
+        lda.w   Controller.Joy1.current
+        beq     NoButtonsPressed
+            // Enable CPU usage if start or select if pressed
+            lda.w   Controller.Joy1.pressed
+            bit.w   #JOY.start | JOY.select
+            beq     +
+                sep     #$20
+            a8()
+                lda.b   #0xff
+                sta.w   showCpuUsageMeter
 
-                    rep     #$30
-                a16()
-                +
-                jsr     WaitFrame
-                bra     WaitForButtonRelease
-        NoButtonsPressed:
+                rep     #$30
+            a16()
+            +
+            jsr     WaitFrame
+    NoButtonsPressed:
 
 
         // Clears the old test name

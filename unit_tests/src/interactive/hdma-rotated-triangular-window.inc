@@ -83,7 +83,7 @@ a16()
         inc.b   angle
 
 
-        lda.l   JOY1
+        lda.w   Controller.Joy1.current
         bit.w   #JOY.r
         beq     ++
             ldy.b   diameter
@@ -95,7 +95,7 @@ a16()
             sty.b   diameter
         +
 
-        // A = JOY1
+        // A = Controller.Joy1.current
         bit.w   #JOY.l
         beq     ++
             ldy.b   diameter

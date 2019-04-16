@@ -32,7 +32,7 @@ function Test {
     Loop:
         jsr     WaitFrame
 
-        lda.l   JOY1
+        lda.w   Controller.Joy1.pressed
         bit.w   #JOY.select
         beq     +
             break(UNIT_TEST_BRK)

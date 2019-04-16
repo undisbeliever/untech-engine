@@ -217,8 +217,6 @@ a16()
     Loop:
         jsr     WaitFrame_PrintFreeCycles
 
-        Controller.UpdateControllerState()
-
         UpdateVariables()
 
         PrintWindowInput()
@@ -235,7 +233,7 @@ a16()
         CopyVar(y2)
         jsr     Hdma.TriangularWindow
 
-        lda.l   JOY1
+        lda.w   Controller.Joy1.pressed
         and.w   #JOY.buttons
         bne     Pass
 
