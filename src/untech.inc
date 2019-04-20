@@ -5,6 +5,10 @@
 
 architecture wdc65816-strict
 
+
+constant UNTECH_VERSION_ID = 28
+
+
 include "util/_dptmp.inc"
 
 include "errors/break.inc"
