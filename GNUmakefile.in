@@ -67,9 +67,9 @@ $(BINARY): $(call rwildcard_all, $(SRC_DIRS) $(UNTECH_DIR)/src)
 $(BINARY): $(TABLE_INCS)
 $(BINARY): $(RESOURCES)
 
-$(BINARY) $(BINARY:.sfc=.sym): $(MAIN)
+$(BINARY) $(BINARY:.sfc=.symbols): $(MAIN)
   ifeq ($(VANILLA_BASS), n)
-	$(bass) -strict -o $(BINARY) -sym $(BINARY:.sfc=.sym) $(MAIN)
+	$(bass) -strict -o $(BINARY) -sym $(BINARY:.sfc=.symbols) $(MAIN)
   else
 	$(bass) -strict -o $(BINARY) $(MAIN)
   endif
@@ -168,7 +168,7 @@ clean-all: clean
 
 .PHONY: clean
 clean:
-	$(RM) $(BINARY) $(BINARY:.sfc=.sym)
+	$(RM) $(BINARY) $(BINARY:.sfc=.symbols)
 	$(RM) $(sort $(TABLE_INCS))
 	$(RM) $(sort $(RESOURCES))
 
