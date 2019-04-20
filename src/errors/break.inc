@@ -9,7 +9,9 @@
 // Distributed under The MIT License: https://opensource.org/licenses/MIT
 
 
-variable __BREAK__.pos = 0
+constant __BREAK__.first = 0x10
+
+variable __BREAK__.pos = __BREAK__.first
 
 // Register a break identifier
 //

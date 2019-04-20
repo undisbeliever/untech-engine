@@ -134,6 +134,9 @@ macro PrintBreakIdString() {
     storeBlockStart(IdStrings, breakIdStrings)
     storeBlockUsed(IdSrings.size, breakIdStrings)
 
+    sec
+    sbc.b   #__BREAK__.first
+
     sep     #$30
 i8()
     ldx.b   #0
