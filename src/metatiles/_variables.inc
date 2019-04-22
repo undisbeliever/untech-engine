@@ -11,7 +11,8 @@
 
 namespace MetaTiles {
     assert(MAP_SIZE >= 1024)
-    assert(N_META_TILES >= 64)
+
+    constant N_META_TILES = 256
 
     constant METATILE_SIZE = 2
     constant METATILE_SIZE_PX = 16

@@ -209,7 +209,8 @@ constant MAP_HEIGHT = 75
 
 constant MAP_GRID_WIDTH = 3
 constant MAP_GRID_HEIGHT = 3
-constant MAP_GRID_TILE_OFFSET = 3
+constant MAP_GRID_TILE_OFFSET = 16
+constant MAP_GRID_LINE_WIDTH = 16;
 constant MAP_REPEAT_HORIZONTAL = 24
 constant MAP_REPEAT_VERTICAL = 21
 
@@ -336,7 +337,7 @@ constant _columnIndex = Test.dpTmp + 2
             while yPos < MAP_GRID_HEIGHT {
                 variable xPos = 0
                 while xPos < MAP_GRID_WIDTH {
-                    lda.w   #(xPos + yPos * MAP_GRID_WIDTH + MAP_GRID_TILE_OFFSET) * 2
+                    lda.w   #(xPos + yPos * MAP_GRID_LINE_WIDTH + MAP_GRID_TILE_OFFSET) * 2
                     sta.w   MetaTiles.map.data + (xPos + MAP_WIDTH * yPos) * 2,x
 
                     xPos = xPos + 1

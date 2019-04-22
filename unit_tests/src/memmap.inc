@@ -52,7 +52,6 @@ define ENEMY_PROJECTILE_ENTITY_LIST  = EnemyProjectiles
 // MetaTile engine settings
 // ========================
 constant MetaTiles.MAP_SIZE = 8192
-constant MetaTiles.N_META_TILES = 512
 
 
 

@@ -26,7 +26,7 @@ namespace Format {
         //      - see Resources.Format.AnimatedTilesetHeader for data format
     }
 
-    if MetaTiles.TILESET_FORMAT_VERSION != 2 {
+    if MetaTiles.TILESET_FORMAT_VERSION != 3 {
         error "Invalid untech-compiler MetaTile Tileset Format"
     }
 }
