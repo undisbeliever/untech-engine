@@ -3,9 +3,10 @@
 // Distributed under The MIT License: https://opensource.org/licenses/MIT
 
 // Tests:
-//  * MetaTile.Render
-//  * MetaTile.LoadTileset
-//  * MetaTile.EntityPositionToMapIndex
+//  * MetaTiles.Render
+//  * MetaTiles.SetMapCell (including the drawMapCellBuffer does not overflow)
+//  * MetaTiles.LoadTileset
+//  * MetaTiles.EntityPositionToMapIndex
 //  * Resources.AnimatedTileset
 //  * Resource palette animations
 
@@ -17,6 +18,8 @@ namespace MapCursor {
     namespace EntityStruct {
         childstruct(BaseEntity)
         field(tmp, 2)
+        field(tmp2, 2)
+        field(tmp3, 2)
         endstruct()
     }
 
@@ -157,42 +160,94 @@ namespace MapCursor {
         beq     SkipSetCell
             // Set tile under cursor if L is down
 
-            constant _mapIndex = EntityStruct.tmp
+            constant EntityStruct._mapIndex     = EntityStruct.tmp
+            constant EntityStruct._displacement = EntityStruct.tmp2
+            constant EntityStruct._cellsLeft    = EntityStruct.tmp3
 
             jsr     MetaTiles.EntityPositionToMapIndex
-            stx.b   _mapIndex
+            stx.b   EntityStruct._mapIndex
             lda.w   #1
             jsr     MetaTiles.SetMapCell
 
             // If R is down then draw map cells to the left and right of
-            // current cell (if possible)
+            // current cell (if possible), repeated as may times as
+            // needed to overflow the drawMapCellBuffer.
 
             lda.w   Controller.Joy1.current
             and.w   #JOY.r
             beq     SkipSetCell
+
+                lda.w   #MetaTiles.drawMapCellBuffer.BUFFER_SIZE
+                sta.b   EntityStruct._cellsLeft
+
+                lda.w   #MetaTiles.METATILE_SIZE_PX
+
+            Loop:
+                // A = displacement
+                sta.b   EntityStruct._displacement
+
+                // Set tile to the left (if in bounds)
                 lda.b   EntityStruct.xPos.px
                 sec
-                sbc.w   #MetaTiles.METATILE_SIZE_PX
+                sbc.b   EntityStruct._displacement
                 cmp.w   MetaTiles.map.left
                 bcc     +
-                    ldx.b   _mapIndex
-                    dex
-                    dex
+                    // X = _mapIndex - _displacement / METATILE_SIZE_PX * 2
+                    lda.b   EntityStruct._displacement
+                    assert(MetaTiles.METATILE_SIZE_PX == 16)
+                    lsr
+                    lsr
+                    lsr
+                    eor.w   #0xffff
+                    sec
+                    adc.b   EntityStruct._mapIndex
+                    tax
+
                     lda.w   #1
                     jsr     MetaTiles.SetMapCell
+
+                    dec.b   EntityStruct._cellsLeft
+                    beq     EndLoop
                 +
 
+                // Set tile to the right (if in bounds)
+                // A = displacement
                 lda.b   EntityStruct.xPos.px
                 clc
-                adc.w   #MetaTiles.METATILE_SIZE_PX
+                adc.b   EntityStruct._displacement
                 cmp.w   MetaTiles.map.right
                 bcs     +
-                    ldx.b   _mapIndex
-                    inx
-                    inx
+                    // X = _mapIndex + _displacement / METATILE_SIZE_PX * 2
+                    lda.b   EntityStruct._displacement
+                    assert(MetaTiles.METATILE_SIZE_PX == 16)
+                    lsr
+                    lsr
+                    lsr
+                    clc
+                    adc.b   EntityStruct._mapIndex
+                    tax
+
                     lda.w   #1
                     jsr     MetaTiles.SetMapCell
+
+                    dec.b   EntityStruct._cellsLeft
+                    beq     EndLoop
                 +
+
+                lda.b   EntityStruct._displacement
+                clc
+                adc.w   #MetaTiles.METATILE_SIZE_PX
+                bra     Loop
+
+            EndLoop:
+
+            // Test that drawMapCellBufferIndex did not overflow
+            ldx.w   MetaTiles.drawMapCellBufferIndex
+            cpx.w   #MetaTiles.drawMapCellBuffer.BUFFER_SIZE * 2
+            beq     +
+            bcc     +
+                break(ASSERT_FAILURE)
+            +
 
     SkipSetCell:
         jmp     Entity.DrawAndGotoNextEntity
@@ -493,13 +548,15 @@ Pass:
 // ROM Data
 // ========
 
+evaluate LR_CELLS = MetaTiles.drawMapCellBuffer.BUFFER_SIZE + 1
+
 rodata(rom0)
 UnitTestMessage:
     db  "Use D-PAD to move cursor\n"
     db  "Hold R to zip\n"
     db  "Press SELECT to redraw map\n"
     db  "Press L to set map cell\n"
-    db  "Press L&R to set 3 map cells",0
+    db  "Press L&R to set {LR_CELLS} map cells",0
 
 }
 }
