@@ -16,15 +16,16 @@ Warnings.Register(SET_MAP_CELL_ERROR, 24, 0, 12)
 
 namespace MetaTiles {
 
-a16()
-i16()
 // DP unknown
+au()
+i16()
 code()
 namespace SetMapCell {
 ReturnWithWarning:
     Warnings.Warn(SET_MAP_CELL_ERROR)
 
 Return:
+    plp
     rts
 }
 
@@ -41,33 +42,40 @@ Return:
 //
 // ASSUMES: Map is on screen if the screen is enabled.
 // ASSUMES: DrawFullScreen_ForceBlank has been called if screen is enabled
-// REQUIRES: 16 bit A, 16 bit Index, DB = 0x7e
+// REQUIRES: DB = 0x7e
 //
 // INPUT: A = tile Id
 // INPUT: X = map index
-a16()
-i16()
+au()
+iu()
 // DP unknown
 code()
 function SetMapCell {
+    php
+
+    rep     #$10
+i16()
     cpx.w   map.dataSize
     bcs     ReturnWithWarning
 
-    asl
-    cmp.w   #N_META_TILES
-    bcs     ReturnWithWarning
-
+    sep     #$20
+a8()
     cmp.w   map.data,x
     beq     Return
 
     sta.w   map.data,x
 
     // skip draw if in force-blank
-    lda.w   inidispBuffer - 1
+    assert(INIDISP.force == 0x80)
+    bit.w   inidispBuffer
     bmi     Return
+
+    rep     #$30
+a16()
 
     Render._DrawMapCell()
 
+    plp
     rts
 }
 
@@ -83,8 +91,8 @@ a16()
 i16()
 code()
 function EntityPositionToMapIndex {
-    // X = ((entity->yPos - map.top) / METATILE_SIZE_PX * map.width
-    //      + (entity->xPos - map.left) / METATILE_SIZE_PX) * 2
+    // X = (entity->yPos - map.top) / METATILE_SIZE_PX * map.width
+    //     + (entity->xPos - map.left) / METATILE_SIZE_PX
 
     assert(METATILE_SIZE_PX == 16)
 
@@ -114,7 +122,6 @@ a16()
     clc
 
     adc.l   RDMPY
-    asl
     tax
 
     rts

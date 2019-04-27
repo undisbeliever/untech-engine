@@ -198,6 +198,7 @@ namespace MapCursor {
                     lsr
                     lsr
                     lsr
+                    lsr
                     eor.w   #0xffff
                     sec
                     adc.b   EntityStruct._mapIndex
@@ -220,6 +221,7 @@ namespace MapCursor {
                     // X = _mapIndex + _displacement / METATILE_SIZE_PX * 2
                     lda.b   EntityStruct._displacement
                     assert(MetaTiles.METATILE_SIZE_PX == 16)
+                    lsr
                     lsr
                     lsr
                     lsr
@@ -352,19 +354,20 @@ constant _columnIndex = Test.dpTmp + 2
     lda.w   #MIN_CAMERA_X + MAP_WIDTH * 16
     sta.w   MetaTiles.map.right
 
-    lda.w   #MAP_WIDTH * MAP_HEIGHT * 2
+    lda.w   #MAP_WIDTH * MAP_HEIGHT
     sta.w   MetaTiles.map.dataSize
 
-    lda.w   #MAP_WIDTH * 2
+    lda.w   #MAP_WIDTH
     sta.w   MetaTiles.map.bytesPerRow
 
-    lda.w   #MAP_WIDTH * MetaTiles.METATILE_DISPLAY_HEIGHT * 2
+    lda.w   #MAP_WIDTH * MetaTiles.METATILE_DISPLAY_HEIGHT
     sta.w   MetaTiles.map.bytesPerDisplayHeight
 
 
     // clear tilemap
 
-    ldx.w   #MetaTiles.MAP_SIZE * 2 - 2
+    assert(MetaTiles.MAP_SIZE % 2 == 0)
+    ldx.w   #MetaTiles.MAP_SIZE - 2
     ClearLoop:
         stz.w   MetaTiles.map.data,x
         dex
@@ -377,7 +380,7 @@ constant _columnIndex = Test.dpTmp + 2
     constant MARGIN_X = (MAP_WIDTH - MAP_REPEAT_HORIZONTAL * MAP_GRID_WIDTH) / 2
     constant MARGIN_Y = (MAP_HEIGHT - MAP_REPEAT_VERTICAL * MAP_GRID_HEIGHT) / 2
 
-    ldx.w   #(MARGIN_X + MARGIN_Y * MAP_WIDTH) * 2
+    ldx.w   #(MARGIN_X + MARGIN_Y * MAP_WIDTH)
 
     lda.w   #MAP_REPEAT_VERTICAL
     sta.b   _columnsLeft
@@ -392,8 +395,8 @@ constant _columnIndex = Test.dpTmp + 2
             while yPos < MAP_GRID_HEIGHT {
                 variable xPos = 0
                 while xPos < MAP_GRID_WIDTH {
-                    lda.w   #(xPos + yPos * MAP_GRID_LINE_WIDTH + MAP_GRID_TILE_OFFSET) * 2
-                    sta.w   MetaTiles.map.data + (xPos + MAP_WIDTH * yPos) * 2,x
+                    lda.w   #(xPos + yPos * MAP_GRID_LINE_WIDTH + MAP_GRID_TILE_OFFSET)
+                    sta.w   MetaTiles.map.data + (xPos + MAP_WIDTH * yPos),x
 
                     xPos = xPos + 1
                 }
@@ -402,7 +405,7 @@ constant _columnIndex = Test.dpTmp + 2
 
             txa
             clc
-            adc.w   #MAP_GRID_WIDTH * 2
+            adc.w   #MAP_GRID_WIDTH
             tax
 
             dey
@@ -410,7 +413,7 @@ constant _columnIndex = Test.dpTmp + 2
 
         lda.b   _columnIndex
         clc
-        adc.w   #MAP_WIDTH * MAP_GRID_HEIGHT * 2
+        adc.w   #MAP_WIDTH * MAP_GRID_HEIGHT
         tax
 
         dec.b   _columnsLeft

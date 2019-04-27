@@ -40,8 +40,8 @@ namespace MetaTiles {
         allocate(left, wram7e, 2)
 
         // Map data
-        // (array of indexes to tileMap AoS)
-        allocate(data, wram7e, MAP_SIZE * 2)
+        // (byte grid array)
+        allocate(data, wram7e, MAP_SIZE)
 
 
         // Calculated values
@@ -62,7 +62,7 @@ namespace MetaTiles {
 
         // Number of bytes per map row
         //
-        // Equal to map.width * 2.
+        // Equal to map.width.
         // (uint16)
         allocate(bytesPerRow, wram7e, 2)
 

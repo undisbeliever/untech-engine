@@ -83,8 +83,8 @@ constant _rowCount = tmp2
     // displayHoffset = Camera.xPos & (METATILE_SIZE_PX - 1)
     // displayVoffset = Camera.yPos & (METATILE_SIZE_PX - 1) - 1
     //
-    // visibleMapPtr = (Camera.xPos - map.left) / METATILE_SIZE_PX * 2
-    //                   + (Camera.yPos - map.top) / METATILE_SIZE_PX * map.width * 2
+    // visibleMapPtr = (Camera.xPos - map.left) / METATILE_SIZE_PX
+    //                   + (Camera.yPos - map.top) / METATILE_SIZE_PX * map.width
     //                   + map.data
 
     stz.w   drawMapCellBufferIndex
@@ -141,9 +141,7 @@ a16()
 
     clc
     adc.l   RDMPY
-    asl
-    assert(MAP_SIZE * 2 < 0x8000)
-    // c clear
+    clc
     adc.w   #map.data
     sta.w   visibleMapPtr
 
@@ -158,14 +156,16 @@ a16()
     // for row = 0 to METATILE_DISPLAY_HEIGHT + 1:
     //      x = mapPtr
     //      for column = 0 to METATILE_DISPLAY_WIDTH:
-    //          VMDATA = tileMap.topLeft[*x]
-    //          VMDATA = tileMap.topRight[*x]
+    //          y = *x * 2
+    //          VMDATA = tileMap.topLeft[y]
+    //          VMDATA = tileMap.topRight[y]
     //          x++
     //
     //      x = mapPtr
     //      for column = 0 to METATILE_DISPLAY_WIDTH:
-    //          VMDATA = tileMap.bottomLeft[*x]
-    //          VMDATA = tileMap.bottomRight[*x]
+    //          y = *x * 2
+    //          VMDATA = tileMap.bottomLeft[y]
+    //          VMDATA = tileMap.bottomRight[y]
     //          x++
     //
     //      mapPtr += map.bytesPerRow
@@ -197,7 +197,10 @@ a16()
         sta.w   _rowCount
 
         TopLineLoop:
-            ldy.w   0,x
+            lda.w   0,x
+            and.w   #0xff
+            asl
+            tay
 
             lda.w   tileMap.topLeft,y
             sta.b   VMDATA
@@ -205,7 +208,6 @@ a16()
             lda.w   tileMap.topRight,y
             sta.b   VMDATA
 
-            inx
             inx
 
             dec.w   _rowCount
@@ -218,7 +220,10 @@ a16()
         sta.w   _rowCount
 
         BottomLineLoop:
-            ldy.w   0,x
+            lda.w   0,x
+            and.w   #0xff
+            asl
+            tay
 
             lda.w   tileMap.bottomLeft,y
             sta.b   VMDATA
@@ -226,7 +231,6 @@ a16()
             lda.w   tileMap.bottomRight,y
             sta.b   VMDATA
 
-            inx
             inx
 
             dec.w   _rowCount
@@ -248,15 +252,17 @@ a16()
     // VMADD = METATILES_MAP_WADDR + 32 * 32
     // x = visibleMapPtr + DISPLAY_WIDTH
     // for row = 0 to METATILE_DISPLAY_HEIGHT + 1:
-    //      VMDATA = tileMap.topLeft[*x]
-    //      VMDATA = tileMap.bottomLeft[*x]
+    //      y = *x * 2
+    //      VMDATA = tileMap.topLeft[y]
+    //      VMDATA = tileMap.bottomLeft[y]
     //      x += map.bytesPerRow
     //
     // VMADD = METATILES_MAP_WADDR + 32 * 32 + 1
     // x = visibleMapPtr + DISPLAY_WIDTH
     // for row = 0 to METATILE_DISPLAY_HEIGHT + 1:
-    //      VMDATA = tileMap.topRight[*x]
-    //      VMDATA = tileMap.bottomRight[*x]
+    //      y = *x * 2
+    //      VMDATA = tileMap.topRight[y]
+    //      VMDATA = tileMap.bottomRight[y]
     //      x += map.bytesPerRow
     //
 
@@ -276,13 +282,16 @@ a16()
 
     lda.w   visibleMapPtr
     clc
-    adc.w   #METATILE_DISPLAY_WIDTH * 2
+    adc.w   #METATILE_DISPLAY_WIDTH
     pha
 
     LeftLoop:
         tax
 
-        ldy.w   0,x
+        lda.w   0,x
+        and.w   #0xff
+        asl
+        tay
 
         lda.w   tileMap.topLeft,y
         sta.b   VMDATA
@@ -308,7 +317,10 @@ a16()
     RightLoop:
         tax
 
-        ldy.w   0,x
+        lda.w   0,x
+        and.w   #0xff
+        asl
+        tay
 
         lda.w   tileMap.topRight,y
         sta.b   VMDATA
@@ -349,7 +361,7 @@ macro _DrawHorizontalBuffer() {
     assertZeroPage(_mapPtrRend)
 
     //  mapPtrRend = mapPtr
-    //  mapPtr += METATILE_DISPLAY_WIDTH * 2 bytes
+    //  mapPtr += METATILE_DISPLAY_WIDTH
     //
     //  a = (verticalBuffer.cursorIndex + vBufferOffset) / 4 * 32 * 2
     //  a &= (32 - 1) * 32
@@ -358,20 +370,21 @@ macro _DrawHorizontalBuffer() {
     //  y = (horizontalBuffer.cursorIndex + DISPLAY_WIDTH) & 127
     //
     //  while mapPtr >= mapPtrRend:
-    //      buffer[y] = tileMap.topLeft[*mapPtr]
-    //      buffer[y + 2] = tileMap.topRight[*mapPtr]
-    //      buffer[y + 128] = tileMap.bottomLeft[*mapPtr]
-    //      buffer[y + 128 + 2] = tileMap.bottomRight[*mapPtr]
+    //      x = *mapPtr * 2
+    //      buffer[y] = tileMap.topLeft[x]
+    //      buffer[y + 2] = tileMap.topRight[x]
+    //      buffer[y + 128] = tileMap.bottomLeft[x]
+    //      buffer[y + 128 + 2] = tileMap.bottomRight[x]
     //
     //      y -= 2 // 4 bytes
     //      if y < 0:
     //          y = buffer.size / 2 - 4 bytes
     //
-    //      mapPtr-- // 2 bytes
+    //      mapPtr--
 
     sta.b   _mapPtrRend
     clc
-    adc.w   #METATILE_DISPLAY_WIDTH * 2
+    adc.w   #METATILE_DISPLAY_WIDTH
     tax
 
     tya
@@ -396,6 +409,8 @@ macro _DrawHorizontalBuffer() {
         stx.b   _mapPtr
 
         lda.w   0,x
+        and.w   #0xff
+        asl
         tax
 
         lda.w   tileMap.topLeft,x
@@ -419,7 +434,6 @@ macro _DrawHorizontalBuffer() {
         +
 
         ldx.b   _mapPtr
-        dex
         dex
         cpx.b   _mapPtrRend
         bcs     Loop
@@ -459,10 +473,11 @@ macro _DrawVerticalBuffer() {
     //  y = horizontalBuffer.cursorIndex + METATILE_DISPLAY_WIDTH * METATILE_SIZE * 2
     //
     //  while mapPtr >= mapPtrRend:
-    //      buffer[y] = tileMap.topLeft[*mapPtr]
-    //      buffer[y + 2] = tileMap.bottomLeft[*mapPtr]
-    //      buffer[y + 64] = tileMap.topRight[*mapPtr]
-    //      buffer[y + 64 + 2] = tileMap.bottomRight[*mapPtr]
+    //      x = *mapPtr * 2
+    //      buffer[y] = tileMap.topLeft[x]
+    //      buffer[y + 2] = tileMap.bottomLeft[x]
+    //      buffer[y + 64] = tileMap.topRight[x]
+    //      buffer[y + 64 + 2] = tileMap.bottomRight[x]
     //
     //      y -= 2 // 4 bytes
     //      if y < 0:
@@ -499,6 +514,8 @@ macro _DrawVerticalBuffer() {
     Loop:
         sta.b   _mapPtr
         lda     (_mapPtr)
+        and.w   #0xff
+        asl
         tax
 
         lda.w   tileMap.topLeft,x
@@ -562,7 +579,7 @@ constant _mapPtrRend = utDpTmp2
     //      horizontalBuffer.cursorIndex &= horizontalBuffer.buffer.size / 2 - 1
     //
     //      verticalBuffer.cursorXpos += METATILE_SIZE_PX
-    //      visibleMapPtr += 2 bytes
+    //      visibleMapPtr++
     //
     //      _DrawVerticalBuffer(visibleMapPtr + METATILE_DISPLAY_WIDTH,
     //                          METATILE_DISPLAY_WIDTH * METATILE_SIZE * 2)
@@ -575,7 +592,7 @@ constant _mapPtrRend = utDpTmp2
     //      horizontalBuffer.cursorIndex &= horizontalBuffer.buffer.size / 2 - 1
     //
     //      verticalBuffer.cursorXpos -= METATILE_SIZE_PX
-    //      visibleMapPtr -= 2 bytes
+    //      visibleMapPtr--
     //
     //      _DrawVerticalBuffer(visibleMapPtr, 0)
 
@@ -608,10 +625,9 @@ constant _mapPtrRend = utDpTmp2
 
         lda.w   visibleMapPtr
         inc
-        inc
         sta.w   visibleMapPtr
         clc
-        adc.w   #METATILE_DISPLAY_WIDTH * 2
+        adc.w   #METATILE_DISPLAY_WIDTH
 
         ldy.w   #METATILE_DISPLAY_WIDTH * METATILE_SIZE * 2
 
@@ -638,7 +654,6 @@ XOffsetNegative:
         sta.w   verticalBuffer.cursorXpos
 
         lda.w   visibleMapPtr
-        dec
         dec
         sta.w   visibleMapPtr
 
@@ -781,18 +796,23 @@ SkipDrawHorizontalBuffer:
 // REQUIRES: 16 bit A, 16 bit Index, DB = 0x7e
 //
 // INPUT: X = index of map cell to draw
+//        A = value of map cell (lower 8 bits only)
 //
 // BRANCH: to Return if cell outside visible range
 // BRANCH: to RetrunWithWarning if drawMapCellBuffer is full
-a16()
-i16()
-// DP unknown
-code()
 macro _DrawMapCell() {
     assert16a()
     assert16i()
+    // DP unknown
 
 allocateTmpWord(_tmp)
+
+    // Get MetaTile tileMap index
+    and.w   #0xff
+    asl
+    tay
+    // MUST NOT MODIFY Y
+
 
     // test if cell is above/below visible display
     //
@@ -803,7 +823,7 @@ allocateTmpWord(_tmp)
     //  if offset - map.bytesPerRow >= map.bytesPerDisplayHeight:
     //      return
     //
-    //  RDDIV,RDMPY = offset / 2 / map.width
+    //  RDDIV,RDMPY = offset / map.width
 
     txa
     clc
@@ -820,7 +840,6 @@ allocateTmpWord(_tmp)
     // c clear
     adc.w   map.bytesPerRow
 
-    lsr
     sta.l   WRDIV
 
     sep     #$20
@@ -828,11 +847,7 @@ a8()
     lda.w   map.width
     sta.l   WRDIVB
 
-
-    // Get MetaTile index and drawMapCellBuffer index
-    // And decrement Dma.transfersLeft
-
-    ldy.w   map.data,x
+    // Get drawMapCellBuffer index and decrement Dma.transfersLeft
 
     lda.b   #-Dma.CalcDmaTime(Render.DRAW_MAP_CELL_VBLANK_LOOP_CYCLES)
     ldx.w   drawMapCellBufferIndex
