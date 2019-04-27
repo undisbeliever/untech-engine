@@ -238,7 +238,7 @@ namespace Entity {
     //   2) Testing if an instanceId is unused can be done with the `n`
     //      status flag.
     allocate(_unusedEntity, wram7e, ENTITY_SIZE)
-    assert(_unusedEntity > 0x8000)
+    assert(_unusedEntity & 0xffff > 0x8000)
 
     // The cursor position in the instanceIdTable.
     //

@@ -88,7 +88,7 @@ macro _AssignInstanceId() {
             ldx.b   #MAX_INSTANCE_ID
     NoWrapping:
 
-        assert(_unusedEntity > 0x8000)
+        assert(_unusedEntity & 0xffff > 0x8000)
         lda.w   instanceIdTable,x
         bpl     Loop
 
@@ -146,7 +146,7 @@ SkipRemoveEntity:
 // OUTPUT: Y = entity address
 // BRANCH: *label* if there is no entity with the id
 macro GetEntityWithIdOrBranchIfEmpty_Y(label) {
-    assert(Entity._unusedEntity > 0x8000)
+    assert(Entity._unusedEntity & 0xffff > 0x8000)
     assertPowerOfTwo(Entity.MAX_INSTANCE_ID + 2)
     assert(Entity.MAX_INSTANCE_ID & 1 == 0)
 
@@ -169,7 +169,7 @@ macro GetEntityWithIdOrBranchIfEmpty_Y(label) {
 // OUTPUT: X = entity address
 // BRANCH: *label* if there is no entity with the id
 macro GetEntityWithIdOrBranchIfEmpty_X(label) {
-    assert(Entity._unusedEntity > 0x8000)
+    assert(Entity._unusedEntity & 0xffff > 0x8000)
     assertPowerOfTwo(Entity.MAX_INSTANCE_ID + 2)
     assert(Entity.MAX_INSTANCE_ID & 1 == 0)
 
@@ -193,7 +193,7 @@ macro GetEntityWithIdOrBranchIfEmpty_X(label) {
 // OUTPUT: Y = entity address
 // BRANCH: *label* if there is no entity with the id
 macro GetEntityWithIdOrBranchIfEmpty_A8Y(label) {
-    assert(Entity._unusedEntity > 0x8000)
+    assert(Entity._unusedEntity & 0xffff > 0x8000)
     assertPowerOfTwo(Entity.MAX_INSTANCE_ID + 2)
     assert(Entity.MAX_INSTANCE_ID & 1 == 0)
     assert(Entity.MAX_INSTANCE_ID < 255)
@@ -222,7 +222,7 @@ i16()
 // OUTPUT: X = entity address
 // BRANCH: *label* if there is no entity with the id
 macro GetEntityWithIdOrBranchIfEmpty_A8X(label) {
-    assert(Entity._unusedEntity > 0x8000)
+    assert(Entity._unusedEntity & 0xffff > 0x8000)
     assertPowerOfTwo(Entity.MAX_INSTANCE_ID + 2)
     assert(Entity.MAX_INSTANCE_ID & 1 == 0)
     assert(Entity.MAX_INSTANCE_ID < 255)
