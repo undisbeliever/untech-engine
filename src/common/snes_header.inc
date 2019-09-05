@@ -82,8 +82,8 @@ if {ROM_SIZE} <= 1 {
 constant _HEADER_MAP_MODE = MEMORY_MAP.{MEMORY_MAP}|ROM_SPEED.{ROM_SPEED}
 
 private.seek(0x00ffb0)
-    db  "FF"                    // $ffbo - 2 Digit marker code
-    db  "SNES"                  // $ffb2 - 4 Character game id
+    db  "  "                    // $ffbo - 2 Digit marker code (blank - unlicensed)
+    db  "    "                  // $ffb2 - 4 Character game code (blank - unlicensed)
 EmptyBytes:
     db  0, 0, 0, 0, 0, 0, 0     // $ffb6 - fixed value (7 bytes)
 
