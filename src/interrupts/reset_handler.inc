@@ -65,10 +65,10 @@ a8()
     // ROM access time
     if ROM_SPEED.{ROM_SPEED} == 0x10 {
         lda.b   #MEMSEL.fastrom
-        sta.b   MEMSEL
+        sta.w   MEMSEL
 
     } else {
-        stz.b   MEMSEL
+        stz.w   MEMSEL
     }
 
 
