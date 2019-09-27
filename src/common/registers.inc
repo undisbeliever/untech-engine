@@ -1097,22 +1097,22 @@ namespace JOYSER1 {
 // Interrupt Enable Flags
 //(write, any)
 //
-// n-yx---a
+// n-vh---a
 //
 // n  = Enable V-Blank(NMI)
-// yx = Enable IRQ
+// vh = Enable IRQ
 //       00 - Disabled
-//       01 - On V-Counter(`VTIME`)
-//       10 - On H-Counter(`HTIME`)
+//       01 - On H-Counter(`HTIME`)
+//       10 - On V-Counter(`VTIME`)
 //       11 - On V-Counter and H-Counter(`VTIME` and `HTIME`)
 // a  = Auto read joypad
 constant NMITIMEN = 0x4200
 
 namespace NMITIMEN {
-    constant vBlank = %10000000
-    constant autoJoy = %00000001
-    constant vCounter = %00010000
-    constant hCounter = %00100000
+    constant vBlank   = %10000000
+    constant vCounter = %00100000
+    constant hCounter = %00010000
+    constant autoJoy  = %00000001
 }
 
 
