@@ -98,7 +98,7 @@ function EntityPositionToMapIndex {
 
     lda.b   BaseEntity.yPos.px
     sec
-    sbc.w   map.top
+    sbc.w   #map.TOP
     lsr
     lsr
     lsr
@@ -107,14 +107,14 @@ function EntityPositionToMapIndex {
 a8()
     xba
     lda.w   map.width
-    rep     #$30
+    rep     #$31
 a16()
     sta.l   WRMPYA      // also sets WRMPYB
 
 
     lda.b   BaseEntity.xPos.px
-    sec
-    sbc.w   map.left
+    // c clear
+    sbc.w   #map.LEFT - 1
     lsr
     lsr
     lsr

@@ -75,7 +75,7 @@ constant _rowCount = tmp2
     // horizontalBuffer.cursorYpos = Camera.yPos & ~(METATILE_SIZE_PX - 1)
     //
     // verticalBuffer.cursorIndex = 0
-    // verticalBuffer.cursorXpos = Camera.yPos & ~(METATILE_SIZE_PX - 1)
+    // verticalBuffer.cursorXpos = Camera.xPos & ~(METATILE_SIZE_PX - 1)
     //
     // cameraXoffset = Camera.xPos & ~(METATILE_SIZE_PX - 1)
     // cameraYoffset = (Camera.yPos & ~(METATILE_SIZE_PX - 1)) + 1
@@ -116,7 +116,7 @@ constant _rowCount = tmp2
 
     lda.w   Camera.yPos
     sec
-    sbc.w   map.top
+    sbc.w   #map.TOP
     lsr
     lsr
     lsr
@@ -127,13 +127,13 @@ a8()
     xba
     lda.w   map.width
 
-    rep     #$30
+    rep     #$31
 a16()
     sta.l   WRMPYA          // also sets WRMPYB
 
     lda.w   Camera.xPos
-    sec
-    sbc.w   map.left
+    // carry clear
+    sbc.w   #map.LEFT - 1
     lsr
     lsr
     lsr

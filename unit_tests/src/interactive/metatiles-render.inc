@@ -129,9 +129,9 @@ namespace MapCursor {
             lda.b   EntityStruct.{c}Pos.px
             adc.b   EntityStruct.{c}Vecl + 2
 
-            cmp.w   MetaTiles.map.{minMap}
+            cmp.w   #MetaTiles.map.{minMap}
             bcs     +
-                lda.w   MetaTiles.map.{minMap}
+                lda.w   #MetaTiles.map.{minMap}
                 bra     ++
             +
             cmp.w   MetaTiles.map.{maxMap}
@@ -151,8 +151,8 @@ namespace MapCursor {
                 sta.w   Camera.{c}Pos
             +
         }
-        _processAxis(x, left, right, DISPLAY_WIDTH)
-        _processAxis(y, top, bottom, DISPLAY_HEIGHT)
+        _processAxis(x, LEFT, right, DISPLAY_WIDTH)
+        _processAxis(y, TOP, bottom, DISPLAY_HEIGHT)
 
 
         lda.w   Controller.Joy1.current
@@ -190,7 +190,7 @@ namespace MapCursor {
                 lda.b   EntityStruct.xPos.px
                 sec
                 sbc.b   EntityStruct._displacement
-                cmp.w   MetaTiles.map.left
+                cmp.w   #MetaTiles.map.LEFT
                 bcc     +
                     // X = _mapIndex - _displacement / METATILE_SIZE_PX * 2
                     lda.b   EntityStruct._displacement
@@ -275,8 +275,8 @@ assert(MAP_GRID_WIDTH * MAP_REPEAT_HORIZONTAL <= MAP_WIDTH)
 assert(MAP_GRID_HEIGHT * MAP_REPEAT_VERTICAL <= MAP_HEIGHT)
 assert(MAP_WIDTH * MAP_HEIGHT < MetaTiles.MAP_SIZE)
 
-constant MIN_CAMERA_X = 0x1000
-constant MIN_CAMERA_Y = 0x8000
+constant MIN_CAMERA_X = MetaTiles.map.LEFT
+constant MIN_CAMERA_Y = MetaTiles.map.TOP
 
 constant MAX_CAMERA_X = MIN_CAMERA_X + MAP_WIDTH * 16 - Camera.DISPLAY_WIDTH
 constant MAX_CAMERA_Y = MIN_CAMERA_Y + MAP_HEIGHT * 16 - Camera.DISPLAY_HEIGHT
@@ -341,12 +341,6 @@ constant _columnIndex = Test.dpTmp + 2
     assert(MetaTiles.map.width + 1 == MetaTiles.map.height)
     lda.w   #MAP_WIDTH | (MAP_HEIGHT << 8)
     sta.w   MetaTiles.map.width
-
-    lda.w   #MIN_CAMERA_Y
-    sta.w   MetaTiles.map.top
-
-    lda.w   #MIN_CAMERA_X
-    sta.w   MetaTiles.map.left
 
     lda.w   #MIN_CAMERA_Y + MAP_HEIGHT * 16
     sta.w   MetaTiles.map.bottom

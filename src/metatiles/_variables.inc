@@ -31,14 +31,6 @@ namespace MetaTiles {
         // (uint8)
         allocate(height, wram7e, 1)
 
-        // Y coordinate of the map
-        // (uint16)
-        allocate(top, wram7e, 2)
-
-        // X coordinate of the map
-        // (uint16)
-        allocate(left, wram7e, 2)
-
         // Map data
         // (byte grid array)
         allocate(data, wram7e, MAP_SIZE)
@@ -51,6 +43,10 @@ namespace MetaTiles {
         // (Equal to width * height * 2)
         // (uint16)
         allocate(dataSize, wram7e, 2)
+
+        // Top-left of map is not at (0, 0) to eliminate signed comparison when collision testing.
+        constant TOP = 0x1000
+        constant LEFT = 0x1000
 
         // The bottom-most y coordinate of the map
         // (uint16)
