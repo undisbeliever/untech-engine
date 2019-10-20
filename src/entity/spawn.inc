@@ -129,10 +129,15 @@ allocateTmpWord(yPos)
         sta.b   BaseEntity.yPos.px
         stz.b   BaseEntity.yPos.sx
 
+        assert(BaseEntity.yVecl - BaseEntity.xVecl == 4)
         stz.b   BaseEntity.xVecl
         stz.b   BaseEntity.xVecl + 2
         stz.b   BaseEntity.yVecl
         stz.b   BaseEntity.yVecl + 2
+
+        // confirm it is safe to override the byte before tileCollisionState
+        assert(BaseEntity.tileCollisionState == BaseEntity.yVecl + 4)
+        stz.b   BaseEntity.tileCollisionState - 1
 
 
         // Set projectileId and listId

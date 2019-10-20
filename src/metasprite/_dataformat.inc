@@ -10,7 +10,7 @@
 
 
 // Data format may be subject to changes
-if MetaSprite.Data.METASPRITE_FORMAT_VERSION != 36 {
+if MetaSprite.Data.METASPRITE_FORMAT_VERSION != 38 {
     error "Invalid UnTech MetaSprite Format"
 }
 
@@ -131,11 +131,6 @@ namespace Format {
             // (Index+1 format)
             field(entityHitbox, 2)
 
-            // Index+1 of the TileHitbox` data in the `TileHitboxData` block
-            // May be NULL
-            // (Index+1 format)
-            field(tileHitbox, 2)
-
             // Index+1 of the ActionPoints data in the `ActionPointsData` block
             // May be NULL
             // (Index+1 format)
@@ -148,6 +143,35 @@ namespace Format {
             // Optional: Never read on fixed tilesets
             // (Index+1 format)
             field(tileset, 2)
+
+            // The frame's tile hitbox, used for collision testing between
+            // the entity and the tilemap.
+            //
+            // NOTE: The frame's origin point MUST BE inside the tile
+            //       hitbox and not touching the hitbox edges.
+            //
+            // Optional: If the frame has no tile hitbox then all 32
+            //           bits of TileHitbox MUST be set.
+            namespace TileHitbox {
+                // Distance from origin to the left side of the hitbox.
+                // Cannot be zero.
+                // (uint8)
+                field(left, 1)
+                // Distance from origin to the right side of the hitbox.
+                // Cannot be zero.
+                // (uint8)
+                field(right, 1)
+
+                // Distance from the origin to the top of the hitbox
+                // Equal to `-top`.  Cannot be zero.  Must be a negative value.
+                // (sint8)
+                field(yOffset, 1)
+
+                // Height of the hitbox
+                // Cannot be zero. `height + yOffset` cannot be zero.
+                // (uint8, max value = 127)
+                field(height, 1)
+            }
         endstruct()
     }
 
@@ -287,21 +311,6 @@ namespace Format {
         constant BODY   = 0x01
 
         constant _N_BITS = 4
-    }
-
-
-    // A hitbox of the entity, used by the physics engine for collisions
-    // with the meta-tilemap.
-    //
-    // For the moment the engine only supports a single AABB hitbox.
-    namespace TileHitbox {
-        assert(Data.TileHitboxData & 0xffff != 0)
-        struct(Data.TileHitboxData - 1)
-            field(xOffset, 1) // int_ms8 format
-            field(yOffset, 1) // int_ms8 format
-            field(width, 1) // uint8
-            field(height, 1) // uint8
-        endstruct()
     }
 
 

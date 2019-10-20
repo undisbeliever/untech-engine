@@ -41,15 +41,15 @@ constant _tilesetPtr = LZ4.ptr
 
     // Transfer tilemap block to WRAM
 
-    ldx.w   #tileMap
-    lda.w   #tileMap >> 16
-    ldy.w   #tileMap.size
+    ldx.w   #Format.Tileset.wramLocation
+    lda.w   #Format.Tileset.wramLocation >> 16
+    ldy.w   #Format.Tileset.size
 
     jsr     LZ4.Decompress
 
 
     // ensure tileMap is full
-    cpy.w   #tileMap + tileMap.size
+    cpy.w   #Format.Tileset.wramLocation + Format.Tileset.size
     bne     Fail
 
 

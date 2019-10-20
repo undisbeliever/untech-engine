@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF_8"?>
+<!DOCTYPE untech>
+<metatile-tileset name="TileCollisionTest">
+  <palette name="TileCollisionTest"/>
+  <tile t="17" collision="solid"/>
+  <tile t="18" collision="up"/>
+  <tile t="19" collision="dp"/>
+  <tile t="20" collision="drs"/>
+  <tile t="21" collision="dls"/>
+  <tile t="22" collision="drss"/>
+  <tile t="23" collision="drts"/>
+  <tile t="24" collision="dlts"/>
+  <tile t="25" collision="dlss"/>
+  <tile t="26" collision="urs"/>
+  <tile t="27" collision="uls"/>
+  <tile t="28" collision="urss"/>
+  <tile t="29" collision="urts"/>
+  <tile t="30" collision="ults"/>
+  <tile t="31" collision="ulss"/>
+  <animation-frames bit-depth="4" animation-delay="30">
+    <frame image="tile-collision-test.png"/>
+  </animation-frames>
+  <scratchpad width="32" height="14">
+    ERERERERERERERERERERERERERERERERERERERERERERHxAQEBAQEBAQEBAQEBAQ
+    ExAQEBAQEBAQEBAREBAQEREQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBEQEBAR
+    ERAQEBAUEhUQEBAQEBAQEBAQEBYXEhgZEBAQEBAQFBEREBAQFBIREhUQFBUWFxgZ
+    EBYXEhERERIYGRAQEBQSEREQEBEREREREREREREREREREREREREREREREBAQERER
+    ERAQEBoTERMbEBobHB0eHxAcHRMRERETHh8QEBAQEBEREBAQEBoTGxAQEBAQEBAQ
+    EBAQHB0THh8QEBAQEBAQEREQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBARERER
+    ERAQEBAQEBAQEBAQEBISEhATExMQEBAQEBAQEBwdExEREBAQEBAQEBAQEBAQEBAQ
+    EBAQEBAQEBQSERAQEBAaEREQEBAREhUQERAUEhEQEBAQEBAQEBYXEhIREBAQEBAR
+    ERgZEBEREhURFBIRERAQEBIQEBYXEhISEhEQEBAQFhERERERERERERERERERERER
+    EREREREREREREREREREREQ==
+  </scratchpad>
+</metatile-tileset>

@@ -25,6 +25,26 @@ define GetEntityId(eName) = Project.EntityIds.{eName}
 define GetProjectileId(pName) = Project.ProjectileIds.{pName}
 
 
+// Moves the entity (using the entity's velocity) and preform collision
+// checks between the MetaTiles and the entity's tile hitbox.
+//
+// ASSUMES: The entity is inside the map boundary.
+//
+// NOTE: This macro MUST ONLY be invoked in the entity's Process routine.
+//
+// REQUITES: 16 bit A, 16 bit Index, DB = 0x7e
+//
+// INPUT: dp = entity
+// OUTPUT: Y = The tilemap index directly above/below the entity (depending on yVecl),
+//             Set to 0 if there is no tile hitbox.
+//        BaseEntity.tileCollisionState = The collisions that occurred in this frame.
+macro MoveEntityAndProcessTileCollisions() {
+    assert16a()
+    assert16i()
+
+    jsr     MetaTiles.MoveEntityAndProcessTileCollisions
+}
+
 
 // Sets the Entity's MetaSprite frame
 //

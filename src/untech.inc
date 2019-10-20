@@ -65,6 +65,7 @@ include "resources/_common.inc"
 
 include "camera/_common.inc"
 
+include "metatiles/collisions.inc"
 include "metatiles/render.inc"
 include "metatiles/tileset.inc"
 include "metatiles/_common.inc"

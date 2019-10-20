@@ -77,6 +77,7 @@ include "tests/text/string.inc"
 
 include "tests/util/lz4.inc"
 
+include "interactive/tile-collision-test.inc"
 include "interactive/entity-validation.inc"
 include "interactive/entityhitbox-collisions.inc"
 include "interactive/metatiles-render.inc"

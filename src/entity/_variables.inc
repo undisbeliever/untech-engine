@@ -102,6 +102,20 @@ namespace BaseEntity {
         // (2 x 1:15:16 fixed point - pixels/display frame, project editable)
         field(xVecl, 4)
         field(yVecl, 4)
+
+        // Tile collision state of entity.
+        //
+        // Used by `MetaTiles.MoveEntityAndProcessTileCollisions` to determine
+        // if the entity was walking on the floor/ceiling in the previous frame.
+        //
+        // Can be used by the Project to determine if an entity is walking on the
+        // floor/ceiling or collided with a wall.
+        //
+        // This bitfield SHOULD NOT be edited by the Project,
+        // unless the entity's position changes, then it should be set to 0.
+        //
+        // (uint8, MetaTiles.TileCollisionState bitfield)
+        field(tileCollisionState, 1)
     endstruct()
 }
 

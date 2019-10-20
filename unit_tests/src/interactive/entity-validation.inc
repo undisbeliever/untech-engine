@@ -70,6 +70,9 @@ macro _PrintMenu() {
 }
 
 
+a16()
+i16()
+code()
 namespace Test {
 Fail:
     clc
