@@ -490,9 +490,10 @@ MovingDown:
         // The code first tests the tile on the hitbox's bottom edge at the
         // entity's xPos (refered to as the bottom-center tile).
         //
-        // Then we test the bottom left/right tiles for a SOLID or UP_PLATFORM
-        // collision.  Only two tiles to the left or right are tested.  If the
-        // tile hitbox's left/right values are > 32 the remaining tiles will be
+        // If the bottom-center tile is empty we then test the bottom
+        // left/right tiles for a SOLID or UP_PLATFORM collision.  Only two
+        // tiles to the left and two to the right are tested.  If the tile
+        // hitbox's left/right values are > 32 the remaining tiles will be
         // ignored.
         //
         // If the tile being tested is an UP_PLATFORM then collision only
@@ -577,8 +578,8 @@ MovingDown:
                 //  x = (entity.xPos.px & 0xf) | collisionMap[x]
                 //  if (_bottom & 0xf) >= TopHeightTable[x]:
                 //      goto Collision
-                //  else
-                //      goto TestLeftRightTiles
+                //  else:
+                //      return
                 lda.b   BaseEntity.xPos.px
                 and.b   #0x0f
                 ora.w   collisionMap,x
@@ -587,7 +588,13 @@ MovingDown:
                 lda.w   _bottom
                 and.b   #0xf
                 cmp.l   TopHeightTable,x
-                bcc     TestLeftRightTiles
+                bcs     Collision
+                    // Entity has not yet landed on the slope tile, no need to test left/right tiles.
+
+                    // Y = entity bottom-center map tile
+                    rep     #$30
+                a16()
+                    rts
 
     // ::SPAGHETTI Have to put Collision here to prevent a "branch out of bounds" assembly error::
 
@@ -669,6 +676,8 @@ MovingDown:
     a8()
     i16()
     TestLeftRightTiles:
+        // Entity bottom-center tile is empty.
+
     inline TestLeftRightTiles(platform, SolidCollisionLabel, NoCollisionLabel) {
         // Test for solid/platform tiles to the left / right of xPos.
         //
@@ -1234,8 +1243,8 @@ MovingUp:
                 //  x = (entity.xPos.px & 0xf) | collisionMap[x]
                 //  if (_top & 0xf) <= BottomHeightTable[x]:
                 //      goto Collision
-                //  else
-                //      goto TestLeftRightTiles
+                //  else:
+                //      return
                 lda.b   BaseEntity.xPos.px
                 and.b   #0x0f
                 ora.w   collisionMap,x
@@ -1245,7 +1254,11 @@ MovingUp:
                 and.b   #0xf
                 cmp.l   BottomHeightTable,x
                 beq     Collision
-                bcs     TestLeftRightTiles
+                bcc     Collision
+                    // Y = entity bottom-center map tile
+                    rep     #$30
+                a16()
+                    rts
 
     // ::SPAGHETTI Have to put Collision here to prevent a "branch out of bounds" assembly error::
 
