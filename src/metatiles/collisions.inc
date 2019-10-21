@@ -1233,32 +1233,41 @@ MovingUp:
         lda.w   collisionMap,x
         assert(HeightTableIndex.EMPTY == 0)
         beq     TestLeftRightTiles
-            cmp.b   #HeightTableIndex.DOWN_PLATFORM
-            beq     CenterTileIsDownPlatform
 
-            // required
-            cmp.b   #HeightTableIndex.UP_PLATFORM
-            beq     TestLeftRightTiles
+        cmp.b   #HeightTableIndex.SOLID
+        beq     CenterTileIsSolid
+        // required
+        cmp.b   #HeightTableIndex.UP_PLATFORM
+        beq     TestLeftRightTiles
 
-                //  x = (entity.xPos.px & 0xf) | collisionMap[x]
-                //  if (_top & 0xf) <= BottomHeightTable[x]:
-                //      goto Collision
-                //  else:
-                //      return
-                lda.b   BaseEntity.xPos.px
-                and.b   #0x0f
-                ora.w   collisionMap,x
-                tax
+        // Treat DOWN slopes as platforms,
+        // prevents small entities from falling through the floor when jumping on a down slope.
+        cmp.b   #HeightTableIndex.DOWN_LEFT_SHORT_SLOPE + 1
+        bcc     CenterTileIsDownPlatform
+            // Center tile is an up slope
 
-                lda.w   _top
-                and.b   #0xf
-                cmp.l   BottomHeightTable,x
-                beq     Collision
-                bcc     Collision
-                    // Y = entity bottom-center map tile
-                    rep     #$30
-                a16()
-                    rts
+            //  x = (entity.xPos.px & 0xf) | collisionMap[x]
+            //  if (_top & 0xf) <= BottomHeightTable[x]:
+            //      goto Collision
+            //  else:
+            //      return
+            lda.b   BaseEntity.xPos.px
+            and.b   #0x0f
+            ora.w   collisionMap,x
+            tax
+
+            lda.w   _top
+            and.b   #0xf
+            cmp.l   BottomHeightTable,x
+            beq     Collision
+            bcc     Collision
+                // Y = entity bottom-center map tile
+                rep     #$30
+            a16()
+                rts
+
+    CenterTileIsSolid:
+        jmp     SolidCollision
 
     // ::SPAGHETTI Have to put Collision here to prevent a "branch out of bounds" assembly error::
 
