@@ -81,25 +81,22 @@ NoHitbox:
 //   * This routine is called once per frame.
 //   * The maximum x/y velocity is 8px/frame.
 //   * The entity is inside the map boundary.
-//   * A UP_PLATFORM tile or a SOLID wall is to the right of a DOWN_RIGHT_SLOPE or a DOWN_RIGHT_SLOPE tile.
-//   * An EMPTY tile or a SOLID wall is to the left of a DOWN_RIGHT_SLOPE or DOWN_RIGHT_TALL_SLOPE.
-//   * A UP_PLATFORM tile or a SOLID wall is to the left of a DOWN_LEFT_SLOPE or a DOWN_LEFT_TALL_SLOPE tile.
-//   * An EMPTY tile or a SOLID wall is to the right of a DOWN_LEFT_SLOPE or DOWN_RIGHT_TALL_SLOPE.
-//   * A DOWN_PLATFORM tile or a SOLID wall is to the right of a UP_RIGHT_SLOPE or a UP_RIGHT_SLOPE tile.
-//   * An EMPTY tile or a SOLID wall is to the left of a UP_RIGHT_SLOPE or UP_RIGHT_TALL_SLOPE.
-//   * A DOWN_PLATFORM tile or a SOLID wall is to the left of a UP_LEFT_SLOPE or a UP_LEFT_TALL_SLOPE tile.
-//   * An EMPTY tile or a SOLID wall is to the right of a DOWN_LEFT_SLOPE or DOWN_RIGHT_TALL_SLOPE.
-//   * A SOLID or UP_PLATFORM tile is below the DOWN_*_SLOPE tiles.
-//   * A DOWN_PLATFORM or SOLID tile is above the UP_*_SLOPE tiles.
-//   * An UP_PLATFORM tile is only one tile tall and not touching the floor, unless it is part of a slope.
-//   * An DOWN_PLATFORM tile is only one tile tall and not touching the floor, unless it is part of a slope.
+//   * An END_SLOPE tile or a SOLID wall is adjacent to the long side of a *_SLOPE tile.
+//   * An EMPTY tile or a SOLID wall is adjacent to the short side of a *_SLOPE tile.
+//   * A SOLID, UP_PLATFORM or END_SLOPE tile is below the DOWN_*_SLOPE tiles.
+//   * A SOLID, DOWN_PLATFORM or END_SLOPE tile is above the UP_*_SLOPE tiles.
+//   * An EMPTY tile is above a DOWN_*_SLOPE tiles.
+//   * An EMPTY tile is below a UP_*_SLOPE tiles.
+//   * An EMPTY tile is *not* to the left or right of an END_SLOPE time.
+//   * An UP_PLATFORM tile is only one tile tall and not touching the floor.
+//   * An DOWN_PLATFORM tile is only one tile tall and not touching the ceiling.
 //   * A short/tall slope pair is never broken, unless there is a SOLID wall in the way.
 //   * It is not possible to walk into the long side of a slope tile.
 //   * The top-left tile of the map is SOLID.
 //
 // If none of these assumptions are met then the entity can either:
-//   * overshoot slope tiles when `abs(xVecl)` > 1px/frame
-//   * fall through a slope if the x origin tile is EMPTY.
+//   * Overshoot slope tiles when `abs(xVecl)` > 1px/frame.
+//   * Fall through a slope if the x origin tile is EMPTY.
 //
 //
 // NOTE: a *SOLID wall* means the tile adjacent and adjacent-above the slope is solid.
@@ -141,6 +138,11 @@ allocateTmpWord(_bottom)
 allocateTmpWord(_yDelta)
 allocateTmpWord(_bottomOffset)
 allocateTmpWord(_edgeOnPlatform)
+
+constant _HeightTableIndex_FIRST_UP_SLOPE   = HeightTableIndex.UP_RIGHT_SLOPE
+constant _HeightTableIndex_LAST_UP_SLOPE    = HeightTableIndex.UP_LEFT_SHORT_SLOPE
+constant _HeightTableIndex_FIRST_DOWN_SLOPE = HeightTableIndex.DOWN_RIGHT_SLOPE
+constant _HeightTableIndex_LAST_DOWN_SLOPE  = HeightTableIndex.DOWN_LEFT_SHORT_SLOPE
 
 
     // clear tileCollisionState
@@ -506,6 +508,14 @@ MovingDown:
         // Only the bottom-center tile is tested for slope collisions, which is
         // not an issue as the engine requires all down slope tiles to have a
         // SOLID or UP_PLATFORM tile underneath them.
+        //
+        // The END_SLOPE tile is only solid in the bottom-center tile.
+        // There is no need to write code to test for END_SLOPE
+        // `BottomHeightTable[END_SLOPE | (xPos & 0xf)]` is always 0.
+
+
+        // verify there is no need to test for END_SLOPE in this code.
+        assert(HeightTableIndex.END_SLOPE & 0xf0 == HeightTableIndex.SOLID)
 
 
         // add entity Y velocity to Y position, saving the change in Ypos to _yDelta
@@ -869,10 +879,12 @@ MovingDown_Standing:
         // hitbox's left/right values are > 32 the remaining tiles will be
         // ignored.
         //
-        // This code treats a UP_PLATFORM tile as a solid, which allows fast
-        // moving entities to walk up slopes without falling through the slope.
+        // As an optimisation this code treats UP_PLATFORM tiles as solid.
         // Unfortunately this design choice will cause the entity to zip
         // upwards if the entity walks into an UP_PLATFORM.
+        //
+        // There is no need to write code to test for END_SLOPE, as
+        // `BottomHeightTable[END_SLOPE | (xPos & 0xf)]` is always 0.
 
 
         // Reset yVecl
@@ -1231,18 +1243,24 @@ MovingUp:
         lda.w   map.data,y
         tax
         lda.w   collisionMap,x
-        assert(HeightTableIndex.EMPTY == 0)
-        beq     TestLeftRightTiles
 
+        // goto CenterTileIsSolid if tile is SOLID or END_SLOPE
+        assert(HeightTableIndex.END_SLOPE & 0xf0 == HeightTableIndex.SOLID)
+        and.b   #0xf0
         cmp.b   #HeightTableIndex.SOLID
         beq     CenterTileIsSolid
-        // required
-        cmp.b   #HeightTableIndex.UP_PLATFORM
-        beq     TestLeftRightTiles
+
+        // goto TestLeftRightTiles if tile is EMPTY or UP_PLATFORM
+        assert(HeightTableIndex.EMPTY == 0x00)
+        assert(HeightTableIndex.SOLID == 0x10)
+        assert(HeightTableIndex.UP_PLATFORM == 0x20)
+        cmp.b   #HeightTableIndex.UP_PLATFORM + 0x10
+        bcc     TestLeftRightTiles
 
         // Treat DOWN slopes as platforms,
         // prevents small entities from falling through the floor when jumping on a down slope.
-        cmp.b   #HeightTableIndex.DOWN_LEFT_SHORT_SLOPE + 1
+        assert(_HeightTableIndex_LAST_DOWN_SLOPE < _HeightTableIndex_FIRST_UP_SLOPE)
+        cmp.b   #_HeightTableIndex_LAST_DOWN_SLOPE + 0x10
         bcc     CenterTileIsDownPlatform
             // Center tile is an up slope
 

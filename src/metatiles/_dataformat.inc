@@ -9,7 +9,7 @@
 
 
 namespace MetaTiles {
-    if MetaTiles.TILESET_FORMAT_VERSION != 6 {
+    if MetaTiles.TILESET_FORMAT_VERSION != 7 {
         error "Invalid untech-compiler MetaTile Tileset Format"
     }
 
@@ -31,21 +31,13 @@ namespace MetaTiles {
 
     // Collision data for each MetaTile
     //
-    // hhhh0000
-    //
-    //      hhhh = Height Table index
-    //
-    // NOTES:
-    //  * The lowest 4 bits MUST be 0
+    // NOTE: Each entry MUST MATCH a HeightTableIndex value
     //
     allocate(collisionMap, wram7e, N_META_TILES)
     constant collisionMap.size = N_META_TILES
 
 
     // The height table used by the collision map
-    //
-    // Does not contain EMPTY (sky), an empty tile is not solid in the
-    // up and down directions.
     //
     // ::KUDOS Christopher Hebert for the slope names::
     // ::: Reconstructing Cave Story: Slope Theory::
@@ -70,8 +62,11 @@ namespace MetaTiles {
             enum(UP_LEFT_SHORT_SLOPE)
         endEnum()
 
-        constant _MASK = %11110000
-        assert(__ENUM__.last <= _MASK)
+        // No collision in X-axis.
+        // Solid collision for bottom-center or top-center tile in Y-axis.
+        constant END_SLOPE = SOLID | 0x08
+
+        assert(__ENUM__.last <= %11110000)
     }
 
 
