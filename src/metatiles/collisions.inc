@@ -1250,18 +1250,19 @@ MovingUp:
         cmp.b   #HeightTableIndex.SOLID
         beq     CenterTileIsSolid
 
-        // goto TestLeftRightTiles if tile is EMPTY or UP_PLATFORM
-        assert(HeightTableIndex.EMPTY == 0x00)
-        assert(HeightTableIndex.SOLID == 0x10)
-        assert(HeightTableIndex.UP_PLATFORM == 0x20)
-        cmp.b   #HeightTableIndex.UP_PLATFORM + 0x10
+        // Goto CenterTileIsDownPlatform if on a DOWN PLATFORM
+        cmp.b   #HeightTableIndex.DOWN_PLATFORM
+        beq     CenterTileIsDownPlatform
+
+        // Goto TestLeftRightTiles if EMPTY, UP_PLATFORM or DOWN SLOPE
+        // Treat DOWN SLOPES as empty tiles to prevent small entities from falling through the floor when jumping on a down slope.
+        assert(HeightTableIndex.EMPTY < _HeightTableIndex_FIRST_UP_SLOPE)
+        assert(HeightTableIndex.UP_PLATFORM < _HeightTableIndex_FIRST_UP_SLOPE)
+        assert(_HeightTableIndex_LAST_DOWN_SLOPE < _HeightTableIndex_FIRST_UP_SLOPE)
+        assert(_HeightTableIndex_LAST_UP_SLOPE == 0xf0)
+        cmp.b   #_HeightTableIndex_FIRST_UP_SLOPE
         bcc     TestLeftRightTiles
 
-        // Treat DOWN slopes as platforms,
-        // prevents small entities from falling through the floor when jumping on a down slope.
-        assert(_HeightTableIndex_LAST_DOWN_SLOPE < _HeightTableIndex_FIRST_UP_SLOPE)
-        cmp.b   #_HeightTableIndex_LAST_DOWN_SLOPE + 0x10
-        bcc     CenterTileIsDownPlatform
             // Center tile is an up slope
 
             //  x = (entity.xPos.px & 0xf) | collisionMap[x]
