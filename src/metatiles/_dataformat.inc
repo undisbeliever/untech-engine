@@ -44,16 +44,16 @@ namespace MetaTiles {
     // ::: https://www.youtube.com/watch?v=ny14i0GxGZw ::
     namespace HeightTableIndex {
         createEnum(0, 16)
-            enum(EMPTY)
-            enum(SOLID)
-            enum(UP_PLATFORM)
-            enum(DOWN_PLATFORM)
+            enum(SOLID)                     // Most common check
             enum(DOWN_RIGHT_SLOPE)          // right and down sides are the biggest, fall down to collide, walk up to ascend
             enum(DOWN_LEFT_SLOPE)
             enum(DOWN_RIGHT_SHORT_SLOPE)
             enum(DOWN_RIGHT_TALL_SLOPE)
             enum(DOWN_LEFT_TALL_SLOPE)
             enum(DOWN_LEFT_SHORT_SLOPE)
+            enum(UP_PLATFORM)
+            enum(EMPTY)
+            enum(DOWN_PLATFORM)
             enum(UP_RIGHT_SLOPE)
             enum(UP_LEFT_SLOPE)
             enum(UP_RIGHT_SHORT_SLOPE)

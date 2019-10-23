@@ -246,7 +246,7 @@ MovingRight:
         lda.w   map.data,y
         tax
         lda.w   collisionMap,x
-        cmp.b   #HeightTableIndex.SOLID
+        assert(HeightTableIndex.SOLID == 0)
         beq     Collision
 
 
@@ -287,7 +287,7 @@ MovingRight:
         a8()
         i8()
             ldy.w   collisionMap,x
-            cpy.b   #HeightTableIndex.SOLID
+            assert(HeightTableIndex.SOLID == 0)
             beq     Collision
 
             dec.w   _counter
@@ -366,7 +366,7 @@ MovingLeft:
         lda.w   map.data,y
         tax
         lda.w   collisionMap,x
-        cmp.b   #HeightTableIndex.SOLID
+        assert(HeightTableIndex.SOLID == 0)
         beq     Collision
 
 
@@ -408,7 +408,7 @@ MovingLeft:
         a8()
         i8()
             ldy.w   collisionMap,x
-            cpy.b   #HeightTableIndex.SOLID
+            assert(HeightTableIndex.SOLID == 0)
             beq     Collision
 
             dec.w   _counter
@@ -580,31 +580,46 @@ MovingDown:
         lda.w   map.data,y
         tax
         lda.w   collisionMap,x
-        assert(HeightTableIndex.EMPTY == 0)
-        beq     TestLeftRightTiles
-            cmp.b   #HeightTableIndex.UP_PLATFORM
-            beq     CenterTileIsUpPlatform
 
-                //  x = (entity.xPos.px & 0xf) | collisionMap[x]
-                //  if (_bottom & 0xf) >= TopHeightTable[x]:
-                //      goto Collision
-                //  else:
-                //      return
-                lda.b   BaseEntity.xPos.px
-                and.b   #0x0f
-                ora.w   collisionMap,x
-                tax
+        // No collision if DOWN_PLATFORM, EMPTY or UP SLOPE
+        assert(HeightTableIndex.DOWN_PLATFORM > HeightTableIndex.EMPTY)
+        assert(_HeightTableIndex_FIRST_UP_SLOPE > HeightTableIndex.EMPTY)
+        assert(_HeightTableIndex_LAST_UP_SLOPE == 0xf0)
+        cmp.b   #HeightTableIndex.EMPTY
+        bcs     TestLeftRightTiles
 
-                lda.w   _bottom
-                and.b   #0xf
-                cmp.l   TopHeightTable,x
-                bcs     Collision
-                    // Entity has not yet landed on the slope tile, no need to test left/right tiles.
+        // Test if UP_PLATFORM
+        assert(HeightTableIndex.UP_PLATFORM < HeightTableIndex.EMPTY)
+        cmp.b   #HeightTableIndex.UP_PLATFORM
+        beq     CenterTileIsUpPlatform
 
-                    // Y = entity bottom-center map tile
-                    rep     #$30
-                a16()
-                    rts
+            // Tile is SOLID, END_SLOPE or DOWN SLOPE
+            // Test if entity is below the collision area of the tile
+
+            assert(HeightTableIndex.SOLID < HeightTableIndex.EMPTY)
+            assert(HeightTableIndex.END_SLOPE < HeightTableIndex.EMPTY)
+            assert(_HeightTableIndex_LAST_DOWN_SLOPE < HeightTableIndex.EMPTY)
+
+            //  x = (entity.xPos.px & 0xf) | collisionMap[x]
+            //  if (_bottom & 0xf) >= TopHeightTable[x]:
+            //      goto Collision
+            //  else:
+            //      return
+            lda.b   BaseEntity.xPos.px
+            and.b   #0x0f
+            ora.w   collisionMap,x
+            tax
+
+            lda.w   _bottom
+            and.b   #0xf
+            cmp.l   TopHeightTable,x
+            bcs     Collision
+                // Entity has not yet landed on the slope tile, no need to test left/right tiles.
+
+                // Y = entity bottom-center map tile
+                rep     #$30
+            a16()
+                rts
 
     // ::SPAGHETTI Have to put Collision here to prevent a "branch out of bounds" assembly error::
 
@@ -618,7 +633,7 @@ MovingDown:
         // Y = entity bottom-center map tile
         // MUST NOT MODIFY Y
         //
-        // NOTE: If I modify this code, also modify code in `MovingDown_Standing.CollisionBelow`
+        // NOTE: If I modify this code, also modify code in `MovingDown_Standing.TileBelowCenterIsDownCollidable`
 
         // set collision flag
         lda.b   #TileCollisionState.DOWN_COLLISION
@@ -728,7 +743,7 @@ MovingDown:
                 lda.w   map.data - 2,y
                 tax
                 lda.w   collisionMap,x
-                cmp.b   #HeightTableIndex.SOLID
+                assert(HeightTableIndex.SOLID == 0)
                 beq     {SolidCollisionLabel}
                 cmp.b   #HeightTableIndex.{platform}
                 bne     +
@@ -739,7 +754,7 @@ MovingDown:
             lda.w   map.data - 1,y
             tax
             lda.w   collisionMap,x
-            cmp.b   #HeightTableIndex.SOLID
+            assert(HeightTableIndex.SOLID == 0)
             beq     {SolidCollisionLabel}
             cmp.b   #HeightTableIndex.{platform}
             bne     +
@@ -761,7 +776,7 @@ MovingDown:
                 lda.w   map.data + 2,y
                 tax
                 lda.w   collisionMap,x
-                cmp.b   #HeightTableIndex.SOLID
+                assert(HeightTableIndex.SOLID == 0)
                 beq     {SolidCollisionLabel}
                 cmp.b   #HeightTableIndex.{platform}
                 bne     +
@@ -772,7 +787,7 @@ MovingDown:
             lda.w   map.data + 1,y
             tax
             lda.w   collisionMap,x
-            cmp.b   #HeightTableIndex.SOLID
+            assert(HeightTableIndex.SOLID == 0)
             beq     {SolidCollisionLabel}
             cmp.b   #HeightTableIndex.{platform}
             beq     OnPlatformTile
@@ -936,25 +951,24 @@ MovingDown_Standing:
         // Check to see if we are about to enter a new slope.
         //
         // This test must jump to `MovingDown.Collision` if the entity
-        // is on-top of a UP_PLATFORM or a downwards slope to prevent
+        // touches an END_SLOPE, UP_PLATFORM or a downwards slope to prevent
         // the entity from overshooting a slope when xVecl is too large.
 
         lda.w   map.data,y
         tax
         lda.w   collisionMap,x
-        assert(HeightTableIndex.EMPTY == 0)
-        beq     +
-        cmp.b   #HeightTableIndex.DOWN_PLATFORM
-        beq     +
-            lda.b   BaseEntity.xPos.px
-            and.b   #0x0f
-            ora.w   collisionMap,x
-            tax
-            jmp     MovingDown.Collision
-        +
 
+        // Collision if tile is SOLID, END_SLOPE, UP_PLATFORM or DOWN SLOPE
+        assert(HeightTableIndex.SOLID < HeightTableIndex.EMPTY)
+        assert(HeightTableIndex.END_SLOPE < HeightTableIndex.EMPTY)
+        assert(HeightTableIndex.UP_PLATFORM < HeightTableIndex.EMPTY)
+        assert(_HeightTableIndex_LAST_DOWN_SLOPE < HeightTableIndex.EMPTY)
+        cmp.b   #HeightTableIndex.EMPTY
+        bcc     BottomCenterIsDownCollidable
 
-        // Test tile below the current one
+        // tile is EMPTY, DOWN_PLATFORM or UP SLOPE
+
+        // Test tile below bottom-center
 
         // Y -= map.bytesPerRow
         rep     #$31
@@ -967,24 +981,21 @@ MovingDown_Standing:
         // set Ah to 0 for the `tax`s below
         lda.w   #0
 
-        // Goto CollisionBelow if tile below the entity is not EMPTY or a DOWN_PLATFORM
         sep     #$20
     a8()
         lda.w   map.data,y
         tax
-
         lda.w   collisionMap,x
-        assert(HeightTableIndex.EMPTY == 0)
-        beq     +
-        cmp.b   #HeightTableIndex.DOWN_PLATFORM
-        beq     +
-            // not EMPTY or DOWN_PLATFORM
-            lda.b   BaseEntity.xPos.px
-            and.b   #0xf
-            ora.w   collisionMap,x
-            tax
-            bra     CollisionBelow
-        +
+
+        // Collision if tile is SOLID, END_SLOPE, UP_PLATFORM or DOWN SLOPE
+        assert(HeightTableIndex.SOLID < HeightTableIndex.EMPTY)
+        assert(HeightTableIndex.END_SLOPE < HeightTableIndex.EMPTY)
+        assert(HeightTableIndex.UP_PLATFORM < HeightTableIndex.EMPTY)
+        assert(_HeightTableIndex_LAST_DOWN_SLOPE < HeightTableIndex.EMPTY)
+        cmp.b   #HeightTableIndex.EMPTY
+        bcc     TileBelowCenterIsDownCollidable
+
+        // tile is EMPTY, DOWN_PLATFORM or UP SLOPE
 
 
     inline TestLeftRightTiles(platform, SolidCollisionLabel) {
@@ -1022,7 +1033,7 @@ MovingDown_Standing:
                 lda.w   map.data - 2,y
                 tax
                 lda.w   collisionMap,x
-                cmp.b   #HeightTableIndex.SOLID
+                assert(HeightTableIndex.SOLID == 0)
                 beq     {SolidCollisionLabel}
                 cmp.b   #HeightTableIndex.{platform}
                 beq     {SolidCollisionLabel}
@@ -1031,7 +1042,7 @@ MovingDown_Standing:
             lda.w   map.data - 1,y
             tax
             lda.w   collisionMap,x
-            cmp.b   #HeightTableIndex.SOLID
+            assert(HeightTableIndex.SOLID == 0)
             beq     {SolidCollisionLabel}
             cmp.b   #HeightTableIndex.{platform}
             beq     {SolidCollisionLabel}
@@ -1052,7 +1063,7 @@ MovingDown_Standing:
                 lda.w   map.data + 2,y
                 tax
                 lda.w   collisionMap,x
-                cmp.b   #HeightTableIndex.SOLID
+                assert(HeightTableIndex.SOLID == 0)
                 beq     {SolidCollisionLabel}
                 cmp.b   #HeightTableIndex.{platform}
                 beq     {SolidCollisionLabel}
@@ -1061,7 +1072,7 @@ MovingDown_Standing:
             lda.w   map.data + 1,y
             tax
             lda.w   collisionMap,x
-            cmp.b   #HeightTableIndex.SOLID
+            assert(HeightTableIndex.SOLID == 0)
             beq     {SolidCollisionLabel}
             cmp.b   #HeightTableIndex.{platform}
             beq     {SolidCollisionLabel}
@@ -1077,20 +1088,40 @@ MovingDown_Standing:
 
     a8()
     i16()
-    CollisionBelow:
+    BottomCenterIsDownCollidable:
+        // bottom-center is down-collideable
+        //
+        // Ah = 0
+        // X = collisionMap index
+        // Y = tile index of bottom-center of hitbox
+        lda.b   BaseEntity.xPos.px
+        and.b   #0x0f
+        ora.w   collisionMap,x
+        tax
+        jmp     MovingDown.Collision
+
+
+    a8()
+    i16()
+    TileBelowCenterIsDownCollidable:
         // Tile below the entity is a down-collision.
         //
         // Ah = 0
-        // X = TopHeightTable index
+        // X = collisionMap Index
         // Y = tile index of tile below the bottom-center of hitbox
         // MUST NOT MODIFY Y
         //
         // NOTE: If I modify this code, also modify code in `MovingDown.Collision`
 
+        lda.b   BaseEntity.xPos.px
+        and.b   #0xf
+        ora.w   collisionMap,x
+        tax
+        // X = TopHeightTable index
+
         // set collision flag
         lda.b   #TileCollisionState.DOWN_COLLISION
         tsb.b   BaseEntity.tileCollisionState
-
 
         // Move entity to one pixel above the tile's TopHeightTable value
         //
@@ -1244,51 +1275,52 @@ MovingUp:
         tax
         lda.w   collisionMap,x
 
-        // goto CenterTileIsSolid if tile is SOLID or END_SLOPE
-        assert(HeightTableIndex.END_SLOPE & 0xf0 == HeightTableIndex.SOLID)
-        and.b   #0xf0
-        cmp.b   #HeightTableIndex.SOLID
-        beq     CenterTileIsSolid
+        // Test if center tile is an UP SLOPE
+        assert(_HeightTableIndex_LAST_UP_SLOPE == 0xf0)
+        cmp.b   #_HeightTableIndex_FIRST_UP_SLOPE
+        bcs     CenterTileIsUpSlope
 
-        // Goto CenterTileIsDownPlatform if on a DOWN PLATFORM
+        // Test if center tile is a DOWN_PLATFORM
         cmp.b   #HeightTableIndex.DOWN_PLATFORM
         beq     CenterTileIsDownPlatform
 
-        // Goto TestLeftRightTiles if EMPTY, UP_PLATFORM or DOWN SLOPE
-        // Treat DOWN SLOPES as empty tiles to prevent small entities from falling through the floor when jumping on a down slope.
-        assert(HeightTableIndex.EMPTY < _HeightTableIndex_FIRST_UP_SLOPE)
-        assert(HeightTableIndex.UP_PLATFORM < _HeightTableIndex_FIRST_UP_SLOPE)
-        assert(_HeightTableIndex_LAST_DOWN_SLOPE < _HeightTableIndex_FIRST_UP_SLOPE)
-        assert(_HeightTableIndex_LAST_UP_SLOPE == 0xf0)
-        cmp.b   #_HeightTableIndex_FIRST_UP_SLOPE
-        bcc     TestLeftRightTiles
+        // Test if center tile is SOLID or END_SLOPE
+        // Goto TestLeftRightTiles if center tile is UP_PLATFORM, EMPTY or DOWN_SLOPE
+        assert(HeightTableIndex.UP_PLATFORM > _HeightTableIndex_LAST_DOWN_SLOPE)
+        assert(HeightTableIndex.EMPTY > _HeightTableIndex_LAST_DOWN_SLOPE)
+        assert(_HeightTableIndex_FIRST_UP_SLOPE > _HeightTableIndex_LAST_DOWN_SLOPE)
 
-            // Center tile is an up slope
+        assert(HeightTableIndex.END_SLOPE & 0xf0 == HeightTableIndex.SOLID)
+        assert(HeightTableIndex.SOLID == 0)
+        and.b   #0xf0
+        bne     TestLeftRightTiles
+            jmp     SolidCollision
 
-            //  x = (entity.xPos.px & 0xf) | collisionMap[x]
-            //  if (_top & 0xf) <= BottomHeightTable[x]:
-            //      goto Collision
-            //  else:
-            //      return
-            lda.b   BaseEntity.xPos.px
-            and.b   #0x0f
-            ora.w   collisionMap,x
-            tax
 
-            lda.w   _top
-            and.b   #0xf
-            cmp.l   BottomHeightTable,x
-            beq     Collision
-            bcc     Collision
-                // Y = entity bottom-center map tile
-                rep     #$30
-            a16()
-                rts
+    CenterTileIsUpSlope:
+        // Center tile is an up slope
+        // Test if entity is above the collision area of the tile
 
-    CenterTileIsSolid:
-        jmp     SolidCollision
+        //  x = (entity.xPos.px & 0xf) | collisionMap[x]
+        //  if (_top & 0xf) <= BottomHeightTable[x]:
+        //      goto Collision
+        //  else:
+        //      return
+        lda.b   BaseEntity.xPos.px
+        and.b   #0x0f
+        ora.w   collisionMap,x
+        tax
 
-    // ::SPAGHETTI Have to put Collision here to prevent a "branch out of bounds" assembly error::
+        lda.w   _top
+        and.b   #0xf
+        cmp.l   BottomHeightTable,x
+        beq     Collision
+        bcc     Collision
+            // Y = entity bottom-center map tile
+            rep     #$30
+        a16()
+            rts
+
 
     a8()
     i16()
@@ -1299,7 +1331,7 @@ MovingUp:
         // Y = entity top-center map tile
         // MUST NOT MODIFY Y
         //
-        // NOTE: If I modify this code, also modify code in `MovingUp_Standing.CollisionAbove`
+        // NOTE: If I modify this code, also modify code in `MovingUp_Standing.TileAboveCenterIsUpCollidable`
 
         // set collision flag
         lda.b   #TileCollisionState.UP_COLLISION
@@ -1340,6 +1372,7 @@ MovingUp:
         rts
 
 
+
     a8()
     i16()
     // Ah = 0
@@ -1354,11 +1387,12 @@ MovingUp:
         sec
         sbc.w   _yDelta                 // yDelta is negative
         cmp.b   #METATILE_SIZE_PX - 1
-        bcs     SolidCollision
+        bcc     TestLeftRightTiles
 
 
     a8()
     i16()
+    // Ah = 0
     TestLeftRightTiles:
         MovingDown.TestLeftRightTiles(DOWN_PLATFORM, SolidCollision, NoCollision)
 
@@ -1462,28 +1496,25 @@ MovingUp_Standing:
     a8()
 
         // Check to see if we are about to enter a new slope.
-        //
-        // This test must jump to `MovingUp.Collision` if the entity
-        // is below of a DOWN_PLATFORM or a upwards slope to prevent the
-        // entity from overshooting a slope when xVecl is too large.
 
         lda.w   map.data,y
         tax
         lda.w   collisionMap,x
-        assert(HeightTableIndex.EMPTY == 0)
-        beq     +
-        cmp.b   #HeightTableIndex.UP_PLATFORM
-        beq     +
-            // not EMPTY or UP_PLATFORM
-            lda.b   BaseEntity.xPos.px
-            and.b   #0x0f
-            ora.w   collisionMap,x
-            tax
-            jmp     MovingUp.Collision
-        +
 
+        // Collision if SOLID or END_SLOPE
+        assert(HeightTableIndex.END_SLOPE & 0xf0 == HeightTableIndex.SOLID)
+        assert(HeightTableIndex.SOLID == 0)
+        and.b   #0xf0
+        beq     TopCenterIsUpCollidable
 
-        // Test tile below the current one
+        // Collision if DOWN_PLATFORM or UP_SLOPE
+        assert(_HeightTableIndex_FIRST_UP_SLOPE == HeightTableIndex.DOWN_PLATFORM + 0x10)
+        cmp.b   #HeightTableIndex.DOWN_PLATFORM
+        bcs     TopCenterIsUpCollidable
+
+        // tile is EMPTY, UP_PLATFORM or DOWN SLOPE
+
+        // Test tile above top-center
 
         // Y += map.bytesPerRow
         rep     #$30
@@ -1496,24 +1527,24 @@ MovingUp_Standing:
         // set Ah to 0 for the `tax`s below
         lda.w   #0
 
-        // goto CollisionAbove if tile below the entity is not EMPTY or an UP_PLATFORM
         sep     #$20
     a8()
         lda.w   map.data,y
         tax
-
         lda.w   collisionMap,x
-        assert(HeightTableIndex.EMPTY == 0)
-        beq     +
-        cmp.b   #HeightTableIndex.UP_PLATFORM
-        beq     +
-            // not EMPTY or UP_PLATFORM
-            lda.b   BaseEntity.xPos.px
-            and.b   #0xf
-            ora.w   collisionMap,x
-            tax
-            bra     CollisionAbove
-        +
+
+        // Collision if SOLID or END_SLOPE
+        assert(HeightTableIndex.END_SLOPE & 0xf0 == HeightTableIndex.SOLID)
+        assert(HeightTableIndex.SOLID == 0)
+        and.b   #0xf0
+        beq     TileAboveCenterIsUpCollidable
+
+        // Collision if DOWN_PLATFORM or UP_SLOPE
+        assert(_HeightTableIndex_FIRST_UP_SLOPE == HeightTableIndex.DOWN_PLATFORM + 0x10)
+        cmp.b   #HeightTableIndex.DOWN_PLATFORM
+        bcs     TileAboveCenterIsUpCollidable
+
+        // tile is EMPTY, UP_PLATFORM or DOWN SLOPE
 
         // goto SolidCollisionAbove if left/right tiles are SOLID or DOWN_PLATFORM
         MovingDown_Standing.TestLeftRightTiles(DOWN_PLATFORM, SolidCollisionAbove)
@@ -1526,19 +1557,40 @@ MovingUp_Standing:
 
     a8()
     i16()
-    CollisionAbove:
+    TopCenterIsUpCollidable:
+        // top-center tile is up-collidable.
+        //
+        // Ah = 0
+        // X = collisionMap index
+        // Y = tile index of top-center of hitbox
+        lda.b   BaseEntity.xPos.px
+        and.b   #0x0f
+        ora.w   collisionMap,x
+        tax
+        jmp     MovingUp.Collision
+
+
+    a8()
+    i16()
+    TileAboveCenterIsUpCollidable:
         // Tile above the entity is up-collidable.
         //
-        // X = BottomHeightTable index
+        // Ah = 0
+        // X = collisionMap Index
         // Y = tile index of tile above the top-center of hitbox
         // MUST NOT MODIFY Y
         //
         // NOTE: If I modify this code, also modify code in `MovingUp.Collision`
 
+        lda.b   BaseEntity.xPos.px
+        and.b   #0xf
+        ora.w   collisionMap,x
+        tax
+        // X = BottomHeightTable index
+
         // set collision flag
         lda.b   #TileCollisionState.UP_COLLISION
         tsb.b   BaseEntity.tileCollisionState
-
 
         // Move entity to one pixel below the tile's BottomHeightTable value
         //
@@ -1620,16 +1672,16 @@ MovingUp_Standing:
 // Values must be between 0-15 or >= 32
 rodata(rom0)
 TopHeightTable:
-    db 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32
     db  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0
-    db  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0
-    db 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32
     db 15, 14, 13, 12, 11, 10,  9,  8,  7,  6,  5,  4,  3,  2,  1,  0
     db  0,  1,  2,  3,  4,  5,  6,  7,  8,  9, 10, 11, 12, 13, 14, 15
     db 15, 15, 14, 14, 13, 13, 12, 12, 11, 11, 10, 10,  9,  9,  8,  8
     db  7,  7,  6,  6,  5,  5,  4,  4,  3,  3,  2,  2,  1,  1,  0,  0
     db  0,  0,  1,  1,  2,  2,  3,  3,  4,  4,  5,  5,  6,  6,  7,  7
     db  8,  8,  9,  9, 10, 10, 11, 11, 12, 12, 13, 13, 14, 14, 15, 15
+    db  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0
+    db 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32
+    db 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32
     db 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32
     db 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32
     db 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32
@@ -1644,15 +1696,15 @@ assert(pc() - TopHeightTable == 16 * 16)
 // Values must be between 0-15
 rodata(rom0)
 BottomHeightTable:
-    db  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0
+    db 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15
+    db 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15
+    db 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15
+    db 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15
+    db 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15
+    db 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15
     db 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15
     db  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0
-    db 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15
-    db 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15
-    db 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15
-    db 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15
-    db 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15
-    db 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15
+    db  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0
     db 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15
     db  0,  1,  2,  3,  4,  5,  6,  7,  8,  9, 10, 11, 12, 13, 14, 15
     db 15, 14, 13, 12, 11, 10,  9,  8,  7,  6,  5,  4,  3,  2,  1,  0
