@@ -505,13 +505,18 @@ MovingDown:
         // If there is a collision then the entity will be moved one pixel
         // above the tile's collision area.
         //
-        // Only the bottom-center tile is tested for slope collisions, which is
-        // not an issue as the engine requires all down slope tiles to have a
-        // SOLID or UP_PLATFORM tile underneath them.
+        // If there is no collision with the bottom tiles then the top-center
+        // tile is tested for a SOLID or UP_SLOPE collision.  This test is to
+        // prevent an entity that is jumping down-left (or right) at an angle
+        // <45 degrees from falling through an UP_SLOPE.
+        //
+        // Only the top-center and bottom-center tiles are tested for slope
+        // collisions, which is not an issue as the engine requires all down
+        // slope tiles to have a SOLID or UP_PLATFORM tile underneath them.
         //
         // The END_SLOPE tile is only solid in the bottom-center tile.
-        // There is no need to write code to test for END_SLOPE
-        // `BottomHeightTable[END_SLOPE | (xPos & 0xf)]` is always 0.
+        // There is no need to write code to test for END_SLOPE as
+        // `TopHeightTable[END_SLOPE | (xPos & 0xf)]` is always 0.
 
 
         // verify there is no need to test for END_SLOPE in this code.
@@ -604,7 +609,7 @@ MovingDown:
             //  if (_bottom & 0xf) >= TopHeightTable[x]:
             //      goto Collision
             //  else:
-            //      return
+            //      goto NoBottomCollision
             lda.b   BaseEntity.xPos.px
             and.b   #0x0f
             ora.w   collisionMap,x
@@ -614,12 +619,7 @@ MovingDown:
             and.b   #0xf
             cmp.l   TopHeightTable,x
             bcs     Collision
-                // Entity has not yet landed on the slope tile, no need to test left/right tiles.
-
-                // Y = entity bottom-center map tile
-                rep     #$30
-            a16()
-                rts
+                jmp     NoBottomCollision
 
     // ::SPAGHETTI Have to put Collision here to prevent a "branch out of bounds" assembly error::
 
@@ -799,7 +799,7 @@ MovingDown:
 
     OnPlatformTile:
     }
-        TestLeftRightTiles(UP_PLATFORM, SolidCollision, NoCollision)
+        TestLeftRightTiles(UP_PLATFORM, SolidCollision, NoBottomCollision)
 
             // bottom left/right is touching a DOWN_PLATFORM tile
 
@@ -809,14 +809,6 @@ MovingDown:
             beq     SolidCollision
             cmp.w   _yDelta
             bcc     SolidCollision
-
-    a8()
-    i16()
-    NoCollision:
-        // Y = entity bottom-center map tile
-        rep     #$30
-    a16()
-        rts
 
 
     a8()
@@ -860,6 +852,97 @@ MovingDown:
         stz.b   BaseEntity.yVecl
         stz.b   BaseEntity.yVecl + 2
 
+        rts
+
+
+
+    i16()
+    NoBottomCollision:
+        // No Collision on the bottom.
+        // Test for a SOLID/END_SLOPE/UP_*_SLOPE collision with the top-center tile
+
+        // Y = entity bottom-center map tile
+        // MUST NOT MODIFY Y
+
+        // Calculate tile index for top-center tile
+        // _top = _yPosHeightPair.yPos + entity.yPos.px
+        // X = (_top - map.TOP) / 16 * map.width + (entity.xPos.px - map.LEFT) / 16
+        rep     #$31
+    a16()
+        lda.w   _yOffsetHeightPair
+        ora.w   #0xff00                 // yOffset is always negative value
+        // carry clear
+        adc.b   BaseEntity.yPos.px
+        sta.w   _top                    // required for `MovingUp.Collision`
+        sec
+        sbc.w   #map.TOP
+        lsr
+        lsr
+        lsr
+        lsr
+        sep     #$20
+    a8()
+        sta.l   WRMPYB  // WRMPYA set in X axis test
+
+        rep     #$31
+    a16()
+
+        lda.b   BaseEntity.xPos.px
+        // carry clear
+        sbc.w   #map.LEFT - 1
+        lsr
+        lsr
+        lsr
+        lsr
+        clc
+        adc.l   RDMPY
+        tax
+        // X = entity top-center map tile
+
+        // set Ah to 0 for the `tax`s below
+        lda.w   #0
+
+        sep     #$20
+    a8()
+        lda.w   map.data,x
+        tax
+        lda.w   collisionMap,x
+
+        // Test if top-center is a SOLID or END_SLOPE tile
+        assert(HeightTableIndex.SOLID == 0)
+        assert(HeightTableIndex.END_SLOPE & 0xf0 == 0)
+        and.b   #0xf0
+        bne     +
+            jmp     MovingUp.SolidCollision
+        +
+
+        // Test if top-center tile is an UP SLOPE tile
+        assert(_HeightTableIndex_LAST_UP_SLOPE == 0xf0)
+        cmp.b   #_HeightTableIndex_FIRST_UP_SLOPE
+        bcc     ++
+            // top-center tile is an UP_*_SLOPE.
+            // Test if _top is on or above the slope
+
+            //  x = (entity.xPos.px & 0xf) | collisionMap[x]
+            //  if (_top & 0xf) <= BottomHeightTable[x]:
+            //      goto MovingUp.Collision
+            lda.b   BaseEntity.xPos.px
+            and.b   #0x0f
+            ora.w   collisionMap,x
+            tax
+
+            lda.w   _top
+            and.b   #0xf
+            cmp.l   BottomHeightTable,x
+            beq     +
+            bcs     ++
+            +
+                jmp     MovingUp.Collision
+        +
+
+        rep     #$30
+    a16()
+        // Y = entity bottom-center map tile
         rts
     }
 
@@ -1305,7 +1388,7 @@ MovingUp:
         //  if (_top & 0xf) <= BottomHeightTable[x]:
         //      goto Collision
         //  else:
-        //      return
+        //      goto NoTopCollision
         lda.b   BaseEntity.xPos.px
         and.b   #0x0f
         ora.w   collisionMap,x
@@ -1316,10 +1399,7 @@ MovingUp:
         cmp.l   BottomHeightTable,x
         beq     Collision
         bcc     Collision
-            // Y = entity bottom-center map tile
-            rep     #$30
-        a16()
-            rts
+            jmp     NoTopCollision
 
 
     a8()
@@ -1394,7 +1474,7 @@ MovingUp:
     i16()
     // Ah = 0
     TestLeftRightTiles:
-        MovingDown.TestLeftRightTiles(DOWN_PLATFORM, SolidCollision, NoCollision)
+        MovingDown.TestLeftRightTiles(DOWN_PLATFORM, SolidCollision, NoTopCollision)
 
             // top left/right is touching a DOWN_PLATFORM tile
 
@@ -1405,14 +1485,6 @@ MovingUp:
             sbc.w   _yDelta
             cmp.b   #METATILE_SIZE_PX - 1
             bcs     SolidCollision
-
-    a8()
-    i16()
-    NoCollision:
-        // Y = entity bottom-center map tile
-        rep     #$30
-    a16()
-        rts
 
 
     a8()
@@ -1454,6 +1526,94 @@ MovingUp:
         stz.b   BaseEntity.yVecl
         stz.b   BaseEntity.yVecl + 2
 
+        rts
+
+
+    i16()
+    NoTopCollision:
+        // No Collision on the top.
+        // Test for SOLID/END_SLOPE/DOWN_*SLOPE collision with the bottom-center tile
+
+        // Y = entity top-center map tile
+        // MUST NOT MODIFY Y
+
+        // Calculate tile index for bottom-center tile
+        // _bottom = _yOffsetHeightPair.yOffset + _yOffsetHeightPair.height + entity.yPos.px
+        // X = (_bottom - map.TOP) / 16 * map.width + (entity.xPos.px - map.LEFT) / 16
+
+        rep     #$31
+    a16()
+        lda.w   _yOffsetHeightPair
+        ora.w   #0xff00                 // yOffset is always negative value
+        // carry clear
+        adc.w   _yOffsetHeightPair + 1  // Third byte of _yOffsetHeightPair is 0
+        clc
+        adc.b   BaseEntity.yPos.px
+        sta.w   _bottom                 // Required for `MovingDown.Collision`
+        sec
+        sbc.w   #map.TOP
+        lsr
+        lsr
+        lsr
+        lsr
+        sep     #$20
+    a8()
+        sta.l   WRMPYB  // WRMPYA set in X axis test
+
+        rep     #$31
+    a16()
+
+        lda.b   BaseEntity.xPos.px
+        // carry clear
+        sbc.w   #map.LEFT - 1
+        lsr
+        lsr
+        lsr
+        lsr
+        clc
+        adc.l   RDMPY
+        tay
+        // Y = entity bottom-center map tile
+
+        // set Ah to 0 for the `tax`s below
+        lda.w   #0
+
+        sep     #$20
+    a8()
+        lda.w   map.data,y
+        tax
+        lda.w   collisionMap,x
+
+        // test if tile is SOLID, END_SLOPE or DOWN_PLATFORM
+        assert(HeightTableIndex.SOLID < HeightTableIndex.EMPTY)
+        assert(HeightTableIndex.END_SLOPE < HeightTableIndex.EMPTY)
+        assert(_HeightTableIndex_LAST_DOWN_SLOPE < HeightTableIndex.EMPTY)
+        assert(_HeightTableIndex_LAST_DOWN_SLOPE < HeightTableIndex.UP_PLATFORM)
+        assert(_HeightTableIndex_LAST_DOWN_SLOPE < HeightTableIndex.DOWN_PLATFORM)
+        assert(_HeightTableIndex_LAST_DOWN_SLOPE < _HeightTableIndex_FIRST_UP_SLOPE)
+        cmp.b   #_HeightTableIndex_LAST_DOWN_SLOPE + 1
+        bcs     +
+            // bottom-center tile is a SOLID, END_SLOPE or DOWN_*_SLOPE.
+            // Test if _bottom is on or below the slope.
+
+            //  x = (entity.xPos.px & 0xf) | collisionMap[x]
+            //  if (_bottom & 0xf) >= TopHeightTable[x]:
+            //      goto MovingDown.Collision
+            lda.b   BaseEntity.xPos.px
+            and.b   #0x0f
+            ora.w   collisionMap,x
+            tax
+
+            lda.w   _bottom
+            and.b   #0xf
+            cmp.l   TopHeightTable,x
+            bcc     +
+                jmp     MovingDown.Collision
+        +
+
+        rep     #$30
+    a16()
+        // Y = entity top-center map tile
         rts
     }
 
