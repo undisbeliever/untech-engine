@@ -801,15 +801,17 @@ MovingDown:
     }
         TestLeftRightTiles(UP_PLATFORM, SolidCollision, NoBottomCollision)
 
-            // bottom left/right is touching a DOWN_PLATFORM tile
+            // bottom left/right is touching a UP_PLATFORM tile
 
-            // goto SolidCollision if entity was above the UP_PLATFORM in the previous frame
+            // if entity was above the UP_PLATFORM in the previous frame:
+            //      goto SolidCollision
+            // else:
+            //      goto NoBottomCollision
             lda.w   _bottom
             and.b   #0xf
             beq     SolidCollision
             cmp.w   _yDelta
-            bcc     SolidCollision
-
+            bcs     NoBottomCollision
 
     a8()
     i16()
@@ -1100,9 +1102,6 @@ MovingDown_Standing:
         //      a = collisionMap[map.data[y + offset]]
         //      if a == SOLID or a == {platform}:
         //          goto {SolidCollisionLabel}
-        //
-        // if _edgeOnPlatform == 0:
-        //      goto {NoCollisionLabel}
 
         lda.b   BaseEntity.xPos.px
         and.b   #0x0f
@@ -1467,8 +1466,7 @@ MovingUp:
         sec
         sbc.w   _yDelta                 // yDelta is negative
         cmp.b   #METATILE_SIZE_PX - 1
-        bcc     TestLeftRightTiles
-
+        bcs     SolidCollision
 
     a8()
     i16()
@@ -1478,14 +1476,17 @@ MovingUp:
 
             // top left/right is touching a DOWN_PLATFORM tile
 
-            // goto SolidCollision if entity was below the DOWN_PLATFORM in the previous frame
+            // if entity was below the DOWN_PLATFORM in the previous frame:
+            //     goto SolidCollision
+            // else:
+            //     goto NoTopCollision
+
             lda.w   _top
             and.b   #0x0f
             sec
             sbc.w   _yDelta
             cmp.b   #METATILE_SIZE_PX - 1
-            bcs     SolidCollision
-
+            bcc     NoTopCollision
 
     a8()
     i16()
