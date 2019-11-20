@@ -87,7 +87,7 @@ NoHitbox:
 //   * A SOLID, DOWN_PLATFORM or END_SLOPE tile is above the UP_*_SLOPE tiles.
 //   * An EMPTY tile is above a DOWN_*_SLOPE tiles.
 //   * An EMPTY tile is below a UP_*_SLOPE tiles.
-//   * An EMPTY tile is *not* to the left or right of an END_SLOPE time.
+//   * An EMPTY tile is *not* to the left or right of an END_SLOPE tile.
 //   * A short/tall slope pair is never broken, unless there is a SOLID wall in the way.
 //   * It is not possible to walk into the long side of a slope tile.
 //   * The top-left tile of the map is SOLID.
@@ -95,6 +95,7 @@ NoHitbox:
 // If none of these assumptions are met then the entity can either:
 //   * Overshoot slope tiles when `abs(xVecl)` > 1px/frame.
 //   * Fall through a slope if the x origin tile is EMPTY.
+//   * Zip to the top or bottom of a tile when walking into an forbidden tile pattern.
 //
 //
 // NOTE: a *SOLID wall* means the tile adjacent and adjacent-above the slope is solid.
@@ -969,8 +970,8 @@ MovingDown_Standing:
         //
         // The bottom left/right tile collision tests will only be test if the
         // entity collides with a SOLID or UP_PLATFORM tile.  This is not an
-        // issue as there all down slope tiles have a SOLID or UP_PLATFORM tile
-        // underneath them.
+        // issue as there all down slope tiles have a SOLID, END_SLOPE or
+        // UP_PLATFORM tile underneath them.
         //
         // The bottom left/right corner tests will only check two tiles to the
         // left and two tiles to the right of the X position.  If the tile
