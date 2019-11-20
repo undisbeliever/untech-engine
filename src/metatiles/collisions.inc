@@ -88,8 +88,6 @@ NoHitbox:
 //   * An EMPTY tile is above a DOWN_*_SLOPE tiles.
 //   * An EMPTY tile is below a UP_*_SLOPE tiles.
 //   * An EMPTY tile is *not* to the left or right of an END_SLOPE time.
-//   * An UP_PLATFORM tile is only one tile tall and not touching the floor.
-//   * An DOWN_PLATFORM tile is only one tile tall and not touching the ceiling.
 //   * A short/tall slope pair is never broken, unless there is a SOLID wall in the way.
 //   * It is not possible to walk into the long side of a slope tile.
 //   * The top-left tile of the map is SOLID.
@@ -979,10 +977,6 @@ MovingDown_Standing:
         // hitbox's left/right values are > 32 the remaining tiles will be
         // ignored.
         //
-        // As an optimisation this code treats UP_PLATFORM tiles as solid.
-        // Unfortunately this design choice will cause the entity to zip
-        // upwards if the entity walks into an UP_PLATFORM.
-        //
         // There is no need to write code to test for END_SLOPE, as
         // `BottomHeightTable[END_SLOPE | (xPos & 0xf)]` is always 0.
 
@@ -1043,15 +1037,14 @@ MovingDown_Standing:
         tax
         lda.w   collisionMap,x
 
-        // Collision if tile is SOLID, END_SLOPE, UP_PLATFORM or DOWN SLOPE
-        assert(HeightTableIndex.SOLID < HeightTableIndex.EMPTY)
-        assert(HeightTableIndex.END_SLOPE < HeightTableIndex.EMPTY)
-        assert(HeightTableIndex.UP_PLATFORM < HeightTableIndex.EMPTY)
-        assert(_HeightTableIndex_LAST_DOWN_SLOPE < HeightTableIndex.EMPTY)
-        cmp.b   #HeightTableIndex.EMPTY
+        // Collision if tile is SOLID, END_SLOPE, or DOWN SLOPE
+        assert(HeightTableIndex.SOLID < HeightTableIndex.UP_PLATFORM)
+        assert(HeightTableIndex.END_SLOPE < HeightTableIndex.UP_PLATFORM)
+        assert(_HeightTableIndex_LAST_DOWN_SLOPE < HeightTableIndex.UP_PLATFORM)
+        cmp.b   #HeightTableIndex.UP_PLATFORM
         bcc     BottomCenterIsDownCollidable
 
-        // tile is EMPTY, DOWN_PLATFORM or UP SLOPE
+        // tile is EMPTY, PLATFORM or UP SLOPE
 
         // Test tile below bottom-center
 
@@ -1668,12 +1661,12 @@ MovingUp_Standing:
         and.b   #0xf0
         beq     TopCenterIsUpCollidable
 
-        // Collision if DOWN_PLATFORM or UP_SLOPE
-        assert(_HeightTableIndex_FIRST_UP_SLOPE == HeightTableIndex.DOWN_PLATFORM + 0x10)
-        cmp.b   #HeightTableIndex.DOWN_PLATFORM
+        // Collision if UP_SLOPE
+        assert(_HeightTableIndex_LAST_UP_SLOPE == 0xf0)
+        cmp.b   #_HeightTableIndex_FIRST_UP_SLOPE
         bcs     TopCenterIsUpCollidable
 
-        // tile is EMPTY, UP_PLATFORM or DOWN SLOPE
+        // tile is EMPTY, PLATFORM or DOWN SLOPE
 
         // Test tile above top-center
 
