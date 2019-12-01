@@ -138,10 +138,10 @@ allocateTmpWord(_yDelta)
 allocateTmpWord(_bottomOffset)
 allocateTmpWord(_edgeOnPlatform)
 
-constant _HeightTableIndex_FIRST_UP_SLOPE   = HeightTableIndex.UP_RIGHT_SLOPE
-constant _HeightTableIndex_LAST_UP_SLOPE    = HeightTableIndex.UP_LEFT_SHORT_SLOPE
-constant _HeightTableIndex_FIRST_DOWN_SLOPE = HeightTableIndex.DOWN_RIGHT_SLOPE
-constant _HeightTableIndex_LAST_DOWN_SLOPE  = HeightTableIndex.DOWN_LEFT_SHORT_SLOPE
+constant _TileCollisionType_FIRST_UP_SLOPE   = TileCollisionType.UP_RIGHT_SLOPE
+constant _TileCollisionType_LAST_UP_SLOPE    = TileCollisionType.UP_LEFT_SHORT_SLOPE
+constant _TileCollisionType_FIRST_DOWN_SLOPE = TileCollisionType.DOWN_RIGHT_SLOPE
+constant _TileCollisionType_LAST_DOWN_SLOPE  = TileCollisionType.DOWN_LEFT_SHORT_SLOPE
 
 
     // clear tileCollisionState
@@ -241,11 +241,11 @@ MovingRight:
         // Goto Collision if tile index is a SOLID tile
         sep     #$20
     a8()
-        // if collisionMap[map.data[y]] == HeightTableIndex.SOLID goto Collision
+        // if collisionMap[map.data[y]] == TileCollisionType.SOLID goto Collision
         lda.w   map.data,y
         tax
         lda.w   collisionMap,x
-        assert(HeightTableIndex.SOLID == 0)
+        assert(TileCollisionType.SOLID == 0)
         beq     Collision
 
 
@@ -286,7 +286,7 @@ MovingRight:
         a8()
         i8()
             ldy.w   collisionMap,x
-            assert(HeightTableIndex.SOLID == 0)
+            assert(TileCollisionType.SOLID == 0)
             beq     Collision
 
             dec.w   _counter
@@ -361,11 +361,11 @@ MovingLeft:
         // Goto Collision if tile index is a SOLID tile
         sep     #$20
     a8()
-        // if collisionMap[map.data[y]] == HeightTableIndex.SOLID goto Collision
+        // if collisionMap[map.data[y]] == TileCollisionType.SOLID goto Collision
         lda.w   map.data,y
         tax
         lda.w   collisionMap,x
-        assert(HeightTableIndex.SOLID == 0)
+        assert(TileCollisionType.SOLID == 0)
         beq     Collision
 
 
@@ -407,7 +407,7 @@ MovingLeft:
         a8()
         i8()
             ldy.w   collisionMap,x
-            assert(HeightTableIndex.SOLID == 0)
+            assert(TileCollisionType.SOLID == 0)
             beq     Collision
 
             dec.w   _counter
@@ -519,7 +519,7 @@ MovingDown:
 
 
         // verify there is no need to test for END_SLOPE in this code.
-        assert(HeightTableIndex.END_SLOPE & 0xf0 == HeightTableIndex.SOLID)
+        assert(TileCollisionType.END_SLOPE & 0xf0 == TileCollisionType.SOLID)
 
 
         // add entity Y velocity to Y position, saving the change in Ypos to _yDelta
@@ -586,23 +586,23 @@ MovingDown:
         lda.w   collisionMap,x
 
         // No collision if DOWN_PLATFORM, EMPTY or UP SLOPE
-        assert(HeightTableIndex.DOWN_PLATFORM > HeightTableIndex.EMPTY)
-        assert(_HeightTableIndex_FIRST_UP_SLOPE > HeightTableIndex.EMPTY)
-        assert(_HeightTableIndex_LAST_UP_SLOPE == 0xf0)
-        cmp.b   #HeightTableIndex.EMPTY
+        assert(TileCollisionType.DOWN_PLATFORM > TileCollisionType.EMPTY)
+        assert(_TileCollisionType_FIRST_UP_SLOPE > TileCollisionType.EMPTY)
+        assert(_TileCollisionType_LAST_UP_SLOPE == 0xf0)
+        cmp.b   #TileCollisionType.EMPTY
         bcs     TestLeftRightTiles
 
         // Test if UP_PLATFORM
-        assert(HeightTableIndex.UP_PLATFORM < HeightTableIndex.EMPTY)
-        cmp.b   #HeightTableIndex.UP_PLATFORM
+        assert(TileCollisionType.UP_PLATFORM < TileCollisionType.EMPTY)
+        cmp.b   #TileCollisionType.UP_PLATFORM
         beq     CenterTileIsUpPlatform
 
             // Tile is SOLID, END_SLOPE or DOWN SLOPE
             // Test if entity is below the collision area of the tile
 
-            assert(HeightTableIndex.SOLID < HeightTableIndex.EMPTY)
-            assert(HeightTableIndex.END_SLOPE < HeightTableIndex.EMPTY)
-            assert(_HeightTableIndex_LAST_DOWN_SLOPE < HeightTableIndex.EMPTY)
+            assert(TileCollisionType.SOLID < TileCollisionType.EMPTY)
+            assert(TileCollisionType.END_SLOPE < TileCollisionType.EMPTY)
+            assert(_TileCollisionType_LAST_DOWN_SLOPE < TileCollisionType.EMPTY)
 
             //  x = (entity.xPos.px & 0xf) | collisionMap[x]
             //  if (_bottom & 0xf) >= TopHeightTable[x]:
@@ -727,7 +727,7 @@ MovingDown:
         //      goto {NoCollisionLabel}
 
         // _edgeOnPlatform will be set to a non-zero value if the tile is a UP_PLATFORM
-        assert(HeightTableIndex.{platform} != 0)
+        assert(TileCollisionType.{platform} != 0)
         stz.w   _edgeOnPlatform
 
         lda.b   BaseEntity.xPos.px
@@ -742,9 +742,9 @@ MovingDown:
                 lda.w   map.data - 2,y
                 tax
                 lda.w   collisionMap,x
-                assert(HeightTableIndex.SOLID == 0)
+                assert(TileCollisionType.SOLID == 0)
                 beq     {SolidCollisionLabel}
-                cmp.b   #HeightTableIndex.{platform}
+                cmp.b   #TileCollisionType.{platform}
                 bne     +
                     sta.w   _edgeOnPlatform
                 +
@@ -753,9 +753,9 @@ MovingDown:
             lda.w   map.data - 1,y
             tax
             lda.w   collisionMap,x
-            assert(HeightTableIndex.SOLID == 0)
+            assert(TileCollisionType.SOLID == 0)
             beq     {SolidCollisionLabel}
-            cmp.b   #HeightTableIndex.{platform}
+            cmp.b   #TileCollisionType.{platform}
             bne     +
                 sta.w   _edgeOnPlatform
             +
@@ -775,9 +775,9 @@ MovingDown:
                 lda.w   map.data + 2,y
                 tax
                 lda.w   collisionMap,x
-                assert(HeightTableIndex.SOLID == 0)
+                assert(TileCollisionType.SOLID == 0)
                 beq     {SolidCollisionLabel}
-                cmp.b   #HeightTableIndex.{platform}
+                cmp.b   #TileCollisionType.{platform}
                 bne     +
                     sta.w   _edgeOnPlatform
                 +
@@ -786,13 +786,13 @@ MovingDown:
             lda.w   map.data + 1,y
             tax
             lda.w   collisionMap,x
-            assert(HeightTableIndex.SOLID == 0)
+            assert(TileCollisionType.SOLID == 0)
             beq     {SolidCollisionLabel}
-            cmp.b   #HeightTableIndex.{platform}
+            cmp.b   #TileCollisionType.{platform}
             beq     OnPlatformTile
 
     NoTilesOnRight:
-        assert(HeightTableIndex.{platform} != 0)
+        assert(TileCollisionType.{platform} != 0)
         lda.w   _edgeOnPlatform
         beq     {NoCollisionLabel}
 
@@ -910,16 +910,16 @@ MovingDown:
         lda.w   collisionMap,x
 
         // Test if top-center is a SOLID or END_SLOPE tile
-        assert(HeightTableIndex.SOLID == 0)
-        assert(HeightTableIndex.END_SLOPE & 0xf0 == 0)
+        assert(TileCollisionType.SOLID == 0)
+        assert(TileCollisionType.END_SLOPE & 0xf0 == 0)
         and.b   #0xf0
         bne     +
             jmp     MovingUp.SolidCollision
         +
 
         // Test if top-center tile is an UP SLOPE tile
-        assert(_HeightTableIndex_LAST_UP_SLOPE == 0xf0)
-        cmp.b   #_HeightTableIndex_FIRST_UP_SLOPE
+        assert(_TileCollisionType_LAST_UP_SLOPE == 0xf0)
+        cmp.b   #_TileCollisionType_FIRST_UP_SLOPE
         bcc     ++
             // top-center tile is an UP_*_SLOPE.
             // Test if _top is on or above the slope
@@ -1039,10 +1039,10 @@ MovingDown_Standing:
         lda.w   collisionMap,x
 
         // Collision if tile is SOLID, END_SLOPE, or DOWN SLOPE
-        assert(HeightTableIndex.SOLID < HeightTableIndex.UP_PLATFORM)
-        assert(HeightTableIndex.END_SLOPE < HeightTableIndex.UP_PLATFORM)
-        assert(_HeightTableIndex_LAST_DOWN_SLOPE < HeightTableIndex.UP_PLATFORM)
-        cmp.b   #HeightTableIndex.UP_PLATFORM
+        assert(TileCollisionType.SOLID < TileCollisionType.UP_PLATFORM)
+        assert(TileCollisionType.END_SLOPE < TileCollisionType.UP_PLATFORM)
+        assert(_TileCollisionType_LAST_DOWN_SLOPE < TileCollisionType.UP_PLATFORM)
+        cmp.b   #TileCollisionType.UP_PLATFORM
         bcc     BottomCenterIsDownCollidable
 
         // tile is EMPTY, PLATFORM or UP SLOPE
@@ -1067,11 +1067,11 @@ MovingDown_Standing:
         lda.w   collisionMap,x
 
         // Collision if tile is SOLID, END_SLOPE, UP_PLATFORM or DOWN SLOPE
-        assert(HeightTableIndex.SOLID < HeightTableIndex.EMPTY)
-        assert(HeightTableIndex.END_SLOPE < HeightTableIndex.EMPTY)
-        assert(HeightTableIndex.UP_PLATFORM < HeightTableIndex.EMPTY)
-        assert(_HeightTableIndex_LAST_DOWN_SLOPE < HeightTableIndex.EMPTY)
-        cmp.b   #HeightTableIndex.EMPTY
+        assert(TileCollisionType.SOLID < TileCollisionType.EMPTY)
+        assert(TileCollisionType.END_SLOPE < TileCollisionType.EMPTY)
+        assert(TileCollisionType.UP_PLATFORM < TileCollisionType.EMPTY)
+        assert(_TileCollisionType_LAST_DOWN_SLOPE < TileCollisionType.EMPTY)
+        cmp.b   #TileCollisionType.EMPTY
         bcc     TileBelowCenterIsDownCollidable
 
         // tile is EMPTY, DOWN_PLATFORM or UP SLOPE
@@ -1109,18 +1109,18 @@ MovingDown_Standing:
                 lda.w   map.data - 2,y
                 tax
                 lda.w   collisionMap,x
-                assert(HeightTableIndex.SOLID == 0)
+                assert(TileCollisionType.SOLID == 0)
                 beq     {SolidCollisionLabel}
-                cmp.b   #HeightTableIndex.{platform}
+                cmp.b   #TileCollisionType.{platform}
                 beq     {SolidCollisionLabel}
 
         OnlyOneTileOnLeft:
             lda.w   map.data - 1,y
             tax
             lda.w   collisionMap,x
-            assert(HeightTableIndex.SOLID == 0)
+            assert(TileCollisionType.SOLID == 0)
             beq     {SolidCollisionLabel}
-            cmp.b   #HeightTableIndex.{platform}
+            cmp.b   #TileCollisionType.{platform}
             beq     {SolidCollisionLabel}
 
             sec
@@ -1139,18 +1139,18 @@ MovingDown_Standing:
                 lda.w   map.data + 2,y
                 tax
                 lda.w   collisionMap,x
-                assert(HeightTableIndex.SOLID == 0)
+                assert(TileCollisionType.SOLID == 0)
                 beq     {SolidCollisionLabel}
-                cmp.b   #HeightTableIndex.{platform}
+                cmp.b   #TileCollisionType.{platform}
                 beq     {SolidCollisionLabel}
 
         OnlyOneTileOnRight:
             lda.w   map.data + 1,y
             tax
             lda.w   collisionMap,x
-            assert(HeightTableIndex.SOLID == 0)
+            assert(TileCollisionType.SOLID == 0)
             beq     {SolidCollisionLabel}
-            cmp.b   #HeightTableIndex.{platform}
+            cmp.b   #TileCollisionType.{platform}
             beq     {SolidCollisionLabel}
     NoTilesOnRight:
     }
@@ -1352,22 +1352,22 @@ MovingUp:
         lda.w   collisionMap,x
 
         // Test if center tile is an UP SLOPE
-        assert(_HeightTableIndex_LAST_UP_SLOPE == 0xf0)
-        cmp.b   #_HeightTableIndex_FIRST_UP_SLOPE
+        assert(_TileCollisionType_LAST_UP_SLOPE == 0xf0)
+        cmp.b   #_TileCollisionType_FIRST_UP_SLOPE
         bcs     CenterTileIsUpSlope
 
         // Test if center tile is a DOWN_PLATFORM
-        cmp.b   #HeightTableIndex.DOWN_PLATFORM
+        cmp.b   #TileCollisionType.DOWN_PLATFORM
         beq     CenterTileIsDownPlatform
 
         // Test if center tile is SOLID or END_SLOPE
         // Goto TestLeftRightTiles if center tile is UP_PLATFORM, EMPTY or DOWN_SLOPE
-        assert(HeightTableIndex.UP_PLATFORM > _HeightTableIndex_LAST_DOWN_SLOPE)
-        assert(HeightTableIndex.EMPTY > _HeightTableIndex_LAST_DOWN_SLOPE)
-        assert(_HeightTableIndex_FIRST_UP_SLOPE > _HeightTableIndex_LAST_DOWN_SLOPE)
+        assert(TileCollisionType.UP_PLATFORM > _TileCollisionType_LAST_DOWN_SLOPE)
+        assert(TileCollisionType.EMPTY > _TileCollisionType_LAST_DOWN_SLOPE)
+        assert(_TileCollisionType_FIRST_UP_SLOPE > _TileCollisionType_LAST_DOWN_SLOPE)
 
-        assert(HeightTableIndex.END_SLOPE & 0xf0 == HeightTableIndex.SOLID)
-        assert(HeightTableIndex.SOLID == 0)
+        assert(TileCollisionType.END_SLOPE & 0xf0 == TileCollisionType.SOLID)
+        assert(TileCollisionType.SOLID == 0)
         and.b   #0xf0
         bne     TestLeftRightTiles
             jmp     SolidCollision
@@ -1580,13 +1580,13 @@ MovingUp:
         lda.w   collisionMap,x
 
         // test if tile is SOLID, END_SLOPE or DOWN_PLATFORM
-        assert(HeightTableIndex.SOLID < HeightTableIndex.EMPTY)
-        assert(HeightTableIndex.END_SLOPE < HeightTableIndex.EMPTY)
-        assert(_HeightTableIndex_LAST_DOWN_SLOPE < HeightTableIndex.EMPTY)
-        assert(_HeightTableIndex_LAST_DOWN_SLOPE < HeightTableIndex.UP_PLATFORM)
-        assert(_HeightTableIndex_LAST_DOWN_SLOPE < HeightTableIndex.DOWN_PLATFORM)
-        assert(_HeightTableIndex_LAST_DOWN_SLOPE < _HeightTableIndex_FIRST_UP_SLOPE)
-        cmp.b   #_HeightTableIndex_LAST_DOWN_SLOPE + 1
+        assert(TileCollisionType.SOLID < TileCollisionType.EMPTY)
+        assert(TileCollisionType.END_SLOPE < TileCollisionType.EMPTY)
+        assert(_TileCollisionType_LAST_DOWN_SLOPE < TileCollisionType.EMPTY)
+        assert(_TileCollisionType_LAST_DOWN_SLOPE < TileCollisionType.UP_PLATFORM)
+        assert(_TileCollisionType_LAST_DOWN_SLOPE < TileCollisionType.DOWN_PLATFORM)
+        assert(_TileCollisionType_LAST_DOWN_SLOPE < _TileCollisionType_FIRST_UP_SLOPE)
+        cmp.b   #_TileCollisionType_LAST_DOWN_SLOPE + 1
         bcs     +
             // bottom-center tile is a SOLID, END_SLOPE or DOWN_*_SLOPE.
             // Test if _bottom is on or below the slope.
@@ -1657,14 +1657,14 @@ MovingUp_Standing:
         lda.w   collisionMap,x
 
         // Collision if SOLID or END_SLOPE
-        assert(HeightTableIndex.END_SLOPE & 0xf0 == HeightTableIndex.SOLID)
-        assert(HeightTableIndex.SOLID == 0)
+        assert(TileCollisionType.END_SLOPE & 0xf0 == TileCollisionType.SOLID)
+        assert(TileCollisionType.SOLID == 0)
         and.b   #0xf0
         beq     TopCenterIsUpCollidable
 
         // Collision if UP_SLOPE
-        assert(_HeightTableIndex_LAST_UP_SLOPE == 0xf0)
-        cmp.b   #_HeightTableIndex_FIRST_UP_SLOPE
+        assert(_TileCollisionType_LAST_UP_SLOPE == 0xf0)
+        cmp.b   #_TileCollisionType_FIRST_UP_SLOPE
         bcs     TopCenterIsUpCollidable
 
         // tile is EMPTY, PLATFORM or DOWN SLOPE
@@ -1689,14 +1689,14 @@ MovingUp_Standing:
         lda.w   collisionMap,x
 
         // Collision if SOLID or END_SLOPE
-        assert(HeightTableIndex.END_SLOPE & 0xf0 == HeightTableIndex.SOLID)
-        assert(HeightTableIndex.SOLID == 0)
+        assert(TileCollisionType.END_SLOPE & 0xf0 == TileCollisionType.SOLID)
+        assert(TileCollisionType.SOLID == 0)
         and.b   #0xf0
         beq     TileAboveCenterIsUpCollidable
 
         // Collision if DOWN_PLATFORM or UP_SLOPE
-        assert(_HeightTableIndex_FIRST_UP_SLOPE == HeightTableIndex.DOWN_PLATFORM + 0x10)
-        cmp.b   #HeightTableIndex.DOWN_PLATFORM
+        assert(_TileCollisionType_FIRST_UP_SLOPE == TileCollisionType.DOWN_PLATFORM + 0x10)
+        cmp.b   #TileCollisionType.DOWN_PLATFORM
         bcs     TileAboveCenterIsUpCollidable
 
         // tile is EMPTY, UP_PLATFORM or DOWN SLOPE

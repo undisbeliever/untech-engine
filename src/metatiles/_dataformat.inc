@@ -31,18 +31,25 @@ namespace MetaTiles {
 
     // Collision data for each MetaTile
     //
-    // NOTE: Each entry MUST MATCH a HeightTableIndex value
+    // NOTE: Each entry MUST MATCH a TileCollisionType value
     //
     allocate(collisionMap, wram7e, N_META_TILES)
     constant collisionMap.size = N_META_TILES
 
 
-    // The height table used by the collision map
+    // Tile Collision type used by the collision map.
+    //
+    // Each value in this enum is combined with the tile X-pixel position to
+    // create a `TopHeightTable`/`BottomHeightTable` index using the following
+    // formula:
+    //
+    //      height_table_index = tileCollisonType | (xPos & 0xf);
+    //
     //
     // ::KUDOS Christopher Hebert for the slope names::
     // ::: Reconstructing Cave Story: Slope Theory::
     // ::: https://www.youtube.com/watch?v=ny14i0GxGZw ::
-    namespace HeightTableIndex {
+    namespace TileCollisionType {
         createEnum(0, 16)
             enum(SOLID)                     // Most common check
             enum(DOWN_RIGHT_SLOPE)          // right and down sides are the biggest, fall down to collide, walk up to ascend
@@ -60,11 +67,11 @@ namespace MetaTiles {
             enum(UP_RIGHT_TALL_SLOPE)
             enum(UP_LEFT_TALL_SLOPE)
             enum(UP_LEFT_SHORT_SLOPE)
-        endEnum()
 
-        // No collision in X-axis.
-        // Solid collision for bottom-center or top-center tile in Y-axis.
-        constant END_SLOPE = SOLID | 0x08
+            // No collision in X-axis.
+            // Solid collision for bottom-center or top-center tile in Y-axis.
+            constant END_SLOPE = SOLID | 0x08
+        endEnum()
 
         assert(__ENUM__.last <= %11110000)
     }
