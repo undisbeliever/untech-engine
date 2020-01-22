@@ -227,23 +227,27 @@ AnimationDisabled:
 
         // nextFrameTime = distance entity travels vertically (0:7:8 fixed point)
         function DistanceVertical {
-            lda.b   BaseEntity.yVecl + 1
-            bra     DistanceHorizontal.AfterLoadVecl
+            // Confirm entity momentum is a 24 bit value
+            assert(BaseEntity.yMomentum.px - BaseEntity.xMomentum.px == 3)
+
+            lda.b   BaseEntity.MetaSprite.Animation.nextFrameTime
+            sec
+            sbc.b   BaseEntity.yMomentum.px - 1
+            bmi     ProcessNextFrame
+
+            sta.b   BaseEntity.MetaSprite.Animation.nextFrameTime
+
+            rts
         }
 
         // nextFrameTime = distance entity travels horizontally (0:7:8 fixed point)
         function DistanceHorizontal {
-            lda.b   BaseEntity.xVecl + 1
-        AfterLoadVecl:
-            bmi     +
-                // negate if positive
-                eor.w   #0xffff
-                inc
-            +
+            // Confirm entity momentum is a 24 bit value
+            assert(BaseEntity.yMomentum.px - BaseEntity.xMomentum.px == 3)
 
-            // A = -abs(velocity)
-            clc
-            adc.b   BaseEntity.MetaSprite.Animation.nextFrameTime
+            lda.b   BaseEntity.MetaSprite.Animation.nextFrameTime
+            sec
+            sbc.b   BaseEntity.xMomentum.px - 1
             bmi     ProcessNextFrame
 
             sta.b   BaseEntity.MetaSprite.Animation.nextFrameTime

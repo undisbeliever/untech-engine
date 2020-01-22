@@ -91,32 +91,58 @@ namespace BaseEntity {
 
         MetaSprite.EntityData()
 
-        // position of entities relative to map
-        // (2 x 0:16:16 fixed point, project editable)
+        // Position of entities relative to map
+        // (2 x unsigned 0:16:16 fixed point, project editable)
         field(xPos.sx, 2)   // subpixel position
         field(xPos.px, 2)   // pixel position
         field(yPos.sx, 2)   // subpixel position
         field(yPos.px, 2)   // pixel position
 
-        // velocity of entity
-        // (2 x 1:15:16 fixed point - pixels/display frame, project editable)
-        field(xVecl, 4)
-        field(yVecl, 4)
+        // Entity momentum.
+        //
+        // Despite the name, these variables have nothing to do with
+        // mass or Newtonian mechanics.  These values represent the
+        // unsigned change in position on each display frame, direction
+        // of movement is determined by `movementState`.
+        //
+        // Nomenclature: The name of these values comes from a Super
+        // Metroid Tool-Assisted-Speedrun resource guide
+        // (http://tasvideos.org/GameResources/SNES/SuperMetroid.html).
+        //
+        // (2 x unsigned 0:8:16 fixed point - pixels/display frame, project editable)
+        field(xMomentum.sx, 2)
+        field(xMomentum.px, 1)
+        field(yMomentum.sx, 2)
+        field(yMomentum.px, 1)
 
-        // Tile collision state of entity.
-        //
-        // Used by `MetaTiles.MoveEntityAndProcessTileCollisions` to determine
-        // if the entity was walking on the floor/ceiling in the previous frame.
-        //
-        // Can be used by the Project to determine if an entity is walking on the
-        // floor/ceiling or collided with a wall.
-        //
-        // This bitfield SHOULD NOT be edited by the Project,
-        // unless the entity's position changes, then it should be set to 0.
-        //
-        // (uint8, MetaTiles.TileCollisionState bitfield)
-        field(tileCollisionState, 1)
+        // Entity movement state
+        // (uint8, Entity.MovementState bitfield, project editable)
+        field(movementState, 1)
     endstruct()
+}
+
+// Bitfield for the entity movement state
+namespace Entity.MovementState {
+    // When set entity is facing right, when clear entity is facing left
+    constant FACING_RIGHT_FLAG      = %00000001
+
+    // When set entity is moving down, when clear entity is moving up
+    constant MOVING_DOWN_FLAG       = %00000010
+
+    // When set entity is in a Standing state, when clear entity is Falling
+    constant STANDING_FLAG          = %00000100
+
+    // When set entity experiences upwards gravity, when clear entity experiences downwards gravity
+    constant UP_GRAVITY_FLAG        = %00001000
+
+    // Set if the entity is unaffected by gravity
+    constant NO_GRAVITY_FLAG        = %00010000
+
+    // When set entity is moving right, when clear entity is moving left
+    constant MOVING_RIGHT_FLAG      = %01000000
+
+    // Set if there was a tile collision in the X-axis in the last `MoveEntityAndProcessTileCollisions` call
+    constant X_COLLISION_FLAG       = %10000000
 }
 
 

@@ -80,7 +80,7 @@ namespace BaseEntityFunctionTable {
         //
         // When this function is called the following is already set:
         //    * Entity position
-        //    * Entity velocity set to 0
+        //    * Entity momentum set to 0
         //    * MetaSprite frameSet and palette initialized
         //
         // After this function is called

@@ -105,28 +105,29 @@ Fail:
 }
 
 
-inline DistanceTest(animation, vecl) {
+inline DistanceTest(animation, axis) {
     a16()
     i16()
     code()
     Test.add("MetaSprite.Animation.Process ({animation})")
     function Process_{animation} {
     constant tmp_frame = tmp0
-        // 79 *VECL parameter means >=2.5px travel
+        // 79 * MOMENTUM parameter means >=2.5px travel
 
         lda.w   #MSEO.AnimationTest.Animations.{animation}
         ldy.w   #MSEO.AnimationTest.Animations.{animation}
         jsr     _Init
         bcc     Fail
 
-        stz.b   BaseEntity.xVecl
-        stz.b   BaseEntity.xVecl + 2
-        stz.b   BaseEntity.yVecl
-        stz.b   BaseEntity.yVecl + 2
+        // Clear X and Y momentum
+        assert(BaseEntity.yMomentum.sx - BaseEntity.xMomentum.sx == 3)
+        stz.b   BaseEntity.xMomentum.sx
+        stz.b   BaseEntity.xMomentum.sx + 2
+        stz.b   BaseEntity.xMomentum.sx + 4
 
         jsr     MetaSprite.Animation.Process
 
-        // Check that the frame will not advance on a 0 velocity
+        // Check that the frame will not advance on a 0 momentum
         lda.b   BaseEntity.MetaSprite.currentFrame
         beq     Fail
         sta.w   tmp_frame
@@ -143,9 +144,9 @@ inline DistanceTest(animation, vecl) {
         cmp.w   tmp_frame
         bne     Fail
 
-        // Set velocity to 0.5 pixels/frame
+        // Set momentum to 0.5 pixels/frame
         lda.w   #0x8000
-        sta.b   BaseEntity.{vecl}
+        sta.b   BaseEntity.{axis}Momentum.sx
 
         jsr     MetaSprite.Animation.Process
         jsr     MetaSprite.Animation.Process
@@ -172,8 +173,8 @@ inline DistanceTest(animation, vecl) {
         rts
     }
 }
-DistanceTest(DistanceVertical, yVecl)
-DistanceTest(DistanceHorizontal, xVecl)
+DistanceTest(DistanceVertical, y)
+DistanceTest(DistanceHorizontal, x)
 
 
 a16()

@@ -13,6 +13,7 @@
 //  * Entity.SpawnManualEnemyProjectiles
 //  * Entity.DeleteIfOutsideAndGotoNextEntity
 //  * Entity.CountEntitiesInList
+//  * Entity.MoveEntity() (Entity.MovementState.NO_GRAVITY_FLAG set)
 
 
 namespace Entities {
@@ -26,7 +27,6 @@ namespace EightDirectionProjectile {
 
     namespace EntityStruct {
         childstruct(BaseEntity)
-            field(tmp, 4)
         endstruct()
     }
 
@@ -35,6 +35,9 @@ namespace EightDirectionProjectile {
     i16()
     code()
     function Init {
+        // Confirm entity momentum is a 24 bit value
+        assert(BaseEntity.yMomentum.sx - BaseEntity.xMomentum.sx == 3)
+
         sep     #$20
     a8()
 
@@ -48,73 +51,63 @@ namespace EightDirectionProjectile {
         // Determine if projectile is diagonal or orthogonal
         lda.w   MetaSprite.ActionPoint.positionPair.xPos
         cmp.b   #INT_MS8_OFFSET
-        beq     Orthogonal
+        beq     Orthogonal_Y
 
         lda.w   MetaSprite.ActionPoint.positionPair.yPos
         cmp.b   #INT_MS8_OFFSET
-        beq     Orthogonal
+        beq     Orthogonal_X
 
             // Projectile is Diagonal
             ldy.w   #DIAGONAL_VELOCITY
-            sty.b   EntityStruct.tmp
-            ldy.w   #DIAGONAL_VELOCITY >> 16
+            sty.b   EntityStruct.xMomentum.sx
+            sty.b   EntityStruct.yMomentum.sx
+            ldy.w   #DIAGONAL_VELOCITY >> 8
+            sty.b   EntityStruct.xMomentum.sx + 1
+            sty.b   EntityStruct.yMomentum.sx + 1
+
             bra     EndIf
 
-        Orthogonal:
-            // Projectile is Orthogonal
+        Orthogonal_X:
+            // Projectile is Orthogonal in the X axis
             ldy.w   #VELOCITY
-            sty.b   EntityStruct.tmp
-            ldy.w   #VELOCITY >> 16
+            sty.b   EntityStruct.xMomentum.sx
+            ldy.w   #VELOCITY >> 8
+            sty.b   EntityStruct.xMomentum.sx + 1
 
+            bra     EndIf
+
+        Orthogonal_Y:
+            // Projectile is Orthogonal in the Y axis
+            ldy.w   #VELOCITY
+            sty.b   EntityStruct.yMomentum.sx
+            ldy.w   #VELOCITY >> 8
+            sty.b   EntityStruct.yMomentum.sx + 1
+
+            bra     EndIf
     EndIf:
-        sty.b   EntityStruct.tmp + 2
+
+
+        // Set movement state
+        lda.b   #Entity.MovementState.NO_GRAVITY_FLAG
+        sta.b   EntityStruct.movementState
+
+        lda.w   MetaSprite.ActionPoint.positionPair.xPos
+        cmp.b   #INT_MS8_OFFSET
+        bcc     +
+            lda.b   #Entity.MovementState.MOVING_RIGHT_FLAG
+            tsb.b   EntityStruct.movementState
+        +
+
+        lda.w   MetaSprite.ActionPoint.positionPair.yPos
+        cmp.b   #INT_MS8_OFFSET
+        bcc     +
+            lda.b   #Entity.MovementState.MOVING_DOWN_FLAG
+            tsb.b   EntityStruct.movementState
+        +
 
 
         rep     #$30
     a16()
-
-        macro _SetVelocity(c) {
-            namespace {c} {
-                // Set Projectile Velocity
-                lda.w   MetaSprite.ActionPoint.positionPair.{c}Pos
-                if '{c}' == 'x' {
-                    and.w   #0xff
-                }
-                cmp.w   #INT_MS8_OFFSET
-                beq     Zero
-                bcs     Positive
-
-                Negative:
-                    // load negative velocity
-                    sec
-                    lda.w   #0
-                    sbc.b   EntityStruct.tmp
-                    sta.b   EntityStruct.{c}Vecl
-
-                    lda.w   #0
-                    sbc.b   EntityStruct.tmp + 2
-                    sta.b   EntityStruct.{c}Vecl + 2
-
-                    bra     EndIf
-
-                Positive:
-                    lda.b   EntityStruct.tmp
-                    sta.b   EntityStruct.{c}Vecl
-                    lda.b   EntityStruct.tmp + 2
-                    sta.b   EntityStruct.{c}Vecl + 2
-
-                    bra     EndIf
-
-                Zero:
-                    stz.b   EntityStruct.{c}Vecl
-                    stz.b   EntityStruct.{c}Vecl + 2
-
-            EndIf:
-            }
-        }
-
-        _SetVelocity(x)
-        _SetVelocity(y)
 
         SetFrame(frame)
 
@@ -137,25 +130,7 @@ namespace EightDirectionProjectile {
     i16()
     code()
     Process: {
-        macro _addVelocity(c) {
-            clc
-            lda.b   BaseEntity.{c}Vecl
-            adc.b   BaseEntity.{c}Pos.sx
-            sta.b   BaseEntity.{c}Pos.sx
-
-            lda.b   BaseEntity.{c}Vecl + 1
-            xba
-            bpl     +
-                ora.w   #$ff00
-                bra     ++
-            +
-                and.w   #$00ff
-            +
-            adc.b   BaseEntity.{c}Pos.px
-            sta.b   BaseEntity.{c}Pos.px
-        }
-        _addVelocity(x)
-        _addVelocity(y)
+        MoveEntity()
 
         jmp     Entity.DeleteIfOutsideOrDrawAndGotoNextEntity
     }

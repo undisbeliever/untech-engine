@@ -20,18 +20,8 @@ namespace TileCollisionTestPlayer {
     endstruct()
     }
 
-    constant X_VECL  = 0x028000
-    constant Y_VECL  = 0x010000
-    constant GRAVITY = 1555
-
-    constant MAX_Y_VECL_PX = 8
-
-    rodata(rom0)
-    GravityTable:
-        dw  +GRAVITY
-        dw  -GRAVITY
-        dw  0
-    constant GravityTable.size = pc() - GravityTable
+    constant X_MOMENTUM  = 0x028000
+    constant Y_MOMENTUM  = 0x010000
 
 
     // REQUIRES: 16 bit A, 16 bit Index, DB = 0x7e
@@ -73,78 +63,79 @@ namespace TileCollisionTestPlayer {
     i16()
     code()
     function Process {
-        // Confirm velocity is a 32 bit value
-        assert(EntityStruct.yVecl - EntityStruct.xVecl == 4)
+        // Confirm entity momentum is a 24 bit value
+        assert(BaseEntity.yMomentum.sx - BaseEntity.xMomentum.sx == 3)
 
-        // Update velocities
+        // Update movement
         lda.w   Controller.Joy1.current
+        bit.w   #JOY.left | JOY.right
+        beq     NoLeftRight
+            bit.w   #JOY.left
+            beq     +
+                lda.w   #Entity.MovementState.MOVING_RIGHT_FLAG
+                trb.b   EntityStruct.movementState
+                bra     ++
+            +
+            bit.w   #JOY.right
+            beq     +
+                lda.w   #Entity.MovementState.MOVING_RIGHT_FLAG
+                tsb.b   EntityStruct.movementState
+            +
 
-        ldx.w   #0
-        ldy.w   #0
-        bit.w   #JOY.left
-        beq     +
-            ldx.w   #-X_VECL
-            ldy.w   #-X_VECL >> 16
-        +
-        bit.w   #JOY.right
-        beq     +
-            ldx.w   #X_VECL
-            ldy.w   #X_VECL >> 16
-        +
-        stx.b   EntityStruct.xVecl
-        sty.b   EntityStruct.xVecl + 2
+            lda.w   #X_MOMENTUM
+            sta.b   BaseEntity.xMomentum.sx
+            lda.w   #X_MOMENTUM >> 8
+            sta.b   BaseEntity.xMomentum.sx + 1
+
+            bra     EndLeftRight
+
+        NoLeftRight:
+            stz.b   BaseEntity.xMomentum.sx
+            stz.b   BaseEntity.xMomentum.sx + 1
+    EndLeftRight:
 
 
+        lda.w   Controller.Joy1.current
         bit.w   #JOY.up | JOY.down
-        bne     Yaxis_DPAD
-
-            lda.b   EntityStruct.gravityIndex
-            and.w   #0xff
-            tax
-
-            ldy.w   #0
-            lda.l   GravityTable,x
-            beq     Yaxis_DPAD
-            bpl     +
-                dey
-            +
-
-            // Y:A is a sint32 value
-            clc
-            adc.b   EntityStruct.yVecl
-            sta.b   EntityStruct.yVecl
-            tya
-            adc.b   EntityStruct.yVecl + 2
-            bpl     +
-                cmp.w   #-MAX_Y_VECL_PX
-                bcs     ++
-                    lda.w   #-MAX_Y_VECL_PX
-                    bra     ++
-            +
-                cmp.w   #MAX_Y_VECL_PX
-                bcc     +
-                    lda.w   #MAX_Y_VECL_PX
-            +
-            sta.b   EntityStruct.yVecl + 2
-
-            bra     Yaxis_End
-
-        Yaxis_DPAD:
-            ldx.w   #0
-            ldy.w   #0
+        beq     NoUpDown
             bit.w   #JOY.up
             beq     +
-                ldx.w   #-Y_VECL
-                ldy.w   #-Y_VECL >> 16
+                lda.w   #Entity.MovementState.MOVING_DOWN_FLAG
+                bit.b   EntityStruct.movementState
+                beq     +
+                    trb.b   EntityStruct.movementState
+                    // Clear standing flag
+                    lda.w   #Entity.MovementState.STANDING_FLAG
+                    trb.b   EntityStruct.movementState
             +
+            lda.w   Controller.Joy1.current
             bit.w   #JOY.down
             beq     +
-                ldx.w   #Y_VECL
-                ldy.w   #Y_VECL >> 16
+                lda.w   #Entity.MovementState.MOVING_DOWN_FLAG
+                bit.b   EntityStruct.movementState
+                bne     +
+                    tsb.b   EntityStruct.movementState
+                    // Clear standing flag
+                    lda.w   #Entity.MovementState.STANDING_FLAG
+                    trb.b   EntityStruct.movementState
             +
-            stx.b   EntityStruct.yVecl
-            sty.b   EntityStruct.yVecl + 2
-        Yaxis_End:
+
+            lda.w   #Y_MOMENTUM
+            sta.b   BaseEntity.yMomentum.sx
+            lda.w   #Y_MOMENTUM >> 8
+            sta.b   BaseEntity.yMomentum.sx + 1
+
+            bra     EndUpDown
+
+        NoUpDown:
+            lda.b   BaseEntity.movementState
+            bit.w   #Entity.MovementState.NO_GRAVITY_FLAG
+            beq     +
+                // No Gravity, clear momentum when not pressing up or down
+                stz.b   BaseEntity.yMomentum.sx
+                stz.b   BaseEntity.yMomentum.sx + 1
+            +
+    EndUpDown:
 
 
         // Change frame on L press
@@ -159,27 +150,33 @@ namespace TileCollisionTestPlayer {
             SetFrame_A()
         +
 
+        // Change gravity settings on R press
         sep     #$20
     a8()
         lda.w   Controller.Joy1.pressed
         bit.b   #JOYL.r
-        beq     ++
-            lda.b   EntityStruct.gravityIndex
-            inc
-            inc
-            cmp.b   #GravityTable.size
-            bcc     +
-                lda.b   #0
+        beq     EndChangeGravity
+            // Alternate between down gravity, up gravity and no gravity
+            lda.b   EntityStruct.movementState
+            bit.b   #Entity.MovementState.NO_GRAVITY_FLAG
+            beq     +
+                and.b   #~(Entity.MovementState.NO_GRAVITY_FLAG | Entity.MovementState.UP_GRAVITY_FLAG)
+                bra     ++
             +
-            sta.b   EntityStruct.gravityIndex
-        +
+            lda.b   EntityStruct.movementState
+            eor.b   #Entity.MovementState.UP_GRAVITY_FLAG
+            bit.b   #Entity.MovementState.UP_GRAVITY_FLAG
+            bne     +
+                ora.b   #Entity.MovementState.NO_GRAVITY_FLAG
+                ora.b   #Entity.MovementState.UP_GRAVITY_FLAG
+            +
+            sta.b   EntityStruct.movementState
+    EndChangeGravity:
 
         rep     #$20
     a16()
 
         MoveEntityAndProcessTileCollisions()
-
-
 
         // Move camera to center of object
         lda.b   EntityStruct.xPos.px
@@ -209,6 +206,7 @@ namespace TileCollisionTest {
 constant ENTITY_X_START = 32
 constant ENTITY_Y_START = 48
 
+constant GRAVITY = 1555
 
 // Initializes the screen and loads tiles/palette to PPU
 //
@@ -329,6 +327,9 @@ a16()
 
     LoadMap()
 
+    lda.w   #GRAVITY
+    sta.w   Room.gravity_sx
+
     lda.w   #MetaTiles.map.LEFT
     sta.w   Camera.xPos
 
@@ -380,7 +381,7 @@ a16()
         Text.Console.SetCursor(24, 2)
 
         ldx.w   _entity
-        lda.b   BaseEntity.tileCollisionState,x
+        lda.b   BaseEntity.movementState,x
         jsr     Text.Console.PrintHex8A
 
         rep     #$20

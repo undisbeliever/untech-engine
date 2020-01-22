@@ -16,52 +16,129 @@
 
 namespace MetaTiles {
 
-// Bitfield containing the collisions that occurred in the
-// last `MoveEntityAndProcessTileCollisions` call.
+code()
+namespace MoveEntityAndProcessTileCollisions {
+
+// Check if standing and set appropriate `movementState` flags.
+// Invoked when in a falling state and bottom of hitbox collided with a tile.
 //
-// See BaseEntity.tileCollisionState.
-namespace TileCollisionState {
-    constant DOWN_COLLISION  = 0x80
-    constant UP_COLLISION    = 0x40
-    constant RIGHT_COLLISION = 0x20
-    constant LEFT_COLLISION  = 0x10
+// REQUIRES: 8 bit A, 16 bit Index, DB = 0x7e
+// INPUT: dp = entity
+// KEEP: X and Y
+inline _CheckIfStanding_Bottom() {
+    assert8a()
+    assert16i()
+
+    // MUST NOT MODIFY X or Y
+
+    // BUGFIX: I have to set direction of movement when setting Standing flag
+    //         to prevent a Mario 64 style ceiling clip.
+
+    // standing if no gravity or down gravity
+    lda.b   BaseEntity.movementState
+    bit.b   #Entity.MovementState.NO_GRAVITY_FLAG
+    bne     NoGravity{#}
+    bit.b   #Entity.MovementState.UP_GRAVITY_FLAG
+    bne     NotStanding{#}
+    NoGravity{#}:
+        // Set standing and moving down state
+        // A = entity->movementState
+        ora.b   #Entity.MovementState.STANDING_FLAG | Entity.MovementState.MOVING_DOWN_FLAG
+        sta.b   BaseEntity.movementState
+
+        bra     EndIf{#}
+
+
+    NotStanding{#}:
+        // Not Standing
+
+        // Set Y direction to down
+        // A = entity->movementState
+        ora.b   #Entity.MovementState.MOVING_DOWN_FLAG
+        sta.b   BaseEntity.movementState
+
+        // reset yMomentum
+        // ::TODO bonking momentum (make it room & region independent)::
+        stz.b   BaseEntity.yMomentum.sx
+        stz.b   BaseEntity.yMomentum.sx + 1
+        stz.b   BaseEntity.yMomentum.px
+EndIf{#}:
 }
 
 
-code()
-namespace MoveEntityAndProcessTileCollisions {
+// Check if standing and set appropriate `movementState` flags.
+// Invoked when in a falling state and top of hitbox collided with a tile.
+//
+// REQUIRES: 8 bit A, 16 bit Index, DB = 0x7e
+// INPUT: dp = entity
+// KEEP: X and Y
+inline _CheckIfStanding_Top() {
+    assert8a()
+    assert16i()
+
+    // MUST NOT MODIFY X or Y
+
+    // BUGFIX: I have to set direction of movement when setting Standing flag
+    //         to prevent a Mario 64 style ceiling clip.
+
+    // standing if no gravity or up gravity
+    lda.b   BaseEntity.movementState
+    bit.b   #Entity.MovementState.UP_GRAVITY_FLAG | Entity.MovementState.NO_GRAVITY_FLAG
+    beq     NotStanding{#}
+        // Set standing and moving up state
+        // A = entity->movementState
+        and.b   #~Entity.MovementState.MOVING_DOWN_FLAG
+        ora.b   #Entity.MovementState.STANDING_FLAG
+        sta.b   BaseEntity.movementState
+
+        bra     EndIf{#}
+
+
+    NotStanding{#}:
+        // Not Standing
+
+        // Set Y direction to UP
+        // A = entity->movementState
+        and.b   #~Entity.MovementState.MOVING_DOWN_FLAG
+        sta.b   BaseEntity.movementState
+
+        // Reset yMomentum
+        // ::TODO bonking momentum (make it room & region independent)::
+        stz.b   BaseEntity.yMomentum.sx
+        stz.b   BaseEntity.yMomentum.sx + 1
+        stz.b   BaseEntity.yMomentum.px
+EndIf{#}:
+}
+
+namespace _CheckIfStanding {
+    constant MovingDown = 1
+    constant MovingUp = 2
+}
+
+
 // DP = entity
 a16()
 i16()
 NoHitbox:
-    // X position already updated
-
-    // add entity Y velocity to Y position
-    clc
-    lda.b   BaseEntity.yVecl
-    adc.b   BaseEntity.yPos.sx
-    sta.b   BaseEntity.yPos.sx
-    lda.b   BaseEntity.yVecl + 2
-    adc.b   BaseEntity.yPos.px
-    sta.b   BaseEntity.yPos.px
-
-    // no tile collision
-    ldy.w   #0
-
     rts
 }
 
 
-// Applies velocity to the entity's position and checks for tile collisions.
+// Moves the entity (using the entity's movementState and momentum values) and
+// preforms collision checks between the MetaTiles and the entity's tile
+// hitbox.
 //
-// If a collison occurs then the entity is moved so its tile hitbox is outside
-// the collision and the approperate bits in `BaseEntity.tileCollisionState`
+// If a collision occurs then the entity is moved so its tile hitbox is outside
+// the collision and the appropriate bits in `BaseEntity.movementState`
 // will be set.
 //
-// You SHOULD NOT modify the value of `BaseEntity.tileCollisionState` unless
-// the entity has been moved (in which case it should be reset to 0).
+// If the entity is in a Standing state and there is no collision then
+// the `Entity.MovementState.STANDING_FLAG` will be cleared.
 //
-// NOTE: you MUST ONLY call this routine inside the entity's Process routine
+// NOTE: You MUST ONLY call this routine inside the entity's Process routine
+//
+// NOTE: If the entity's MetaSprite frame has no tile hitbox then the entity
+//       will not be moved.
 //
 // NOTE: Collision testing is only preformed in the direction of movement.
 //       For instance, if the entity is moving right then a left collision test
@@ -72,14 +149,14 @@ NoHitbox:
 //
 //       The x-axis test will be preformed using the full width of the tile hitbox.
 //
+// REQUIRES: 16 bit A, 16 bit Index, DB = 0x7e
 // INPUT: dp = entity
-// OUTPUT: Y = The tilemap index directly above/below the entity (depending on yVecl),
+// OUTPUT: Y = The tilemap index directly above/below the entity (depending on Y direction of movement),
 //             Set to 0 if there is no tile hitbox.
-//        BaseEntity.tileCollisionState = The collisions that occurred in this frame.
 //
 // This code assumes:
 //   * This routine is called once per frame.
-//   * The maximum x/y velocity is 8px/frame.
+//   * The maximum x/y momentum is 8px/frame.
 //   * The entity is inside the map boundary.
 //   * An END_SLOPE tile or a SOLID wall is adjacent to the long side of a *_SLOPE tile.
 //   * An EMPTY tile or a SOLID wall is adjacent to the short side of a *_SLOPE tile.
@@ -93,7 +170,7 @@ NoHitbox:
 //   * The top-left tile of the map is SOLID.
 //
 // If none of these assumptions are met then the entity can either:
-//   * Overshoot slope tiles when `abs(xVecl)` > 1px/frame.
+//   * Overshoot slope tiles when `xMomentum` > 1px/frame.
 //   * Fall through a slope if the x origin tile is EMPTY.
 //   * Zip to the top or bottom of a tile when walking into an forbidden tile pattern.
 //
@@ -117,8 +194,8 @@ function MoveEntityAndProcessTileCollisions {
 
 assert(METATILE_SIZE_PX == 16)
 
-// Confirm velocity is a 32 bit value
-assert(BaseEntity.yVecl - BaseEntity.xVecl == 4)
+// Confirm entity momentum is a 24 bit value
+assert(BaseEntity.yMomentum.sx - BaseEntity.xMomentum.sx == 3)
 
 assert(MetaSprite.Format.Frame.TileHitbox.left + 1 == MetaSprite.Format.Frame.TileHitbox.right)
 assert(MetaSprite.Format.Frame.TileHitbox.yOffset + 1 == MetaSprite.Format.Frame.TileHitbox.height)
@@ -144,32 +221,13 @@ constant _TileCollisionType_FIRST_DOWN_SLOPE = TileCollisionType.DOWN_RIGHT_SLOP
 constant _TileCollisionType_LAST_DOWN_SLOPE  = TileCollisionType.DOWN_LEFT_SHORT_SLOPE
 
 
-    // clear tileCollisionState
-    sep     #$20
-a8()
-    lda.b   BaseEntity.tileCollisionState
-    sta.w   _oldTileCollisionState
-    stz.b   BaseEntity.tileCollisionState
-
-
 //  X AXIS
 // --------
 //
 // X-Axis movement can only collide with a SOLID tile, all other tile collision types are ignored.
 
-
-    // add entity X velocity to X position
-    rep     #$31
 a16()
-    // carry clear
-    lda.b   BaseEntity.xVecl
-    adc.b   BaseEntity.xPos.sx
-    sta.b   BaseEntity.xPos.sx
-    lda.b   BaseEntity.xVecl + 2
-    adc.b   BaseEntity.xPos.px
-    sta.b   BaseEntity.xPos.px
-
-
+i16()
     // Calculate tile index for the top of the tile hitbox (if any)
 
     ldx.b   BaseEntity.MetaSprite.currentFrame
@@ -195,33 +253,31 @@ a8()
     xba
     lda.w   map.width
 
-    rep     #$31        // also clear carry
+    rep     #$30
 a16()
     sta.l   WRMPYA      // a = map.width, b = top / 16
 
 
-    // MUST NOT CHANGE CARRY HERE
     lda.l   MetaSprite.Format.Frame.TileHitbox.left,x
     sta.w   _leftRightPair
 
-    // MUST NOT CHANGE CARRY HERE
-    // MUST NOT CHANGE A HERE
 
-    // Check if moving left/right
-    ldy.b   BaseEntity.xVecl + 2
-    bmi     MovingLeft
-
+    assert(Entity.MovementState.MOVING_RIGHT_FLAG == 0x40)
+    bit.b   BaseEntity.movementState - 1
+    bvs     MovingRight
+        jmp     MovingLeft
 
 a16()
 i16()
 MovingRight:
     namespace MovingRight {
-        // Calculate tile index for top-right of tile hitbox
+        Entity.Movement._AddMomentumToPosition(x)
+
+        // A = entity.xPos.px
 
         // _xTmp = entity.xPos.px + _leftRightPair.right
         // Y = (_xTmp - map.LEFT) / 16 + RDMPY
-        lda.b   BaseEntity.xPos.px
-        // carry clear
+        clc
         adc.w   _leftRightPair + 1          // Third byte of _leftRightPair is 0
         sta.w   _xTmp
         sec
@@ -233,6 +289,8 @@ MovingRight:
         clc
         adc.l   RDMPY
         tay
+
+        // Y = tile index for top-right of hitbox
 
         // set Ah to 0 for `tax` below
         lda.w   #0
@@ -296,6 +354,10 @@ MovingRight:
     a8()
     iu()
     NoCollision:
+        // clear X collision flag
+        lda.b   #Entity.MovementState.X_COLLISION_FLAG
+        trb.b   BaseEntity.movementState
+
         rep     #$30
     a16()
     i16()
@@ -307,23 +369,23 @@ MovingRight:
     Collision:
         // The right edge of the tile hitbox touched a SOLID tile
 
-        // set collision flag
-        lda.b   #TileCollisionState.RIGHT_COLLISION
-        tsb.b   BaseEntity.tileCollisionState
+        // set X collision flag
+        lda.b   #Entity.MovementState.X_COLLISION_FLAG
+        tsb.b   BaseEntity.movementState
 
-        // entity.xPos.px = (_xTmp & 0xfff0) + _leftRightPair.right
+        // Reset xMomentum
+        stz.b   BaseEntity.xMomentum.px
         rep     #$30
     a16()
     i16()
+        stz.b   BaseEntity.xMomentum.sx
+
+        // entity.xPos.px = (_xTmp & 0xfff0) + _leftRightPair.right
         lda.w   _xTmp
         and.w   #0xfff0
         sec
         sbc.w   _leftRightPair + 1          // 3rd byte of pair is 0
         sta.b   BaseEntity.xPos.px
-
-        // Reset xVecl
-        stz.b   BaseEntity.xVecl
-        stz.b   BaseEntity.xVecl + 2
 
         jmp     EndXaxis_A16
     }
@@ -333,12 +395,14 @@ a16()
 i16()
 MovingLeft:
     namespace MovingLeft {
-        // Calculate tile index for top-left of tile hitbox
+        Entity.Movement._SubtractMomentumFromPosition(x)
+
+        // A = entity.xPos.px
 
         // _xTmp = entity.xPos.px - _leftRightPair.left
         // Y = (_xTmp - map.LEFT) / 16 + RDMPY
 
-        // A = _leftRightPair
+        lda.w   _leftRightPair
         and.w   #0x00ff
         eor.w   #0xffff
         sec
@@ -353,6 +417,8 @@ MovingLeft:
         clc
         adc.l   RDMPY
         tay
+
+        // Y = tile index for top-left of hitbox
 
         // set Ah to 0 for `tax` below
         lda.w   #0
@@ -416,6 +482,10 @@ MovingLeft:
     a8()
     iu()
     NoCollision:
+        // clear X collision flag
+        lda.b   #Entity.MovementState.X_COLLISION_FLAG
+        trb.b   BaseEntity.movementState
+
         rep     #$30
     a16()
     i16()
@@ -425,11 +495,13 @@ MovingLeft:
     a8()
     iu()
     Collision:
-        // The right edge of the tile hitbox touched a SOLID tile
+        // The left edge of the tile hitbox touched a SOLID tile
 
-        // set collision flag
-        lda.b   #TileCollisionState.LEFT_COLLISION
-        tsb.b   BaseEntity.tileCollisionState
+        // set X collision flag
+        lda.b   #Entity.MovementState.X_COLLISION_FLAG
+        tsb.b   BaseEntity.movementState
+
+        stz.b   BaseEntity.xMomentum.px
 
         // entity.xPos.px += (~_xTmp & 0xf) + 1;
         lda.w   _xTmp
@@ -443,9 +515,7 @@ MovingLeft:
         adc.b   BaseEntity.xPos.px
         sta.b   BaseEntity.xPos.px
 
-        // Reset xVecl
-        stz.b   BaseEntity.xVecl
-        stz.b   BaseEntity.xVecl + 2
+        stz.b   BaseEntity.xMomentum.sx
     }
 a16()
 i16()
@@ -456,34 +526,45 @@ EndXaxis_A16:
 //  Y AXIS
 // --------
 
-// The collision tests preformed on the y-axis depend on the state of
-// the `BaseEntity.tileCollisionState` and the direction of movement.
+// The collision tests preformed on the y-axis depend on the value of
+// `BaseEntity.movementState`.
 //
 // NOMENCLATURE: center tile means the tile above or below the entity's xPos.
 
-    ldy.b   BaseEntity.yVecl + 2
-    bpl     ++
-        // Moving Upwards
-        assert(TileCollisionState.UP_COLLISION == 0x40)
-        bit.w   _oldTileCollisionState - 1
-        bvs     +
-            jmp     MovingUp
-        +
-        jmp     MovingUp_Standing
-    +
+    lda.b   BaseEntity.movementState
+    and.w   #Entity.Movement.Y_AXIS_MOVEMENT_STATE_FUNCTION_TABLE_MASK
+    tax
+    jmp     (MovementState_FunctionTable,x)
 
-    // Moving downwards
-    assert(TileCollisionState.DOWN_COLLISION == 0x80)
-    bit.w   _oldTileCollisionState - 1
-    bpl     +
-        jmp     MovingDown_Standing
-    +
+constant MovementState_NoGravity_Falling_Down     = MovingDown
+constant MovementState_NoGravity_Falling_Up       = MovingUp
 
+constant MovementState_NoGravity_Standing_Down    = MovingDown_Standing
+constant MovementState_UpGravity_Standing_Down    = MovingDown_Standing
+constant MovementState_DownGravity_Standing_Down  = MovingDown_Standing
+constant MovementState_NoGravity_Standing_Up      = MovingUp_Standing
+constant MovementState_UpGravity_Standing_Up      = MovingUp_Standing
+constant MovementState_DownGravity_Standing_Up    = MovingUp_Standing
+
+MovementState_UpGravity_Falling_Up:
+    Entity.Movement._AddGravityToYMomentum()
+    jmp     MovingUp
+
+MovementState_DownGravity_Falling_Up:
+    Entity.Movement._SubtractGravityFromYMomentum_AndBranchIfDirectionChanges(MovingDown, Down)
+    jmp     MovingUp
+
+MovementState_UpGravity_Falling_Down:
+    Entity.Movement._SubtractGravityFromYMomentum_AndBranchIfDirectionChanges(MovingUp, Up)
+    jmp     MovingDown
+
+MovementState_DownGravity_Falling_Down:
+    Entity.Movement._AddGravityToYMomentum()
+MovementState_DownGravity_Falling_Down__FallThrough:
 
 a16()
 i16()
 MovingDown:
-    // Y = hiword(BaseEntity.yVecl)
     namespace MovingDown {
         // Entity is moving down and was not standing on the floor in the
         // previous `MoveEntityAndProcessTileCollisions` call.
@@ -516,20 +597,24 @@ MovingDown:
         // The END_SLOPE tile is only solid in the bottom-center tile.
         // There is no need to write code to test for END_SLOPE as
         // `TopHeightTable[END_SLOPE | (xPos & 0xf)]` is always 0.
-
+        //
+        // The falling code will only reset the entity's yMomentum if the
+        // entity has a collision in the Y-Axis and it did not change into a
+        // standing state.
 
         // verify there is no need to test for END_SLOPE in this code.
         assert(TileCollisionType.END_SLOPE & 0xf0 == TileCollisionType.SOLID)
 
+    assert(pc() == MovementState_DownGravity_Falling_Down__FallThrough)
 
-        // add entity Y velocity to Y position, saving the change in Ypos to _yDelta
+        // add entity Y momentum to Y position, saving the change in Ypos to _yDelta
         clc
-        lda.b   BaseEntity.yVecl
+        lda.b   BaseEntity.yMomentum.sx
         adc.b   BaseEntity.yPos.sx
         sta.b   BaseEntity.yPos.sx
 
-        // Y = hiword(BaseEntity.yVecl)
-        tya
+        lda.b   BaseEntity.yMomentum.px
+        and.w   #0xff
         adc.w   #0
         sta.w   _yDelta
 
@@ -634,10 +719,7 @@ MovingDown:
         //
         // NOTE: If I modify this code, also modify code in `MovingDown_Standing.TileBelowCenterIsDownCollidable`
 
-        // set collision flag
-        lda.b   #TileCollisionState.DOWN_COLLISION
-        tsb.b   BaseEntity.tileCollisionState
-
+        _CheckIfStanding_Bottom()
 
         // Calculate bottom offset.
         //
@@ -672,11 +754,6 @@ MovingDown:
         sbc.w   _bottomOffset
         sta.b   BaseEntity.yPos.px
         stz.b   BaseEntity.yPos.sx
-
-
-        // Reset yVecl
-        stz.b   BaseEntity.yVecl
-        stz.b   BaseEntity.yVecl + 2
 
         rts
 
@@ -823,10 +900,7 @@ MovingDown:
         //
         // NOTE: If I modify this code, also modify code in `MovingDown_Standing.SolidCollisionBelow`
 
-        // set collision flag
-        lda.b   #TileCollisionState.DOWN_COLLISION
-        tsb.b   BaseEntity.tileCollisionState
-
+        _CheckIfStanding_Bottom()
 
         // Move entity to one pixel above the current tile
         //
@@ -847,11 +921,6 @@ MovingDown:
         sbc.w   _bottomOffset
         sta.b   BaseEntity.yPos.px
         stz.b   BaseEntity.yPos.sx
-
-
-        // Reset yVecl
-        stz.b   BaseEntity.yVecl
-        stz.b   BaseEntity.yVecl + 2
 
         rts
 
@@ -956,7 +1025,7 @@ MovingDown_Standing:
         // slope/platform/solid on the previous
         // `MoveEntityAndProcessTileCollisions` call.
         //
-        // The Y velocity is not processed when standing.  The entity's Y
+        // The Y momentum is not processed when standing.  The entity's Y
         // position will be set so it is always 1 pixel above the floor height.
         //
         // When ascending the slope the hitbox bottom is already on the correct
@@ -980,11 +1049,9 @@ MovingDown_Standing:
         //
         // There is no need to write code to test for END_SLOPE, as
         // `BottomHeightTable[END_SLOPE | (xPos & 0xf)]` is always 0.
-
-
-        // Reset yVecl
-        stz.b   BaseEntity.yVecl
-        stz.b   BaseEntity.yVecl + 2
+        //
+        // The Standing code will reset the yMomentum to 0 when there is no collision
+        // and the entity's Standing flag is cleared.
 
 
         // Calculate tile index for bottom-center of tile hitbox
@@ -1032,7 +1099,7 @@ MovingDown_Standing:
         //
         // This test must jump to `MovingDown.Collision` if the entity
         // touches an END_SLOPE, UP_PLATFORM or a downwards slope to prevent
-        // the entity from overshooting a slope when xVecl is too large.
+        // the entity from overshooting a slope when X-Momentum is too large.
 
         lda.w   map.data,y
         tax
@@ -1156,8 +1223,20 @@ MovingDown_Standing:
     }
         TestLeftRightTiles(UP_PLATFORM, SolidCollisionBelow)
 
+    NoCollision:
+        // All tiles tested have no collision
+
+        // Clear Standing flag
+        lda.b   #Entity.MovementState.STANDING_FLAG
+        trb.b   BaseEntity.movementState
+
+        // Reset Y momentum
+        stz.b   BaseEntity.yMomentum.px
+
         rep     #$30
     a16()
+        stz.b   BaseEntity.yMomentum.sx
+
         // Y = tile index of tile below the bottom-center of hitbox
         rts
 
@@ -1195,10 +1274,6 @@ MovingDown_Standing:
         tax
         // X = TopHeightTable index
 
-        // set collision flag
-        lda.b   #TileCollisionState.DOWN_COLLISION
-        tsb.b   BaseEntity.tileCollisionState
-
         // Move entity to one pixel above the tile's TopHeightTable value
         //
         // _bottomOffset = _yOffsetHeightPair.height + _yPosHeightPair.yOffset
@@ -1229,7 +1304,6 @@ MovingDown_Standing:
         sta.b   BaseEntity.yPos.px
         stz.b   BaseEntity.yPos.sx
 
-        // yVecl is already reset
         rts
 
 
@@ -1243,10 +1317,6 @@ MovingDown_Standing:
         // MUST NOT MODIFY Y
         //
         // NOTE: If I modify this code, also modify code in `MovingDown.SolidCollision`
-
-        // set collision flag
-        lda.b   #TileCollisionState.DOWN_COLLISION
-        tsb.b   BaseEntity.tileCollisionState
 
 
         // Move entity to one pixel above the tile below the _bottom
@@ -1271,10 +1341,6 @@ MovingDown_Standing:
         sta.b   BaseEntity.yPos.px
         stz.b   BaseEntity.yPos.sx
 
-        stz.b   BaseEntity.yVecl
-        stz.b   BaseEntity.yVecl + 2
-
-        // yVecl is already reset
         rts
     }
 
@@ -1282,20 +1348,19 @@ MovingDown_Standing:
 a16()
 i16()
 MovingUp:
-    // Y = hiword(BaseEntity.yVecl)
     namespace MovingUp {
         // Entity moving up and was not standing on a ceiling in the previous
         // `MoveEntityAndProcessTileCollisions` call
 
-
-        // add entity Y velocity to Y position, saving the change in Ypos to _yDelta
-        clc
-        lda.b   BaseEntity.yVecl
-        adc.b   BaseEntity.yPos.sx
+        // Subtract 24 bit Y Momentum from 32 bit Position, saving the change in Ypos.px to _yDelta
+        sec
+        lda.b   BaseEntity.yPos.sx
+        sbc.b   BaseEntity.yMomentum.sx
         sta.b   BaseEntity.yPos.sx
 
-        // Y = hiword(BaseEntity.yVecl)
-        tya
+        lda.b   BaseEntity.yMomentum.px
+        and.w   #0xff
+        eor.w   #0xffff
         adc.w   #0
         sta.w   _yDelta
 
@@ -1406,10 +1471,7 @@ MovingUp:
         //
         // NOTE: If I modify this code, also modify code in `MovingUp_Standing.TileAboveCenterIsUpCollidable`
 
-        // set collision flag
-        lda.b   #TileCollisionState.UP_COLLISION
-        tsb.b   BaseEntity.tileCollisionState
-
+        _CheckIfStanding_Top()
 
         // Move entity to one pixel below the tile's BottomHeightTable value
         //
@@ -1436,11 +1498,6 @@ MovingUp:
         sbc.w   _yOffsetHeightPair
         sta.b   BaseEntity.yPos.px
         stz.b   BaseEntity.yPos.sx
-
-
-        // Reset yVecl
-        stz.b   BaseEntity.yVecl
-        stz.b   BaseEntity.yVecl + 2
 
         rts
 
@@ -1492,10 +1549,7 @@ MovingUp:
         //
         // NOTE: If I modify this code, also modify code in `MovingUp_Standing.SolidCollisionAbove`
 
-        // set collision flag
-        lda.b   #TileCollisionState.UP_COLLISION
-        tsb.b   BaseEntity.tileCollisionState
-
+        _CheckIfStanding_Top()
 
         // Move entity to one pixel below the tile's BottomHeightTable value
         //
@@ -1515,11 +1569,6 @@ MovingUp:
         sbc.w   _yOffsetHeightPair
         sta.b   BaseEntity.yPos.px
         stz.b   BaseEntity.yPos.sx
-
-
-        // Reset yVecl
-        stz.b   BaseEntity.yVecl
-        stz.b   BaseEntity.yVecl + 2
 
         rts
 
@@ -1622,11 +1671,6 @@ MovingUp_Standing:
         // `MoveEntityAndProcessTileCollisions` call.
 
 
-        // Reset yVecl
-        stz.b   BaseEntity.yVecl
-        stz.b   BaseEntity.yVecl + 2
-
-
         // Calculate tile index for bottom-center of tile hitbox
         // _top and RDMPY already set in X-axis test
 
@@ -1704,9 +1748,21 @@ MovingUp_Standing:
         // goto SolidCollisionAbove if left/right tiles are SOLID or DOWN_PLATFORM
         MovingDown_Standing.TestLeftRightTiles(DOWN_PLATFORM, SolidCollisionAbove)
 
+    NoCollision:
+        // All tiles tested have no collision
+
+        // Clear Standing flag
+        lda.b   #Entity.MovementState.STANDING_FLAG
+        trb.b   BaseEntity.movementState
+
+        // Reset Y momentum
+        stz.b   BaseEntity.yMomentum.px
+
         rep     #$30
     a16()
-        // Y = tile index of tile above the top-center of hitbox
+        stz.b   BaseEntity.yMomentum.sx
+
+        // Y = tile index of tile below the bottom-center of hitbox
         rts
 
 
@@ -1743,10 +1799,6 @@ MovingUp_Standing:
         tax
         // X = BottomHeightTable index
 
-        // set collision flag
-        lda.b   #TileCollisionState.UP_COLLISION
-        tsb.b   BaseEntity.tileCollisionState
-
         // Move entity to one pixel below the tile's BottomHeightTable value
         //
         // BaseEntity.yPos.px = ((_top & 0xfff0) | BottomHeightTable[x])
@@ -1774,7 +1826,6 @@ MovingUp_Standing:
         sta.b   BaseEntity.yPos.px
         stz.b   BaseEntity.yPos.sx
 
-        // yVecl is already reset
         rts
 
 
@@ -1788,11 +1839,6 @@ MovingUp_Standing:
         // MUST NOT MODIFY Y
         //
         // NOTE: If I modify this code, also modify code in `MovingUp.SolidCollision`
-
-        // set collision flag
-        lda.b   #TileCollisionState.UP_COLLISION
-        tsb.b   BaseEntity.tileCollisionState
-
 
         // Move entity to one pixel below the current tile
         //
@@ -1811,12 +1857,14 @@ MovingUp_Standing:
         sta.b   BaseEntity.yPos.px
         stz.b   BaseEntity.yPos.sx
 
-        stz.b   BaseEntity.yVecl
-        stz.b   BaseEntity.yVecl + 2
-
-        // yVecl already reset
         rts
     }
+
+
+// ::SPAGHETTI have to place this at bottom to prevent a `constant has unknown value` error::
+MovementState_FunctionTable:
+    Entity.Movement._GenerateYAxisMovementStateFunctionTable(MovementState, 1)
+assert(pc() - MovementState_FunctionTable == Entity.Movement.N_Y_AXIS_MOVEMENT_STATE_FUNCTIONS * 2)
 }
 
 

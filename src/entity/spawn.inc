@@ -129,15 +129,16 @@ allocateTmpWord(yPos)
         sta.b   BaseEntity.yPos.px
         stz.b   BaseEntity.yPos.sx
 
-        assert(BaseEntity.yVecl - BaseEntity.xVecl == 4)
-        stz.b   BaseEntity.xVecl
-        stz.b   BaseEntity.xVecl + 2
-        stz.b   BaseEntity.yVecl
-        stz.b   BaseEntity.yVecl + 2
+        // Confirm entity momentum is a 24 bit value
+        assert(BaseEntity.yMomentum.sx - BaseEntity.xMomentum.sx == 3)
+        stz.b   BaseEntity.xMomentum.sx
+        stz.b   BaseEntity.xMomentum.sx + 2
+        stz.b   BaseEntity.xMomentum.sx + 4
 
-        // confirm it is safe to override the byte before tileCollisionState
-        assert(BaseEntity.tileCollisionState == BaseEntity.yVecl + 4)
-        stz.b   BaseEntity.tileCollisionState - 1
+        // ::TODO move into BaseEntityRomStruct::
+        // confirm it is safe to override the byte before movementState
+        assert(BaseEntity.movementState - 1 == BaseEntity.yMomentum.px)
+        stz.b   BaseEntity.movementState - 1
 
 
         // Set projectileId and listId
@@ -503,10 +504,16 @@ function __SpawnAtActionPoint {
         sta.b   BaseEntity.yPos.px
         stz.b   BaseEntity.yPos.sx
 
-        stz.b   BaseEntity.xVecl
-        stz.b   BaseEntity.xVecl + 2
-        stz.b   BaseEntity.yVecl
-        stz.b   BaseEntity.yVecl + 2
+        // Confirm entity momentum is a 24 bit value
+        assert(BaseEntity.yMomentum.sx - BaseEntity.xMomentum.sx == 3)
+        stz.b   BaseEntity.xMomentum.sx
+        stz.b   BaseEntity.xMomentum.sx + 2
+        stz.b   BaseEntity.xMomentum.sx + 4
+
+        // ::TODO move into BaseEntityRomStruct::
+        // confirm it is safe to override the byte before movementState
+        assert(BaseEntity.movementState - 1 == BaseEntity.yMomentum.px)
+        stz.b   BaseEntity.movementState - 1
 
 
         // Initiate entity data

@@ -60,7 +60,7 @@ namespace MapCursor {
     code()
     function Process {
 
-        // Set Velocity depending on joypad settings
+        // Update entity position depending on joypad settings
 
         lda.w   Controller.Joy1.current
 
@@ -72,46 +72,47 @@ namespace MapCursor {
 
         // X = speed
         // A = Controller.Joy1.current
-        ldy.w   #0
-        bit.w   #JOY.up | JOY.down
-        beq     SkipUpDown
-            bit.w   #JOY.down
-            beq     +
-                txy
-                bra     ++
-            +
+        bit.w   #JOY.left
+        beq     +
             txa
             eor.w   #0xffff
-            inc
-            tay
+            sec
+            adc.b   BaseEntity.xPos.px
+            sta.b   BaseEntity.xPos.px
+
             lda.w   Controller.Joy1.current
         +
-    SkipUpDown:
-        sty.b   EntityStruct.yVecl + 2
 
+        bit.w   #JOY.right
+        beq     +
+            txa
+            clc
+            adc.b   BaseEntity.xPos.px
+            sta.b   BaseEntity.xPos.px
 
-        // X = speed
-        // A = Controller.Joy1.current
-        ldy.w   #0
-        bit.w   #JOY.left | JOY.right
-        beq     SkipLeftRight
-            bit.w   #JOY.right
-            beq     +
-                txy
-                bra     ++
-            +
+            lda.w   Controller.Joy1.current
+        +
+
+        bit.w   #JOY.up
+        beq     +
             txa
             eor.w   #0xffff
-            inc
-            tay
-        +
-    SkipLeftRight:
-        sty.b   EntityStruct.xVecl + 2
+            sec
+            adc.b   BaseEntity.yPos.px
+            sta.b   BaseEntity.yPos.px
 
+            lda.w   Controller.Joy1.current
+        +
+
+        bit.w   #JOY.down
+        beq     +
+            txa
+            clc
+            adc.b   BaseEntity.yPos.px
+            sta.b   BaseEntity.yPos.px
+        +
 
         macro _processAxis(c, minMap, maxMap, displaySize) {
-            //  pos += vecl
-            //
             //  if pos < minMap:
             //      pos = minMap
             //  else if pos >= maxMap:
@@ -122,13 +123,7 @@ namespace MapCursor {
             //  else if pos - displaySize > Camera.pos:
             //      Camera.pos = pos - displaySize
 
-            clc
-            lda.b   EntityStruct.{c}Pos.sx
-            adc.b   EntityStruct.{c}Vecl
-            sta.b   EntityStruct.{c}Pos.sx
             lda.b   EntityStruct.{c}Pos.px
-            adc.b   EntityStruct.{c}Vecl + 2
-
             cmp.w   #MetaTiles.map.{minMap}
             bcs     +
                 lda.w   #MetaTiles.map.{minMap}

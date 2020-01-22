@@ -65,12 +65,6 @@ include "resources/_common.inc"
 
 include "camera/_common.inc"
 
-include "metatiles/collisions.inc"
-include "metatiles/render.inc"
-include "metatiles/tileset.inc"
-include "metatiles/_common.inc"
-include "metatiles/_vblank.inc"
-
 include "metasprite/animation.inc"
 include "metasprite/entityhitbox.inc"
 include "metasprite/palette.inc"
@@ -85,9 +79,16 @@ include "entity/counters.inc"
 include "entity/deallocation.inc"
 include "entity/gameloop.inc"
 include "entity/invalid-entity.inc"
+include "entity/movement.inc"
 include "entity/spawn.inc"
 include "entity/transitions.inc"
 include "entity/validation.inc"
+
+include "metatiles/collisions.inc"
+include "metatiles/render.inc"
+include "metatiles/tileset.inc"
+include "metatiles/_common.inc"
+include "metatiles/_vblank.inc"
 
 include "metasprite/actionpoints.inc"
 
