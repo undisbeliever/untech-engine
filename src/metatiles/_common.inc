@@ -91,37 +91,28 @@ a16()
 i16()
 code()
 function EntityPositionToMapIndex {
-    // X = (entity->yPos - map.top) / METATILE_SIZE_PX * map.width
-    //     + (entity->xPos - map.left) / METATILE_SIZE_PX
+allocateTmpWord(_tileIndexTmp)
 
     assert(METATILE_SIZE_PX == 16)
 
-    lda.b   BaseEntity.yPos.px
-    sec
-    sbc.w   #map.TOP
-    lsr
-    lsr
-    lsr
-    lsr
-    sep     #$20
-a8()
-    xba
-    lda.w   map.width
-    rep     #$31
-a16()
-    sta.l   WRMPYA      // also sets WRMPYB
+    // X = (entity->yPos & Y_POSITION_MASK) / 16
+    //     + ((entity.xPos.px & X_POSITION_MASK) / 16 * MAP_HEIGHT)
 
+    lda.b   BaseEntity.yPos.px
+    and.w   #Y_POSITION_MASK
+    lsr
+    lsr
+    lsr
+    lsr
+    sta.w   _tileIndexTmp
 
     lda.b   BaseEntity.xPos.px
-    // c clear
-    sbc.w   #map.LEFT - 1
-    lsr
-    lsr
-    lsr
-    lsr
-    clc
-
-    adc.l   RDMPY
+    and.w   #X_POSITION_MASK
+    assert(map.HEIGHT / 16 == 4)
+    asl
+    asl
+    // carry clear
+    adc.w   _tileIndexTmp
     tax
 
     rts

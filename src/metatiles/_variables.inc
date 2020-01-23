@@ -23,14 +23,11 @@ namespace MetaTiles {
         allocate(width, wram7e, 1)
 
         // Map Height in metatiles
-        //
-        // Must be >= 12
-        //
-        // (uint8)
-        allocate(height, wram7e, 1)
+        constant HEIGHT = 64
 
         // Map data
-        // (byte grid array)
+        //
+        // (byte grid array column-major order)
         allocate(data, wram7e, MAP_SIZE)
 
 
@@ -38,7 +35,7 @@ namespace MetaTiles {
         // =================
 
         // The number of bytes in the data
-        // (Equal to width * height * 2)
+        // (Equal to map.width * HEIGHT)
         // (uint16)
         allocate(dataSize, wram7e, 2)
 
@@ -53,20 +50,14 @@ namespace MetaTiles {
         // The right-most x coordinate of the map
         // (uint16)
         allocate(right, wram7e, 2)
-
-        // Number of bytes per map row
-        //
-        // Equal to map.width.
-        // (uint16)
-        allocate(bytesPerRow, wram7e, 2)
-
-        // Number of bytes per display height
-        //
-        // Equal to map.width * METATILE_DISPLAY_HEIGHT * 2
-        // (uint16)
-        allocate(bytesPerDisplayHeight, wram7e, 2)
     }
 
+    // A bit-mask used when converting a position to a tile index/address
+    constant X_POSITION_MASK = 0xff * METATILE_SIZE_PX
+    constant Y_POSITION_MASK = (map.HEIGHT - 1) * METATILE_SIZE_PX
+    assertPowerOfTwo(map.HEIGHT)
+    assert(X_POSITION_MASK < map.LEFT)
+    assert(Y_POSITION_MASK < map.TOP)
 
     // Horizontal SNES Tilemap Buffer
     // A single tile map 64 * 2 tiles in size

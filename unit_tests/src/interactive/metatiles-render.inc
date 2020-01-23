@@ -257,14 +257,14 @@ namespace InteractiveTests {
 namespace MetaTileRenderTest {
 
 constant MAP_WIDTH = 84
-constant MAP_HEIGHT = 75
+constant MAP_HEIGHT = MetaTiles.map.HEIGHT
 
 constant MAP_GRID_WIDTH = 3
 constant MAP_GRID_HEIGHT = 3
 constant MAP_GRID_TILE_OFFSET = 16
-constant MAP_GRID_LINE_WIDTH = 16;
+constant MAP_GRID_LINE_WIDTH = 16
 constant MAP_REPEAT_HORIZONTAL = 24
-constant MAP_REPEAT_VERTICAL = 21
+constant MAP_REPEAT_VERTICAL = 19
 
 assert(MAP_GRID_WIDTH * MAP_REPEAT_HORIZONTAL <= MAP_WIDTH)
 assert(MAP_GRID_HEIGHT * MAP_REPEAT_VERTICAL <= MAP_HEIGHT)
@@ -330,11 +330,10 @@ macro GenerateMap() {
     assert16a()
     assert16i()
 
-constant _columnsLeft = Test.dpTmp
-constant _columnIndex = Test.dpTmp + 2
+constant _rowsLeft = Test.dpTmp
+constant _rowIndex = Test.dpTmp + 2
 
-    assert(MetaTiles.map.width + 1 == MetaTiles.map.height)
-    lda.w   #MAP_WIDTH | (MAP_HEIGHT << 8)
+    lda.w   #MAP_WIDTH
     sta.w   MetaTiles.map.width
 
     lda.w   #MIN_CAMERA_Y + MAP_HEIGHT * 16
@@ -346,12 +345,6 @@ constant _columnIndex = Test.dpTmp + 2
     lda.w   #MAP_WIDTH * MAP_HEIGHT
     sta.w   MetaTiles.map.dataSize
 
-    lda.w   #MAP_WIDTH
-    sta.w   MetaTiles.map.bytesPerRow
-
-    lda.w   #MAP_WIDTH * MetaTiles.METATILE_DISPLAY_HEIGHT
-    sta.w   MetaTiles.map.bytesPerDisplayHeight
-
 
     // clear tilemap
 
@@ -361,7 +354,7 @@ constant _columnIndex = Test.dpTmp + 2
         stz.w   MetaTiles.map.data,x
         dex
         dex
-        bmi     ClearLoop
+        bpl     ClearLoop
 
 
     // Repeat grid pattern
@@ -369,15 +362,18 @@ constant _columnIndex = Test.dpTmp + 2
     constant MARGIN_X = (MAP_WIDTH - MAP_REPEAT_HORIZONTAL * MAP_GRID_WIDTH) / 2
     constant MARGIN_Y = (MAP_HEIGHT - MAP_REPEAT_VERTICAL * MAP_GRID_HEIGHT) / 2
 
-    ldx.w   #(MARGIN_X + MARGIN_Y * MAP_WIDTH)
+    assert(MARGIN_Y > 1)
+    assert(MARGIN_X > 1)
 
-    lda.w   #MAP_REPEAT_VERTICAL
-    sta.b   _columnsLeft
+    ldx.w   #(MARGIN_Y + MARGIN_X * MAP_HEIGHT)
+
+    lda.w   #MAP_REPEAT_HORIZONTAL
+    sta.b   _rowsLeft
 
     Loop:
-        stx.b   _columnIndex
+        stx.b   _rowIndex
 
-        ldy.w   #MAP_REPEAT_HORIZONTAL
+        ldy.w   #MAP_REPEAT_VERTICAL
 
         LineLoop:
             variable yPos = 0
@@ -385,7 +381,7 @@ constant _columnIndex = Test.dpTmp + 2
                 variable xPos = 0
                 while xPos < MAP_GRID_WIDTH {
                     lda.w   #(xPos + yPos * MAP_GRID_LINE_WIDTH + MAP_GRID_TILE_OFFSET)
-                    sta.w   MetaTiles.map.data + (xPos + MAP_WIDTH * yPos),x
+                    sta.w   MetaTiles.map.data + (yPos + xPos * MAP_HEIGHT),x
 
                     xPos = xPos + 1
                 }
@@ -394,18 +390,18 @@ constant _columnIndex = Test.dpTmp + 2
 
             txa
             clc
-            adc.w   #MAP_GRID_WIDTH
+            adc.w   #MAP_GRID_HEIGHT
             tax
 
             dey
             bne     LineLoop
 
-        lda.b   _columnIndex
+        lda.b   _rowIndex
         clc
-        adc.w   #MAP_WIDTH * MAP_GRID_HEIGHT
+        adc.w   #MAP_HEIGHT * MAP_GRID_WIDTH
         tax
 
-        dec.b   _columnsLeft
+        dec.b   _rowsLeft
         bne     Loop
 }
 

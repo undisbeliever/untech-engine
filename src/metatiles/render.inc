@@ -59,6 +59,7 @@ constant _mapPtr = tmp0
 constant _columnCount = tmp1
 constant _rowCount = tmp2
 
+
     Dma.ForceBlank.AssertForceBlank()
 
     phd
@@ -83,9 +84,9 @@ constant _rowCount = tmp2
     // displayHoffset = Camera.xPos & (METATILE_SIZE_PX - 1)
     // displayVoffset = Camera.yPos & (METATILE_SIZE_PX - 1) - 1
     //
-    // visibleMapPtr = (Camera.xPos - map.left) / METATILE_SIZE_PX
-    //                   + (Camera.yPos - map.top) / METATILE_SIZE_PX * map.width
-    //                   + map.data
+    // visibleMapPtr = (Camera.yPos & Y_POSITION_MASK) / METATILE_SIZE_PX
+    //                 + (Camera.xPos & X_POSITION_MASK) / METATILE_SIZE_PX * map.HEIGHT
+    //                 + map.data
 
     stz.w   drawMapCellBufferIndex
 
@@ -114,33 +115,23 @@ constant _rowCount = tmp2
     sta.w   displayVoffset
 
 
+    assertPowerOfTwo(map.HEIGHT)
+    assertPowerOfTwo(METATILE_SIZE_PX)
     lda.w   Camera.yPos
-    sec
-    sbc.w   #map.TOP
+    and.w   #Y_POSITION_MASK
     lsr
     lsr
     lsr
     lsr
-
-    sep     #$20
-a8()
-    xba
-    lda.w   map.width
-
-    rep     #$31
-a16()
-    sta.l   WRMPYA          // also sets WRMPYB
+    sta.w   _mapPtr
 
     lda.w   Camera.xPos
+    and.w   #X_POSITION_MASK
+    assert(map.HEIGHT / METATILE_SIZE_PX == 4)
+    asl
+    asl
     // carry clear
-    sbc.w   #map.LEFT - 1
-    lsr
-    lsr
-    lsr
-    lsr
-
-    clc
-    adc.l   RDMPY
+    adc.w   _mapPtr
     clc
     adc.w   #map.data
     sta.w   visibleMapPtr
@@ -159,16 +150,16 @@ a16()
     //          y = *x * 2
     //          VMDATA = tileMap.topLeft[y]
     //          VMDATA = tileMap.topRight[y]
-    //          x++
+    //          x += map.bytesPerRow
     //
     //      x = mapPtr
     //      for column = 0 to METATILE_DISPLAY_WIDTH:
     //          y = *x * 2
     //          VMDATA = tileMap.bottomLeft[y]
     //          VMDATA = tileMap.bottomRight[y]
-    //          x++
+    //          x += map.bytesPerRow
     //
-    //      mapPtr += map.bytesPerRow
+    //      mapPtr++
 
 
     // A = visibleMapPtr
@@ -208,7 +199,10 @@ a16()
             lda.w   tileMap.topRight,y
             sta.b   VMDATA
 
-            inx
+            txa
+            clc
+            adc.w   #map.HEIGHT
+            tax
 
             dec.w   _rowCount
             bne     TopLineLoop
@@ -231,15 +225,16 @@ a16()
             lda.w   tileMap.bottomRight,y
             sta.b   VMDATA
 
-            inx
+            txa
+            clc
+            adc.w   #map.HEIGHT
+            tax
 
             dec.w   _rowCount
             bne     BottomLineLoop
 
-        lda.w   _mapPtr
-        clc
-        adc.w   map.bytesPerRow
-        tax
+        ldx.w   _mapPtr
+        inx
 
         dec.w   _columnCount
         bne     ColumnLoop
@@ -250,12 +245,12 @@ a16()
     // VMAIN = incrementMode.high | increment.bg32
     //
     // VMADD = METATILES_MAP_WADDR + 32 * 32
-    // x = visibleMapPtr + DISPLAY_WIDTH
+    // x = visibleMapPtr + DISPLAY_WIDTH * map.HEIGHT
     // for row = 0 to METATILE_DISPLAY_HEIGHT + 1:
     //      y = *x * 2
     //      VMDATA = tileMap.topLeft[y]
     //      VMDATA = tileMap.bottomLeft[y]
-    //      x += map.bytesPerRow
+    //      x++
     //
     // VMADD = METATILES_MAP_WADDR + 32 * 32 + 1
     // x = visibleMapPtr + DISPLAY_WIDTH
@@ -263,7 +258,7 @@ a16()
     //      y = *x * 2
     //      VMDATA = tileMap.topRight[y]
     //      VMDATA = tileMap.bottomRight[y]
-    //      x += map.bytesPerRow
+    //      x++
     //
 
     sep     #$20
@@ -282,12 +277,11 @@ a16()
 
     lda.w   visibleMapPtr
     clc
-    adc.w   #METATILE_DISPLAY_WIDTH
-    pha
+    adc.w   #METATILE_DISPLAY_WIDTH * map.HEIGHT
+    tax
 
+    phx
     LeftLoop:
-        tax
-
         lda.w   0,x
         and.w   #0xff
         asl
@@ -299,9 +293,7 @@ a16()
         lda.w   tileMap.bottomLeft,y
         sta.b   VMDATA
 
-        txa
-        clc
-        adc.w   map.bytesPerRow
+        inx
 
         dec.w   _columnCount
         bne     LeftLoop
@@ -313,10 +305,8 @@ a16()
     lda.w   #METATILE_DISPLAY_HEIGHT + 1
     sta.w   _columnCount
 
-    pla
+    plx
     RightLoop:
-        tax
-
         lda.w   0,x
         and.w   #0xff
         asl
@@ -328,9 +318,7 @@ a16()
         lda.w   tileMap.bottomRight,y
         sta.b   VMDATA
 
-        txa
-        clc
-        adc.w   map.bytesPerRow
+        inx
 
         dec.w   _columnCount
         bne     RightLoop
@@ -361,7 +349,7 @@ macro _DrawHorizontalBuffer() {
     assertZeroPage(_mapPtrRend)
 
     //  mapPtrRend = mapPtr
-    //  mapPtr += METATILE_DISPLAY_WIDTH
+    //  mapPtr += METATILE_DISPLAY_WIDTH * map.HEIGHT
     //
     //  a = (verticalBuffer.cursorIndex + vBufferOffset) / 4 * 32 * 2
     //  a &= (32 - 1) * 32
@@ -380,11 +368,11 @@ macro _DrawHorizontalBuffer() {
     //      if y < 0:
     //          y = buffer.size / 2 - 4 bytes
     //
-    //      mapPtr--
+    //      mapPtr -= map.HEIGHT
 
     sta.b   _mapPtrRend
     clc
-    adc.w   #METATILE_DISPLAY_WIDTH
+    adc.w   #METATILE_DISPLAY_WIDTH * map.HEIGHT
     tax
 
     tya
@@ -405,10 +393,11 @@ macro _DrawHorizontalBuffer() {
     and.w   #127
     tay
 
+    txa
     Loop:
-        stx.b   _mapPtr
+        sta.b   _mapPtr
 
-        lda.w   0,x
+        lda     (_mapPtr)
         and.w   #0xff
         asl
         tax
@@ -433,9 +422,10 @@ macro _DrawHorizontalBuffer() {
             ldy.w   #horizontalBuffer.buffer.size / 2 - 4
         +
 
-        ldx.b   _mapPtr
-        dex
-        cpx.b   _mapPtrRend
+        lda.b   _mapPtr
+        sec
+        sbc.w   #map.HEIGHT
+        cmp.b   _mapPtrRend
         bcs     Loop
 
     Dma.MetaTiles.QueueHorizontalBuffer()
@@ -462,7 +452,7 @@ macro _DrawVerticalBuffer() {
     assertZeroPage(_mapPtrRend)
 
     //  mapPtrRend = mapPtr
-    //  mapPtr += map.bytesPerDisplayHeight
+    //  mapPtr += METATILE_DISPLAY_HEIGHT
     //
     //  a = (horizontalBuffer.cursorIndex + hBufferOffset) / 4 * 2
     //  a &= 32 * 2 - 1
@@ -483,11 +473,11 @@ macro _DrawVerticalBuffer() {
     //      if y < 0:
     //          y = buffer.size / 2 - 4 bytes
     //
-    //      mapPtr -= map.bytesPerRow
+    //      mapPtr--
 
     sta.b   _mapPtrRend
     clc
-    adc.w   map.bytesPerDisplayHeight
+    adc.w   #METATILE_DISPLAY_HEIGHT
     tax
 
     tya
@@ -510,10 +500,10 @@ macro _DrawVerticalBuffer() {
     and.w   #63
     tay
 
-    txa
     Loop:
-        sta.b   _mapPtr
-        lda     (_mapPtr)
+        stx.b   _mapPtr
+
+        lda.w   0,x
         and.w   #0xff
         asl
         tax
@@ -538,10 +528,9 @@ macro _DrawVerticalBuffer() {
             ldy.w   #verticalBuffer.buffer.size / 2 - 4
         +
 
-        lda.b   _mapPtr
-        sec
-        sbc.w   map.bytesPerRow
-        cmp.b   _mapPtrRend
+        ldx.b   _mapPtr
+        dex
+        cpx.b   _mapPtrRend
         bcs     Loop
 
     Dma.MetaTiles.QueueVerticalBuffer()
@@ -579,9 +568,9 @@ constant _mapPtrRend = utDpTmp2
     //      horizontalBuffer.cursorIndex &= horizontalBuffer.buffer.size / 2 - 1
     //
     //      verticalBuffer.cursorXpos += METATILE_SIZE_PX
-    //      visibleMapPtr++
+    //      visibleMapPtr += map.HEIGHT
     //
-    //      _DrawVerticalBuffer(visibleMapPtr + METATILE_DISPLAY_WIDTH,
+    //      _DrawVerticalBuffer(visibleMapPtr + METATILE_DISPLAY_WIDTH * map.HEIGHT,
     //                          METATILE_DISPLAY_WIDTH * METATILE_SIZE * 2)
     //
     //  else if xOffset < 0:
@@ -592,7 +581,7 @@ constant _mapPtrRend = utDpTmp2
     //      horizontalBuffer.cursorIndex &= horizontalBuffer.buffer.size / 2 - 1
     //
     //      verticalBuffer.cursorXpos -= METATILE_SIZE_PX
-    //      visibleMapPtr--
+    //      visibleMapPtr -= map.HEIGHT
     //
     //      _DrawVerticalBuffer(visibleMapPtr, 0)
 
@@ -624,10 +613,11 @@ constant _mapPtrRend = utDpTmp2
         sta.w   verticalBuffer.cursorXpos
 
         lda.w   visibleMapPtr
-        inc
+        clc
+        adc.w   #map.HEIGHT
         sta.w   visibleMapPtr
         clc
-        adc.w   #METATILE_DISPLAY_WIDTH
+        adc.w   #METATILE_DISPLAY_WIDTH * map.HEIGHT
 
         ldy.w   #METATILE_DISPLAY_WIDTH * METATILE_SIZE * 2
 
@@ -654,7 +644,8 @@ XOffsetNegative:
         sta.w   verticalBuffer.cursorXpos
 
         lda.w   visibleMapPtr
-        dec
+        sec
+        sbc.w   #map.HEIGHT
         sta.w   visibleMapPtr
 
         ldy.w   #0
@@ -676,9 +667,9 @@ SkipDrawVerticalBuffer:
     //      verticalBuffer.cursorIndex &= verticalBuffer.buffer.size / 2 - 1
     //
     //      horizontalBuffer.cursorYpos += METATILE_SIZE_PX
-    //      visibleMapPtr += map.bytesPerRow
+    //      visibleMapPtr++
     //
-    //      _DrawHorizontalBuffer(visibleMapPtr + map.bytesPerDisplayHeight,
+    //      _DrawHorizontalBuffer(visibleMapPtr + METATILE_DISPLAY_HEIGHT,
     //                            METATILE_DISPLAY_HEIGHT * METATILE_SIZE * 2)
     //
     //  else if yOffset < 0:
@@ -689,7 +680,7 @@ SkipDrawVerticalBuffer:
     //      verticalBuffer.cursorIndex &= verticalBuffer.buffer.size / 2 - 1
     //
     //      horizontalBuffer.cursorYpos -= METATILE_SIZE_PX
-    //      visibleMapPtr -= map.bytesPerRow
+    //      visibleMapPtr--
     //
     //      _DrawHorizontalBuffer(visibleMapPtr, 0)
 
@@ -721,11 +712,10 @@ SkipDrawVerticalBuffer:
         sta.w   horizontalBuffer.cursorYpos
 
         lda.w   visibleMapPtr
-        clc
-        adc.w   map.bytesPerRow
+        inc
         sta.w   visibleMapPtr
         clc
-        adc.w   map.bytesPerDisplayHeight
+        adc.w   #METATILE_DISPLAY_HEIGHT
 
         ldy.w   #METATILE_DISPLAY_HEIGHT * METATILE_SIZE * 2
 
@@ -752,8 +742,7 @@ YOffsetNegative:
         sta.w   horizontalBuffer.cursorYpos
 
         lda.w   visibleMapPtr
-        sec
-        sbc.w   map.bytesPerRow
+        dec
         sta.w   visibleMapPtr
 
         ldy.w   #0
@@ -814,16 +803,18 @@ allocateTmpWord(_tmp)
     // MUST NOT MODIFY Y
 
 
-    // test if cell is above/below visible display
+    // test if cell is left/right of the visible display
     //
     //  offset = cellIndex + map.data
     //  if offset < visibleMapPtr:
     //      return
     //  offset -= visibleMapPtr
-    //  if offset - map.bytesPerRow >= map.bytesPerDisplayHeight:
+    //  if offset > map.HEIGHT * METATILE_DISPLAY_WIDTH + METATILE_DISPLAY_HEIGHT
+    //      return
+    //  if offset & (map.HEIGHT - 1) > METATILE_DISPLAY_HEIGHT
     //      return
     //
-    //  RDDIV,RDMPY = offset / map.width
+    //  RDDIV,RDMPY = offset / map.HEIGHT
 
     txa
     clc
@@ -831,21 +822,22 @@ allocateTmpWord(_tmp)
     sec
     sbc.w   Render.visibleMapPtr
     bcc     Return
-    // c set
-    sbc.w   map.bytesPerRow
-    bcc     +
-        cmp.w   map.bytesPerDisplayHeight
-        bcs     Return
-    +
-    // c clear
-    adc.w   map.bytesPerRow
+    cmp.w   #map.HEIGHT * METATILE_DISPLAY_WIDTH + METATILE_DISPLAY_HEIGHT + 1
+    bcs     Return
 
     sta.l   WRDIV
 
+    // Test if cell is outside the display on the vertical axis
+    assertPowerOfTwo(map.HEIGHT)
+    and.w   #map.HEIGHT - 1
+    cmp.w   #METATILE_DISPLAY_HEIGHT + 1
+    bcs     Return
+
     sep     #$20
 a8()
-    lda.w   map.width
+    lda.b   #map.HEIGHT
     sta.l   WRDIVB
+
 
     // Get drawMapCellBuffer index and decrement Dma.transfersLeft
 
@@ -862,14 +854,6 @@ a8()
     +
     sta.w   Dma.transfersLeft
 
-
-    // Test if cell is outside the display on the horizontal axis
-    rep     #$30
-a16()
-    lda.l   RDMPY
-    cmp.w   #METATILE_DISPLAY_WIDTH + 1
-    bcs     Return
-
     // Exit with warning if drawMapCellBuffer is full
     cpx.w   #drawMapCellBuffer.BUFFER_SIZE * 2
     bcs     ReturnWithWarning
@@ -877,12 +861,12 @@ a16()
 
     // calculate Vram Word Address of map Cell
     //
-    //  tmp = (RDMPY * METATILE_SIZE * 2 + horizontalBuffer.cursorIndex) / 2
+    //  tmp = (RDDIV * METATILE_SIZE * 2 + horizontalBuffer.cursorIndex) / 2
     //  tmp &= (32 * 2 - 1)
     //  if tmp & 32:
     //      tmp += 32 * 32 - 32
     //
-    //  a = RDDIV * METATILE_SIZE * 2 + verticalBuffer.cursorIndex
+    //  a = RDMPY * METATILE_SIZE * 2 + verticalBuffer.cursorIndex
     //  a *= 32 / METATILE_SIZE
     //  a &= (32 - 1) * 32
     //
@@ -890,7 +874,9 @@ a16()
 
     assert(METATILE_SIZE == 2)
 
-    // a = RDMPY
+    rep     #$30
+a16()
+    lda.l   RDDIV
     asl
     asl
     // c clear
@@ -904,7 +890,7 @@ a16()
     +
     sta.w   _tmp
 
-    lda.l   RDDIV
+    lda.l   RDMPY
     asl
     asl
     // c clear

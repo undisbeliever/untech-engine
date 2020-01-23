@@ -207,6 +207,8 @@ constant _yOffsetHeightPair = MetaSprite.EntityHitbox._yPosHeightPair
 allocateTmpWord(_top)
 allocateTmpWord(_oldTileCollisionState)
 
+allocateTmpWord(_tileIndexTmp)
+
 allocateTmpWord(_counter)
 allocateTmpWord(_xTmp)
 
@@ -219,6 +221,8 @@ constant _TileCollisionType_FIRST_UP_SLOPE   = TileCollisionType.UP_RIGHT_SLOPE
 constant _TileCollisionType_LAST_UP_SLOPE    = TileCollisionType.UP_LEFT_SHORT_SLOPE
 constant _TileCollisionType_FIRST_DOWN_SLOPE = TileCollisionType.DOWN_RIGHT_SLOPE
 constant _TileCollisionType_LAST_DOWN_SLOPE  = TileCollisionType.DOWN_LEFT_SHORT_SLOPE
+
+constant MAP_HEIGHT = MetaTiles.map.HEIGHT
 
 
 //  X AXIS
@@ -237,26 +241,17 @@ i16()
     sta.w   _yOffsetHeightPair
 
     // _top = MS.TileHitbox[x].yOffset + entity.yPos.px
-    // RDMPY = (_top - map.TOP) / 16 * map.width
+    // _tileIndexTmp = (_top & Y_POSITION_MASK) / 16
     ora.w   #0xff00                 // yOffset is always a negative value
     clc
     adc.b   BaseEntity.yPos.px
     sta.w   _top
-    sec
-    sbc.w   #map.TOP
+    and.w   #Y_POSITION_MASK
     lsr
     lsr
     lsr
     lsr
-    sep     #$20
-a8()
-    xba
-    lda.w   map.width
-
-    rep     #$30
-a16()
-    sta.l   WRMPYA      // a = map.width, b = top / 16
-
+    sta.w   _tileIndexTmp
 
     lda.l   MetaSprite.Format.Frame.TileHitbox.left,x
     sta.w   _leftRightPair
@@ -276,18 +271,16 @@ MovingRight:
         // A = entity.xPos.px
 
         // _xTmp = entity.xPos.px + _leftRightPair.right
-        // Y = (_xTmp - map.LEFT) / 16 + RDMPY
+        // Y = (_xTmp & X_POSITION_MASK) / 16 * MAP_HEIGHT + _tileIndexTmp
         clc
         adc.w   _leftRightPair + 1          // Third byte of _leftRightPair is 0
         sta.w   _xTmp
-        sec
-        sbc.w   #map.LEFT
-        lsr
-        lsr
-        lsr
-        lsr
-        clc
-        adc.l   RDMPY
+        and.w   #X_POSITION_MASK
+        assert(MAP_HEIGHT / 16 == 4)
+        asl
+        asl
+        // carry clear
+        adc.w   _tileIndexTmp
         tay
 
         // Y = tile index for top-right of hitbox
@@ -323,27 +316,12 @@ MovingRight:
 
         sta.w   _counter
 
-        rep     #$30    // Transfer 16 bits in `tya`
-    i16()
-    a16()
-        tya
-    au()
-    iu()
         Loop:
-            // A = previous tile index
-            rep     #$31
-        i16()
-        a16()
-            // carry clear
-            adc.w   map.bytesPerRow
-            tay
-
-            ldx.w   map.data,y
-
-            sep     #$30
-        a8()
-        i8()
-            ldy.w   collisionMap,x
+            iny
+            lda.w   map.data,y
+            // Ah = 0
+            tax
+            lda.w   collisionMap,x
             assert(TileCollisionType.SOLID == 0)
             beq     Collision
 
@@ -400,7 +378,7 @@ MovingLeft:
         // A = entity.xPos.px
 
         // _xTmp = entity.xPos.px - _leftRightPair.left
-        // Y = (_xTmp - map.LEFT) / 16 + RDMPY
+        // Y = (_xTmp & X_POSITION_MASK) / 16 * MAP_HEIGHT + _tileIndexTmp
 
         lda.w   _leftRightPair
         and.w   #0x00ff
@@ -408,14 +386,12 @@ MovingLeft:
         sec
         adc.b   BaseEntity.xPos.px
         sta.w   _xTmp
-        sec
-        sbc.w   #map.LEFT
-        lsr
-        lsr
-        lsr
-        lsr
-        clc
-        adc.l   RDMPY
+        and.w   #X_POSITION_MASK
+        assert(MAP_HEIGHT / 16 == 4)
+        asl
+        asl
+        // carry clear
+        adc.w   _tileIndexTmp
         tay
 
         // Y = tile index for top-left of hitbox
@@ -451,28 +427,12 @@ MovingLeft:
 
         sta.w   _counter
 
-        rep     #$30    // Transfer 16 bits in `tya`
-    i16()
-    a16()
-        tya
-
-        au()
-        iu()
         Loop:
-            // A = previous tile index
-            rep     #$31
-        i16()
-        a16()
-            // carry clear
-            adc.w   map.bytesPerRow
-            tay
-
-            ldx.w   map.data,y
-
-            sep     #$30
-        a8()
-        i8()
-            ldy.w   collisionMap,x
+            iny
+            lda.w   map.data,y
+            // Ah = 0
+            tax
+            lda.w   collisionMap,x
             assert(TileCollisionType.SOLID == 0)
             beq     Collision
 
@@ -626,7 +586,6 @@ MovingDown:
         // Calculate tile index for bottom-center of tile hitbox
 
         // _bottom = _yOffsetHeightPair.yOffset + _yOffsetHeightPair.height + entity.yPos.px
-        // Y = (_bottom - map.TOP) / 16 * map.width + (entity.xPos.px - map.LEFT) / 16
         lda.w   _yOffsetHeightPair
         ora.w   #0xff00                 // yOffset is always negative value
         clc
@@ -634,29 +593,24 @@ MovingDown:
         clc
         adc.b   BaseEntity.yPos.px
         sta.w   _bottom
-        sec
-        sbc.w   #map.TOP
-        lsr
-        lsr
-        lsr
-        lsr
-        sep     #$20
-    a8()
-        sta.l   WRMPYB  // WRMPYA set in X axis test
 
-        rep     #$31
-    a16()
+        // Y = (_bottom & Y_POSITION_MASK) / 16 + ((entity.xPos.px & X_POSITION_MASK) / 16 * MAP_HEIGHT)
+        and.w   #Y_POSITION_MASK
+        lsr
+        lsr
+        lsr
+        lsr
+        sta.w   _tileIndexTmp
 
         lda.b   BaseEntity.xPos.px
+        and.w   #X_POSITION_MASK
+        assert(MAP_HEIGHT / 16 == 4)
+        asl
+        asl
         // carry clear
-        sbc.w   #map.LEFT - 1
-        lsr
-        lsr
-        lsr
-        lsr
-        clc
-        adc.l   RDMPY
+        adc.w   _tileIndexTmp
         tay
+
         // Y = entity bottom-center map tile
 
         // set Ah to 0 for the `tax`s below
@@ -816,7 +770,7 @@ MovingDown:
             cmp.b   #-METATILE_SIZE_PX
             bcs     OnlyOneTileOnLeft
                 // Two tiles on left
-                lda.w   map.data - 2,y
+                lda.w   map.data - 2 * MAP_HEIGHT,y
                 tax
                 lda.w   collisionMap,x
                 assert(TileCollisionType.SOLID == 0)
@@ -827,7 +781,7 @@ MovingDown:
                 +
 
         OnlyOneTileOnLeft:
-            lda.w   map.data - 1,y
+            lda.w   map.data - 1 * MAP_HEIGHT,y
             tax
             lda.w   collisionMap,x
             assert(TileCollisionType.SOLID == 0)
@@ -849,7 +803,7 @@ MovingDown:
             cmp.b   #32 + 2
             bcc     OnlyOneTileOnRight
                 // two tiles on right
-                lda.w   map.data + 2,y
+                lda.w   map.data + 2 * MAP_HEIGHT,y
                 tax
                 lda.w   collisionMap,x
                 assert(TileCollisionType.SOLID == 0)
@@ -860,7 +814,7 @@ MovingDown:
                 +
 
         OnlyOneTileOnRight:
-            lda.w   map.data + 1,y
+            lda.w   map.data + 1 * MAP_HEIGHT,y
             tax
             lda.w   collisionMap,x
             assert(TileCollisionType.SOLID == 0)
@@ -925,18 +879,14 @@ MovingDown:
         rts
 
 
-
+    a8()
     i16()
     NoBottomCollision:
         // No Collision on the bottom.
         // Test for a SOLID/END_SLOPE/UP_*_SLOPE collision with the top-center tile
 
-        // Y = entity bottom-center map tile
-        // MUST NOT MODIFY Y
-
         // Calculate tile index for top-center tile
         // _top = _yPosHeightPair.yPos + entity.yPos.px
-        // X = (_top - map.TOP) / 16 * map.width + (entity.xPos.px - map.LEFT) / 16
         rep     #$31
     a16()
         lda.w   _yOffsetHeightPair
@@ -944,37 +894,32 @@ MovingDown:
         // carry clear
         adc.b   BaseEntity.yPos.px
         sta.w   _top                    // required for `MovingUp.Collision`
-        sec
-        sbc.w   #map.TOP
-        lsr
-        lsr
-        lsr
-        lsr
-        sep     #$20
-    a8()
-        sta.l   WRMPYB  // WRMPYA set in X axis test
 
-        rep     #$31
-    a16()
+        // Y = (_top & Y_POSITION_MASK) / 16 + ((entity.xPos.px & X_POSITION_MASK) / 16 * MAP_HEIGHT)
+        and.w   #Y_POSITION_MASK
+        lsr
+        lsr
+        lsr
+        lsr
+        sta.w   _tileIndexTmp
 
         lda.b   BaseEntity.xPos.px
+        and.w   #X_POSITION_MASK
+        assert(MAP_HEIGHT / 16 == 4)
+        asl
+        asl
         // carry clear
-        sbc.w   #map.LEFT - 1
-        lsr
-        lsr
-        lsr
-        lsr
-        clc
-        adc.l   RDMPY
-        tax
-        // X = entity top-center map tile
+        adc.w   _tileIndexTmp
+        tay
 
         // set Ah to 0 for the `tax`s below
         lda.w   #0
 
+
+        // Test bottom-center tile
         sep     #$20
     a8()
-        lda.w   map.data,x
+        lda.w   map.data,y
         tax
         lda.w   collisionMap,x
 
@@ -1057,7 +1002,6 @@ MovingDown_Standing:
         // Calculate tile index for bottom-center of tile hitbox
 
         // _bottom = _yOffsetHeightPair.yOffset + _yOffsetHeightPair.height + entity.yPos.px
-        // Y = (_bottom - map.TOP) / 16 * map.width + (entity.xPos.px - map.LEFT) / 16
         lda.w   _yOffsetHeightPair
         ora.w   #0xff00                 // yOffset is always negative value
         clc
@@ -1065,28 +1009,24 @@ MovingDown_Standing:
         clc
         adc.b   BaseEntity.yPos.px
         sta.w   _bottom
-        sec
-        sbc.w   #map.TOP
-        lsr
-        lsr
-        lsr
-        lsr
-        sep     #$21    // also set carry
-    a8()
-        sta.l   WRMPYB  // WRMPYA set in X axis test
 
-        rep     #$30
-    a16()
+        // Y = (_bottom & Y_POSITION_MASK) / 16 + ((entity.xPos.px & X_POSITION_MASK) / 16 * MAP_HEIGHT)
+        and.w   #Y_POSITION_MASK
+        lsr
+        lsr
+        lsr
+        lsr
+        sta.w   _tileIndexTmp
+
         lda.b   BaseEntity.xPos.px
-        // carry set
-        sbc.w   #map.LEFT
-        lsr
-        lsr
-        lsr
-        lsr
-        clc
-        adc.l   RDMPY
+        and.w   #X_POSITION_MASK
+        assert(MAP_HEIGHT / 16 == 4)
+        asl
+        asl
+        // carry clear
+        adc.w   _tileIndexTmp
         tay
+
         // Y = entity bottom-center map tile
 
         // set Ah to 0 for the `tax`s below
@@ -1116,19 +1056,10 @@ MovingDown_Standing:
 
         // Test tile below bottom-center
 
-        // Y -= map.bytesPerRow
-        rep     #$31
-    a16()
-        tya
-        // carry clear
-        adc.w   map.bytesPerRow
-        tay
+        // Advance to tile below bottom-center
+        // (using INY so routine returns tile below bottom-center if collision occurs)
+        iny
 
-        // set Ah to 0 for the `tax`s below
-        lda.w   #0
-
-        sep     #$20
-    a8()
         lda.w   map.data,y
         tax
         lda.w   collisionMap,x
@@ -1173,7 +1104,7 @@ MovingDown_Standing:
             cmp.b   #-METATILE_SIZE_PX
             bcs     OnlyOneTileOnLeft
                 // two tiles on left
-                lda.w   map.data - 2,y
+                lda.w   map.data - 2 * MAP_HEIGHT,y
                 tax
                 lda.w   collisionMap,x
                 assert(TileCollisionType.SOLID == 0)
@@ -1182,7 +1113,7 @@ MovingDown_Standing:
                 beq     {SolidCollisionLabel}
 
         OnlyOneTileOnLeft:
-            lda.w   map.data - 1,y
+            lda.w   map.data - 1 * MAP_HEIGHT,y
             tax
             lda.w   collisionMap,x
             assert(TileCollisionType.SOLID == 0)
@@ -1203,7 +1134,7 @@ MovingDown_Standing:
             cmp.b   #32 + 2
             bcc     OnlyOneTileOnRight
                 // two tiles on right
-                lda.w   map.data + 2,y
+                lda.w   map.data + 2 * MAP_HEIGHT,y
                 tax
                 lda.w   collisionMap,x
                 assert(TileCollisionType.SOLID == 0)
@@ -1212,7 +1143,7 @@ MovingDown_Standing:
                 beq     {SolidCollisionLabel}
 
         OnlyOneTileOnRight:
-            lda.w   map.data + 1,y
+            lda.w   map.data + 1 * MAP_HEIGHT,y
             tax
             lda.w   collisionMap,x
             assert(TileCollisionType.SOLID == 0)
@@ -1372,35 +1303,29 @@ MovingUp:
         // Calculate tile index for top-center of tile hitbox
 
         // _top = _yPosHeightPair.yPos + entity.yPos.px
-        // Y = (_top - map.TOP) / 16 * map.width + (entity.xPos.px - map.LEFT) / 16
         lda.w   _yOffsetHeightPair
         ora.w   #0xff00                 // yOffset is always negative value
         clc
         adc.b   BaseEntity.yPos.px
         sta.w   _top
-        sec
-        sbc.w   #map.TOP
-        lsr
-        lsr
-        lsr
-        lsr
-        sep     #$20
-    a8()
-        sta.l   WRMPYB  // WRMPYA set in X axis test
 
-        rep     #$31
-    a16()
+        // Y = (_top & Y_POSITION_MASK) / 16 + ((entity.xPos.px & X_POSITION_MASK) / 16 * MAP_HEIGHT)
+        and.w   #Y_POSITION_MASK
+        lsr
+        lsr
+        lsr
+        lsr
+        sta.w   _tileIndexTmp
 
         lda.b   BaseEntity.xPos.px
+        and.w   #X_POSITION_MASK
+        assert(MAP_HEIGHT / 16 == 4)
+        asl
+        asl
         // carry clear
-        sbc.w   #map.LEFT - 1
-        lsr
-        lsr
-        lsr
-        lsr
-        clc
-        adc.l   RDMPY
+        adc.w   _tileIndexTmp
         tay
+
         // Y = entity top-center map tile
 
         // set Ah to 0 for the `tax`s below
@@ -1573,18 +1498,14 @@ MovingUp:
         rts
 
 
+    a8()
     i16()
     NoTopCollision:
         // No Collision on the top.
         // Test for SOLID/END_SLOPE/DOWN_*SLOPE collision with the bottom-center tile
 
-        // Y = entity top-center map tile
-        // MUST NOT MODIFY Y
-
         // Calculate tile index for bottom-center tile
         // _bottom = _yOffsetHeightPair.yOffset + _yOffsetHeightPair.height + entity.yPos.px
-        // X = (_bottom - map.TOP) / 16 * map.width + (entity.xPos.px - map.LEFT) / 16
-
         rep     #$31
     a16()
         lda.w   _yOffsetHeightPair
@@ -1594,34 +1515,31 @@ MovingUp:
         clc
         adc.b   BaseEntity.yPos.px
         sta.w   _bottom                 // Required for `MovingDown.Collision`
-        sec
-        sbc.w   #map.TOP
-        lsr
-        lsr
-        lsr
-        lsr
-        sep     #$20
-    a8()
-        sta.l   WRMPYB  // WRMPYA set in X axis test
 
-        rep     #$31
-    a16()
+        // Y = (_bottom & Y_POSITION_MASK) / 16 + ((entity.xPos.px & X_POSITION_MASK) / 16 * MAP_HEIGHT)
+        and.w   #Y_POSITION_MASK
+        lsr
+        lsr
+        lsr
+        lsr
+        sta.w   _tileIndexTmp
 
         lda.b   BaseEntity.xPos.px
+        and.w   #X_POSITION_MASK
+        assert(MAP_HEIGHT / 16 == 4)
+        asl
+        asl
         // carry clear
-        sbc.w   #map.LEFT - 1
-        lsr
-        lsr
-        lsr
-        lsr
-        clc
-        adc.l   RDMPY
+        adc.w   _tileIndexTmp
         tay
+
         // Y = entity bottom-center map tile
 
         // set Ah to 0 for the `tax`s below
         lda.w   #0
 
+
+        // Test top-center tile
         sep     #$20
     a8()
         lda.w   map.data,y
@@ -1672,20 +1590,18 @@ MovingUp_Standing:
 
 
         // Calculate tile index for bottom-center of tile hitbox
-        // _top and RDMPY already set in X-axis test
+        // _top and _tileIndexTmp are already set in X-axis test
 
-        // Y = (entity.xPos.px - map.LEFT) / 16 + RDMPY
-        clc
+        // Y = ((entity.xPos.px & X_POSITION_MASK) / 16 * MAP_HEIGHT) + _tileIndexTmp
         lda.b   BaseEntity.xPos.px
-        sec
-        sbc.w   #map.LEFT
-        lsr
-        lsr
-        lsr
-        lsr
-        clc
-        adc.l   RDMPY
+        and.w   #X_POSITION_MASK
+        assert(MAP_HEIGHT / 16 == 4)
+        asl
+        asl
+        // carry clear
+        adc.w   _tileIndexTmp
         tay
+
         // Y = entity top-center map tile
 
         // set Ah to 0 for the `tax`s below
@@ -1715,19 +1631,10 @@ MovingUp_Standing:
 
         // Test tile above top-center
 
-        // Y += map.bytesPerRow
-        rep     #$30
-    a16()
-        tya
-        sec
-        sbc.w   map.bytesPerRow
-        tay
+        // Advance to tile above top-center
+        // (using INY so routine returns tile above top-center if collision occurs)
+        dey
 
-        // set Ah to 0 for the `tax`s below
-        lda.w   #0
-
-        sep     #$20
-    a8()
         lda.w   map.data,y
         tax
         lda.w   collisionMap,x
