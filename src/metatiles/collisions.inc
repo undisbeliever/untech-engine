@@ -265,6 +265,9 @@ NoHitbox:
 // NOTE: If the entity's MetaSprite frame has no tile hitbox then the entity
 //       will not be moved.
 //
+// NOTE: This routine will apply gravity to the entity's `yMomentum` if the
+//       entity's `NO_GRAVITY_FLAG` movementState flag is clear.
+//
 // NOTE: Collision testing is only preformed in the direction of movement.
 //       For instance, if the entity is moving right then a left collision test
 //       is not preformed.

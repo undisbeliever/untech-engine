@@ -195,6 +195,9 @@ namespace __Y_Axis {
 //
 // NOTE: The entity's standing flag is ignored by this routine.
 //
+// NOTE: This routine will apply gravity to the entity's `yMomentum` if the
+//       entity's `NO_GRAVITY_FLAG` movementState flag is clear.
+//
 // REQUIRES: 16 bit A, 16 bit Index, DB = 0x7e
 // INPUT:    dp = entity
 a16()

@@ -27,11 +27,10 @@ define GetProjectileId(pName) = Project.ProjectileIds.{pName}
 
 // Moves the entity (using the entity's movementState and momentum).
 //
-// ASSUMES: The entity is inside the map boundary.
-//
-// NOTE: This macro MUST ONLY be invoked in the entity's Process routine.
-//
 // NOTE: The entity's standing flag is ignored by this routine.
+//
+// NOTE: This routine will apply gravity to the entity's `yMomentum` if the
+//       entity's `NO_GRAVITY_FLAG` movementState flag is clear.
 //
 // REQUITES: 16 bit A, 16 bit Index, DB = 0x7e
 //
@@ -55,6 +54,9 @@ macro MoveEntity() {
 //
 // NOTE: If the entity's MetaSprite frame has no tile hitbox then the entity
 //       will not be moved.
+//
+// NOTE: This routine will apply gravity to the entity's `yMomentum` if the
+//       entity's `NO_GRAVITY_FLAG` movementState flag is clear.
 //
 // REQUITES: 16 bit A, 16 bit Index, DB = 0x7e
 //
