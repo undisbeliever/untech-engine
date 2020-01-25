@@ -59,8 +59,8 @@ macro MoveEntity() {
 // REQUITES: 16 bit A, 16 bit Index, DB = 0x7e
 //
 // INPUT: dp = entity
-// OUTPUT: Y = The tilemap index directly above/below the entity (depending on Y direction of movement),
-//             Set to 0 if there is no tile hitbox.
+// OUTPUT: carry set if collision occurred in Y-Axis
+//         Y = The tile index of the tile that collided in the Y-Axis (if carry set).
 macro MoveEntityAndProcessTileCollisions() {
     assert16a()
     assert16i()

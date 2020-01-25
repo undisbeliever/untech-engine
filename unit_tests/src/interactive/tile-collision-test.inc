@@ -16,7 +16,8 @@ namespace TileCollisionTestPlayer {
     namespace EntityStruct {
     childstruct(BaseEntity)
         field(currentFrame, 2)
-        field(gravityIndex, 1)
+        field(tcReturnCarry, 1)
+        field(tcReturnY, 2)
     endstruct()
     }
 
@@ -31,8 +32,6 @@ namespace TileCollisionTestPlayer {
     i16()
     code()
     function Init {
-        stz.b   EntityStruct.gravityIndex
-
         lda.w   #0
         sta.b   EntityStruct.currentFrame
         SetFrame_A()
@@ -177,10 +176,19 @@ namespace TileCollisionTestPlayer {
     a16()
 
         MoveEntityAndProcessTileCollisions()
+        sty.b   EntityStruct.tcReturnY
+        sep     #$20
+    a8()
+        // Carry set/clear from MoveEntityAndProcessTileCollisions call
+        lda.b   #0
+        adc.b   #0
+        sta.b   EntityStruct.tcReturnCarry
 
+        rep     #$31
+    a16()
         // Move camera to center of object
         lda.b   EntityStruct.xPos.px
-        clc
+        // Carry clear
         adc.w   #Camera.DISPLAY_WIDTH / 2
         cmp.w   MetaTiles.map.right
         bcc     +
@@ -371,11 +379,25 @@ a16()
 
         sep     #$20
     a8()
-        Text.Console.SetCursor(24, 2)
+        Text.Console.SetCursor(25, 2)
 
         ldx.w   _entity
         lda.b   BaseEntity.movementState,x
         jsr     Text.Console.PrintHex8A
+
+        Text.Console.SetCursor(21, 3)
+        ldx.w   _entity
+        lda.b   Entities.TileCollisionTestPlayer.EntityStruct.tcReturnCarry,x
+        beq     +
+            Text.Console.PrintConstString("C ")
+            bra     ++
+        +
+            Text.Console.PrintConstString("  ")
+        +
+
+        ldx.w   _entity
+        ldy.b   Entities.TileCollisionTestPlayer.EntityStruct.tcReturnY,x
+        jsr     Text.Console.PrintHex16Y
 
         rep     #$20
     a16()

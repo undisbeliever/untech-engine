@@ -158,9 +158,84 @@ inline _CheckIfStanding_Top() {
 EndIf{#}:
 }
 
-namespace _CheckIfStanding {
-    constant MovingDown = 1
-    constant MovingUp = 2
+
+// Generate code to adjust tileIndex left/right and then goto `{CollisionLabel}
+//
+// PARAM: CollisionLabel - the label to create the left/right
+// PARAM: no_fallthrough - if zero then this macro is above `{CollisionLabel}`
+//                         and the final `bra {CollisionLabel}` will not be emitted.
+//                         A {CollisionLabel}_OneRight_FallThrough` label will be generated instead.
+//
+// REQUIRES: 8 bit A, 16 bit Index, DB = 0x7e
+// REQUIRES: Ah = 0
+// INPUT: Y = tileIndex
+// OUTPUT: Y = tileIndex
+// BRANCH: to {CollisionLabel}
+inline __AdjustTileIndexAndGoto(CollisionLabel, evaluate no_fallthrough) {
+    assert8a()
+    assert16i()
+
+    {CollisionLabel}_TwoLeft:
+        rep     #$31
+    a16()
+        // carry clear
+        tya
+        adc.w   #-2 * MAP_HEIGHT
+        tay
+        lda.w   #0  // Set Ah to 0
+        sep     #$20
+    a8()
+        bra     {CollisionLabel}
+
+
+    {CollisionLabel}_OneLeft:
+        rep     #$31
+    a16()
+        // carry clear
+        tya
+        adc.w   #-1 * MAP_HEIGHT
+        tay
+        lda.w   #0  // Set Ah to 0
+        sep     #$20
+    a8()
+        bra     {CollisionLabel}
+
+
+    {CollisionLabel}_TwoRight:
+        rep     #$31
+    a16()
+        // carry clear
+        tya
+        adc.w   #2 * MAP_HEIGHT
+        tay
+        lda.w   #0  // Set Ah to 0
+        sep     #$20
+    a8()
+        bra     {CollisionLabel}
+
+
+    {CollisionLabel}_OneRight:
+        rep     #$31
+    a16()
+        // carry clear
+        tya
+        adc.w   #1 * MAP_HEIGHT
+        tay
+        lda.w   #0  // Set Ah to 0
+        sep     #$20
+    a8()
+
+    if {no_fallthrough} {
+        bra     {CollisionLabel}
+    } else {
+{CollisionLabel}_OneRight_FallThrough:
+    }
+}
+inline _AdjustTileIndexAndGoto(CollisionLabel) {
+    __AdjustTileIndexAndGoto({CollisionLabel}, 1)
+}
+inline _AdjustTileIndexAndGoto_FallThrough(CollisionLabel) {
+    __AdjustTileIndexAndGoto({CollisionLabel}, 0)
 }
 
 
@@ -168,6 +243,8 @@ namespace _CheckIfStanding {
 a16()
 i16()
 NoHitbox:
+    ldy.w   #0
+    clc
     rts
 }
 
@@ -199,8 +276,8 @@ NoHitbox:
 //
 // REQUIRES: 16 bit A, 16 bit Index, DB = 0x7e
 // INPUT: dp = entity
-// OUTPUT: Y = The tilemap index directly above/below the entity (depending on Y direction of movement),
-//             Set to 0 if there is no tile hitbox.
+// OUTPUT: carry set if collision occurred in Y-Axis
+//         Y = The tile index of the tile that collided in the Y-Axis (if carry set).
 //
 // This code assumes:
 //   * This routine is called once per frame.
@@ -726,6 +803,7 @@ MovingDown:
         sta.b   BaseEntity.yPos.px
         stz.b   BaseEntity.yPos.sx
 
+        sec
         rts
 
 
@@ -740,9 +818,12 @@ MovingDown:
 
         lda.w   _bottom
         and.b   #0xf
-        beq     SolidCollision
+        beq     +
         cmp.w   _yDelta
-        bcc     SolidCollision
+        bcs     ++
+        +
+            jmp SolidCollision
+        +
 
 
     a8()
@@ -760,8 +841,11 @@ MovingDown:
         // BRANCH to `SolidCollisionLabel` if the test hits is a SOLID tile
         // BRANCH to `NoCollisionLabel` if the test does not find a SOLID or {platform} tile.
         // NO BRANCH if the test touches a {platform} tile and does not hit a SOLID tile
+        // OUTPUT: X = (If on platform tile, no branch) - tileIndex offset within `LeftRightPlatformTileOffsetTable`
         assert8a()
         assert16i()
+
+        evaluate MAP_HEIGHT = MAP_HEIGHT
 
         // _edgeOnPlatform = 0
         // for each left/right tile:
@@ -769,7 +853,7 @@ MovingDown:
         //      if a == PlatformIndex.SOLID:
         //          goto {SolidCollisionLabel}
         //      if a == {platform}:
-        //          _edgeOnPlatform = {platform}
+        //          _edgeOnPlatform = LeftRightPlatformTileOffsetTable.{offset}_{MAP_HEIGHT}
         //
         // if _edgeOnPlatform == 0:
         //      goto {NoCollisionLabel}
@@ -791,9 +875,10 @@ MovingDown:
                 tax
                 lda.w   collisionMap,x
                 assert(TileCollisionType.SOLID == 0)
-                beq     {SolidCollisionLabel}
+                beq     {SolidCollisionLabel}_TwoLeft
                 cmp.b   #TileCollisionType.{platform}
                 bne     +
+                    lda.b   #LeftRightPlatformTileOffsetTable.TWO_LEFT_{MAP_HEIGHT}
                     sta.w   _edgeOnPlatform
                 +
 
@@ -802,9 +887,10 @@ MovingDown:
             tax
             lda.w   collisionMap,x
             assert(TileCollisionType.SOLID == 0)
-            beq     {SolidCollisionLabel}
+            beq     {SolidCollisionLabel}_OneLeft
             cmp.b   #TileCollisionType.{platform}
             bne     +
+                lda.b   #LeftRightPlatformTileOffsetTable.ONE_LEFT_{MAP_HEIGHT}
                 sta.w   _edgeOnPlatform
             +
             sec
@@ -824,9 +910,10 @@ MovingDown:
                 tax
                 lda.w   collisionMap,x
                 assert(TileCollisionType.SOLID == 0)
-                beq     {SolidCollisionLabel}
+                beq     {SolidCollisionLabel}_TwoRight
                 cmp.b   #TileCollisionType.{platform}
                 bne     +
+                    lda.b   #LeftRightPlatformTileOffsetTable.TWO_RIGHT_{MAP_HEIGHT}
                     sta.w   _edgeOnPlatform
                 +
 
@@ -835,30 +922,61 @@ MovingDown:
             tax
             lda.w   collisionMap,x
             assert(TileCollisionType.SOLID == 0)
-            beq     {SolidCollisionLabel}
+            beq     {SolidCollisionLabel}_OneRight
             cmp.b   #TileCollisionType.{platform}
-            beq     OnPlatformTile
+            bne     +
+                lda.b   #LeftRightPlatformTileOffsetTable.ONE_RIGHT_{MAP_HEIGHT}
+                bra     LeftRightTouchingPlatform
+
+                _AdjustTileIndexAndGoto({SolidCollisionLabel})
+            +
 
     NoTilesOnRight:
         assert(TileCollisionType.{platform} != 0)
         lda.w   _edgeOnPlatform
         beq     {NoCollisionLabel}
 
+        // Touching a left/right platform tile
+    LeftRightTouchingPlatform:
+        tax     // Ah = 0
+
     OnPlatformTile:
     }
-        TestLeftRightTiles(UP_PLATFORM, SolidCollision, NoBottomCollision)
+    TestLeftRightTiles(UP_PLATFORM, SolidCollision, NoBottomCollision)
 
             // bottom left/right is touching a UP_PLATFORM tile
 
-            // if entity was above the UP_PLATFORM in the previous frame:
-            //      goto SolidCollision
-            // else:
+            // X = index within LeftRightPlatformTileOffsetTable
+
+            // if entity was not above the UP_PLATFORM in the previous frame:
             //      goto NoBottomCollision
             lda.w   _bottom
             and.b   #0xf
-            beq     SolidCollision
+            beq     +
             cmp.w   _yDelta
             bcs     NoBottomCollision
+        +
+
+            // Entity is standing on the platform
+
+            // Adjust tileIndex (Y) so it points to the platform tile
+            //
+            // (using indexed long to retrieve tile offsets is just as fast as storing
+            //  the offset in _edgeOnPlatform, but is 1 cycle faster in the no-collision case)
+
+            // X = LeftRightPlatformTileOffsetTable index
+            rep     #$31
+        a16()
+            // carry clear
+            tya
+            adc.l   LeftRightPlatformTileOffsetTable,x
+            tay
+
+            // Set Ah to 0
+            lda.w   #0
+
+            sep     #$20
+        a8()
 
     a8()
     i16()
@@ -893,6 +1011,7 @@ MovingDown:
         sta.b   BaseEntity.yPos.px
         stz.b   BaseEntity.yPos.sx
 
+        sec
         rts
 
 
@@ -959,12 +1078,83 @@ MovingDown:
                 jmp     MovingUp.Collision
         +
 
-        rep     #$30
+        rep     #$31
     a16()
-        // Y = entity bottom-center map tile
+        // Y = entity top-center map tile
+        // carry clear
         rts
     }
 
+
+    namespace MovingDown_Standing {
+    // ::SPAGHETTI Have to put BottomCenterIsDownCollidable here to prevent a "branch out of bounds" assembly error::
+    a8()
+    i16()
+    BottomCenterIsDownCollidable:
+        // bottom-center is down-collideable
+        //
+        // Ah = 0
+        // X = collisionMap index
+        // Y = tile index of bottom-center of hitbox
+        lda.b   BaseEntity.xPos.px
+        and.b   #0x0f
+        ora.w   collisionMap,x
+        tax
+        jmp     MovingDown.Collision
+
+
+    // ::SPAGHETTI Moved TileBelowCenterIsDownCollidable here so it is below BottomCenterIsDownCollidable::
+    a8()
+    i16()
+    TileBelowCenterIsDownCollidable:
+        // Tile below the entity is a down-collision.
+        //
+        // Ah = 0
+        // X = collisionMap Index
+        // Y = tile index of tile below the bottom-center of hitbox
+        // MUST NOT MODIFY Y
+        //
+        // NOTE: If I modify this code, also modify code in `MovingDown.Collision`
+
+        lda.b   BaseEntity.xPos.px
+        and.b   #0xf
+        ora.w   collisionMap,x
+        tax
+        // X = TopHeightTable index
+
+        // Move entity to one pixel above the tile's TopHeightTable value
+        //
+        // _bottomOffset = _yOffsetHeightPair.height + _yPosHeightPair.yOffset
+        // BaseEntity.yPos.px = (((_bottom + METATILE_SIZE_PX) & 0xfff0) | TopHeightTable[x]) - _bottomOffset - 1
+        lda.w   _yOffsetHeightPair + 1
+        clc
+        adc.w   _yOffsetHeightPair
+
+        rep     #$31
+    a16()
+        // Ah 0
+        sta.w   _bottomOffset
+
+
+        lda.w   _bottom
+        // carry clear
+        adc.w   #METATILE_SIZE_PX   // Move entity one tile below _bottom
+        and.w   #0xfff0
+
+        sep     #$20
+    a8()
+        ora.l   TopHeightTable,x
+
+        rep     #$21
+    a16()
+        // carry clear (-1 to place entity above solid tiles)
+        sbc.w   _bottomOffset
+        sta.b   BaseEntity.yPos.px
+        stz.b   BaseEntity.yPos.sx
+
+        sec
+        rts
+    }
 
 a16()
 i16()
@@ -1082,7 +1272,7 @@ MovingDown_Standing:
         // for each left/right tile:
         //      a = collisionMap[map.data[y + offset]]
         //      if a == SOLID or a == {platform}:
-        //          goto {SolidCollisionLabel}
+        //          goto {SolidCollisionLabel}_{offset}
 
         lda.b   BaseEntity.xPos.px
         and.b   #0x0f
@@ -1097,18 +1287,18 @@ MovingDown_Standing:
                 tax
                 lda.w   collisionMap,x
                 assert(TileCollisionType.SOLID == 0)
-                beq     {SolidCollisionLabel}
+                beq     {SolidCollisionLabel}_TwoLeft
                 cmp.b   #TileCollisionType.{platform}
-                beq     {SolidCollisionLabel}
+                beq     {SolidCollisionLabel}_TwoLeft
 
         OnlyOneTileOnLeft:
             lda.w   map.data - 1 * MAP_HEIGHT,y
             tax
             lda.w   collisionMap,x
             assert(TileCollisionType.SOLID == 0)
-            beq     {SolidCollisionLabel}
+            beq     {SolidCollisionLabel}_OneLeft
             cmp.b   #TileCollisionType.{platform}
-            beq     {SolidCollisionLabel}
+            beq     {SolidCollisionLabel}_OneLeft
 
             sec
 
@@ -1127,18 +1317,19 @@ MovingDown_Standing:
                 tax
                 lda.w   collisionMap,x
                 assert(TileCollisionType.SOLID == 0)
-                beq     {SolidCollisionLabel}
+                beq     {SolidCollisionLabel}_TwoRight
                 cmp.b   #TileCollisionType.{platform}
-                beq     {SolidCollisionLabel}
+                beq     {SolidCollisionLabel}_TwoRight
 
         OnlyOneTileOnRight:
             lda.w   map.data + 1 * MAP_HEIGHT,y
             tax
             lda.w   collisionMap,x
             assert(TileCollisionType.SOLID == 0)
-            beq     {SolidCollisionLabel}
+            beq     {SolidCollisionLabel}_OneRight
             cmp.b   #TileCollisionType.{platform}
-            beq     {SolidCollisionLabel}
+            beq     {SolidCollisionLabel}_OneRight
+
     NoTilesOnRight:
     }
         TestLeftRightTiles(UP_PLATFORM, SolidCollisionBelow)
@@ -1153,83 +1344,24 @@ MovingDown_Standing:
         // Reset Y momentum
         stz.b   BaseEntity.yMomentum.px
 
-        rep     #$30
+        rep     #$31
     a16()
         stz.b   BaseEntity.yMomentum.sx
 
         // Y = tile index of tile below the bottom-center of hitbox
-        rts
-
-
-    a8()
-    i16()
-    BottomCenterIsDownCollidable:
-        // bottom-center is down-collideable
-        //
-        // Ah = 0
-        // X = collisionMap index
-        // Y = tile index of bottom-center of hitbox
-        lda.b   BaseEntity.xPos.px
-        and.b   #0x0f
-        ora.w   collisionMap,x
-        tax
-        jmp     MovingDown.Collision
-
-
-    a8()
-    i16()
-    TileBelowCenterIsDownCollidable:
-        // Tile below the entity is a down-collision.
-        //
-        // Ah = 0
-        // X = collisionMap Index
-        // Y = tile index of tile below the bottom-center of hitbox
-        // MUST NOT MODIFY Y
-        //
-        // NOTE: If I modify this code, also modify code in `MovingDown.Collision`
-
-        lda.b   BaseEntity.xPos.px
-        and.b   #0xf
-        ora.w   collisionMap,x
-        tax
-        // X = TopHeightTable index
-
-        // Move entity to one pixel above the tile's TopHeightTable value
-        //
-        // _bottomOffset = _yOffsetHeightPair.height + _yPosHeightPair.yOffset
-        // BaseEntity.yPos.px = (((_bottom + METATILE_SIZE_PX) & 0xfff0) | TopHeightTable[x]) - _bottomOffset - 1
-        lda.w   _yOffsetHeightPair + 1
-        clc
-        adc.w   _yOffsetHeightPair
-
-        rep     #$31
-    a16()
-        // Ah 0
-        sta.w   _bottomOffset
-
-
-        lda.w   _bottom
         // carry clear
-        adc.w   #METATILE_SIZE_PX   // Move entity one tile below _bottom
-        and.w   #0xfff0
-
-        sep     #$20
-    a8()
-        ora.l   TopHeightTable,x
-
-        rep     #$21
-    a16()
-        // carry clear (-1 to place entity above solid tiles)
-        sbc.w   _bottomOffset
-        sta.b   BaseEntity.yPos.px
-        stz.b   BaseEntity.yPos.sx
-
         rts
 
+
+    a8()
+    i16()
+    _AdjustTileIndexAndGoto_FallThrough(SolidCollisionBelow)
 
     a8()
     i16()
     SolidCollisionBelow:
+        assert(pc() == SolidCollisionBelow_OneRight_FallThrough)
+
         // Entity collided with a SOLID or UP_PLATFORM tile.
         //
         // Ah = 0
@@ -1261,6 +1393,7 @@ MovingDown_Standing:
         sta.b   BaseEntity.yPos.px
         stz.b   BaseEntity.yPos.sx
 
+        sec
         rts
     }
 
@@ -1398,6 +1531,7 @@ MovingUp:
         sta.b   BaseEntity.yPos.px
         stz.b   BaseEntity.yPos.sx
 
+        sec
         rts
 
 
@@ -1416,7 +1550,9 @@ MovingUp:
         sec
         sbc.w   _yDelta                 // yDelta is negative
         cmp.b   #METATILE_SIZE_PX - 1
-        bcs     SolidCollision
+        bcc     +
+            jmp     SolidCollision
+        +
 
     a8()
     i16()
@@ -1426,9 +1562,9 @@ MovingUp:
 
             // top left/right is touching a DOWN_PLATFORM tile
 
-            // if entity was below the DOWN_PLATFORM in the previous frame:
-            //     goto SolidCollision
-            // else:
+            // X = index within LeftRightPlatformTileOffsetTable
+
+            // if entity was not below the DOWN_PLATFORM in the previous frame:
             //     goto NoTopCollision
 
             lda.w   _top
@@ -1437,6 +1573,24 @@ MovingUp:
             sbc.w   _yDelta
             cmp.b   #METATILE_SIZE_PX - 1
             bcc     NoTopCollision
+
+            // Entity is standing on the platform
+
+            // Adjust tileIndex (Y) so it points to the platform tile
+
+            // X = LeftRightPlatformTileOffsetTable index
+            rep     #$31
+        a16()
+            // carry clear
+            tya
+            adc.l   LeftRightPlatformTileOffsetTable,x
+            tay
+
+            // Set Ah to 0
+            lda.w   #0
+
+            sep     #$20
+        a8()
 
     a8()
     i16()
@@ -1469,6 +1623,7 @@ MovingUp:
         sta.b   BaseEntity.yPos.px
         stz.b   BaseEntity.yPos.sx
 
+        sec
         rts
 
 
@@ -1532,12 +1687,80 @@ MovingUp:
                 jmp     MovingDown.Collision
         +
 
-        rep     #$30
+        rep     #$31
     a16()
-        // Y = entity top-center map tile
+        // Y = entity bottom-center map tile
+        // carry clear
         rts
     }
 
+
+    namespace MovingUp_Standing {
+    // ::SPAGHETTI Moved TopCenterIsUpCollidable to match MovingDown_Standing::
+    a8()
+    i16()
+    TopCenterIsUpCollidable:
+        // top-center tile is up-collidable.
+        //
+        // Ah = 0
+        // X = collisionMap index
+        // Y = tile index of top-center of hitbox
+        lda.b   BaseEntity.xPos.px
+        and.b   #0x0f
+        ora.w   collisionMap,x
+        tax
+        jmp     MovingUp.Collision
+
+
+    // ::SPAGHETTI Moved TileAboveCenterIsUpCollidable to match MovingDown_Standing::
+    a8()
+    i16()
+    TileAboveCenterIsUpCollidable:
+        // Tile above the entity is up-collidable.
+        //
+        // Ah = 0
+        // X = collisionMap Index
+        // Y = tile index of tile above the top-center of hitbox
+        // MUST NOT MODIFY Y
+        //
+        // NOTE: If I modify this code, also modify code in `MovingUp.Collision`
+
+        lda.b   BaseEntity.xPos.px
+        and.b   #0xf
+        ora.w   collisionMap,x
+        tax
+        // X = BottomHeightTable index
+
+        // Move entity to one pixel below the tile's BottomHeightTable value
+        //
+        // BaseEntity.yPos.px = ((_top & 0xfff0) | BottomHeightTable[x])
+        //                       - _yPosHeightPair.yOffset - METATILE_SIZE_PX + 1
+
+        // sign extend _yOffset to 16 bits
+        lda.b   #0xff
+        sta.w   _yOffsetHeightPair + 1
+
+        rep     #$31
+    a16()
+        lda.w   _top
+        and.w   #0xfff0
+
+        sep     #$20
+    a8()
+        ora.l   BottomHeightTable,x
+
+        rep     #$31
+    a16()
+        // carry clear
+        sbc.w   #METATILE_SIZE_PX - 1 - 1 // -1 for carry and -1 to place entity below solid tiles
+        sec
+        sbc.w   _yOffsetHeightPair
+        sta.b   BaseEntity.yPos.px
+        stz.b   BaseEntity.yPos.sx
+
+        sec
+        rts
+    }
 
 a16()
 i16()
@@ -1607,6 +1830,7 @@ MovingUp_Standing:
         // goto SolidCollisionAbove if left/right tiles are SOLID or DOWN_PLATFORM
         MovingDown_Standing.TestLeftRightTiles(DOWN_PLATFORM, SolidCollisionAbove)
 
+
     NoCollision:
         // All tiles tested have no collision
 
@@ -1617,80 +1841,24 @@ MovingUp_Standing:
         // Reset Y momentum
         stz.b   BaseEntity.yMomentum.px
 
-        rep     #$30
+        rep     #$31
     a16()
         stz.b   BaseEntity.yMomentum.sx
 
         // Y = tile index of tile below the bottom-center of hitbox
-        rts
-
-
-    a8()
-    i16()
-    TopCenterIsUpCollidable:
-        // top-center tile is up-collidable.
-        //
-        // Ah = 0
-        // X = collisionMap index
-        // Y = tile index of top-center of hitbox
-        lda.b   BaseEntity.xPos.px
-        and.b   #0x0f
-        ora.w   collisionMap,x
-        tax
-        jmp     MovingUp.Collision
-
-
-    a8()
-    i16()
-    TileAboveCenterIsUpCollidable:
-        // Tile above the entity is up-collidable.
-        //
-        // Ah = 0
-        // X = collisionMap Index
-        // Y = tile index of tile above the top-center of hitbox
-        // MUST NOT MODIFY Y
-        //
-        // NOTE: If I modify this code, also modify code in `MovingUp.Collision`
-
-        lda.b   BaseEntity.xPos.px
-        and.b   #0xf
-        ora.w   collisionMap,x
-        tax
-        // X = BottomHeightTable index
-
-        // Move entity to one pixel below the tile's BottomHeightTable value
-        //
-        // BaseEntity.yPos.px = ((_top & 0xfff0) | BottomHeightTable[x])
-        //                       - _yPosHeightPair.yOffset - METATILE_SIZE_PX + 1
-
-        // sign extend _yOffset to 16 bits
-        lda.b   #0xff
-        sta.w   _yOffsetHeightPair + 1
-
-        rep     #$31
-    a16()
-        lda.w   _top
-        and.w   #0xfff0
-
-        sep     #$20
-    a8()
-        ora.l   BottomHeightTable,x
-
-        rep     #$31
-    a16()
         // carry clear
-        sbc.w   #METATILE_SIZE_PX - 1 - 1 // -1 for carry and -1 to place entity below solid tiles
-        sec
-        sbc.w   _yOffsetHeightPair
-        sta.b   BaseEntity.yPos.px
-        stz.b   BaseEntity.yPos.sx
-
         rts
 
+
+    a8()
+    i16()
+    _AdjustTileIndexAndGoto_FallThrough(SolidCollisionAbove)
 
     a8()
     i16()
     SolidCollisionAbove:
+        assert(pc() == SolidCollisionAbove_OneRight_FallThrough)
+
         // Entity collided with a SOLID or DOWN_PLATFORM tile.
         //
         // Ah = 0
@@ -1716,6 +1884,7 @@ MovingUp_Standing:
         sta.b   BaseEntity.yPos.px
         stz.b   BaseEntity.yPos.sx
 
+        sec
         rts
     }
 
@@ -1727,6 +1896,22 @@ assert(pc() - MovementState_FunctionTable == Entity.Movement.N_Y_AXIS_MOVEMENT_S
 }
 
 
+// Table of offsets for the left/right tile tests
+// First item in this table cannot have an index of 0
+rodata(rom0)
+constant LeftRightPlatformTileOffsetTable = pc() - 1
+namespace LeftRightPlatformTileOffsetTable {
+    dw  -2 * 64
+    dw  -1 * 64
+    dw  +2 * 64
+    dw  +1 * 64
+
+    assert(map.HEIGHT == 64)
+    constant TWO_LEFT_64  = 1
+    constant ONE_LEFT_64  = 3
+    constant TWO_RIGHT_64 = 5
+    constant ONE_RIGHT_64 = 7
+}
 
 // Top Y position of the tile collision for each X position
 // NOTE: If you change these values, you must also change them in untech-editor
