@@ -55,9 +55,9 @@ i16()
 code()
 function DrawFullScreen_ForceBlank {
 
-constant _mapPtr = tmp0
-constant _columnCount = tmp1
-constant _rowCount = tmp2
+constant _mapPtrTmp = tmp0
+constant _vramAddr = tmp1
+constant _mapEndColumnPtr = tmp2
 
 
     Dma.ForceBlank.AssertForceBlank()
@@ -123,7 +123,7 @@ constant _rowCount = tmp2
     lsr
     lsr
     lsr
-    sta.w   _mapPtr
+    sta.w   _mapPtrTmp
 
     lda.w   Camera.xPos
     and.w   #X_POSITION_MASK
@@ -131,7 +131,7 @@ constant _rowCount = tmp2
     asl
     asl
     // carry clear
-    adc.w   _mapPtr
+    adc.w   _mapPtrTmp
     clc
     adc.w   #map.data
     sta.w   visibleMapPtr
@@ -139,35 +139,51 @@ constant _rowCount = tmp2
 
     // Draw Tilemap
     //
-    // mapPtr = visibleMapPtr
+    //  VMAIN = incrementMode.high | increment.by32
     //
-    // VMAIN = incrementMode.high | increment.bg1
-    // VMADD = METATILES_MAP_WADDR
+    //  x = visibleMapPtr
+    //  _mapEndColumnPtr = x + _TILES_PER_COLUMN
     //
-    // for row = 0 to METATILE_DISPLAY_HEIGHT + 1:
-    //      x = mapPtr
-    //      for column = 0 to METATILE_DISPLAY_WIDTH:
+    //  _vramAddr = METATILES_MAP_WADDR
+    //
+    //  repeat:
+    //      VMADD = _vramAddr
+    //      repeat:
     //          y = *x * 2
     //          VMDATA = tileMap.topLeft[y]
-    //          VMDATA = tileMap.topRight[y]
-    //          x += map.bytesPerRow
-    //
-    //      x = mapPtr
-    //      for column = 0 to METATILE_DISPLAY_WIDTH:
-    //          y = *x * 2
     //          VMDATA = tileMap.bottomLeft[y]
-    //          VMDATA = tileMap.bottomRight[y]
-    //          x += map.bytesPerRow
+    //      until x == _mapEndColumnPtr
     //
-    //      mapPtr++
+    //      x -= _TILES_PER_COLUMN
+    //
+    //      VMADD = _vramAddr + 1
+    //      repeat:
+    //          y = *x * 2
+    //          VMDATA = tileMap.topRight[y]
+    //          VMDATA = tileMap.bottomRight[y]
+    //          x++
+    //      until x == _mapEndColumnPtr
+    //
+    //      x += map.HEIGHT - _TILES_PER_COLUMN
+    //      _mapEndColumnPtr = x + _TILES_PER_COLUMN
+    //
+    //      _vramAddr += 2
+    //      if _vramAddr == METATILES_MAP_WADDR + 32
+    //          _vramAddr = METATILES_MAP_WADDR + 32 * 32
+    //  until _vramAddr >= _VRAM_WADDR_END
 
+    constant _TILES_PER_COLUMN = METATILE_DISPLAY_HEIGHT + 1
+    constant _VRAM_WADDR_END = METATILES_MAP_WADDR + 32 * 32 + (METATILE_DISPLAY_WIDTH - 16 + 1) * 2
 
     // A = visibleMapPtr
     tax
+    clc
+    adc.w   #_TILES_PER_COLUMN
+    sta.w   _mapEndColumnPtr
 
     sep     #$20
 a8()
-    lda.b   #VMAIN.incrementMode.high | VMAIN.increment.by1
+    lda.b   #VMAIN.incrementMode.high | VMAIN.increment.by32
     sta.b   VMAIN
 
     assert(METATILE_DISPLAY_WIDTH * METATILE_SIZE == 32)
@@ -176,18 +192,13 @@ a8()
 a16()
 
     lda.w   #METATILES_MAP_WADDR
-    sta.b   VMADD
-
-    lda.w   #METATILE_DISPLAY_HEIGHT + 1
-    sta.w   _columnCount
 
     ColumnLoop:
-        stx.w   _mapPtr
+        // A = _vramAddr
+        sta.w   _vramAddr
+        sta.b   VMADD
 
-        lda.w   #METATILE_DISPLAY_WIDTH
-        sta.w   _rowCount
-
-        TopLineLoop:
+        LeftLoop:
             lda.w   0,x
             and.w   #0xff
             asl
@@ -196,132 +207,55 @@ a16()
             lda.w   tileMap.topLeft,y
             sta.b   VMDATA
 
-            lda.w   tileMap.topRight,y
+            lda.w   tileMap.bottomLeft,y
             sta.b   VMDATA
 
-            txa
-            clc
-            adc.w   #map.HEIGHT
-            tax
+            inx
+            cpx.w   _mapEndColumnPtr
+            bne     LeftLoop
 
-            dec.w   _rowCount
-            bne     TopLineLoop
+        txa
+        sec
+        sbc.w   #_TILES_PER_COLUMN
+        tax
 
+        lda.w   _vramAddr
+        inc
+        sta.b   VMADD
 
-        ldx.w   _mapPtr
-
-        lda.w   #METATILE_DISPLAY_WIDTH
-        sta.w   _rowCount
-
-        BottomLineLoop:
+        RightLoop:
             lda.w   0,x
             and.w   #0xff
             asl
             tay
 
-            lda.w   tileMap.bottomLeft,y
+            lda.w   tileMap.topRight,y
             sta.b   VMDATA
 
             lda.w   tileMap.bottomRight,y
             sta.b   VMDATA
 
-            txa
-            clc
-            adc.w   #map.HEIGHT
-            tax
+            inx
+            cpx.w   _mapEndColumnPtr
+            bne     RightLoop
 
-            dec.w   _rowCount
-            bne     BottomLineLoop
+        txa
+        clc
+        adc.w   #map.HEIGHT - _TILES_PER_COLUMN
+        tax
+        clc
+        adc.w   #_TILES_PER_COLUMN
+        sta.w   _mapEndColumnPtr
 
-        ldx.w   _mapPtr
-        inx
-
-        dec.w   _columnCount
-        bne     ColumnLoop
-
-
-    // Draw rightmost column
-    //
-    // VMAIN = incrementMode.high | increment.bg32
-    //
-    // VMADD = METATILES_MAP_WADDR + 32 * 32
-    // x = visibleMapPtr + DISPLAY_WIDTH * map.HEIGHT
-    // for row = 0 to METATILE_DISPLAY_HEIGHT + 1:
-    //      y = *x * 2
-    //      VMDATA = tileMap.topLeft[y]
-    //      VMDATA = tileMap.bottomLeft[y]
-    //      x++
-    //
-    // VMADD = METATILES_MAP_WADDR + 32 * 32 + 1
-    // x = visibleMapPtr + DISPLAY_WIDTH
-    // for row = 0 to METATILE_DISPLAY_HEIGHT + 1:
-    //      y = *x * 2
-    //      VMDATA = tileMap.topRight[y]
-    //      VMDATA = tileMap.bottomRight[y]
-    //      x++
-    //
-
-    sep     #$20
-a8()
-    lda.b   #VMAIN.incrementMode.high | VMAIN.increment.by32
-    sta.b   VMAIN
-
-    rep     #$30
-a16()
-
-    lda.w   #METATILES_MAP_WADDR + 32 * 32
-    sta.b   VMADD
-
-    lda.w   #METATILE_DISPLAY_HEIGHT + 1
-    sta.w   _columnCount
-
-    lda.w   visibleMapPtr
-    clc
-    adc.w   #METATILE_DISPLAY_WIDTH * map.HEIGHT
-    tax
-
-    phx
-    LeftLoop:
-        lda.w   0,x
-        and.w   #0xff
-        asl
-        tay
-
-        lda.w   tileMap.topLeft,y
-        sta.b   VMDATA
-
-        lda.w   tileMap.bottomLeft,y
-        sta.b   VMDATA
-
-        inx
-
-        dec.w   _columnCount
-        bne     LeftLoop
-
-
-    lda.w   #METATILES_MAP_WADDR + 32 * 32 + 1
-    sta.b   VMADD
-
-    lda.w   #METATILE_DISPLAY_HEIGHT + 1
-    sta.w   _columnCount
-
-    plx
-    RightLoop:
-        lda.w   0,x
-        and.w   #0xff
-        asl
-        tay
-
-        lda.w   tileMap.topRight,y
-        sta.b   VMDATA
-
-        lda.w   tileMap.bottomRight,y
-        sta.b   VMDATA
-
-        inx
-
-        dec.w   _columnCount
-        bne     RightLoop
+        lda.w   _vramAddr
+        inc
+        inc
+        cmp.w   #METATILES_MAP_WADDR + 32
+        bne     +
+            lda.w   #METATILES_MAP_WADDR + 32 * 32
+        +
+        cmp.w   #_VRAM_WADDR_END
+        bcc     ColumnLoop
 
     pld
 
