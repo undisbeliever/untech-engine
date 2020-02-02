@@ -41,82 +41,23 @@ assertPowerOfTwo(horizontalBuffer.buffer.size)
 assertPowerOfTwo(verticalBuffer.buffer.size)
 
 
-// Draw the visible map directly to the VRAM
+// Calculates visibleMapPtr address and draws map tiles to VRAM
 //
-// Also initializes the buffer state
+// PARAM: mapHeight - map height (SMALL or LARGE)
 //
-// ASSUMES: Camera position inside map
-//
-// REQUIRES: Force Blank
-// REQUIRES: Map loaded
-// REQUIRES: 16 bit A, 16 bit Index, DB = 0x7e, Force Blank
-a16()
-i16()
-code()
-function DrawFullScreen_ForceBlank {
+// REQUIRES: 16 bit A, 16 bit Index, DB = 0x7e, DP = 2100
+inline DrawFullScreen_ForceBlank.__CalcVisibleMapPtrAndDrawTiles(mapHeight) {
+    assert16a()
+    assert16i()
 
-constant _mapPtrTmp = tmp0
-constant _vramAddr = tmp1
-constant _mapEndColumnPtr = tmp2
+    constant MAP_HEIGHT      = MAP_HEIGHT_{mapHeight}
+    constant Y_POSITION_MASK = Y_POSITION_MASK_{mapHeight}
 
-
-    Dma.ForceBlank.AssertForceBlank()
-
-    phd
-
-    // set DP to registers
-    lda.w   #0x2100
-    tcd
-
-
-    // Reset render state
-    //
-    // drawMapCellBufferIndex = 0
-    // horizontalBuffer.cursorIndex = 0
-    // horizontalBuffer.cursorYpos = Camera.yPos & ~(METATILE_SIZE_PX - 1)
-    //
-    // verticalBuffer.cursorIndex = 0
-    // verticalBuffer.cursorXpos = Camera.xPos & ~(METATILE_SIZE_PX - 1)
-    //
-    // cameraXoffset = Camera.xPos & ~(METATILE_SIZE_PX - 1)
-    // cameraYoffset = (Camera.yPos & ~(METATILE_SIZE_PX - 1)) + 1
-    //
-    // displayHoffset = Camera.xPos & (METATILE_SIZE_PX - 1)
-    // displayVoffset = Camera.yPos & (METATILE_SIZE_PX - 1) - 1
-    //
     // visibleMapPtr = (Camera.yPos & Y_POSITION_MASK) / METATILE_SIZE_PX
-    //                 + (Camera.xPos & X_POSITION_MASK) / METATILE_SIZE_PX * map.HEIGHT
+    //                 + (Camera.xPos & X_POSITION_MASK) / METATILE_SIZE_PX * MAP_HEIGHT
     //                 + map.data
 
-    stz.w   drawMapCellBufferIndex
-
-    stz.w   horizontalBuffer.cursorIndex
-
-    lda.w   Camera.yPos
-    and.w   #~(METATILE_SIZE_PX - 1)
-    sta.w   horizontalBuffer.cursorYpos
-    inc
-    sta.w   cameraYoffset
-
-    stz.w   verticalBuffer.cursorIndex
-
-    lda.w   Camera.xPos
-    and.w   #~(METATILE_SIZE_PX - 1)
-    sta.w   verticalBuffer.cursorXpos
-    sta.w   cameraXoffset
-
-    lda.w   Camera.xPos
-    and.w   #METATILE_SIZE_PX - 1
-    sta.w   displayHoffset
-
-    lda.w   Camera.yPos
-    and.w   #METATILE_SIZE_PX - 1
-    dec
-    sta.w   displayVoffset
-
-
-    assertPowerOfTwo(map.HEIGHT)
-    assertPowerOfTwo(METATILE_SIZE_PX)
+    assert(METATILE_SIZE_PX == 16)
     lda.w   Camera.yPos
     and.w   #Y_POSITION_MASK
     lsr
@@ -127,9 +68,16 @@ constant _mapEndColumnPtr = tmp2
 
     lda.w   Camera.xPos
     and.w   #X_POSITION_MASK
-    assert(map.HEIGHT / METATILE_SIZE_PX == 4)
-    asl
-    asl
+    if MAP_HEIGHT / METATILE_SIZE_PX == 4 {
+        asl
+        asl
+    } else if MAP_HEIGHT / METATILE_SIZE_PX == 8 {
+        asl
+        asl
+        asl
+    } else {
+        error "Invalid MAP_HEIGHT"
+    }
     // carry clear
     adc.w   _mapPtrTmp
     clc
@@ -164,7 +112,7 @@ constant _mapEndColumnPtr = tmp2
     //          x++
     //      until x == _mapEndColumnPtr
     //
-    //      x += map.HEIGHT - _TILES_PER_COLUMN
+    //      x += MAP_HEIGHT - _TILES_PER_COLUMN
     //      _mapEndColumnPtr = x + _TILES_PER_COLUMN
     //
     //      _vramAddr += 2
@@ -241,7 +189,7 @@ a16()
 
         txa
         clc
-        adc.w   #map.HEIGHT - _TILES_PER_COLUMN
+        adc.w   #MAP_HEIGHT - _TILES_PER_COLUMN
         tax
         clc
         adc.w   #_TILES_PER_COLUMN
@@ -256,10 +204,93 @@ a16()
         +
         cmp.w   #_VRAM_WADDR_END
         bcc     ColumnLoop
+}
 
-    pld
 
-    rts
+// Draw the visible map directly to the VRAM
+//
+// Also initializes the buffer state
+//
+// ASSUMES: Camera position inside map
+//
+// REQUIRES: Force Blank
+// REQUIRES: Map loaded
+// REQUIRES: 16 bit A, 16 bit Index, DB = 0x7e, Force Blank
+a16()
+i16()
+code()
+function DrawFullScreen_ForceBlank {
+
+constant _mapPtrTmp = tmp0
+constant _vramAddr = tmp1
+constant _mapEndColumnPtr = tmp2
+
+
+    Dma.ForceBlank.AssertForceBlank()
+
+    phd
+
+    // set DP to registers
+    lda.w   #0x2100
+    tcd
+
+
+    // Reset render state
+    //
+    // drawMapCellBufferIndex = 0
+    // horizontalBuffer.cursorIndex = 0
+    // horizontalBuffer.cursorYpos = Camera.yPos & ~(METATILE_SIZE_PX - 1)
+    //
+    // verticalBuffer.cursorIndex = 0
+    // verticalBuffer.cursorXpos = Camera.xPos & ~(METATILE_SIZE_PX - 1)
+    //
+    // cameraXoffset = Camera.xPos & ~(METATILE_SIZE_PX - 1)
+    // cameraYoffset = (Camera.yPos & ~(METATILE_SIZE_PX - 1)) + 1
+    //
+    // displayHoffset = Camera.xPos & (METATILE_SIZE_PX - 1)
+    // displayVoffset = Camera.yPos & (METATILE_SIZE_PX - 1) - 1
+
+    stz.w   drawMapCellBufferIndex
+
+    stz.w   horizontalBuffer.cursorIndex
+
+    lda.w   Camera.yPos
+    and.w   #~(METATILE_SIZE_PX - 1)
+    sta.w   horizontalBuffer.cursorYpos
+    inc
+    sta.w   cameraYoffset
+
+    stz.w   verticalBuffer.cursorIndex
+
+    lda.w   Camera.xPos
+    and.w   #~(METATILE_SIZE_PX - 1)
+    sta.w   verticalBuffer.cursorXpos
+    sta.w   cameraXoffset
+
+    lda.w   Camera.xPos
+    and.w   #METATILE_SIZE_PX - 1
+    sta.w   displayHoffset
+
+    lda.w   Camera.yPos
+    and.w   #METATILE_SIZE_PX - 1
+    dec
+    sta.w   displayVoffset
+
+
+    BranchIfMapIsSmall_Long(SmallMapHeight)
+
+    LargeMapHeight:
+    namespace LargeMapHeight {
+        __CalcVisibleMapPtrAndDrawTiles(LARGE)
+        pld
+        rts
+    }
+    SmallMapHeight:
+    namespace SmallMapHeight {
+        __CalcVisibleMapPtrAndDrawTiles(SMALL)
+        pld
+        rts
+    }
 }
 
 
@@ -270,20 +301,22 @@ a16()
 //        Y = vBuffer offset (0 or DISPLAY_HEIGHT * 2)
 //
 // REQUIRES: 16 bit A, 16 bit Index, DB = 0x7e, DP = 0
-macro _DrawHorizontalBuffer() {
+// INPUT: MAP_HEIGHT constant: height of map in metatiles
+macro __DrawHorizontalBuffer() {
     assert16a()
     assert16i()
 
     assert(verticalBuffer.buffer.size == 32 * 2 * 2)
     assert(horizontalBuffer.buffer.size == 64 * 2 * 2)
-    // prevent ptr under-run
-    assert(map.data > 2)
+
+    // prevent map ptr under-run
+    assert((map.data & 0xffff) > MAP_HEIGHT + 2)
 
     assertZeroPage(_mapPtr)
     assertZeroPage(_mapPtrRend)
 
     //  mapPtrRend = mapPtr
-    //  mapPtr += METATILE_DISPLAY_WIDTH * map.HEIGHT
+    //  mapPtr += METATILE_DISPLAY_WIDTH * MAP_HEIGHT
     //
     //  a = (verticalBuffer.cursorIndex + vBufferOffset) / 4 * 32 * 2
     //  a &= (32 - 1) * 32
@@ -302,16 +335,17 @@ macro _DrawHorizontalBuffer() {
     //      if y < 0:
     //          y = buffer.size / 2 - 4 bytes
     //
-    //      mapPtr -= map.HEIGHT
+    //      mapPtr -= MAP_HEIGHT
 
     sta.b   _mapPtrRend
     clc
-    adc.w   #METATILE_DISPLAY_WIDTH * map.HEIGHT
+    adc.w   #METATILE_DISPLAY_WIDTH * MAP_HEIGHT
     tax
 
     tya
     clc
     adc.w   verticalBuffer.cursorIndex
+    assert(METATILE_SIZE_PX == 16)
     and.w   #((32 - 1) * 32) >> 4
     asl
     asl
@@ -358,7 +392,7 @@ macro _DrawHorizontalBuffer() {
 
         lda.b   _mapPtr
         sec
-        sbc.w   #map.HEIGHT
+        sbc.w   #MAP_HEIGHT
         cmp.b   _mapPtrRend
         bcs     Loop
 
@@ -373,14 +407,15 @@ macro _DrawHorizontalBuffer() {
 //        Y = hBuffer offset (0 or DISPLAY_WIDTH * 2)
 //
 // REQUIRES: 16 bit A, 16 bit Index, DB = 0x7e, DP = 0
-macro _DrawVerticalBuffer() {
+macro __DrawVerticalBuffer() {
     assert16a()
     assert16i()
 
     assert(verticalBuffer.buffer.size == 32 * 2 * 2)
     assert(horizontalBuffer.buffer.size == 64 * 2 * 2)
-    // prevent ptr under-run (max value of map.bytesPerRow is 512)
-    assert(map.data > 512)
+
+    // prevent map ptr under-run
+    assert((map.data & 0xffff) > MAP_HEIGHT_LARGE)
 
     assertZeroPage(_mapPtr)
     assertZeroPage(_mapPtrRend)
@@ -471,26 +506,19 @@ macro _DrawVerticalBuffer() {
 }
 
 
-
 // Updates the position of the map, drawing new tiles as necessary
-//
-// Will change the camera position to ensure only 1 metatile row and/or column
-// is processed per frame.
-//
-// This routine SHOULD BE called early in the game loop (ie, before
-// `Entities.ProcessGameLoop` and `Resources.ProcessAnimations`) to prevent a
-// VBlank overrun.
 //
 // ASSUMES: DrawFullScreen_ForceBlank has been called to setup map state
 // ASSUMES: Camera position inside map
 //
 // REQUIRES: 16 bit A, 16 bit Index, DB = 0x7e
-a16()
-i16()
-code()
-function Update {
-constant _mapPtr = utDpTmp0
-constant _mapPtrRend = utDpTmp2
+//
+// PARAM: mapHeight - height of map (SMALL or LARGE)
+inline __Update(mapHeight) {
+    assert16a()
+    assert16i()
+
+constant MAP_HEIGHT = MAP_HEIGHT_{mapHeight}
 
     //  xOffset = Camera.xPos - verticalBuffer.cursorXpos
     //
@@ -502,9 +530,9 @@ constant _mapPtrRend = utDpTmp2
     //      horizontalBuffer.cursorIndex &= horizontalBuffer.buffer.size / 2 - 1
     //
     //      verticalBuffer.cursorXpos += METATILE_SIZE_PX
-    //      visibleMapPtr += map.HEIGHT
+    //      visibleMapPtr += MAP_HEIGHT
     //
-    //      _DrawVerticalBuffer(visibleMapPtr + METATILE_DISPLAY_WIDTH * map.HEIGHT,
+    //      _DrawVerticalBuffer(visibleMapPtr + METATILE_DISPLAY_WIDTH * MAP_HEIGHT,
     //                          METATILE_DISPLAY_WIDTH * METATILE_SIZE * 2)
     //
     //  else if xOffset < 0:
@@ -515,7 +543,7 @@ constant _mapPtrRend = utDpTmp2
     //      horizontalBuffer.cursorIndex &= horizontalBuffer.buffer.size / 2 - 1
     //
     //      verticalBuffer.cursorXpos -= METATILE_SIZE_PX
-    //      visibleMapPtr -= map.HEIGHT
+    //      visibleMapPtr -= MAP_HEIGHT
     //
     //      _DrawVerticalBuffer(visibleMapPtr, 0)
 
@@ -548,10 +576,10 @@ constant _mapPtrRend = utDpTmp2
 
         lda.w   visibleMapPtr
         clc
-        adc.w   #map.HEIGHT
+        adc.w   #MAP_HEIGHT
         sta.w   visibleMapPtr
         clc
-        adc.w   #METATILE_DISPLAY_WIDTH * map.HEIGHT
+        adc.w   #METATILE_DISPLAY_WIDTH * MAP_HEIGHT
 
         ldy.w   #METATILE_DISPLAY_WIDTH * METATILE_SIZE * 2
 
@@ -579,14 +607,14 @@ XOffsetNegative:
 
         lda.w   visibleMapPtr
         sec
-        sbc.w   #map.HEIGHT
+        sbc.w   #MAP_HEIGHT
         sta.w   visibleMapPtr
 
         ldy.w   #0
 
     DrawVerticalBuffer:
         // A = map Index, Y = vramOffset
-        _DrawVerticalBuffer()
+        __DrawVerticalBuffer()
 
 SkipDrawVerticalBuffer:
 
@@ -683,7 +711,7 @@ YOffsetNegative:
 
     DrawHorizontalBuffer:
         // A = map Index, Y = vramOffset
-        _DrawHorizontalBuffer()
+        __DrawHorizontalBuffer()
 
 SkipDrawHorizontalBuffer:
 
@@ -706,6 +734,44 @@ SkipDrawHorizontalBuffer:
 
 
 
+// Updates the position of the map, drawing new tiles as necessary
+//
+// Will change the camera position to ensure only 1 MetaTile row and 1 MetaTile
+// column is processed per frame.
+//
+// This routine SHOULD BE called early in the game loop (ie, before
+// `Entities.ProcessGameLoop` and `Resources.ProcessAnimations`) to prevent a
+// VBlank overrun.
+//
+// ASSUMES: DrawFullScreen_ForceBlank has been called to setup map state
+// ASSUMES: Camera position inside map
+//
+// REQUIRES: 16 bit A, 16 bit Index, DB = 0x7e
+a16()
+i16()
+code()
+function Update {
+constant _mapPtr = utDpTmp0
+constant _mapPtrRend = utDpTmp2
+
+    BranchIfMapIsSmall_Long(SmallMapHeight)
+
+    LargeMapHeight:
+    namespace LargeMapHeight {
+        __Update(LARGE)
+        pld
+        rts
+    }
+    SmallMapHeight:
+    namespace SmallMapHeight {
+        __Update(SMALL)
+        pld
+        rts
+    }
+}
+
+
+
 // Draws a map cell to the VBlank buffer (if necessary).
 //
 // ASSUMES: DrawFullScreen_ForceBlank has been called to setup map state
@@ -718,17 +784,22 @@ SkipDrawHorizontalBuffer:
 //
 // REQUIRES: 16 bit A, 16 bit Index, DB = 0x7e
 //
+// PARAM: mapHeight - height of map (SMALL or LARGE)
+//
 // INPUT: X = index of map cell to draw
 //        A = value of map cell (lower 8 bits only)
 //
 // BRANCH: to Return if cell outside visible range
 // BRANCH: to RetrunWithWarning if drawMapCellBuffer is full
-macro _DrawMapCell() {
+macro _DrawMapCell(mapHeight) {
     assert16a()
     assert16i()
     // DP unknown
 
 allocateTmpWord(_tmp)
+assert(METATILE_SIZE_PX == 16)
+
+constant MAP_HEIGHT = MAP_HEIGHT_{mapHeight}
 
     // Get MetaTile tileMap index
     and.w   #0xff
@@ -743,12 +814,12 @@ allocateTmpWord(_tmp)
     //  if offset < visibleMapPtr:
     //      return
     //  offset -= visibleMapPtr
-    //  if offset > map.HEIGHT * METATILE_DISPLAY_WIDTH + METATILE_DISPLAY_HEIGHT
+    //  if offset > MAP_HEIGHT * METATILE_DISPLAY_WIDTH + METATILE_DISPLAY_HEIGHT
     //      return
-    //  if offset & (map.HEIGHT - 1) > METATILE_DISPLAY_HEIGHT
+    //  if offset & (MAP_HEIGHT - 1) > METATILE_DISPLAY_HEIGHT
     //      return
     //
-    //  RDDIV,RDMPY = offset / map.HEIGHT
+    //  RDDIV,RDMPY = offset / MAP_HEIGHT
 
     txa
     clc
@@ -756,20 +827,20 @@ allocateTmpWord(_tmp)
     sec
     sbc.w   Render.visibleMapPtr
     bcc     Return
-    cmp.w   #map.HEIGHT * METATILE_DISPLAY_WIDTH + METATILE_DISPLAY_HEIGHT + 1
+    cmp.w   #MAP_HEIGHT * METATILE_DISPLAY_WIDTH + METATILE_DISPLAY_HEIGHT + 1
     bcs     Return
 
     sta.l   WRDIV
 
     // Test if cell is outside the display on the vertical axis
-    assertPowerOfTwo(map.HEIGHT)
-    and.w   #map.HEIGHT - 1
+    assertPowerOfTwo(MAP_HEIGHT)
+    and.w   #MAP_HEIGHT - 1
     cmp.w   #METATILE_DISPLAY_HEIGHT + 1
     bcs     Return
 
     sep     #$20
 a8()
-    lda.b   #map.HEIGHT
+    lda.b   #MAP_HEIGHT
     sta.l   WRDIVB
 
 

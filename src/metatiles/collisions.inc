@@ -47,9 +47,16 @@ macro _xPosA_tileIndexTmp_To_tileIndexY() {
 
     // Y = (xPos & X_POSITION_MASK) / 16 * MAP_HEIGHT + _tileIndexTmp
     and.w   #X_POSITION_MASK
-    assert(MAP_HEIGHT / 16 == 4)
-    asl
-    asl
+    if MAP_HEIGHT / METATILE_SIZE_PX == 4 {
+        asl
+        asl
+    } else if MAP_HEIGHT / METATILE_SIZE_PX == 8 {
+        asl
+        asl
+        asl
+    } else {
+        error "Invalid MAP_HEIGHT"
+    }
     // carry clear
     adc.w   _tileIndexTmp
     tay
@@ -237,88 +244,17 @@ inline _AdjustTileIndexAndGoto(CollisionLabel) {
 inline _AdjustTileIndexAndGoto_FallThrough(CollisionLabel) {
     __AdjustTileIndexAndGoto({CollisionLabel}, 0)
 }
-
-
-// DP = entity
-a16()
-i16()
-NoHitbox:
-    ldy.w   #0
-    clc
-    rts
 }
 
 
-// Moves the entity (using the entity's movementState and momentum values) and
-// preforms collision checks between the MetaTiles and the entity's tile
-// hitbox.
-//
-// If a collision occurs then the entity is moved so its tile hitbox is outside
-// the collision and the appropriate bits in `BaseEntity.movementState`
-// will be set.
-//
-// If the entity is in a Standing state and there is no collision then
-// the `Entity.MovementState.STANDING_FLAG` will be cleared.
-//
-// NOTE: You MUST ONLY call this routine inside the entity's Process routine
-//
-// NOTE: If the entity's MetaSprite frame has no tile hitbox then the entity
-//       will not be moved.
-//
-// NOTE: This routine will apply gravity to the entity's `yMomentum` if the
-//       entity's `NO_GRAVITY_FLAG` movementState flag is clear.
-//
-// NOTE: Collision testing is only preformed in the direction of movement.
-//       For instance, if the entity is moving right then a left collision test
-//       is not preformed.
-//
-// NOTE: `MoveEntityAndProcessTileCollisions` will only preform a y-axis test
-//       on the first 32 pixels to the left and right of the entity's xPos.
-//
-//       The x-axis test will be preformed using the full width of the tile hitbox.
-//
 // REQUIRES: 16 bit A, 16 bit Index, DB = 0x7e
+// PARAM: mapHeight - map height (SMALL or LARGE)
 // INPUT: dp = entity
 // OUTPUT: carry set if collision occurred in Y-Axis
 //         Y = The tile index of the tile that collided in the Y-Axis (if carry set).
-//
-// This code assumes:
-//   * This routine is called once per frame.
-//   * The maximum x/y momentum is 8px/frame.
-//   * The entity is inside the map boundary.
-//   * An END_SLOPE tile or a SOLID wall is adjacent to the long side of a *_SLOPE tile.
-//   * An EMPTY tile or a SOLID wall is adjacent to the short side of a *_SLOPE tile.
-//   * A SOLID, UP_PLATFORM or END_SLOPE tile is below the DOWN_*_SLOPE tiles.
-//   * A SOLID, DOWN_PLATFORM or END_SLOPE tile is above the UP_*_SLOPE tiles.
-//   * An EMPTY tile is above a DOWN_*_SLOPE tiles.
-//   * An EMPTY tile is below a UP_*_SLOPE tiles.
-//   * An EMPTY tile is *not* to the left or right of an END_SLOPE tile.
-//   * A short/tall slope pair is never broken, unless there is a SOLID wall in the way.
-//   * It is not possible to walk into the long side of a slope tile.
-//   * The top-left tile of the map is SOLID.
-//
-// If none of these assumptions are met then the entity can either:
-//   * Overshoot slope tiles when `xMomentum` > 1px/frame.
-//   * Fall through a slope if the x origin tile is EMPTY.
-//   * Zip to the top or bottom of a tile when walking into an forbidden tile pattern.
-//
-//
-// NOTE: a *SOLID wall* means the tile adjacent and adjacent-above the slope is solid.
-//
-//       For example, the following tile arrangements are valid.
-//             ◼     ◼
-//            ◣◼◢   ◢◼◣
-//           ◼◼◼◼◼◼◼◼◼◼◼
-//
-//       Whereas the following are forbidden:
-//
-//            ◣◼◢   ◢◼◣
-//           ◼◼◼◼◼◼◼◼◼◼◼
-//
-a16()
-i16()
-code()
-function MoveEntityAndProcessTileCollisions {
+inline __MoveEntityAndProcessTileCollisions(mapHeight) {
+assert16a()
+assert16i()
 
 assert(METATILE_SIZE_PX == 16)
 
@@ -351,7 +287,9 @@ constant _TileCollisionType_LAST_UP_SLOPE    = TileCollisionType.UP_LEFT_SHORT_S
 constant _TileCollisionType_FIRST_DOWN_SLOPE = TileCollisionType.DOWN_RIGHT_SLOPE
 constant _TileCollisionType_LAST_DOWN_SLOPE  = TileCollisionType.DOWN_LEFT_SHORT_SLOPE
 
-constant MAP_HEIGHT = MetaTiles.map.HEIGHT
+constant MAP_HEIGHT = MAP_HEIGHT_{mapHeight}
+constant Y_POSITION_MASK = Y_POSITION_MASK_{mapHeight}
+
 
 
 //  X AXIS
@@ -1899,21 +1837,138 @@ assert(pc() - MovementState_FunctionTable == Entity.Movement.N_Y_AXIS_MOVEMENT_S
 }
 
 
+namespace MoveEntityAndProcessTileCollisions.LargeMapHeight {
+    // DP = entity
+    a16()
+    i16()
+    NoHitbox:
+        ldy.w   #0
+        clc
+        rts
+}
+
+// Moves the entity (using the entity's movementState and momentum values) and
+// preforms collision checks between the MetaTiles and the entity's tile
+// hitbox.
+//
+// If a collision occurs then the entity is moved so its tile hitbox is outside
+// the collision and the appropriate bits in `BaseEntity.movementState`
+// will be set.
+//
+// If the entity is in a Standing state and there is no collision then
+// the `Entity.MovementState.STANDING_FLAG` will be cleared.
+//
+// NOTE: You MUST ONLY call this routine inside the entity's Process routine
+//
+// NOTE: If the entity's MetaSprite frame has no tile hitbox then the entity
+//       will not be moved.
+//
+// NOTE: This routine will apply gravity to the entity's `yMomentum` if the
+//       entity's `NO_GRAVITY_FLAG` movementState flag is clear.
+//
+// NOTE: Collision testing is only preformed in the direction of movement.
+//       For instance, if the entity is moving right then a left collision test
+//       is not preformed.
+//
+// NOTE: `MoveEntityAndProcessTileCollisions` will only preform a y-axis test
+//       on the first 32 pixels to the left and right of the entity's xPos.
+//
+//       The x-axis test will be preformed using the full width of the tile hitbox.
+//
+// REQUIRES: 16 bit A, 16 bit Index, DB = 0x7e
+// INPUT: dp = entity
+// OUTPUT: carry set if collision occurred in Y-Axis
+//         Y = The tile index of the tile that collided in the Y-Axis (if carry set).
+//
+// This code assumes:
+//   * This routine is called once per frame.
+//   * The maximum x/y momentum is 8px/frame.
+//   * The entity is inside the map boundary.
+//   * An END_SLOPE tile or a SOLID wall is adjacent to the long side of a *_SLOPE tile.
+//   * An EMPTY tile or a SOLID wall is adjacent to the short side of a *_SLOPE tile.
+//   * A SOLID, UP_PLATFORM or END_SLOPE tile is below the DOWN_*_SLOPE tiles.
+//   * A SOLID, DOWN_PLATFORM or END_SLOPE tile is above the UP_*_SLOPE tiles.
+//   * An EMPTY tile is above a DOWN_*_SLOPE tiles.
+//   * An EMPTY tile is below a UP_*_SLOPE tiles.
+//   * An EMPTY tile is *not* to the left or right of an END_SLOPE tile.
+//   * A short/tall slope pair is never broken, unless there is a SOLID wall in the way.
+//   * It is not possible to walk into the long side of a slope tile.
+//   * The top-left tile of the map is SOLID.
+//
+// If none of these assumptions are met then the entity can either:
+//   * Overshoot slope tiles when `xMomentum` > 1px/frame.
+//   * Fall through a slope if the x origin tile is EMPTY.
+//   * Zip to the top or bottom of a tile when walking into an forbidden tile pattern.
+//
+//
+// NOTE: a *SOLID wall* means the tile adjacent and adjacent-above the slope is solid.
+//
+//       For example, the following tile arrangements are valid.
+//             ◼     ◼
+//            ◣◼◢   ◢◼◣
+//           ◼◼◼◼◼◼◼◼◼◼◼
+//
+//       Whereas the following are forbidden:
+//
+//            ◣◼◢   ◢◼◣
+//           ◼◼◼◼◼◼◼◼◼◼◼
+//
+a16()
+i16()
+code()
+function MoveEntityAndProcessTileCollisions {
+    BranchIfMapIsSmall_Long(SmallMapHeight)
+
+    LargeMapHeight:
+    namespace LargeMapHeight {
+        __MoveEntityAndProcessTileCollisions(LARGE)
+    }
+
+    namespace SmallMapHeight {
+    // DP = entity
+    a16()
+    i16()
+    NoHitbox:
+        ldy.w   #0
+        clc
+        rts
+    }
+
+    SmallMapHeight:
+    namespace SmallMapHeight {
+        __MoveEntityAndProcessTileCollisions(SMALL)
+    }
+}
+
+
 // Table of offsets for the left/right tile tests
 // First item in this table cannot have an index of 0
 rodata(rom0)
 constant LeftRightPlatformTileOffsetTable = pc() - 1
 namespace LeftRightPlatformTileOffsetTable {
+    assert(MAP_HEIGHT_SMALL == 64)
+    assert(MAP_HEIGHT_LARGE == 128)
+
     dw  -2 * 64
     dw  -1 * 64
     dw  +2 * 64
     dw  +1 * 64
+    dw  -2 * 128
+    dw  -1 * 128
+    dw  +2 * 128
+    dw  +1 * 128
 
-    assert(map.HEIGHT == 64)
-    constant TWO_LEFT_64  = 1
-    constant ONE_LEFT_64  = 3
-    constant TWO_RIGHT_64 = 5
-    constant ONE_RIGHT_64 = 7
+    createEnum(1, 2)
+        enum(TWO_LEFT_64)
+        enum(ONE_LEFT_64)
+        enum(TWO_RIGHT_64)
+        enum(ONE_RIGHT_64)
+
+        enum(TWO_LEFT_128)
+        enum(ONE_LEFT_128)
+        enum(TWO_RIGHT_128)
+        enum(ONE_RIGHT_128)
+    endEnum()
 }
 
 // Top Y position of the tile collision for each X position

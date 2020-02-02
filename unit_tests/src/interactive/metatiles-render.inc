@@ -256,29 +256,6 @@ namespace MapCursor {
 namespace InteractiveTests {
 namespace MetaTileRenderTest {
 
-constant MAP_WIDTH = 84
-constant MAP_HEIGHT = MetaTiles.map.HEIGHT
-
-constant MAP_GRID_WIDTH = 3
-constant MAP_GRID_HEIGHT = 3
-constant MAP_GRID_TILE_OFFSET = 16
-constant MAP_GRID_LINE_WIDTH = 16
-constant MAP_REPEAT_HORIZONTAL = 24
-constant MAP_REPEAT_VERTICAL = 19
-
-assert(MAP_GRID_WIDTH * MAP_REPEAT_HORIZONTAL <= MAP_WIDTH)
-assert(MAP_GRID_HEIGHT * MAP_REPEAT_VERTICAL <= MAP_HEIGHT)
-assert(MAP_WIDTH * MAP_HEIGHT < MetaTiles.MAP_SIZE)
-
-constant MIN_CAMERA_X = MetaTiles.map.LEFT
-constant MIN_CAMERA_Y = MetaTiles.map.TOP
-
-constant MAX_CAMERA_X = MIN_CAMERA_X + MAP_WIDTH * 16 - Camera.DISPLAY_WIDTH
-constant MAX_CAMERA_Y = MIN_CAMERA_Y + MAP_HEIGHT * 16 - Camera.DISPLAY_HEIGHT
-
-constant CAMERA_START_X = MIN_CAMERA_X + (MAX_CAMERA_X - MIN_CAMERA_X) / 2 - 7
-constant CAMERA_START_Y = MIN_CAMERA_Y + (MAX_CAMERA_Y - MIN_CAMERA_Y) / 2 + 13
-
 
 // Initializes the screen and loads tiles/palette to PPU
 //
@@ -326,6 +303,8 @@ macro SetupPpu() {
 // Generates the map.
 //
 // REQUIRES: 16 bit A, 16 bit Index, DB = 0x7e
+//
+// REQUIRES: MAP_WIDTH, MAP_HEIGHT, MAP_REPEAT_HORIZONTAL & MAP_REPEAT_VERTICAL set
 macro GenerateMap() {
     assert16a()
     assert16i()
@@ -333,13 +312,28 @@ macro GenerateMap() {
 constant _rowsLeft = Test.dpTmp
 constant _rowIndex = Test.dpTmp + 2
 
+    constant MAP_GRID_WIDTH = 3
+    constant MAP_GRID_HEIGHT = 3
+    constant MAP_GRID_TILE_OFFSET = 16
+    constant MAP_GRID_LINE_WIDTH = 16
+
+    assert(MAP_WIDTH < 256)
+    assert(MAP_HEIGHT == MetaTiles.MAP_HEIGHT_SMALL || MAP_HEIGHT == MetaTiles.MAP_HEIGHT_LARGE)
+    assert(MAP_GRID_WIDTH * MAP_REPEAT_HORIZONTAL <= MAP_WIDTH)
+    assert(MAP_GRID_HEIGHT * MAP_REPEAT_VERTICAL <= MAP_HEIGHT)
+    assert(MAP_WIDTH * MAP_HEIGHT < MetaTiles.MAP_SIZE)
+
+
     lda.w   #MAP_WIDTH
     sta.w   MetaTiles.map.width
 
-    lda.w   #MIN_CAMERA_Y + MAP_HEIGHT * 16
+    lda.w   #MAP_HEIGHT
+    sta.w   MetaTiles.map.bytesPerColumn
+
+    lda.w   #MetaTiles.map.TOP + MAP_HEIGHT * 16
     sta.w   MetaTiles.map.bottom
 
-    lda.w   #MIN_CAMERA_X + MAP_WIDTH * 16
+    lda.w   #MetaTiles.map.LEFT + MAP_WIDTH * 16
     sta.w   MetaTiles.map.right
 
     lda.w   #MAP_WIDTH * MAP_HEIGHT
@@ -415,7 +409,6 @@ macro PrintCameraPos() {
     constant textXPos = 0
     constant textYPos = 4
 
-
     Text.Console.SetCursor(textXPos, textYPos)
     Text.Console.PrintConstString("xPos: ")
 
@@ -431,11 +424,14 @@ macro PrintCameraPos() {
 
 
 // MetaTile Render Test
+//
+// REQUIRES: MetaTile map loaded
+//
+// REQUIRES: 16 bit A, 16 bit Index, DB = 0x7e
 a16()
 i16()
 code()
-Test.add("MetaTile Render Test")
-function Test {
+function DoTest {
     Text.Console.SetCursor(0, 19)
     Text.Console.PrintString(UnitTestMessage)
 
@@ -459,19 +455,21 @@ a16()
     lda.w   #Project.PaletteList.MetaTileRenderTest
     jsr     Resources.Palette.LoadPalette
 
-    GenerateMap()
 
-    lda.w   #CAMERA_START_X
+    lda.w   MetaTiles.map.right
+    lsr
+    adc.w   #MetaTiles.map.LEFT / 2
     sta.w   Camera.xPos
-
-    lda.w   #CAMERA_START_Y
-    sta.w   Camera.yPos
-
-
-    lda.w   #CAMERA_START_X + Camera.DISPLAY_WIDTH / 2
+    clc
+    adc.w   #Camera.DISPLAY_WIDTH / 2
     sta.w   Entity.Spawn.xPos
 
-    lda.w   #CAMERA_START_Y + Camera.DISPLAY_HEIGHT / 2
+    lda.w   MetaTiles.map.bottom
+    lsr
+    adc.w   #MetaTiles.map.TOP / 2
+    sta.w   Camera.yPos
+    clc
+    adc.w   #Camera.DISPLAY_WIDTH / 2
     sta.w   Entity.Spawn.yPos
 
     lda.w   #Project.EntityIds.MapCursor
@@ -533,6 +531,40 @@ Pass:
 }
 
 
+a16()
+i16()
+code()
+Test.add("MetaTile Render (Small map)")
+function SmallMapHeightTest {
+    constant MAP_WIDTH = 84
+    constant MAP_HEIGHT = MetaTiles.MAP_HEIGHT_SMALL
+
+    constant MAP_REPEAT_HORIZONTAL = 24
+    constant MAP_REPEAT_VERTICAL = 19
+
+    GenerateMap()
+
+    jmp     DoTest
+}
+
+
+a16()
+i16()
+code()
+Test.add("MetaTile Render (Large map)")
+function LargeMapHeightTest {
+    constant MAP_WIDTH = 84
+    constant MAP_HEIGHT = MetaTiles.MAP_HEIGHT_LARGE
+
+    constant MAP_REPEAT_HORIZONTAL = 24
+    constant MAP_REPEAT_VERTICAL = 40
+
+    GenerateMap()
+
+    jmp     DoTest
+}
+
+
 // ROM Data
 // ========
 
@@ -545,7 +577,6 @@ UnitTestMessage:
     db  "Press SELECT to redraw map\n"
     db  "Press L to set map cell\n"
     db  "Press L&R to set {LR_CELLS} map cells",0
-
 }
 }
 

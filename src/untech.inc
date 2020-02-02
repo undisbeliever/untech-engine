@@ -85,6 +85,7 @@ include "entity/spawn.inc"
 include "entity/transitions.inc"
 include "entity/validation.inc"
 
+include "metatiles/_mapheight.inc"
 include "metatiles/collisions.inc"
 include "metatiles/render.inc"
 include "metatiles/tileset.inc"

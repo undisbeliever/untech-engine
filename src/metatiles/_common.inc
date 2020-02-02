@@ -16,11 +16,12 @@ Warnings.Register(SET_MAP_CELL_ERROR, 24, 0, 12)
 
 namespace MetaTiles {
 
+namespace SetMapCell {
 // DP unknown
+// P on stack
 au()
 i16()
 code()
-namespace SetMapCell {
 ReturnWithWarning:
     Warnings.Warn(SET_MAP_CELL_ERROR)
 
@@ -70,13 +71,43 @@ a8()
     bit.w   inidispBuffer
     bmi     Return
 
-    rep     #$30
-a16()
+    BranchIfMapIsSmall_Long(SmallMapHeight)
 
-    Render._DrawMapCell()
+    LargeMapHeight:
+    namespace LargeMapHeight {
+        rep     #$30
+    a16()
 
-    plp
-    rts
+        Render._DrawMapCell(LARGE)
+
+        plp
+        rts
+    }
+
+    namespace SmallMapHeight {
+    // DP unknown
+    // P on stack
+    au()
+    i16()
+    code()
+    ReturnWithWarning:
+        Warnings.Warn(SET_MAP_CELL_ERROR)
+
+    Return:
+        plp
+        rts
+    }
+
+    SmallMapHeight:
+    namespace SmallMapHeight {
+        rep     #$30
+    a16()
+
+        Render._DrawMapCell(SMALL)
+
+        plp
+        rts
+    }
 }
 
 
@@ -95,27 +126,54 @@ allocateTmpWord(_tileIndexTmp)
 
     assert(METATILE_SIZE_PX == 16)
 
-    // X = (entity->yPos & Y_POSITION_MASK) / 16
-    //     + ((entity.xPos.px & X_POSITION_MASK) / 16 * MAP_HEIGHT)
+    inline __PositionToMapIndex(mapHeight) {
+        assert16a()
+        assert16i()
 
-    lda.b   BaseEntity.yPos.px
-    and.w   #Y_POSITION_MASK
-    lsr
-    lsr
-    lsr
-    lsr
-    sta.w   _tileIndexTmp
+        constant MAP_HEIGHT = MAP_HEIGHT_{mapHeight}
+        constant Y_POSITION_MASK = Y_POSITION_MASK_{mapHeight}
 
-    lda.b   BaseEntity.xPos.px
-    and.w   #X_POSITION_MASK
-    assert(map.HEIGHT / 16 == 4)
-    asl
-    asl
-    // carry clear
-    adc.w   _tileIndexTmp
-    tax
+        // X = (entity->yPos & Y_POSITION_MASK) / 16
+        //     + ((entity.xPos.px & X_POSITION_MASK) / 16 * MAP_HEIGHT)
 
-    rts
+        lda.b   BaseEntity.yPos.px
+        and.w   #Y_POSITION_MASK
+        lsr
+        lsr
+        lsr
+        lsr
+        sta.w   _tileIndexTmp
+
+        lda.b   BaseEntity.xPos.px
+        and.w   #X_POSITION_MASK
+        if MAP_HEIGHT / METATILE_SIZE_PX == 4 {
+            asl
+            asl
+        } else if MAP_HEIGHT / METATILE_SIZE_PX == 8 {
+            asl
+            asl
+            asl
+        } else {
+            error "Invalid MAP_HEIGHT"
+        }
+        // carry clear
+        adc.w   _tileIndexTmp
+        tax
+    }
+
+    BranchIfMapIsSmall(SmallMapHeight)
+
+    LargeMapHeight:
+    namespace LargeMapHeight {
+        __PositionToMapIndex(LARGE)
+        rts
+    }
+
+    SmallMapHeight:
+    namespace SmallMapHeight {
+        __PositionToMapIndex(SMALL)
+        rts
+    }
 }
 
 }

@@ -17,13 +17,13 @@ namespace MetaTiles {
     constant METATILE_DISPLAY_WIDTH = 16
     constant METATILE_DISPLAY_HEIGHT = 14
 
+    constant MAP_HEIGHT_SMALL = 64
+    constant MAP_HEIGHT_LARGE = 128
+
     namespace map {
-        // Map Width in metatiles
+        // Map width in metatiles
         // (uint8)
         allocate(width, wram7e, 1)
-
-        // Map Height in metatiles
-        constant HEIGHT = 64
 
         // Map data
         //
@@ -34,8 +34,20 @@ namespace MetaTiles {
         // Calculated values
         // =================
 
+        // Number of bytes per column (AKA map height in metaTiles)
+        //
+        // Used to determine if the map has a small (64) or large (128)
+        // height, see `BranchIfMapIsSmall` macro for more details.
+        //
+        // Used to move tileIndex left or right.
+        //
+        // MUST be equal to MAP_HEIGHT_SMALL (64) or MAP_HEIGHT_LARGE (128)
+        //
+        // (uint16, MUST be equal to 64 or 128)
+        allocate(bytesPerColumn, wram7e, 2)
+
         // The number of bytes in the data
-        // (Equal to map.width * HEIGHT)
+        // (Equal to map.width * map.bytesPerColumn)
         // (uint16)
         allocate(dataSize, wram7e, 2)
 
@@ -54,10 +66,13 @@ namespace MetaTiles {
 
     // A bit-mask used when converting a position to a tile index/address
     constant X_POSITION_MASK = 0xff * METATILE_SIZE_PX
-    constant Y_POSITION_MASK = (map.HEIGHT - 1) * METATILE_SIZE_PX
-    assertPowerOfTwo(map.HEIGHT)
+    constant Y_POSITION_MASK_SMALL = (MAP_HEIGHT_SMALL - 1) * METATILE_SIZE_PX
+    constant Y_POSITION_MASK_LARGE = (MAP_HEIGHT_LARGE - 1) * METATILE_SIZE_PX
+    assertPowerOfTwo(MAP_HEIGHT_SMALL)
+    assertPowerOfTwo(MAP_HEIGHT_LARGE)
     assert(X_POSITION_MASK < map.LEFT)
-    assert(Y_POSITION_MASK < map.TOP)
+    assert(Y_POSITION_MASK_SMALL < map.TOP)
+    assert(Y_POSITION_MASK_LARGE < map.TOP)
 
     // Horizontal SNES Tilemap Buffer
     // A single tile map 64 * 2 tiles in size
