@@ -95,16 +95,6 @@ constant Main = Test.ProcessTests
 
 Test.finalizeTable()
 
-
-au()
-iu()
-code(code)
-CopHandler:
-IrqHandler:
-EmptyHandler:
-    rti
-
-
 finalizeMemory()
 
 // vim: ft=bass-65816 ts=4 sw=4 et:

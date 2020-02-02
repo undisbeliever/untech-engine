@@ -11,8 +11,11 @@
 
 au()
 iu()
-code()
+code(interrupt_code)
 function NmiHandler {
+    // ensure NmiHandler is accessible by interrupt vectors
+    assert((pc() & 0x3fffff) >= 0x008000 && (pc() & 0x3fffff) < 0x00ffff)
+
 // Number of NMIs processed since the counter was last reset
 // (byte)
 allocate(counter, shadow, 1)

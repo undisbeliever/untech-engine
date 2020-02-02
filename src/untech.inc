@@ -47,6 +47,7 @@ include "hdma/horizontal-trapezium-window.inc"
 include "hdma/triangular-window.inc"
 include "hdma/_common.inc"
 
+include "interrupts/unused_interrupts.inc"
 include "interrupts/break_handler.inc"
 include "interrupts/reset_handler.inc"
 include "interrupts/nmi_handler.inc"

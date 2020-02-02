@@ -14,14 +14,22 @@
 // Distributed under The MIT License: https://opensource.org/licenses/MIT
 
 
-namespace BreakHandler {
+// Break ISR
+au()
+iu()
+code(interrupt_code)
+function BreakHandler {
+    // ensure BreakHandler is accessible by interrupt vectors
+    assert((pc() & 0x3fffff) >= 0x008000 && (pc() & 0x3fffff) < 0x00ffff)
+
+    jml     BreakBSOD.ISR
+}
+
+
+namespace BreakBSOD {
 
 constant BSOD_BG_COLOR = 13 << Palette.blue.shift
 constant BSOD_TEXT_COLOR = 0x7fff
-
-// Code must be in bank 0
-code()
-assert((pc() & 0x3fffff) >= 0x008000 && (pc() & 0x3fffff) < 0x00ffff)
 
 
 // Initializes the error text console
@@ -341,6 +349,8 @@ macro PrintBreakpoint() {
     assert8a()
     assert16i()
 
+    phb
+
     // Break String and Break Id
     SetCursor(2, 3)
     lda     13,s
@@ -358,7 +368,6 @@ a8()
     lda.w   0,x
     ldx.w   #BreakString
 
-    phk
     plb
 
     if {defined __MEMORY__.romBlocks.breakIdStrings} {
@@ -514,15 +523,16 @@ i16()
 
     jsr     ResetRegisters
 
-    // DB = 0, DP = $2100
-    phk
-    plb
+    // Set DB = 0, DP = $2100
 
     lda.w   #$2100
     tcd
 
     sep     #$20
 a8()
+    // A = 0
+    pha
+    plb
 
     Init()
 
@@ -569,8 +579,6 @@ DPString:
 DBString:
     db  "DB: ", 0
 }
-
-constant BreakHandler = BreakHandler.ISR
 
 // vim: ft=bass-65816 ts=4 sw=4 et:
 

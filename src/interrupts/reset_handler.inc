@@ -16,15 +16,6 @@
 // Copyright (c) 2016 - 2019, Marcus Rowe <undisbeliever@gmail.com>.
 // Distributed under The MIT License: https://opensource.org/licenses/MIT
 
-
-au()
-iu()
-code()
-
-// ensure ResetHandler is accessible by interrupt vectors
-assert(pc() & 0x3fffff < 0x010000)
-assert(pc() & 0x00ffff >= 0x008000)
-
 constant STACK_SIZE = __MEMORY__.ramBlocks.stack.end - __MEMORY__.ramBlocks.stack.start + 1
 constant STACK_BOTTOM = __MEMORY__.ramBlocks.stack.end
 assert((STACK_BOTTOM & 0xffff) < 0x2000)
@@ -33,12 +24,25 @@ assert((STACK_BOTTOM >> 16) == 0 || (STACK_BOTTOM >> 16) == 0x7e)
 allocate(STACK_TOP, stack, STACK_SIZE)
 
 
-// Reset the SNES, initializing the registers and clearing all the memory.
+// Reset ISR
+au()
+iu()
+code(interrupt_code)
 function ResetHandler {
+    // ensure ResetHandler is accessible by interrupt vectors
+    assert((pc() & 0x3fffff) >= 0x008000 && (pc() & 0x3fffff) < 0x00ffff)
 
-    jml     reset
-reset:
+    jml     _ResetHandler_Start
+}
 
+// Reset the SNES, initializing the registers, clearing the memory and jump to `Main`.
+//
+// NOTE: It is not possible to reset the SPC700.
+//       This routine MUST ONLY be called once by the ResetHandler.
+au()
+iu()
+code()
+function _ResetHandler_Start {
     sei
     clc
     xce             // Switch to native mode

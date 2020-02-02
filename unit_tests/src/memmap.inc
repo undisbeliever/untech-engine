@@ -2,7 +2,8 @@
 // Copyright (c) 2016 - 2019, Marcus Rowe <undisbeliever@gmail.com>.
 // Distributed under The MIT License: https://opensource.org/licenses/MIT
 
-createCodeBlock(code,                   0xc08000, 0xc0ffaf)
+createCodeBlock(code,                   0xc08000, 0xc0ff8f)
+createCodeBlock(interrupt_code,         0xc0ff90, 0xc0ffaf)
 createDataBlock(breakIdStrings,         0xc00000, 0xc017ff)
 createDataBlock(testTableBlock,         0xc02000, 0xc03fff)
 
