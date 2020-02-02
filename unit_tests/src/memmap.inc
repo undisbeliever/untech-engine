@@ -2,23 +2,21 @@
 // Copyright (c) 2016 - 2019, Marcus Rowe <undisbeliever@gmail.com>.
 // Distributed under The MIT License: https://opensource.org/licenses/MIT
 
-createCodeBlock(code,                   0xc08000, 0xc0ff8f)
-createCodeBlock(interrupt_code,         0xc0ff90, 0xc0ffaf)
-createDataBlock(breakIdStrings,         0xc00000, 0xc017ff)
-createDataBlock(testTableBlock,         0xc02000, 0xc03fff)
 
-createDataBlock(RES_Lists,              0xc04000, 0xc04fff)
-createDataBlock(rom0,                   0xc05000, 0xc07fff)
+createDataBlock(breakIdStrings,         0xc00000, 0xc007ff)
+createDataBlock(testNameBlock,          0xc00800, 0xc02bff)
+createDataBlock(testTableBlock,         0xc02c00, 0xc02fff)
+createCodeBlock(code,                   0xc03000, 0xc0ff8f)
+createCodeBlock(interrupt_code,         0xc0ff90, 0xc0ffaf)
 
 createDataBlock(RES_Block0,             0xc10000, 0xc11fff)
 createDataBlock(RES_Block1,             0xc12000, 0xc13fff)
 createDataBlock(RES_Block2,             0xc14000, 0xc15fff)
 createDataBlock(RES_Block3,             0xc16000, 0xc17fff)
 createDataBlock(RES_Block4,             0xc18000, 0xc19fff)
-createDataBlock(RES_Block5,             0xc1a000, 0xc1bfff)
-createDataBlock(RES_Block6,             0xc1c000, 0xc1dfff)
 
-createDataBlock(testNameBlock,          0xc1e000, 0xc1ffff)
+createDataBlock(RES_Lists,              0xc1a000, 0xc1bfff)
+createDataBlock(rom0,                   0xc1c000, 0xc1ffff)
 
 
 createRamBlock(dp,          0x000000, 0x0000ff)
