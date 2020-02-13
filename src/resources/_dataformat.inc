@@ -34,11 +34,9 @@ namespace Format {
     // AnimatedTileset resource data format.
     //   <header> <lz4 static tiles + animated tiles>
     //
-    // NOTE: The size of the animated tiles block must be <= MAX_ANIMATED_TILES_BLOCK_SIZE
     // NOTE: The size of the animated tiles frame must be <= MAX_ANIMATION_FRAME_SIZE
     //
     namespace AnimatedTilesetHeader {
-        constant MAX_ANIMATED_TILES_BLOCK_SIZE = 8192
         constant MAX_ANIMATION_FRAME_SIZE = 32 * 32 // 32 4bpp tiles
         constant ANIMATION_FRAME_SIZE_SCALE = 16
 

@@ -10,8 +10,18 @@
 
 namespace Resources {
 
-constant decompressionBuffer.size = 32 * 1024
+// Decompression buffer
+//
+// Holds the decompressed tile data used by the resources subsystem.
+//
+// Must call `Resources.Init` to reset the buffer position
+// (wram 7F)
+constant decompressionBuffer.size = 48 * 1024
 allocate(decompressionBuffer, wram7f, decompressionBuffer.size)
+
+// Current location within the decompression buffer
+// (word pointer)
+allocate(decompressionBufferPos, wram7e, 2)
 
 
 // Number of animation ticks per display frame.
@@ -23,30 +33,30 @@ allocate(animationSpeed, wram7e, 2)
 
 
 namespace AnimatedTileset {
-    // buffer to hold the decompressed animated tiles
-    // (wram7f)
-    constant animationBuffer.size = Format.AnimatedTilesetHeader.MAX_ANIMATED_TILES_BLOCK_SIZE
-    allocate(animationBuffer, wram7f, animationBuffer.size)
-    assert(decompressionBuffer + decompressionBuffer.size == animationBuffer)
-
     // Vram word address to store the upload the buffer to
     // (vram word address)
     allocate(animationVramWaddr, shadow, 2)
 
-    // Address of the current animation frame in the paletteBuffer
-    // If 0 then animation is disabled
-    // (word addr - shadow)
-    allocate(animationBufferPos, shadow, 2)
-
-    // The size of the palette animation frame in bytes
+    // The size of the animation frame in bytes
     // NOTE: After setting this value you MUST INVOKE
     //       `Dma.Resources.CalcualateDmaTime(AnimatedTileset)`
     // (uint16 - shadow)
     allocate(animationFrameSize, shadow, 2)
 
-    // The address following the end of the data in the palette buffer
+
+    // Address of the current animation frame
+    // If 0 then animation is disabled
+    // (word addr - shadow)
+    allocate(animationBufferPos, shadow, 2)
+
+    // The starting address of the animation buffer
+    // (word addr - shadow)
+    allocate(animationBufferBegin, wram7e, 2)
+
+    // The address following the end of the data in the animation buffer
     // (word addr - shadow)
     allocate(animationBufferEnd, wram7e, 2)
+
 
     // The amount of DMA time requited to upload the animation frame to VRAM
     // (uint16)

@@ -29,15 +29,21 @@ i16()
 code()
 function LoadAnimatedTileset_FromPtr {
 constant _ptr = LZ4.ptr
-constant _staticTilesSize = utDpTmp0
-constant _staticTilesPtr = utDpTmp1
+constant _animatedTilesSize = utDpTmp0
+constant _vramUploadSize = utDpTmp1
+
+constant _vramWordAddress = utDpTmp2
 
 assertZeroPage(_ptr)
 assert(Format.AnimatedTilesetHeader.size == 4)
-assert(decompressionBuffer + decompressionBuffer.size == animationBuffer)
+
+
+    stx.b   _vramWordAddress
 
     ldy.b   _ptr
 
+    assert(Format.AnimatedTilesetHeader.nAnimations == 0)
+    assert(Format.AnimatedTilesetHeader.animationFrameSizeScaled == 1)
     lda     [_ptr]                  // nAnimations & animationFrameSizeScaled
     iny
     bit.w   #0xff
@@ -46,8 +52,9 @@ assert(decompressionBuffer + decompressionBuffer.size == animationBuffer)
 
         sty.b   _ptr
         stz.w   animationBufferPos
-        // X = vram word address
-        jmp     DecompressToVram_FromPtr
+
+        jsr     DecompressData_FromPtr
+        bra     UploadToVram
 
 HasAnimation:
     iny
@@ -72,9 +79,7 @@ HasAnimation:
     sta.w   animationFrameSize
     Dma.Resources.CalcualateDmaTime(AnimatedTileset)
 
-    lda.w   #animationBuffer
-    sta.w   animationBufferPos
-
+    assert(Format.AnimatedTilesetHeader.animationDelay == 2)
     lda     [_ptr]                  // animationDelay
     sta.w   animationDelay
     sta.w   animationCountdown
@@ -84,18 +89,9 @@ HasAnimation:
     sty.b   _ptr
 
 
-    // Calculate location to decompress the buffer to.
-    // Align _staticTilesPtr so that the animated tiles start at animationBuffer
-
+    // Calculate size of animated tiles
     //  RDMPY = nTiles * animationFrameSizeScaled  (from above)
-    //  if RDMPY * ANIMATION_FRAME_SIZE_SCALE > animationBuffer.size:
-    //      goto Fail
-    //
-    //  _staticTilesSize = decompressedDataSize - RDMPY * ANIMATION_FRAME_SIZE_SCALE
-    //  _staticTilesPtr = animationBuffer - _staticTilesPtr
-    //
-    //  if _staticTilesPtr < decompressionBuffer:
-    //      goto Fail
+    // _animatedTilesSize = RDMPY * ANIMATION_FRAME_SIZE_SCALE
 
     assert(Format.AnimatedTilesetHeader.ANIMATION_FRAME_SIZE_SCALE == 16)
     lda.l   RDMPY
@@ -103,63 +99,69 @@ HasAnimation:
     asl
     asl
     asl
-    cmp.w   #animationBuffer.size
-    bcs     Fail
+    sta.b   _animatedTilesSize
 
-    // A = size of animation Block
-    eor.w   #0xffff
+
+    jsr     DecompressData_FromPtr
+
+
+    // X = start of decompression buffer
+    // Y = end of decompression buffer
+    // A = size of decompression buffer
+
+    // MUST KEEP X
+
+    // _vramUploadSize = decompressedSize - _animatedTilesSize + animationFrameSize
     sec
-    adc     [_ptr]                  // lz4 decompressed size
-    bcc     Fail                    // error: underflow
-    sta.b   _staticTilesSize
-
-    eor.w   #0xffff
-    sec
-    adc.w   #animationBuffer
-    bcc     Fail                    // error: underflow
-    assert(decompressionBuffer & 0xffff == 0)
-    sta.b   _staticTilesPtr
-
-
-    // save VRAM word address
-    txa
-    sta.l   VMADD
-
-    // animationVramWaddr = VMADD + _staticTilesSize / 2
-    asl
+    sbc.b   _animatedTilesSize
+    // A = size of static tiles
     clc
-    adc.b   _staticTilesSize
+    adc.w   animationFrameSize
+    sta.b   _vramUploadSize
+
+    // set animationVramWaddr
+    sec
+    sbc.w   animationFrameSize
+    // A = size of static tiles
     lsr
+    clc
+    adc.b   _vramWordAddress
     sta.w   animationVramWaddr
 
-
-    // Decompress data block to _staticTilesPtr
-
-    ldx.b   _staticTilesPtr
-    lda.w   #decompressionBuffer >> 16
-    ldy.w   #decompressionBuffer.size + animationBuffer.size
-
-    jsr     LZ4.Decompress
-
+    // Set animation buffer end/begin/pos
     sty.w   animationBufferEnd
+    tya
+    sec
+    sbc.b   _animatedTilesSize
+    sta.w   animationBufferBegin
+    sta.w   animationBufferPos
+    bne     +
+        // This should never happen.
+        // Animated tileset should have at least one static tile.
+    InvalidAnimationBufferPos:
+        break(INVALID_ANIMATED_TILESET)
+    +
+
+    lda.b   _vramUploadSize
 
 
-
+UploadToVram:
     // Transfer static tiles and first frame of animated tiles to VRAM
+
+    // X = starting address
+    // A = bytes to transfer
+    tay
+
+    // save VRAM word address
+    lda.b   _vramWordAddress
+    sta.l   VMADD
 
     pea     (0x7e << 8) | REGISTER_DB
     plb
     // DB == REGISTER_DB
 
-    // transfer size = _staticTilesSize + animationFrameSize
-    lda.b   _staticTilesSize
-    clc
-    adc.w   animationFrameSize
-    tay
-
     sep     #$20
 a8()
-    ldx.b   _staticTilesPtr
     lda.b   #decompressionBuffer >> 16
 
     jsr     Dma.ForceBlank.TransferToVram
@@ -173,7 +175,7 @@ a16()
 }
 
 
-// Disables the palette animation
+// Disables the animated tileset animation
 // REQUIRES: 16 bit A, DB access shadow
 macro DisableAnimation() {
     assert16a()
@@ -205,7 +207,7 @@ macro _ProcessAnimation() {
             adc.w   AnimatedTileset.animationFrameSize
             cmp.w   AnimatedTileset.animationBufferEnd
             bcc     +
-                lda.w   #AnimatedTileset.animationBuffer
+                lda.w   AnimatedTileset.animationBufferBegin
             +
             sta.w   AnimatedTileset.animationBufferPos
 

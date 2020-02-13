@@ -110,7 +110,7 @@ macro _VBlank() {
 
         lda.w   Resources.AnimatedTileset.animationBufferPos
         sta.b   A1T0
-        ldx.b   #Resources.AnimatedTileset.animationBuffer >> 16
+        ldx.b   #Resources.decompressionBuffer >> 16
         stx.b   A1B0
 
         lda.w   Resources.AnimatedTileset.animationFrameSize

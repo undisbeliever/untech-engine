@@ -7,6 +7,7 @@
 // Copyright (c) 2016 - 2019, Marcus Rowe <undisbeliever@gmail.com>.
 // Distributed under The MIT License: https://opensource.org/licenses/MIT
 
+RegisterBreakId(DECOMPRESSION_BUFFER_FULL)
 
 namespace Resources {
 
@@ -34,6 +35,11 @@ function Init {
     +
     sta.w   animationSpeed
 
+
+    // Reset decompression Buffer
+    lda.w   #decompressionBuffer
+    sta.w   decompressionBufferPos
+
     rts
 }
 
@@ -55,61 +61,61 @@ function ProcessAnimations {
 
 
 
-// Decompress a lz4 block to VRAM at a given word address
+// Decompress a lz4 block into the decompressionBuffer
 //
-// REQUIRES: 16 bit A, 16 bit Index, DB = 0x7e, DP = 0, force blank
-// DMA: Uses DMA channel 0
+// REQUIRES: 16 bit A, 16 bit Index, DB = 0x7e, DP = 0
 // MODIFIES: decompressionBuffer
-//
 // INPUT: LZ4.ptr = address of the lz4 block
-//              X = vram word address to load tiles to
+// OUTPUT: X = address at the start of the decompressed data
+//         Y = address of the end of the decompressed data
+//         A = size of the decompressed data
 a16()
 i16()
 code()
-function DecompressToVram_FromPtr {
-    pea     (0x7e << 8) | REGISTER_DB
-    plb
-    // DB == REGISTER_DB
+function DecompressData_FromPtr {
+    lda.w   #decompressionBuffer - decompressionBuffer.size
+    sec
+    sbc.w   decompressionBufferPos
+    bcc     DecompressionBufferFull
+    tay
+    // Y = remaining size of buffer
+
+    // Check we can fit the decompressed data in the decompressionBuffer
+    lda.w   decompressionBufferPos
+    clc
+    adc     [LZ4.ptr]                   // LZ4 header: decompressed size
+    bcs     DecompressionBufferFull
+    cmp.w   #decompressionBuffer.size
+    bcc     +
+    DecompressionBufferFull:
+        // Decided to do this here so I get a cleaner error message
+        break(DECOMPRESSION_BUFFER_FULL)
+    +
 
     sep     #$20
 a8()
-i16()
 
-    stx.w   VMADD
-
-
-    // Decompress tiles
-
-    ldx.w   #decompressionBuffer
+    ldx.w   decompressionBufferPos
     lda.b   #decompressionBuffer >> 16
-    ldy.w   #decompressionBuffer.size
+
 
     jsr     LZ4.Decompress
 
 
-    // Transfer tiles to VRAM
-
-    rep     #$30
+    rep     #$20
 a16()
-    // Y = end of decompressed buffer
-    tya
-    clc
-    adc.w   #-decompressionBuffer
-    tay
+    ldx.w   decompressionBufferPos
+    // X = start of the decompressed data
 
-    sep     #$20
-a8()
-    ldx.w   #decompressionBuffer
-    lda.b   #decompressionBuffer >> 16
+    // Y = end of the decompressed output buffer
+    sty.w   decompressionBufferPos
 
-    jsr     Dma.ForceBlank.TransferToVram
+    txa
+    eor.w   #0xffff
+    sec
+    adc.w   decompressionBufferPos
+    // A = size of decompressed buffer
 
-    plb
-    // DB = 0x7e
-
-    rep     #$30
-a16()
-i16()
     rts
 }
 
