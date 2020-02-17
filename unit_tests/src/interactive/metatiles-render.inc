@@ -435,16 +435,6 @@ function DoTest {
     Text.Console.SetCursor(0, 19)
     Text.Console.PrintString(UnitTestMessage)
 
-    sep     #$20
-a8()
-
-    jsr     ForceBlank
-
-    SetupPpu()
-
-    rep     #$30
-a16()
-
     jsr     Entity.Init
     jsr     Resources.Init
 
@@ -477,6 +467,20 @@ a16()
     bcs     +
         rts
     +
+
+
+
+    sep     #$20
+a8()
+
+    jsr     ForceBlank
+
+    SetupPpu()
+
+    rep     #$30
+a16()
+
+    jsr     Resources.TransferToPpu
 
 
 RedrawMap:

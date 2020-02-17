@@ -327,19 +327,11 @@ function Test {
 
 constant _entity = Test.tmp + 0
 
-    sep     #$20
-a8()
-
-    jsr     ForceBlank
-
-    SetupPpu()
-
-    rep     #$30
-a16()
-
     jsr     Entity.Init
     jsr     Resources.Init
 
+
+    LoadMap()
 
     lda.w   #Project.MetaTileTilesetList.TileCollisionTest
     jsr     MetaTiles.LoadTileset
@@ -347,7 +339,6 @@ a16()
     lda.w   #Project.PaletteList.TileCollisionTest
     jsr     Resources.Palette.LoadPalette
 
-    LoadMap()
 
     lda.w   #GRAVITY
     sta.w   Room.gravity_sx
@@ -374,7 +365,18 @@ a16()
     sty.w   _entity
 
 
+
+    sep     #$20
+a8()
+
     jsr     ForceBlank
+
+    SetupPpu()
+
+    rep     #$30
+a16()
+
+    jsr     Resources.TransferToPpu
 
     jsr     MetaTiles.Render.DrawFullScreen_ForceBlank
 

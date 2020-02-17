@@ -265,6 +265,33 @@ i8()
 }
 
 
+// Transfers a block of memory to CGRAM
+// DMA: Uses DMA channel 0
+// REQUIRES: 8 bit A, 16 bit Index, DB access registers
+// REQUIRES: screen blank
+//
+// INPUT: A:X address
+// INPUT: Y   size (in bytes)
+a8()
+i16()
+code()
+function TransferToCgram {
+    stx.w   A1T0
+    sta.w   A1B0
+    sty.w   DAS0
+
+    ldx.w   #DMAP.direction.toPpu | DMAP.transfer.one | (CGDATA << 8)
+    stx.w   DMAP0
+
+    AssertForceBlank()
+
+    lda.b   #MDMAEN.dma0
+    sta.w   MDMAEN
+
+    rts
+}
+
+
 // Transfers a block of memory to VRAM
 // DMA: Uses DMA channel 0
 // REQUIRES: 8 bit A, 16 bit Index, DB access registers

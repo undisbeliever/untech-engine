@@ -8,6 +8,9 @@
 // Distributed under The MIT License: https://opensource.org/licenses/MIT
 
 
+// Triggered when the VramTransferBuffer overflows
+RegisterBreakId(TOO_MANY_RESOURCES)
+
 namespace Resources {
 
 // Decompression buffer
@@ -75,6 +78,7 @@ namespace AnimatedTileset {
     allocate(animationCountdown, wram7e, 2)
 }
 
+
 namespace Palette {
     // memory buffer to store the decompressed palettes in
     // (wram7f)
@@ -111,6 +115,31 @@ namespace Palette {
     // When < 0 then a queue the next animation
     // (uint16 - animationTicks)
     allocate(animationCountdown, wram7e, 2)
+}
+
+
+// Buffer of DMA transfers from WRAM 7F to VRAM
+namespace VramTransferBuffer {
+    constant N_ELEMENTS = 10
+
+    // current index within buffer
+    // (word)
+    allocate(currentIndex, wram7e, 2)
+
+    constant LAST_INDEX = N_ELEMENTS * 2
+
+
+    // Location of data in bank wram7f
+    // (word ptr array)
+    allocate(sourceWram7fAddr, wram7e, 2 * N_ELEMENTS)
+
+    // size of transfer
+    // (uint16 array)
+    allocate(size, wram7e, 2 * N_ELEMENTS)
+
+    // vram word address to upload data to
+    // (uint16 array - word address)
+    allocate(destinationVramWaddr, wram7e, 2 * N_ELEMENTS)
 }
 
 }

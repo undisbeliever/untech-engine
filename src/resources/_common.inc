@@ -40,6 +40,11 @@ function Init {
     lda.w   #decompressionBuffer
     sta.w   decompressionBufferPos
 
+    stz.w   VramTransferBuffer.currentIndex
+
+    // Disable palette data
+    stz.w   Palette.animationFrameSize
+
     rts
 }
 
@@ -115,6 +120,73 @@ a16()
     sec
     adc.w   decompressionBufferPos
     // A = size of decompressed buffer
+
+    rts
+}
+
+
+
+// Transfer decompressed data to the PPU
+//
+// REQUIRES: 16 bit A, 16 bit Index, DB = 0x7e, Force Blank
+a16()
+i16()
+code()
+function TransferToPpu {
+    pea     (0x7e << 8) | REGISTER_DB
+    plb
+    // DB == REGISTER_DB
+
+    VramLoop:
+        lda.l   VramTransferBuffer.currentIndex
+        beq     EndVramLoop
+        dec
+        dec
+        sta.l   VramTransferBuffer.currentIndex
+        tax
+
+
+        lda.l   VramTransferBuffer.destinationVramWaddr,x
+        sta.w   VMADD
+
+        lda.l   VramTransferBuffer.size,x
+        tay
+
+        lda.l   VramTransferBuffer.sourceWram7fAddr,x
+        tax
+
+        sep     #$20
+    a8()
+        lda.b   #decompressionBuffer >> 16
+
+        jsr     Dma.ForceBlank.TransferToVram
+
+        rep     #$20
+    a16()
+
+        bra     VramLoop
+EndVramLoop:
+
+
+    // Transfer palette data to CGRAM
+    ldy.w   Resources.Palette.animationFrameSize
+    beq     NoCgramTransfer
+        sep     #$20
+    a8()
+
+        stz.w   CGADD
+
+        ldx.w   Resources.Palette.animationPos
+        lda.b   #Resources.Palette.paletteBuffer >> 16
+
+        jsr     Dma.ForceBlank.TransferToCgram
+
+        rep     #$30
+    a16()
+NoCgramTransfer:
+
+    plb
+    // DB = 0x7e
 
     rts
 }

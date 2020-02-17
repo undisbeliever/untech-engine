@@ -54,7 +54,7 @@ assert(Format.AnimatedTilesetHeader.size == 4)
         stz.w   animationBufferPos
 
         jsr     DecompressData_FromPtr
-        bra     UploadToVram
+        bra     AddToVramTransferBuffer
 
 HasAnimation:
     iny
@@ -145,32 +145,30 @@ HasAnimation:
     lda.b   _vramUploadSize
 
 
-UploadToVram:
-    // Transfer static tiles and first frame of animated tiles to VRAM
+AddToVramTransferBuffer:
+    // Add tiles to DMA buffer
 
     // X = starting address
     // A = bytes to transfer
-    tay
+    
+    ldy.w   VramTransferBuffer.currentIndex
+    cpy.w   #VramTransferBuffer.LAST_INDEX
+    bcc     +
+        break(TOO_MANY_RESOURCES)
+    +
 
-    // save VRAM word address
+    sta.w   VramTransferBuffer.size,y
+
+    txa
+    sta.w   VramTransferBuffer.sourceWram7fAddr,y
+
     lda.b   _vramWordAddress
-    sta.l   VMADD
+    sta.w   VramTransferBuffer.destinationVramWaddr,y
 
-    pea     (0x7e << 8) | REGISTER_DB
-    plb
-    // DB == REGISTER_DB
+    iny
+    iny
+    sty.w   VramTransferBuffer.currentIndex
 
-    sep     #$20
-a8()
-    lda.b   #decompressionBuffer >> 16
-
-    jsr     Dma.ForceBlank.TransferToVram
-
-    plb
-    // DB = 0x7e
-
-    rep     #$30
-a16()
     rts
 }
 
