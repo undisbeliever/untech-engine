@@ -272,7 +272,7 @@ namespace MetaSprite {
     namespace Animation {
         // The speed of the animations in Wait Timer mode
         //
-        // This variable is set to 5  = NTSC) or 6 (PAL
+        // This variable is set to 5 on an NTSC console or 6 or a PAL console
         // (word)
         allocateTmpWord(timerSpeed)
     }

@@ -29,7 +29,7 @@ allocate(decompressionBufferPos, wram7e, 2)
 
 // Number of animation ticks per display frame.
 //
-// This variable is set to 5 on NTSC and 6 on PAL
+// This variable is set to 5 on an NTSC console or 6 on a PAL console
 // This variable is shared by MetaSprite.Animation.timerSpeed
 // (uint16 - ticks)
 allocate(animationSpeed, wram7e, 2)
