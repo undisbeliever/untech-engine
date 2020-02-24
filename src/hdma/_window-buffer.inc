@@ -349,7 +349,6 @@ function FinalizeBuffer {
     sta.w   ChannelSettings.tableAddr
 
     assert(ChannelSettings.dmap + 1 == ChannelSettings.register)
-
     lda.w   #DMAP.direction.toPpu | DMAP.addressing.indirect | DMAP.transfer.two | (WH0 << 8)
     sta.w   ChannelSettings.dmap
 

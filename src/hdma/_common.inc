@@ -61,9 +61,8 @@ macro VBlank() {
     ldx.w   Hdma.ChannelSettings.enabled
     beq     Skip
         assert(Hdma.ChannelSettings.dmap + 1 == Hdma.ChannelSettings.register)
-
         lda.w   Hdma.ChannelSettings.dmap
-        sta.b   DMAP7
+        sta.b   DMAP7       // also sets BBAD7
 
         lda.w   Hdma.ChannelSettings.tableAddr
         sta.b   A1T7

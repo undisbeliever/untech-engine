@@ -281,7 +281,7 @@ function TransferToCgram {
     sty.w   DAS0
 
     ldx.w   #DMAP.direction.toPpu | DMAP.transfer.one | (CGDATA << 8)
-    stx.w   DMAP0
+    stx.w   DMAP0       // also sets BBAD0
 
     AssertForceBlank()
 
@@ -311,7 +311,7 @@ function TransferToVram {
     sta.w   VMAIN
 
     ldx.w   #DMAP.direction.toPpu | DMAP.transfer.two | (VMDATA << 8)
-    stx.w   DMAP0
+    stx.w   DMAP0       // also sets BBAD0
 
     AssertForceBlank()
 
@@ -341,7 +341,7 @@ function TransferToVramL {
     stz.w   VMAIN
 
     ldx.w   #DMAP.direction.toPpu | DMAP.transfer.one | (VMDATAL << 8)
-    stx.w   DMAP0
+    stx.w   DMAP0       // also sets BBAD0
 
     AssertForceBlank()
 
@@ -371,7 +371,7 @@ function TransferToVramH {
     sta.w   VMAIN
 
     ldx.w   #DMAP.direction.toPpu | DMAP.transfer.one | (VMDATAH << 8)
-    stx.w   DMAP0
+    stx.w   DMAP0       // also sets BBAD0
 
     AssertForceBlank()
 

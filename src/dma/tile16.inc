@@ -227,7 +227,7 @@ macro _ResetQueue() {
 // Uploads the tiles in the tileQueue to VRAM using DMA
 //
 // REGISTERS: 16 bit A, 16 bit Index, DB = $80, DP = $4300
-// INPUT: DMAPx set to VRAM, VMAIN set
+// INPUT: DMAPx/BBADx set to VMDATA (2 registers), VMAIN set
 // INPUT: A - Word address of second half of the tiles
 // INPUT: Y = _ProcessDMA.tileQueuePos = current location in the tile Queue
 // OUTPUT: _ProcessDMA.tileQueuePos updated to new location

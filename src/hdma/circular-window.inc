@@ -696,7 +696,6 @@ a8()
 
 
     assert(ChannelSettings.dmap + 1 == ChannelSettings.register)
-
     ldx.w   #DMAP.direction.toPpu | DMAP.addressing.absolute | DMAP.transfer.two | (WH0 << 8)
     stx.w   ChannelSettings.dmap
 
