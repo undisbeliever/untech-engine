@@ -34,5 +34,14 @@ macro assertZeroPage(var) {
     }
 }
 
+// Asserts that a variable is inside shadow RAM
+// Breaks assembly if variable is not inside shadow RAM
+macro assertShadowRam(var) {
+    evaluate addr = {var}
+    if {addr} >= 0x2000 && ({addr} < 0x7e0000 || {addr} >= 0x7e2000) {
+        error "{var} is not inside shadow RAM"
+    }
+}
+
 // vim: ft=bass-65816 ts=4 sw=4 et:
 
