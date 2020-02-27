@@ -36,6 +36,12 @@ allocate(animationSpeed, wram7e, 2)
 
 
 namespace AnimatedTileset {
+    // The BG scroll register values used by the animated tileset
+    // (2 * uint16, shadow)
+    allocate(displayHoffset, shadow, 2)
+    allocate(displayVoffset, shadow, 2)
+
+
     // Vram word address to store the upload the buffer to
     // (vram word address)
     allocate(animationVramWaddr, shadow, 2)

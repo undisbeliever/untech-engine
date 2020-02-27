@@ -33,8 +33,8 @@ allocate(cameraYoffset, wram7e, 2)
 
 
 // Display offset of the tilemap
-constant displayHoffset = ScrollBuffer.bg1.hOffset
-constant displayVoffset = ScrollBuffer.bg1.vOffset
+constant displayHoffset = Resources.AnimatedTileset.displayHoffset
+constant displayVoffset = Resources.AnimatedTileset.displayVoffset
 
 
 assertPowerOfTwo(horizontalBuffer.buffer.size)

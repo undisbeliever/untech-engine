@@ -63,6 +63,7 @@ include "util/lz4.inc"
 include "resources/animated-tileset.inc"
 include "resources/palette.inc"
 include "resources/_common.inc"
+include "resources/_vblank.inc"
 
 include "camera/_common.inc"
 
@@ -95,7 +96,6 @@ include "metatiles/_vblank.inc"
 include "metasprite/actionpoints.inc"
 
 include "vblank/controller.inc"
-include "vblank/scrollbuffer.inc"
 include "vblank/_common.inc"
 
 include "entity/macros.inc"

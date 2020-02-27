@@ -16,6 +16,22 @@ namespace Resources {
 namespace AnimatedTileset {
 
 
+// Initialize the AnimatedTileset subsystem
+//
+// REQUIRES: 16 bit A, 16 bit Index, DB = 0x7e, DP = 0
+macro _Init() {
+    assert16a()
+    assert16i()
+
+    AnimatedTileset.DisableAnimation()
+
+    stz.w   AnimatedTileset.displayHoffset
+    lda.w   #-1
+    sta.w   AnimatedTileset.displayVoffset
+}
+
+
+
 // Load Animated tileset from a given ptr to a given word address.
 //
 // REQUIRES: 16 bit A, 16 bit Index, DB = 0x7e, DP = 0, interrupts disabled, force blank

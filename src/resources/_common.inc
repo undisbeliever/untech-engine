@@ -18,7 +18,6 @@ a16()
 i16()
 code()
 function Init {
-    AnimatedTileset.DisableAnimation()
     Palette.DisableAnimation()
 
     // Set animation speed
@@ -41,6 +40,10 @@ function Init {
     sta.w   decompressionBufferPos
 
     stz.w   VramTransferBuffer.currentIndex
+
+
+    AnimatedTileset._Init()
+
 
     // Disable palette data
     stz.w   Palette.animationFrameSize

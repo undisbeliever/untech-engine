@@ -291,10 +291,15 @@ SkipWaitForNMI:
     MetaTiles.Render.DrawMapCell_VBlank()
 
     Warnings.VBlank()
-    ScrollBuffer.VBlank()
+
+    lda.w   #0x2100
+    tcd
+// DP = $2100
+
+    Resources.VBlank_dp2100()
 
     ldx.w   inidispBuffer
-    stx.w   INIDISP
+    stx.b   INIDISP
 
     Dma.ResetQueues()
 
