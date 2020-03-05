@@ -19,6 +19,7 @@ namespace MetaTiles {
 // MODIFIES: Disable HDMA, Disable Interrupts, Force Blank
 //
 // INPUT: A = tileset Id
+//        Resources.AnimatedTileset.bgIndex = bgIndex for the animated tileset
 a16()
 i16()
 code()
@@ -55,7 +56,6 @@ constant _tilesetPtr = LZ4.ptr
 
     // Load tiles
 
-    ldx.w   #METATILES_TILES_WADDR
     jmp     Resources.AnimatedTileset.LoadAnimatedTileset_FromPtr
 
 

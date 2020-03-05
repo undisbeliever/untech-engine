@@ -31,6 +31,9 @@ namespace BreakBSOD {
 constant BSOD_BG_COLOR = 13 << Palette.blue.shift
 constant BSOD_TEXT_COLOR = 0x7fff
 
+constant VRAM_CONSOLE_TILES_WADDR = 0x0000
+constant VRAM_CONSOLE_MAP_WADDR   = 0x1000
+
 
 // Initializes the error text console
 //

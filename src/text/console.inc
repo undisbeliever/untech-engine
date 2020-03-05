@@ -118,25 +118,34 @@ macro SetCursor(evaluate x, evaluate y) {
 // DMA: Uses DMA channel 0
 // REQUIRES: 8 bit A, 16 bit Index, DB access registers
 // REQUIRES: screen blank
+// REQUIRES: Resources Subsystem initialized with a scene layout set
+//
+// INPUT: A = bgIndex of the background used by the text subsystem
 a8()
 i16()
 code()
 function Init {
     // Transfer the font to the VRAM
 
-    if Text.Font.FixedTiles.bitDepth == 2 {
-        ldx.w   #VRAM_CONSOLE_TILES_WADDR
-        stx.w   VMADD
+    rep     #$30
+a16()
+    pha
+    jsr     Resources.SceneLayout.CalcMapVramWaddr
+    sta.w   tilemapVramWaddr
 
+    pla
+    jsr     Resources.SceneLayout.CalcTileVramWaddr
+    sta.w   VMADD
+
+    sep     #$20
+a8()
+
+    if Text.Font.FixedTiles.bitDepth == 2 {
         Dma.ForceBlank.ToVram(Text.Font.FixedTiles)
 
     } else if Text.Font.FixedTiles.bitDepth == 1 {
-        ldx.w   #VRAM_CONSOLE_TILES_WADDR
-        stx.w   VMADD
-
         Dma.ForceBlank.ToVramL(Text.Font.FixedTiles)
 
-        ldx.w   #VRAM_CONSOLE_TILES_WADDR
         ldy.w   #Text.Font.FixedTiles.size
         jsr     Dma.ForceBlank.ClearVramH
 
@@ -152,7 +161,7 @@ function Init {
     // Clear the vram tilemap
     // Sets the tilemap palette to 0 and priority to high
 
-    ldx.w   #VRAM_CONSOLE_MAP_WADDR
+    ldx.w   tilemapVramWaddr
     ldy.w   #Tilemap.order
     jsr     Dma.ForceBlank.FillTilemap
 

@@ -35,7 +35,30 @@ allocate(decompressionBufferPos, wram7e, 2)
 allocate(animationSpeed, wram7e, 2)
 
 
+namespace SceneLayout {
+    // Byte Index of the current SceneLayout data
+    //
+    // Equal to `sceneId * Format.SceneLayout.size`
+    //
+    // (word index, shadow)
+    allocate(dataIndex, shadow, 2)
+}
+
+constant BG_INDEX_MASK = Format.SceneLayout.BG_INDEX_MASK
+constant BG_INDEX_INCREMENT = Format.SceneLayout.BG_INDEX_INCREMENT
+
 namespace AnimatedTileset {
+    // BG layer used by the animated tileset
+    //
+    // This variable MUST BE masked by BG_INDEX_MASK before storing it.
+    //
+    // (byte index inc2, shadow)
+    allocate(bgIndex, shadow, 1)
+
+    // VRAM word address of the tilemap of the BG used by the animated BG
+    // (vram word address)
+    allocate(tilemapVramWaddr, wram7e, 2)
+
     // The BG scroll register values used by the animated tileset
     // (2 * uint16, shadow)
     allocate(displayHoffset, shadow, 2)

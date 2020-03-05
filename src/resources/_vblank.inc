@@ -21,18 +21,25 @@ macro VBlank_dp2100() {
     assert16a()
     assert8i()
 
+    // Ensure bgIndex can be used for PPU offset registers
+    assert(BG1HOFS + Resources.BG_INDEX_INCREMENT == BG2HOFS)
+
+    assertShadowRam(Resources.AnimatedTileset.bgIndex)
     assertShadowRam(Resources.AnimatedTileset.displayHoffset)
     assertShadowRam(Resources.AnimatedTileset.displayVoffset)
 
-    ldy.w   Resources.AnimatedTileset.displayHoffset
-    sty.b   BG1HOFS
-    ldy.w   Resources.AnimatedTileset.displayHoffset + 1
-    sty.b   BG1HOFS
+    ldx.w   Resources.AnimatedTileset.bgIndex
+    bmi     SkipUpdate
+        ldy.w   Resources.AnimatedTileset.displayHoffset
+        sty.b   BG1HOFS,x
+        ldy.w   Resources.AnimatedTileset.displayHoffset + 1
+        sty.b   BG1HOFS,x
 
-    ldy.w   Resources.AnimatedTileset.displayVoffset
-    sty.b   BG1VOFS
-    ldy.w   Resources.AnimatedTileset.displayVoffset + 1
-    sty.b   BG1VOFS
+        ldy.w   Resources.AnimatedTileset.displayVoffset
+        sty.b   BG1VOFS,x
+        ldy.w   Resources.AnimatedTileset.displayVoffset + 1
+        sty.b   BG1VOFS,x
+    SkipUpdate:
 }
 
 }

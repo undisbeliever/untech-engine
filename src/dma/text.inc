@@ -39,7 +39,8 @@ macro _VBlank() {
             ldx.b   #VMAIN.incrementMode.low | VMAIN.increment.by1
             stx.w   VMAIN
 
-            lda.w   Text.bufferVramWaddr
+            assertShadowRam(Text.tilemapVramWaddr)
+            lda.w   Text.tilemapVramWaddr
             sta.w   VMADD
 
             lda.w   #DMAP.direction.toPpu | DMAP.transfer.one | (VMDATAL << 8)

@@ -342,38 +342,34 @@ code()
 function ResetPpuState {
     php
     rep     #$30
-    sep     #$20
-a8()
+a16()
 i16()
+    pea     0x7e7e
+    plb
+    plb
+// DB = 0x7e
+
+    Warnings.Reset_a16()
+
+    // Setup Screen
+
+    jsr     Resources.Init
+
+    // ::TODO move into scene subsystem::
+    assert(Resources.SceneLayoutData.count == 1)
+
+    jsr     Resources.TransferToPpu
+
+
     pea     (0x7e << 8) | REGISTER_DB
     plb
 // DB = REGISTER_DB
 
-    jsr     ForceBlank
+    sep     #$20
+a8()
 
-    jsr     ResetRegisters
-
-    Warnings.Reset()
-
-
-    // Setup Screen
-    //
-    // MODE1
-    // BG1 - text console buffer
-
-    // ::TODO move elsewhere::
-    // ::TODO design how to do this, I'm thinking of a macro that generates for each map layout::
-
-    stz.w   BGMODE
-    lda.b   #((VRAM_CONSOLE_MAP_WADDR / BGXSC.base.walign) << BGXSC.base.shift) | BGXSC.map.s32x32
-    sta.w   BG1SC
-
-    lda.b   #(VRAM_CONSOLE_TILES_WADDR / BG12NBA.walign) << BG12NBA.bg1.shift
-    sta.w   BG12NBA
-
-    lda.b   #TM.bg1
+    lda.b   #TM.bg3
     sta.w   TM
-
 
     // set BG color
     stz.w   CGADD
@@ -388,15 +384,21 @@ i16()
     stz.w   CGDATA
     stz.w   CGDATA
 
-    jsr     Text.Console.Init
-    Text.Console.PrintConstString("UnTech Unit Tests:")
 
+    // ::TODO move into scene subsystem::
+    assert(Resources.SceneLayoutData.count == 1)
+    lda.b   #2 * 2      // bg3
+    jsr     Text.Console.Init
+
+
+    Text.Console.PrintConstString("UnTech Unit Tests:")
 
     jsr     EnableDisplay_Full
 
 
     plb
 // DB = 0x7e
+
 
     plp
     sec

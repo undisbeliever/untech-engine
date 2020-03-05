@@ -25,6 +25,8 @@ macro _Init() {
 
     AnimatedTileset.DisableAnimation()
 
+    stz.w   AnimatedTileset.bgIndex
+
     stz.w   AnimatedTileset.displayHoffset
     lda.w   #-1
     sta.w   AnimatedTileset.displayVoffset
@@ -39,7 +41,9 @@ macro _Init() {
 // MODIFIES: decompressionBuffer
 //
 // INPUT: LZ4.ptr = address of the lz4 block
-//              X = vram word address to load tiles to
+//        AnimatedTileset.bgIndex = bgIndex for the animated tileset
+//
+// OUTPUT: AnimatedTileset.tilemapVramWaddr = VRAM word address for the tile map used by BgLayer
 a16()
 i16()
 code()
@@ -47,14 +51,20 @@ function LoadAnimatedTileset_FromPtr {
 constant _ptr = LZ4.ptr
 constant _animatedTilesSize = utDpTmp0
 constant _vramUploadSize = utDpTmp1
-
-constant _vramWordAddress = utDpTmp2
+constant _vramTileWaddr = utDpTmp2
 
 assertZeroPage(_ptr)
 assert(Format.AnimatedTilesetHeader.size == 4)
 
 
-    stx.b   _vramWordAddress
+    lda.w   bgIndex
+    jsr     SceneLayout.CalcTileVramWaddr
+    sta.b   _vramTileWaddr
+
+    lda.w   bgIndex
+    jsr     SceneLayout.CalcMapVramWaddr
+    sta.w   tilemapVramWaddr
+
 
     ldy.b   _ptr
 
@@ -141,7 +151,7 @@ HasAnimation:
     // A = size of static tiles
     lsr
     clc
-    adc.b   _vramWordAddress
+    adc.b   _vramTileWaddr
     sta.w   animationVramWaddr
 
     // Set animation buffer end/begin/pos
@@ -166,7 +176,7 @@ AddToVramTransferBuffer:
 
     // X = starting address
     // A = bytes to transfer
-    
+
     ldy.w   VramTransferBuffer.currentIndex
     cpy.w   #VramTransferBuffer.LAST_INDEX
     bcc     +
@@ -178,7 +188,7 @@ AddToVramTransferBuffer:
     txa
     sta.w   VramTransferBuffer.sourceWram7fAddr,y
 
-    lda.b   _vramWordAddress
+    lda.b   _vramTileWaddr
     sta.w   VramTransferBuffer.destinationVramWaddr,y
 
     iny

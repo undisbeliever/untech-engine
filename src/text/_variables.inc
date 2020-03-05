@@ -10,6 +10,9 @@
 
 
 namespace Text {
+    // Word address of the tilemap of the BG used by the text
+    // (vram word address, shadow)
+    allocate(tilemapVramWaddr, shadow, 2)
 
     // The buffer in which to hold the data to transfer to VRAM
     //
@@ -19,10 +22,6 @@ namespace Text {
     // (whatever the format)
     constant buffer.size = 32 * 32
     allocate(buffer, wram7e, buffer.size)
-
-    // The VRAM word address to store the buffer to
-    // (shadow)
-    allocate(bufferVramWaddr, shadow, 2)
 
     // If non-zero then the buffer is transferred to VRAM on vblank
     // (dp)

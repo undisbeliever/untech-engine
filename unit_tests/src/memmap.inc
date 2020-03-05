@@ -52,16 +52,5 @@ define ENEMY_PROJECTILE_ENTITY_LIST  = EnemyProjectiles
 // ========================
 constant MetaTiles.MAP_SIZE = 16384
 
-
-
-// VRAM Layout
-// ===========
-constant VRAM_OBJ_WADDR = 0x6000
-constant VRAM_CONSOLE_TILES_WADDR = 0x1000
-constant VRAM_CONSOLE_MAP_WADDR = 0x0000
-
-constant METATILES_MAP_WADDR = 0x0400   // 64x32 tiles in size
-constant METATILES_TILES_WADDR = 0x2000
-
 // vim: ft=bass-65816 ts=4 sw=4 et:
 

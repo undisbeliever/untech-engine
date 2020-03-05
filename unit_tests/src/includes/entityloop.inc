@@ -24,12 +24,7 @@ function Init {
 a8()
     jsr     ForceBlank
 
-    assert(VRAM_OBJ_WADDR % OBSEL.base.walign == 0)
-
-    lda.b   #(VRAM_OBJ_WADDR / OBSEL.base.walign) | OBSEL.size.s8_16
-    sta.w   OBSEL
-
-    lda.b   #TM.bg1 | TM.obj
+    lda.b   #TM.bg3 | TM.obj
     sta.w   TM
 
     jsr     EnableDisplay_Full

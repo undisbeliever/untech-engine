@@ -257,49 +257,6 @@ namespace InteractiveTests {
 namespace MetaTileRenderTest {
 
 
-// Initializes the screen and loads tiles/palette to PPU
-//
-// REQUIRES: 16 bit A, 16 bit Index, DB = 0x7e, ForceBlank
-macro SetupPpu() {
-    assert8a()
-    assert16i()
-
-    pea     (0x7e << 8) | REGISTER_DB
-    plb
-    // DB = REGISTER_DB
-
-
-    // Setup PPU
-    // MODE 1 - bg3 priority
-    //   BG1 - MetaTiles map
-    //   BG3 - text console buffer
-
-    lda.b   #BGMODE.mode1Bg3
-    sta.w   BGMODE
-
-    lda.b   #((METATILES_MAP_WADDR / BGXSC.base.walign) << BGXSC.base.shift) | BGXSC.map.s64x32
-    sta.w   BG1SC
-
-    lda.b   #((VRAM_CONSOLE_MAP_WADDR / BGXSC.base.walign) << BGXSC.base.shift) | BGXSC.map.s32x32
-    sta.w   BG3SC
-
-    lda.b   #(METATILES_TILES_WADDR / BG12NBA.walign) << BG12NBA.bg1.shift
-    sta.w   BG12NBA
-
-    lda.b   #(VRAM_CONSOLE_TILES_WADDR / BG34NBA.walign) << BG34NBA.bg3.shift
-    sta.w   BG34NBA
-
-    lda.b   #(VRAM_OBJ_WADDR / OBSEL.base.walign) | OBSEL.size.s8_16
-    sta.w   OBSEL
-
-    lda.b   #TM.bg1 | TM.bg3 | TM.obj
-    sta.w   TM
-
-    plb
-    // DB = 0x7e
-}
-
-
 // Generates the map.
 //
 // REQUIRES: 16 bit A, 16 bit Index, DB = 0x7e
@@ -439,6 +396,17 @@ function DoTest {
     jsr     Resources.Init
 
 
+    // ::TODO move to resources scene data::
+    sep     #$20
+a8()
+    // Use BG2 for metatiles
+    lda.b   #1 * 2
+    sta.w   Resources.AnimatedTileset.bgIndex
+
+    rep     #$30
+a16()
+
+
     lda.w   #Project.MetaTileTilesetList.MetaTileRenderTest
     jsr     MetaTiles.LoadTileset
 
@@ -469,18 +437,16 @@ function DoTest {
     +
 
 
+    jsr     Resources.TransferToPpu
 
     sep     #$20
 a8()
-
-    jsr     ForceBlank
-
-    SetupPpu()
+    // ::TODO move elsewhere::
+    lda.b   #TM.bg2 | TM.bg3 | TM.obj
+    sta.l   TM
 
     rep     #$30
 a16()
-
-    jsr     Resources.TransferToPpu
 
 
 RedrawMap:

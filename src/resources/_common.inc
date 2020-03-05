@@ -18,6 +18,8 @@ a16()
 i16()
 code()
 function Init {
+constant _tmp = utDpTmp0
+
     Palette.DisableAnimation()
 
     // Set animation speed
@@ -47,6 +49,12 @@ function Init {
 
     // Disable palette data
     stz.w   Palette.animationFrameSize
+
+
+    // ::TODO move into load scene::
+    assert(SceneLayoutData.count == 1)
+    lda.w   #0
+    SceneLayout._SetSceneLayout()
 
     rts
 }
@@ -131,15 +139,31 @@ a16()
 
 // Transfer decompressed data to the PPU
 //
+// NOTE: This routine will reset the PPU registers.
+//
 // REQUIRES: 16 bit A, 16 bit Index, DB = 0x7e, Force Blank
 a16()
 i16()
 code()
 function TransferToPpu {
+constant _tmp = utDpTmp0
+
     pea     (0x7e << 8) | REGISTER_DB
     plb
-    // DB == REGISTER_DB
+// DB == REGISTER_DB
 
+
+    // Reset Registers
+    jsr     ResetRegisters
+
+    sep     #$20
+a8()
+    SceneLayout._SetupPpuRegisters_RegisterDB()
+
+    rep     #$30
+a16()
+
+    // Transfer tile/map data to VRAM
     VramLoop:
         lda.l   VramTransferBuffer.currentIndex
         beq     EndVramLoop
@@ -189,7 +213,7 @@ EndVramLoop:
 NoCgramTransfer:
 
     plb
-    // DB = 0x7e
+// DB = 0x7e
 
     rts
 }

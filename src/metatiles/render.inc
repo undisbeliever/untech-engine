@@ -36,6 +36,8 @@ allocate(cameraYoffset, wram7e, 2)
 constant displayHoffset = Resources.AnimatedTileset.displayHoffset
 constant displayVoffset = Resources.AnimatedTileset.displayVoffset
 
+constant tilemapVramWaddr = Resources.AnimatedTileset.tilemapVramWaddr
+
 
 assertPowerOfTwo(horizontalBuffer.buffer.size)
 assertPowerOfTwo(verticalBuffer.buffer.size)
@@ -57,6 +59,7 @@ inline DrawFullScreen_ForceBlank.__CalcVisibleMapPtrAndDrawTiles(mapHeight) {
     //                 + (Camera.xPos & X_POSITION_MASK) / METATILE_SIZE_PX * MAP_HEIGHT
     //                 + map.data
 
+    // using visibleMapPtr as temporary to reduce the number of temporary variables required
     assert(METATILE_SIZE_PX == 16)
     lda.w   Camera.yPos
     and.w   #Y_POSITION_MASK
@@ -64,7 +67,7 @@ inline DrawFullScreen_ForceBlank.__CalcVisibleMapPtrAndDrawTiles(mapHeight) {
     lsr
     lsr
     lsr
-    sta.w   _mapPtrTmp
+    sta.w   visibleMapPtr
 
     lda.w   Camera.xPos
     and.w   #X_POSITION_MASK
@@ -79,9 +82,9 @@ inline DrawFullScreen_ForceBlank.__CalcVisibleMapPtrAndDrawTiles(mapHeight) {
         error "Invalid MAP_HEIGHT"
     }
     // carry clear
-    adc.w   _mapPtrTmp
-    clc
     adc.w   #map.data
+    clc
+    adc.w   visibleMapPtr
     sta.w   visibleMapPtr
 
 
@@ -92,7 +95,8 @@ inline DrawFullScreen_ForceBlank.__CalcVisibleMapPtrAndDrawTiles(mapHeight) {
     //  x = visibleMapPtr
     //  _mapEndColumnPtr = x + _TILES_PER_COLUMN
     //
-    //  _vramAddr = METATILES_MAP_WADDR
+    //  _vramAddr = tilemapVramWaddr
+    //  _vramAddrEnd = _vramWaddr + _MAP_WADDR_END_OFFSET
     //
     //  repeat:
     //      VMADD = _vramAddr
@@ -116,12 +120,12 @@ inline DrawFullScreen_ForceBlank.__CalcVisibleMapPtrAndDrawTiles(mapHeight) {
     //      _mapEndColumnPtr = x + _TILES_PER_COLUMN
     //
     //      _vramAddr += 2
-    //      if _vramAddr == METATILES_MAP_WADDR + 32
-    //          _vramAddr = METATILES_MAP_WADDR + 32 * 32
-    //  until _vramAddr >= _VRAM_WADDR_END
+    //      if _vramAddr & 31 == 0:
+    //          _vramAddr += (32 - 1) * 32
+    //  until _vramAddr >= _vramWaddrEnd
 
     constant _TILES_PER_COLUMN = METATILE_DISPLAY_HEIGHT + 1
-    constant _VRAM_WADDR_END = METATILES_MAP_WADDR + 32 * 32 + (METATILE_DISPLAY_WIDTH - 16 + 1) * 2
+    constant _MAP_WADDR_END_OFFSET = 32 * 32 + (METATILE_DISPLAY_WIDTH - 16 + 1) * 2
 
     // A = visibleMapPtr
     tax
@@ -136,10 +140,14 @@ a8()
 
     assert(METATILE_DISPLAY_WIDTH * METATILE_SIZE == 32)
 
-    rep     #$30
+    rep     #$31
 a16()
+    lda.w   tilemapVramWaddr
+    // carry clear
+    adc.w   #_MAP_WADDR_END_OFFSET
+    sta.w   _vramWaddrEnd
 
-    lda.w   #METATILES_MAP_WADDR
+    lda.w   tilemapVramWaddr
 
     ColumnLoop:
         // A = _vramAddr
@@ -195,14 +203,16 @@ a16()
         adc.w   #_TILES_PER_COLUMN
         sta.w   _mapEndColumnPtr
 
+
         lda.w   _vramAddr
         inc
         inc
-        cmp.w   #METATILES_MAP_WADDR + 32
+        bit.w   #31
         bne     +
-            lda.w   #METATILES_MAP_WADDR + 32 * 32
+            clc
+            adc.w   #(32 - 1) * 32
         +
-        cmp.w   #_VRAM_WADDR_END
+        cmp.w   _vramWaddrEnd
         bcc     ColumnLoop
 }
 
@@ -221,8 +231,8 @@ i16()
 code()
 function DrawFullScreen_ForceBlank {
 
-constant _mapPtrTmp = tmp0
-constant _vramAddr = tmp1
+constant _vramAddr = tmp0
+constant _vramWaddrEnd = tmp1
 constant _mapEndColumnPtr = tmp2
 
 
@@ -320,7 +330,7 @@ macro __DrawHorizontalBuffer() {
     //
     //  a = (verticalBuffer.cursorIndex + vBufferOffset) / 4 * 32 * 2
     //  a &= (32 - 1) * 32
-    //  horizontalBuffer.vramWaddr = METATILES_MAP_WADDR + a
+    //  horizontalBuffer.vramWaddr = tilemapVramWaddr + a
     //
     //  y = (horizontalBuffer.cursorIndex + DISPLAY_WIDTH) & 127
     //
@@ -352,7 +362,7 @@ macro __DrawHorizontalBuffer() {
     asl
     asl
     // c clear
-    adc.w   #METATILES_MAP_WADDR
+    adc.w   tilemapVramWaddr
     sta.w   horizontalBuffer.vramWaddr
 
     lda.w   horizontalBuffer.cursorIndex
@@ -427,7 +437,7 @@ macro __DrawVerticalBuffer() {
     //  a &= 32 * 2 - 1
     //  if a & 32:
     //      a ^= 32 + 32 * 32
-    //  verticalBuffer.vramWaddr = METATILES_MAP_WADDR + a
+    //  verticalBuffer.vramWaddr = tilemapVramWaddr + a
     //
     //  y = horizontalBuffer.cursorIndex + METATILE_DISPLAY_WIDTH * METATILE_SIZE * 2
     //
@@ -459,7 +469,7 @@ macro __DrawVerticalBuffer() {
         eor.w   #32 + (32 * 32)
     +
     clc
-    adc.w   #METATILES_MAP_WADDR
+    adc.w   tilemapVramWaddr
     sta.w   verticalBuffer.vramWaddr
 
 
@@ -875,7 +885,7 @@ a8()
     //  a *= 32 / METATILE_SIZE
     //  a &= (32 - 1) * 32
     //
-    //  vramWaddr = tmp + a + METATILES_MAP_WADDR
+    //  vramWaddr = tmp + a + tilemapVramWaddr
 
     assert(METATILE_SIZE == 2)
 
@@ -908,7 +918,7 @@ a16()
     // c clear
     adc.w   _tmp
     clc
-    adc.w   #METATILES_MAP_WADDR
+    adc.w   Render.tilemapVramWaddr
 
 
     // Fill drawMapCellBuffer
