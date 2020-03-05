@@ -290,13 +290,13 @@ SkipWaitForNMI:
 
     MetaTiles.Render.DrawMapCell_VBlank_dp4300()
 
-    Warnings.VBlank_dp4300()
-
     lda.w   #0x2100
     tcd
 // DP = $2100
 
     Resources.VBlank_dp2100()
+    Warnings.VBlank_dp2100()
+
 
     ldx.w   inidispBuffer
     stx.b   INIDISP

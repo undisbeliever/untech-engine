@@ -180,19 +180,19 @@ SetCurrent:
 //
 // MUST BE CALLED AFTER Dma.VBlank
 //
-// REQUIRES: 16 bit A, 8 bit Index, DB = $80, DP = $4300
-macro VBlank_dp4300() {
+// REQUIRES: 16 bit A, 8 bit Index, DB = $80, DP = $2100
+macro VBlank_dp2100() {
     assert16a()
     assert8i()
 
     ldy.w   Warnings.current + 1
     bmi     Skip
         ldx.b   #Warnings.CGRAM_POS
-        stx.w   CGADD
+        stx.b   CGADD
 
         ldx.w   Warnings.current
-        stx.w   CGDATA
-        sty.w   CGDATA
+        stx.b   CGDATA
+        sty.b   CGDATA
 Skip:
 }
 }
