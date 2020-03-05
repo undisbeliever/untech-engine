@@ -147,7 +147,7 @@ macro _FinalizeFrame() {
 //
 // REQUIRES: 16 bit A, 8 bit Index, DB = $80, DP = $4300
 // REQUIRES: VMAIN = VMAIN.incrementMode.high
-macro _VBlank() {
+macro _VBlank_dp4300() {
     assert16a()
     assert8i()
         // REMEMBER to update DmaTransferTime if you change this routine
@@ -235,8 +235,8 @@ a16()
 i16()
 code()
 namespace _ProcessDMA {
-    constant ContinueLoop = WaitFrame.Dma.VBlank.Dma.Tile16._VBlank.ContinueLoop
-    constant EndLoopFunction = WaitFrame.Dma.VBlank.Dma.Tile16._VBlank.EndLoopFunction
+    constant ContinueLoop = WaitFrame.Dma.VBlank_dp4300.Dma.Tile16._VBlank_dp4300.ContinueLoop
+    constant EndLoopFunction = WaitFrame.Dma.VBlank_dp4300.Dma.Tile16._VBlank_dp4300.EndLoopFunction
 
     FunctionTable: {
         dw  EndLoopFunction

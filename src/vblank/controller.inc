@@ -59,9 +59,9 @@ macro _UpdateState(joyRegister, joyStruct) {
 
 // Update joypad state
 //
-// REQUIRES: 16 bit A, 8 bit Index, DB = $80
+// REQUIRES: 16 bit A, 8 bit Index, DB = $80, dp = 0x2100
 // MODIFIES: 16 bit A, 16 bit Index
-macro VBlank() {
+macro VBlank_dp2100_set16I() {
 	assert16a()
     assert8i()
 

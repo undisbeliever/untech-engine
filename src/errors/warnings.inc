@@ -181,7 +181,7 @@ SetCurrent:
 // MUST BE CALLED AFTER Dma.VBlank
 //
 // REQUIRES: 16 bit A, 8 bit Index, DB = $80, DP = $4300
-macro VBlank() {
+macro VBlank_dp4300() {
     assert16a()
     assert8i()
 

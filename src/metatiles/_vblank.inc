@@ -17,7 +17,7 @@ namespace Render {
 // REQUIRES: 16 bit A, 8 bit Index, DB = $80, DP = $4300
 //
 // MODIFIES: VMAIN = VMAIN.incrementMode.high
-macro DrawMapCell_VBlank() {
+macro DrawMapCell_VBlank_dp4300() {
     assert16a()
     assert8i()
 

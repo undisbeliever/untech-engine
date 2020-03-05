@@ -35,7 +35,7 @@ macro _Init() {
 //
 // REQUIRES: 16 bit A, 8 bit Index, DB = $80, DP = $4300
 // MODIFIES: CGADD, Dma Channel 0
-macro _VBlank() {
+macro _VBlank_dp4300() {
     assert16a()
     assert8i()
 

@@ -81,22 +81,22 @@ macro FinalizeFrame() {
 // VBlank code.
 //
 // REQUIRES: 16 bit A, 8 bit Index, DB = $80, DP = $4300
-macro VBlank() {
+macro VBlank_dp4300() {
     assert16a()
     assert8i()
 
     ldx.b   #VMAIN.incrementMode.high | VMAIN.increment.by1
     stx.w   VMAIN
 
-    Dma.MetaSprite._VBlank()
-    Dma.MetaTiles._VBlank()
-    Dma.ObjPalette._VBlank()
-    Dma.Resources._VBlank()
-    Dma.Tile16._VBlank()
+    Dma.MetaSprite._VBlank_dp4300()
+    Dma.MetaTiles._VBlank_dp4300()
+    Dma.ObjPalette._VBlank_dp4300()
+    Dma.Resources._VBlank_dp4300()
+    Dma.Tile16._VBlank_dp4300()
 
     // Text module is low priority.
     // Must be done last
-    Dma.Text._VBlank()
+    Dma.Text._VBlank_dp4300()
 }
 
 

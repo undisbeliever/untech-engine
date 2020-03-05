@@ -79,7 +79,7 @@ NoUnderflow{#}:
 //
 // MODIFIES: VMADD, DMA Channel 0 & DMA Channel 1
 // MODIFIES: VMAIN = VMAIN.incrementMode.high
-macro _VBlank() {
+macro _VBlank_dp4300() {
     assert16a()
     assert8i()
 

@@ -154,11 +154,11 @@ i8()
     ldx.b   #0x80
     phx
     plb
-    // DB = 0x80
+// DB = 0x80
 
     lda.w   #0x4300
     tcd
-    // DP = 0x4300
+// DP = 0x4300
 
 
     Dma.FinalizeFrame()
@@ -255,8 +255,8 @@ i8()
 a16()
 i8()
 SkipWaitForNMI:
-    // DB = 0x80
-    // DP = 0x4300
+// DB = 0x80
+// DP = 0x4300
 
     // Force blank to prevent PPU corruption if VBlank overruns.
 	//
@@ -285,12 +285,12 @@ SkipWaitForNMI:
 	//   * Setup the DP and DB registers, or
 	//   * Test is it is safe to execute the VBlank macros
 
-    Dma.VBlank()
-    Hdma.VBlank()
+    Dma.VBlank_dp4300()
+    Hdma.VBlank_dp4300()
 
-    MetaTiles.Render.DrawMapCell_VBlank()
+    MetaTiles.Render.DrawMapCell_VBlank_dp4300()
 
-    Warnings.VBlank()
+    Warnings.VBlank_dp4300()
 
     lda.w   #0x2100
     tcd
@@ -304,7 +304,7 @@ SkipWaitForNMI:
     Dma.ResetQueues()
 
 
-    Controller.VBlank()
+    Controller.VBlank_dp2100_set16I()
 
 assert16a()
 assert16i()

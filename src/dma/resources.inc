@@ -94,7 +94,7 @@ a16()
 // REQUIRES: VMAIN = VMAIN.incrementMode.high | VMAIN.increment.by1
 //
 // MODIFIES: CGADD, VMADD, DMA Channel 0
-macro _VBlank() {
+macro _VBlank_dp4300() {
     assert16a()
     assert8i()
 

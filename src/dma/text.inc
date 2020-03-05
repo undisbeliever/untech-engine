@@ -20,7 +20,7 @@ namespace Text {
 // NOTE: changes VMAIN mode
 //
 // REQUIRES: 16 bit A, 8 bit Index, DB = $80, DP = $4300, DB = REGISTERS
-macro _VBlank() {
+macro _VBlank_dp4300() {
     assert16a()
     assert8i()
 
