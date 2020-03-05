@@ -95,11 +95,11 @@ inline DrawFullScreen_ForceBlank.__CalcVisibleMapPtrAndDrawTiles(mapHeight) {
     //  x = visibleMapPtr
     //  _mapEndColumnPtr = x + _TILES_PER_COLUMN
     //
-    //  _vramAddr = tilemapVramWaddr
-    //  _vramAddrEnd = _vramWaddr + _MAP_WADDR_END_OFFSET
+    //  _vramWaddr = tilemapVramWaddr
+    //  _vramWaddrEnd = _vramWaddr + _MAP_WADDR_END_OFFSET
     //
     //  repeat:
-    //      VMADD = _vramAddr
+    //      VMADD = _vramWaddr
     //      repeat:
     //          y = *x * 2
     //          VMDATA = tileMap.topLeft[y]
@@ -108,7 +108,7 @@ inline DrawFullScreen_ForceBlank.__CalcVisibleMapPtrAndDrawTiles(mapHeight) {
     //
     //      x -= _TILES_PER_COLUMN
     //
-    //      VMADD = _vramAddr + 1
+    //      VMADD = _vramWaddr + 1
     //      repeat:
     //          y = *x * 2
     //          VMDATA = tileMap.topRight[y]
@@ -119,10 +119,10 @@ inline DrawFullScreen_ForceBlank.__CalcVisibleMapPtrAndDrawTiles(mapHeight) {
     //      x += MAP_HEIGHT - _TILES_PER_COLUMN
     //      _mapEndColumnPtr = x + _TILES_PER_COLUMN
     //
-    //      _vramAddr += 2
-    //      if _vramAddr & 31 == 0:
-    //          _vramAddr += (32 - 1) * 32
-    //  until _vramAddr >= _vramWaddrEnd
+    //      _vramWaddr += 2
+    //      if _vramWaddr & 31 == 0:
+    //          _vramWaddr += (32 - 1) * 32
+    //  until _vramWaddr >= _vramWaddrEnd
 
     constant _TILES_PER_COLUMN = METATILE_DISPLAY_HEIGHT + 1
     constant _MAP_WADDR_END_OFFSET = 32 * 32 + (METATILE_DISPLAY_WIDTH - 16 + 1) * 2
@@ -150,8 +150,8 @@ a16()
     lda.w   tilemapVramWaddr
 
     ColumnLoop:
-        // A = _vramAddr
-        sta.w   _vramAddr
+        // A = _vramWaddr
+        sta.w   _vramWaddr
         sta.b   VMADD
 
         LeftLoop:
@@ -175,7 +175,7 @@ a16()
         sbc.w   #_TILES_PER_COLUMN
         tax
 
-        lda.w   _vramAddr
+        lda.w   _vramWaddr
         inc
         sta.b   VMADD
 
@@ -204,7 +204,7 @@ a16()
         sta.w   _mapEndColumnPtr
 
 
-        lda.w   _vramAddr
+        lda.w   _vramWaddr
         inc
         inc
         bit.w   #31
@@ -231,7 +231,7 @@ i16()
 code()
 function DrawFullScreen_ForceBlank {
 
-constant _vramAddr = tmp0
+constant _vramWaddr = tmp0
 constant _vramWaddrEnd = tmp1
 constant _mapEndColumnPtr = tmp2
 
