@@ -39,18 +39,18 @@ macro _SetSceneLayout() {
 }
 
 
-
-// Calculate VRAM word address of the tile map for a given BG
+// Calculate VRAM word address of the tile data and map data for a given BG
 //
 // REQUIRES: 16 bit A, 16 bit index, DB = 0x7e, DP = 0
 // REQUIRES: SceneLayout set
 //
 // INPUT: A = bgIndex
-// OUTPUT: A = VRAM word address of the tile map
+// OUTPUT: A = VRAM word address of the tile data
+// OUTPUT: Y = VRAM word address of the tile map
 a16()
 i16()
 code()
-function CalcMapVramWaddr {
+function CalcTileAndMapVramWaddr {
     and.w   #Format.SceneLayout.BG_INDEX_MASK
     clc
     adc.w   dataIndex
@@ -59,27 +59,7 @@ function CalcMapVramWaddr {
     lda.l   Format.SceneLayout.bg1Sc - 1,x
     and.w   #BGXSC.base.mask << 8
     assert(BGXSC.base.walign == 1 << (BGXSC.base.shift + 8))
-
-    rts
-}
-
-
-
-// Calculate VRAM word address of the tile data for a given BG
-//
-// REQUIRES: 16 bit A, 16 bit index, DB = 0x7e, DP = 0
-// REQUIRES: SceneLayout set
-//
-// INPUT: A = bgIndex
-// OUTPUT: A = VRAM word address of the tile data
-a16()
-i16()
-code()
-function CalcTileVramWaddr {
-    and.w   #Format.SceneLayout.BG_INDEX_MASK
-    clc
-    adc.w   dataIndex
-    tax
+    tay
 
     lda.l   Format.SceneLayout.bg1Nba - 1,x
     and.w   #BG12NBA.bg1.mask << 8

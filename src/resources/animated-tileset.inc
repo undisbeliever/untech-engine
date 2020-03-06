@@ -36,8 +36,7 @@ macro _Init() {
 
 // Load Animated tileset from a given ptr to a given word address.
 //
-// REQUIRES: 16 bit A, 16 bit Index, DB = 0x7e, DP = 0, interrupts disabled, force blank
-// DMA: Uses DMA channel 0
+// REQUIRES: 16 bit A, 16 bit Index, DB = 0x7e, DP = 0
 // MODIFIES: decompressionBuffer
 //
 // INPUT: LZ4.ptr = address of the lz4 block
@@ -58,12 +57,9 @@ assert(Format.AnimatedTilesetHeader.size == 4)
 
 
     lda.w   bgIndex
-    jsr     SceneLayout.CalcTileVramWaddr
+    jsr     SceneLayout.CalcTileAndMapVramWaddr
     sta.b   _vramTileWaddr
-
-    lda.w   bgIndex
-    jsr     SceneLayout.CalcMapVramWaddr
-    sta.w   tilemapVramWaddr
+    sty.w   tilemapVramWaddr
 
 
     ldy.b   _ptr

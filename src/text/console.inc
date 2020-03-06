@@ -129,13 +129,10 @@ function Init {
 
     rep     #$30
 a16()
-    pha
-    jsr     Resources.SceneLayout.CalcMapVramWaddr
-    sta.w   tilemapVramWaddr
-
-    pla
-    jsr     Resources.SceneLayout.CalcTileVramWaddr
+    jsr     Resources.SceneLayout.CalcTileAndMapVramWaddr
+    // A = tile data Vram Waddr
     sta.w   VMADD
+    sty.w   tilemapVramWaddr
 
     sep     #$20
 a8()
