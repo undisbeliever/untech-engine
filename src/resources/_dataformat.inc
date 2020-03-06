@@ -32,6 +32,10 @@ constant ANIMATION_TICKS_PER_SECOND = 300
 constant SceneLayoutData = Project.SceneLayout
 constant SceneLayoutData.count = Project.SceneLayout.count
 
+// List of Background Images
+// (Long Addr Table)
+constant BackgroundImageList = Project.BackgroundImageList
+constant BackgroundImageList.count = Project.BackgroundImageList.count
 
 // List of palettes
 // (Long Addr Table)
@@ -119,6 +123,32 @@ namespace Format {
 
     if Resources.ANIMATED_TILESET_FORMAT_VERSION != 2 {
         error "Invalid untech-compiler Animated Tileset Format"
+    }
+
+
+
+    // BackgroundImage resource data format.
+    //  <header> <lz4 of concatenated tilemap + tile data>
+    namespace BackgroundImageHeader {
+        constant MAX_N_TILEMAPS = 16
+        constant TILEMAP_SIZE = 32 * 32 *2
+
+        struct()
+            // Tilemap count
+            //
+            //  0000mmmm
+            //
+            //      mmmm = number of tilemaps - 1
+            //
+            // (byte)
+            field(tilemapCount, 1)
+
+            constant tilemapCount.mask  = 0b00001111
+            assert(MAX_N_TILEMAPS - 1 == tilemapCount.mask)
+        endstruct()
+    }
+    if Resources.BACKGROUND_IMAGE_FORMAT_VERSION != 1 {
+        error "Invalid untech-compiler Background Image Format"
     }
 
 

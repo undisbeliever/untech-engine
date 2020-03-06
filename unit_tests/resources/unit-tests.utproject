@@ -114,7 +114,8 @@
   <frameset src="metasprite/utms/DeleteIfAnimationEnds.utms" type="metasprite"/>
   <frameset src="metasprite/utms/TileCollisionTestPlayer.utms" type="metasprite"/>
   <palette name="MetaTileRenderTest" image="palettes/metatile-render-test.palette.png" rows-per-frame="3" animation-delay="300"/>
-  <palette name="TileCollisionTest" image="palettes/tile-collision-test.png" rows-per-frame="1" animation-delay="255"/>
+  <palette name="TileCollisionTest" image="palettes/tile-collision-test.png" rows-per-frame="2" animation-delay="255"/>
+  <background-image name="Sun" bit-depth="4" image="background-images/sun.png" palette="TileCollisionTest" first-palette="0" npalettes="2" default-order="0"/>
   <metatile-tileset src="metatile-tilesets/metatile-render-test.utmt"/>
   <metatile-tileset src="metatile-tilesets/tile-collision-test.utmt"/>
 </project>

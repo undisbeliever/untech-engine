@@ -301,6 +301,10 @@ a16()
 
     LoadMap()
 
+    lda.w   #Project.BackgroundImageList.Sun
+    ldy.w   #2
+    jsr     Resources.LoadBackgroundImage
+
     lda.w   #Project.MetaTileTilesetList.TileCollisionTest
     jsr     MetaTiles.LoadTileset
 
@@ -339,7 +343,7 @@ a16()
     sep     #$20
 a8()
     // ::TODO move elsewhere::
-    lda.b   #TM.bg1 | TM.bg3 | TM.obj
+    lda.b   #TM.bg1 | TM.bg2 | TM.bg3 | TM.obj
     sta.l   TM
 
     rep     #$30

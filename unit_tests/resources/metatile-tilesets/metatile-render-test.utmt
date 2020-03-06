@@ -2,7 +2,7 @@
 <!DOCTYPE untech>
 <metatile-tileset name="MetaTileRenderTest">
   <palette name="MetaTileRenderTest"/>
-  <animation-frames bit-depth="4" animation-delay="35">
+  <animation-frames palette="MetaTileRenderTest" bit-depth="4" animation-delay="35">
     <frame image="metatile-render-test.frame0.png"/>
     <frame image="metatile-render-test.frame1.png"/>
   </animation-frames>

@@ -18,7 +18,7 @@
   <tile t="30" collision="ults"/>
   <tile t="31" collision="ulss"/>
   <tile t="32" collision="es"/>
-  <animation-frames bit-depth="4" animation-delay="30">
+  <animation-frames palette="TileCollisionTest" bit-depth="4" animation-delay="30">
     <frame image="tile-collision-test.png"/>
   </animation-frames>
   <scratchpad width="32" height="14">
