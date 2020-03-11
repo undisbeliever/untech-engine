@@ -46,6 +46,7 @@ assert(Format.PaletteHeader.size == 3)
     tax
 
 
+    assert(Format.PaletteHeader.nAnimations == 0)
     lda     [_ptr]              // nAnimations
     inx
     and.w   #0xff
@@ -62,11 +63,13 @@ assert(Format.PaletteHeader.size == 3)
 
         tay
 
+        assert(Format.PaletteHeader.animationDelay == 1)
         stx.b   _ptr
         lda     [_ptr]          // animationDelay
         inx
         inx
     EndIf:
+    assert(Format.PaletteHeader.size == 3)
 
     // Y = nAnimations
     // A = animationDelay
