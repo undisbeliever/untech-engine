@@ -28,17 +28,18 @@ namespace Render {
 constant SCREEN_WIDTH = 256
 constant SCREEN_HEIGHT = 224
 
-// Resets the oamXposBuffer, prevent possible bugs
+// Reset `oamXposBuffer` and move all sprites in `oamBuffer` off-screen.
 //
 // REQUITES: 16 bit A, 16 bit Index, DB = $7e
 macro _Init() {
 	assert16a()
 	assert16i()
 
+    lda.w   #256 - 16
     ldx.w   #(128 - 1) * 4
-
     Loop:
         stz.w   MetaSprite.Render.oamXposBuffer,x
+        sta.w   MetaSprite.Render.oamBuffer.yPos,x
         dex
         dex
         dex
@@ -47,6 +48,14 @@ macro _Init() {
 
     ldy.w   #128 * 4
     sty.w   MetaSprite.Render.previousBufferPos
+
+
+    sep     #$20
+a8()
+    stz.w   Dma.MetaSprite.transferOnZero
+
+    rep     #$20
+a16()
 }
 
 
