@@ -18,16 +18,26 @@ namespace MetaTiles {
 // DMA: Uses DMA channel 0
 // MODIFIES: Disable HDMA, Disable Interrupts, Force Blank
 //
-// INPUT: A = tileset Id
-//        Resources.AnimatedTileset.bgIndex = bgIndex for the animated tileset
+// INPUT: A = tileset Id (only 8 bits read)
+//        Y = bgIndex (only 8 bits read)
 a16()
 i16()
 code()
 function LoadTileset {
 constant _tilesetPtr = LZ4.ptr
 
-    cmp.w   #MetaTiles.TilesetList.count
+    sep     #$30
+a8()
+i8()
+    sty.w   Resources.AnimatedTileset.bgIndex
+
+    cmp.b   #MetaTiles.TilesetList.count
     bcs     Fail
+
+    rep     #$30
+a16()
+i16()
+    and.w   #0xff
     sta.b   _tilesetPtr
     asl
     clc

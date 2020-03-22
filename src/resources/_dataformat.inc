@@ -15,22 +15,30 @@ constant VRAM_OBJ_WADDR = 0x6000
 
 namespace Resources {
 
-// The Resources subsystem requires the following to be defined:
-//
-//   Resources.PaletteList
-//      a list of long pointers that point to Resources.Format.Palette data
-//
-//   Resources.PaletteList.count
-//      the number of elements in the PaletteList
-//
 
 // number of animation ticks per second
 constant ANIMATION_TICKS_PER_SECOND = 300
 
+
+// Scene settings data
+// (SceneSettings table, long addressing)
+constant SceneSettingsData = Project.SceneSettingsData
+constant SceneSettingsData.count = Project.SceneSettingsData.count
+
+// Scene settings function table
+// (function table, SceneSettingsFunctionTable layout)
+constant SceneSettingsFunctionTable = Project.SceneSettingsFunctionTable
+constant SceneSettingsFunctionTable.tableSize = Project.SceneSettingsFunctionTable.size
+
 // Scene layout data
-// (Long SceneLayout table)
-constant SceneLayoutData = Project.SceneLayout
-constant SceneLayoutData.count = Project.SceneLayout.count
+// (SceneLayout table, long addressing)
+constant SceneLayoutData = Project.SceneLayoutData
+constant SceneLayoutData.count = Project.SceneLayoutData.count
+
+// Scene data
+// (Scene table, long addressing)
+constant SceneData = Project.SceneData
+constant SceneData.count = Project.SceneData.count
 
 // List of Background Images
 // (Long Addr Table)
@@ -44,9 +52,14 @@ constant PaletteList.count = Project.PaletteList.count
 
 
 namespace Format {
-    // SceneLayout resource data format
-    namespace SceneLayout {
-        struct(SceneLayoutData)
+    if Resources.SCENE_FORMAT_VERSION != 1 {
+        error "Invalid untech-compiler Scene Format"
+    }
+
+
+    // SceneSettings resource data format
+    namespace SceneSettings {
+        struct(SceneSettingsData)
             // BG mode
             //
             // Save format as the BGMODE register
@@ -54,7 +67,88 @@ namespace Format {
             // (byte, BGMODE, shadow ram)
             field(bgMode, 1)
 
+            // Layer types for each BG layer
+            //
+            //  ddd0 ccc0 bbb0 aaa0
+            //
+            //      aaa = BG1 layer type
+            //      bbb = BG2 layer type
+            //      ccc = BG3 layer type
+            //      ddd = BG4 layer type
+            //
+            // See `LayerTypes` for layer values.
+            //
+            // (4 nibbles, `LayerTypes` enum entry)
+            field(layerTypes, 2)
 
+            constant LAYER_TYPES_BG_MASK = 0b1110
+            constant LAYER_TYPES_BG_SHIFT = 4
+        endstruct()
+    }
+
+    // Scene Layer Types
+    namespace LayerTypes {
+        // Using struct as it allows me to automatically build a function table
+        basestruct()
+            // The layer is unused
+            field(None, 2)
+
+            // The layer is a background image
+            field(BackgroundImage, 2)
+
+            // ::TODO add AnimatedImage::
+
+            // The layer is an MetaTile Tileset
+            // (NOTE: a maximum of one MetaTileTileset per scene is allowed, 2)
+            field(MetaTileTileset, 2)
+
+            // Text.Console layer
+            // (NOTE: a maximum of one Text Console per scene is allowed, 2)
+            field(TextConsole, 2)
+
+            // ::TODO add StatusBar::
+        endstruct()
+
+        assert(size <= SceneSettings.LAYER_TYPES_BG_MASK)
+    }
+
+
+    // SceneSettings Function Table.
+    //
+    // Each SceneSettings entry has its own function table.
+    namespace SceneSettingsFunctionTable {
+        struct(SceneSettingsFunctionTable)
+            // Scene PPU setup routine.
+            //
+            // This function is called by `TransferToPpu` and is used to
+            // setup the PPU registers for the scene.
+            //
+            // REGS: 16 bit A, 8 bit Index, DB = 0x7e, DP = 0x2100
+            field(SetupPpu_dp2100, 2)
+
+            // Scene process routine.
+            //
+            // Called once per frame by `Resources.ProcessAnimations`
+            //
+            // REGS: 16 bit A, 8 bit Index, DB = 0x7e, DP = 0
+            field(Process, 2)
+
+            // Scene VBlank routine.
+            //
+            // Called once per frame during VBlank.
+            //
+            // REGS: 16 bit A, 8 bit Index, DB = 0x80, DP = 0
+            field(VBlank_dp2100, 2)
+        endstruct()
+    }
+    assert(SceneLayoutData.count * SceneSettingsFunctionTable.size == SceneSettingsFunctionTable.tableSize)
+    assert(SceneSettingsFunctionTable.tableSize < 256)  // allow 8 bit indexing
+
+
+
+    // SceneLayout resource data format
+    namespace SceneLayout {
+        struct(SceneLayoutData)
             // Background tilemap and character locations
             //
             // Two bytes per BG:
@@ -83,7 +177,34 @@ namespace Format {
             constant BG_INDEX_INCREMENT = 2
         endstruct()
     }
-    // ::TODO add Resources.SCENE_LAYOUT_FORMAT_VERSION test::
+
+
+
+    // Scene resource data format
+    namespace Scene {
+        struct(SceneData)
+            // Scene Settings id (`SceneSettings` struct)
+            //
+            // (byte)
+            field(settings, 1)
+
+            // Vram Layout id (`SceneLayout` struct)
+            // (byte)
+            field(vramLayout, 1)
+
+            // Palette Id (`PaletteHeader` struct)
+            // (byte)
+            field(palette, 1)
+
+            // Layer id for each Background layer.
+            //
+            // The type of each entry is determined by the `SceneSettings` struct.
+            // See `SceneSettings.layerTypes` for more details.
+            //
+            // (4x bytes)
+            field(layers, 4)
+        endstruct()
+    }
 
 
 
@@ -147,6 +268,7 @@ namespace Format {
             assert(MAX_N_TILEMAPS - 1 == tilemapCount.mask)
         endstruct()
     }
+
     if Resources.BACKGROUND_IMAGE_FORMAT_VERSION != 1 {
         error "Invalid untech-compiler Background Image Format"
     }

@@ -110,72 +110,107 @@ macro SetCursor(evaluate x, evaluate y) {
 
 
 
-// Initialize the console and copy font to VRAM.
+// Transfer the font to VRAM and clear the VRAM tilemap
 //
-// NOTE: This does not setup the Tilemap Addresses or
-//       size registers
-//
-// DMA: Uses DMA channel 0
-// REQUIRES: 8 bit A, 16 bit Index, DB access registers
-// REQUIRES: screen blank
-// REQUIRES: Resources Subsystem initialized with a scene layout set
-//
-// INPUT: A = bgIndex of the background used by the text subsystem
-a8()
-i16()
-code()
-function Init {
-    // Transfer the font to the VRAM
-
-    rep     #$30
+// REQUIRES: 16 bit A, 16 bit Index, DB access registers
 a16()
-    jsr     Resources.SceneLayout.CalcTileAndMapVramWaddr
-    // A = tile data Vram Waddr
-    sta.w   VMADD
-    sty.w   tilemapVramWaddr
+i16()
+macro Init() {
+    assert8a()
+    assert16i()
 
-    sep     #$20
-a8()
+    stz.w   bufferDirty
 
-    if Text.Font.FixedTiles.bitDepth == 2 {
-        Dma.ForceBlank.ToVram(Text.Font.FixedTiles)
+    ldx.w   #0xffff
+    stx.w   Text.tilesVramWaddr
+    stx.w   Text.tilemapVramWaddr
 
-    } else if Text.Font.FixedTiles.bitDepth == 1 {
-        Dma.ForceBlank.ToVramL(Text.Font.FixedTiles)
-
-        ldy.w   #Text.Font.FixedTiles.size
-        jsr     Dma.ForceBlank.ClearVramH
-
-    } else {
-        error "Invalid Text.Font.FixedTiles bitDepth"
-    }
 
     // Reset padding character
     lda.b   #Text.Font.SPACE
     sta.l   Text.paddingChar
 
-
-    // Clear the vram tilemap
-    // Sets the tilemap palette to 0 and priority to high
-
-    ldx.w   tilemapVramWaddr
-    ldy.w   #Tilemap.order
-    jsr     Dma.ForceBlank.FillTilemap
-
-End:
-    // CleanBuffer
+    rts
 }
 
 
 
-// Clear the Buffer
-// REQUIRES: 8 bit A, 16 bit Index, DB access shadow
-a8()
+// Transfer the font and buffer to VRAM if the text console is enabled.
+//
+// NOTE: This does not setup the Tilemap Addresses or
+//       size registers
+//
+// MUST ONLY be called by the Resources subsystem
+//
+// DMA: Uses DMA channel 0
+// REQUIRES: 8 bit A, 16 bit Index, DB access registers
+// REQUIRES: screen blank
+// REQUIRES: Resources Subsystem initialized with a scene layout set
+macro _TransferToPpu() {
+    assert8a()
+    assert16i()
+
+    assert(64 * 1024 / 2 <= 0x8000)      // if negative then text console is unused
+    ldx.w   Text.tilesVramWaddr
+    bmi     NotEnabled
+
+        // Transfer the font to the VRAM
+        stx.w   VMADD
+
+        if Text.Font.FixedTiles.bitDepth == 2 {
+            Dma.ForceBlank.ToVram(Text.Font.FixedTiles)
+
+        } else if Text.Font.FixedTiles.bitDepth == 1 {
+            Dma.ForceBlank.ToVramL(Text.Font.FixedTiles)
+
+            ldx.w   Text.tilesVramWaddr
+            stx.w   VMADD
+
+            ldy.w   #Text.Font.FixedTiles.size
+            jsr     Dma.ForceBlank.ClearVramH
+
+        } else {
+            error "Invalid Text.Font.FixedTiles bitDepth"
+        }
+
+
+        // Set the tilemap palette to 0 and priority to high
+        ldx.w   Text.tilemapVramWaddr
+        ldy.w   #Tilemap.order
+        jsr     Dma.ForceBlank.FillTilemap
+
+NotEnabled:
+}
+
+
+// Enables the text buffer
+//
+// MUST ONLY be called by the Resources subsystem
+//
+// REQUIRES: 16 bit A, 16 bit Index, DB = 0x7e
+//
+// INPUT: Y = bgIndex of the background used by the text subsystem
+a16()
 i16()
+code()
+function _EnableTextBuffer {
+    tya
+    jsr     Resources.SceneLayout.CalcTileAndMapVramWaddr
+    sta.w   tilesVramWaddr
+    sty.w   tilemapVramWaddr
+
+FallThrough:
+}
+
+
+// Clear the Buffer
+// REQUIRES: DB access shadow
+au()
+iu()
 code()
 // P & DP & DB unknown
 function ClearBuffer {
-    assert(pc() == Init.End)
+    assert(pc() == _EnableTextBuffer.FallThrough)
 
     php
 

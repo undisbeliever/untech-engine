@@ -35,6 +35,30 @@ allocate(decompressionBufferPos, wram7e, 2)
 allocate(animationSpeed, wram7e, 2)
 
 
+namespace Scene {
+    // SceneSettings Function Table Index
+    // See `Resources.Format.SceneSettingsFunctionTable`
+    // (byte index, shadow)
+    allocate(functionTableIndex, shadow, 1)
+
+
+    // Current scene ID
+    // (byte)
+    allocate(sceneId, wram7e, 1)
+
+    // BGMODE register buffer
+    // (byte)
+    allocate(bgMode, wram7e, 1)
+
+    // TM register buffer
+    //
+    // Dynamically created depending on SceneSettings selected
+    //
+    // (byte)
+    allocate(tm, wram7e, 1)
+}
+
+
 namespace SceneLayout {
     // Byte Index of the current SceneLayout data
     //
@@ -43,7 +67,6 @@ namespace SceneLayout {
     // (word index, shadow)
     allocate(dataIndex, shadow, 2)
 }
-
 constant BG_INDEX_MASK = Format.SceneLayout.BG_INDEX_MASK
 constant BG_INDEX_INCREMENT = Format.SceneLayout.BG_INDEX_INCREMENT
 
@@ -171,6 +194,20 @@ namespace VramTransferBuffer {
     allocate(destinationVramWaddr, wram7e, 2 * N_ELEMENTS)
 }
 
+}
+
+
+namespace Scenes {
+    // Scene Setting Function variables
+    // (7x word, shadow)
+    allocate(sceneVar0, shadow, 2)
+    allocate(sceneVar1, shadow, 2)
+    allocate(sceneVar2, shadow, 2)
+    allocate(sceneVar3, shadow, 2)
+    allocate(sceneVar4, shadow, 2)
+    allocate(sceneVar5, shadow, 2)
+    allocate(sceneVar6, shadow, 2)
+    allocate(sceneVar7, shadow, 2)
 }
 
 // vim: ft=bass-65816 ts=4 sw=4 et:

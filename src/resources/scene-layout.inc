@@ -11,6 +11,14 @@ namespace Resources {
 namespace SceneLayout {
 
 
+// Reset the SceneLayout subsystem
+//
+// REQUIRES: 16 bit A, 16 bit index, DB = 0x7e, DP = 0
+macro _Init() {
+    stz.w   SceneLayout.dataIndex
+}
+
+
 // Set the current scene layout
 //
 // REQUIRES: 16 bit A, 16 bit index, DB = 0x7e, DP = 0
@@ -25,15 +33,11 @@ macro _SetSceneLayout() {
         lda.w   #0
     +
 
-    assert(Format.SceneLayout.size == 9)
-    assertZeroPage(_tmp)
-    sta.b   _tmp
+    assert(Format.SceneLayout.size == 1 << 3)
     asl
     asl
     asl
     assert(SceneLayoutData.count < 256)
-    // c clear
-    adc.b   _tmp
 
     sta.w   SceneLayout.dataIndex
 }
@@ -93,11 +97,6 @@ macro _SetupPpuRegisters_RegisterDB() {
 
     assertShadowRam(SceneLayout.dataIndex)
     ldx.w   SceneLayout.dataIndex
-
-
-    // Set BG Mode
-    lda.l   Format.SceneLayout.bgMode,x
-    sta.w   BGMODE
 
 
     // Set BG tile map address and size

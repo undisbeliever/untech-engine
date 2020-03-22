@@ -389,29 +389,10 @@ a16()
 i16()
 code()
 function DoTest {
-    Text.Console.SetCursor(0, 19)
-    Text.Console.PrintString(UnitTestMessage)
-
     jsr     Entity.Init
-    jsr     Resources.Init
 
-
-    // ::TODO move to resources scene data::
-    sep     #$20
-a8()
-    // Use BG2 for metatiles
-    lda.b   #1 * 2
-    sta.w   Resources.AnimatedTileset.bgIndex
-
-    rep     #$30
-a16()
-
-
-    lda.w   #Project.MetaTileTilesetList.MetaTileRenderTest
-    jsr     MetaTiles.LoadTileset
-
-    lda.w   #Project.PaletteList.MetaTileRenderTest
-    jsr     Resources.Palette.LoadPalette
+    lda.w   #Project.Scenes.MetaTileRenderTest
+    jsr     Resources.LoadScene
 
 
     lda.w   MetaTiles.map.right
@@ -437,16 +418,13 @@ a16()
     +
 
 
+    jsr     Test.PrintCurrentTestName
+
+    Text.Console.SetCursor(0, 19)
+    Text.Console.PrintString(UnitTestMessage)
+
+
     jsr     Resources.TransferToPpu
-
-    sep     #$20
-a8()
-    // ::TODO move elsewhere::
-    lda.b   #TM.bg2 | TM.bg3 | TM.obj
-    sta.l   TM
-
-    rep     #$30
-a16()
 
 
 RedrawMap:

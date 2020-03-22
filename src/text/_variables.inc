@@ -10,9 +10,20 @@
 
 
 namespace Text {
+    // Word address of the tiles of the BG used by the text
+    //
+    // If negative then the text console is not loaded
+    //
+    // (vram word address, shadow)
+    allocate(tilesVramWaddr, shadow, 2)
+
     // Word address of the tilemap of the BG used by the text
+    //
+    // If negative then the text console is not loaded
+    //
     // (vram word address, shadow)
     allocate(tilemapVramWaddr, shadow, 2)
+
 
     // The buffer in which to hold the data to transfer to VRAM
     //

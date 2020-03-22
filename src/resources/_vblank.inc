@@ -40,6 +40,10 @@ macro VBlank_dp2100() {
         ldy.w   Resources.AnimatedTileset.displayVoffset + 1
         sty.b   BG1VOFS,x
     SkipUpdate:
+
+    assert(Resources.SceneSettingsFunctionTable.tableSize < 256)  // Confirm 8 bit indexing is allowed on function table
+    ldx.w   Resources.Scene.functionTableIndex
+    jsr     (Resources.Format.SceneSettingsFunctionTable.VBlank_dp2100,x)
 }
 
 }

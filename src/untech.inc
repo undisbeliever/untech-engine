@@ -60,13 +60,6 @@ include "text/string.inc"
 
 include "util/lz4.inc"
 
-include "resources/scene-layout.inc"
-include "resources/animated-tileset.inc"
-include "resources/images.inc"
-include "resources/palette.inc"
-include "resources/_common.inc"
-include "resources/_vblank.inc"
-
 include "camera/_common.inc"
 
 include "metasprite/animation.inc"
@@ -96,6 +89,13 @@ include "metatiles/_common.inc"
 include "metatiles/_vblank.inc"
 
 include "metasprite/actionpoints.inc"
+
+include "resources/scene-layout.inc"
+include "resources/animated-tileset.inc"
+include "resources/images.inc"
+include "resources/palette.inc"
+include "resources/_common.inc"
+include "resources/_vblank.inc"
 
 include "vblank/controller.inc"
 include "vblank/_common.inc"

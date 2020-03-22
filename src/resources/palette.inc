@@ -20,7 +20,7 @@ namespace Palette {
 //
 // REQUIRES: 16 bit A, 16 bit Index, DB = 0x7e, DP = 0
 //
-// INPUT: A = palette Id
+// INPUT: A = palette Id (only 8 bits read)
 a16()
 i16()
 code()
@@ -29,6 +29,7 @@ constant _ptr = LZ4.ptr
 assertZeroPage(_ptr)
 assert(Format.PaletteHeader.size == 3)
 
+    and.w   #0xff
     cmp.w   #Resources.PaletteList.count
     bcc     +
         break(INVALID_PALETTE_ID)

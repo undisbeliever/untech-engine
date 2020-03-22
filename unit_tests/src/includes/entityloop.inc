@@ -13,30 +13,6 @@ a16()
 i16()
 code()
 function Init {
-
-    // Setup The screen
-    // ----------------
-    pea     (0x7e << 8) | REGISTER_DB
-    plb
-// DB = REGISTER_DB
-
-    sep     #$20
-a8()
-    jsr     ForceBlank
-
-    lda.b   #TM.bg3 | TM.obj
-    sta.w   TM
-
-    jsr     EnableDisplay_Full
-
-    rep     #$30
-a16()
-    plb
-// DB = 0x7e
-
-
-    // Setup the modules
-    // -----------------
     jsr     Entity.Init
 
     rts

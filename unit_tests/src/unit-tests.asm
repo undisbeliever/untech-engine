@@ -18,22 +18,6 @@ include "memmap.inc"
 
 include "resources.inc"
 
-
-// ::TODO create this data in untech-editor::
-rodata(rom0)
-Project.SceneLayout:
-    db  BGMODE.mode1Bg3
-    db  ((0x0000 / BGXSC.base.walign) << BGXSC.base.shift) | BGXSC.map.s64x32       // Bg1Sc
-    db  0x2000 / BG12NBA.walign                                                     // Bg1Nba
-    db  ((0x0800 / BGXSC.base.walign) << BGXSC.base.shift) | BGXSC.map.s64x32       // Bg2Sc
-    db  0x3000 / BG12NBA.walign                                                     // Bg2Nba
-    db  ((0x1000 / BGXSC.base.walign) << BGXSC.base.shift) | BGXSC.map.s32x32       // Bg3Sc
-    db  0x4000 / BG12NBA.walign                                                     // Bg3Nba
-    db  0                                                                           // Bg4Sc
-    db  0                                                                           // Bg4Nba
-constant Project.SceneLayout.count = 1
-
-
 include "../gen/tables/entityhitbox-collisionorder.inc"
 include "../gen/tables/sine-table.inc"
 
@@ -55,6 +39,7 @@ function SuccessTest {
 }
 
 include "actionpoints.inc"
+include "scenes.inc"
 
 include "tests/dma/obj-palette.inc"
 include "tests/dma/tile16.inc"

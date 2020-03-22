@@ -280,36 +280,15 @@ code()
 Test.add("Tile Collision Test")
 Test.add("Tile Collision Test")     // Test both small and large tile heights
 function Test {
-    Text.Console.SetCursor(0, 21)
-    Text.Console.PrintString(UnitTestMessage)
-
 constant _entity = Test.tmp + 0
 
     jsr     Entity.Init
-    jsr     Resources.Init
 
-
-    // ::TODO move to resources scene data::
-    sep     #$20
-a8()
-    lda.b   #0
-    sta.w   Resources.AnimatedTileset.bgIndex
-
-    rep     #$30
-a16()
+    lda.w   #Project.Scenes.TileCollisionTest
+    jsr     Resources.LoadScene
 
 
     LoadMap()
-
-    lda.w   #Project.BackgroundImageList.Sun
-    ldy.w   #2
-    jsr     Resources.LoadBackgroundImage
-
-    lda.w   #Project.MetaTileTilesetList.TileCollisionTest
-    jsr     MetaTiles.LoadTileset
-
-    lda.w   #Project.PaletteList.TileCollisionTest
-    jsr     Resources.Palette.LoadPalette
 
 
     lda.w   #GRAVITY
@@ -338,16 +317,15 @@ a16()
 
 
 
+    jsr     Test.PrintCurrentTestName
+
+    Text.Console.SetCursor(0, 21)
+    Text.Console.PrintString(UnitTestMessage)
+
+
+
+
     jsr     Resources.TransferToPpu
-
-    sep     #$20
-a8()
-    // ::TODO move elsewhere::
-    lda.b   #TM.bg1 | TM.bg2 | TM.bg3 | TM.obj
-    sta.l   TM
-
-    rep     #$30
-a16()
 
     jsr     MetaTiles.Render.DrawFullScreen_ForceBlank
 

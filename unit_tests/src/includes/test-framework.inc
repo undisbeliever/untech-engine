@@ -120,11 +120,7 @@ i16()
     Loop:
         // ::TODO print test number
 
-        Text.Console.SetCursor(0, 2)
-
-        ldx.w   currentTestName
-        lda.w   #TestNameList >> 16
-        jsr     Text.Console.PrintString
+        jsr     PrintCurrentTestName
 
         Warnings.Reset_a16()
 
@@ -329,6 +325,28 @@ a8()
 }
 
 
+
+au()
+iu()
+code()
+function PrintCurrentTestName {
+    php
+
+    rep     #$30
+a16()
+i16()
+    Text.Console.SetCursor(0, 2)
+
+    ldx.w   currentTestName
+    lda.w   #TestNameList >> 16
+    jsr     Text.Console.PrintString
+
+    plp
+    rts
+}
+
+
+
 // Resets the PPU registers to initial state
 //
 // All tests that change PPU registers MUST call this routine upon clean-up.
@@ -353,10 +371,8 @@ i16()
 
     // Setup Screen
 
-    jsr     Resources.Init
-
-    // ::TODO move into scene subsystem::
-    assert(Resources.SceneLayoutData.count == 1)
+    lda.w   #Project.Scenes.UnitTest
+    jsr     Resources.LoadScene
 
     jsr     Resources.TransferToPpu
 
@@ -367,9 +383,6 @@ i16()
 
     sep     #$20
 a8()
-
-    lda.b   #TM.bg3
-    sta.w   TM
 
     // set BG color
     stz.w   CGADD
@@ -383,12 +396,6 @@ a8()
     // text color (black)
     stz.w   CGDATA
     stz.w   CGDATA
-
-
-    // ::TODO move into scene subsystem::
-    assert(Resources.SceneLayoutData.count == 1)
-    lda.b   #2 * 2      // bg3
-    jsr     Text.Console.Init
 
 
     Text.Console.PrintConstString("UnTech Unit Tests:")
