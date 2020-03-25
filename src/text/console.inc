@@ -28,6 +28,7 @@ namespace Console {
 // Buffer
 // Each byte in the buffer represents a single character
 constant buffer = Text.buffer
+constant BUFFER_BANK = buffer >> 16
 
 // Location in the buffer
 // (word dp)
@@ -219,7 +220,7 @@ a16()
 i16()
     // Clear the buffer
     lda.w   #0
-    ldx.w   #32 * 32 - 2
+    ldx.w   #buffer.size - 2
     Loop:
         sta.l   buffer,x
         dex
@@ -362,10 +363,10 @@ _AfterPhp:
 
     sep     #$20
 a8()
-    lda.b   #0x7e
+    lda.b   #BUFFER_BANK
     pha
     plb
-// DB = 0x7e
+// DB = BUFFER_BANK
 
 
     // Ensure that hex string fits in the current line
@@ -456,9 +457,10 @@ function PrintU16Y {
 
     sep     #$20
 a8()
-    lda.b   #0x7e
+    lda.b   #BUFFER_BANK
     pha
     plb
+// DB = BUFFER_BANK
 
     pea     PrintString.AfterSetBank - 1
     jmp     Text.String.U16Y_ToString
@@ -480,11 +482,13 @@ function PrintPaddedU16Y {
     phb
     phd
 
+    // Must not modify A
     sep     #$20
 a8()
-    pea     0x7e7e
+    pea     BUFFER_BANK | (BUFFER_BANK << 8)
     plb
     plb
+// DB = BUFFER_BANK
 
     pea     PrintString.AfterSetBank - 1
     jmp     Text.String.U16Y_ToPaddedString
@@ -506,9 +510,10 @@ function PrintU32XY {
 
     sep     #$20
 a8()
-    lda.b   #0x7e
+    lda.b   #BUFFER_BANK
     pha
     plb
+// DB = BUFFER_BANK
 
     pea     PrintString.AfterSetBank - 1
     jmp     Text.String.U32XY_ToString
@@ -530,11 +535,13 @@ function PrintPaddedU32XY {
     phb
     phd
 
+    // Must not modify A
     sep     #$20
 a8()
-    pea     0x7e7e
+    pea     BUFFER_BANK | (BUFFER_BANK << 8)
     plb
     plb
+// DB = BUFFER_BANK
 
     pea     PrintString.AfterSetBank - 1
     jmp     Text.String.U32XY_ToPaddedString
