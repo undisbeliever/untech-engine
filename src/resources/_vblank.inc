@@ -15,36 +15,96 @@ namespace Resources {
 //  * Updates animated tileset display offset
 //
 // REQUIRES: 16 bit A, 8 bit Index, DB = $80, DP = $2100
-//
-// MODIFIES: VMAIN = VMAIN.incrementMode.high
 macro VBlank_dp2100() {
     assert16a()
     assert8i()
-
-    // Ensure bgIndex can be used for PPU offset registers
-    assert(BG1HOFS + Resources.BG_INDEX_INCREMENT == BG2HOFS)
-
-    assertShadowRam(Resources.AnimatedTileset.bgIndex)
-    assertShadowRam(Resources.AnimatedTileset.displayHoffset)
-    assertShadowRam(Resources.AnimatedTileset.displayVoffset)
-
-    ldx.w   Resources.AnimatedTileset.bgIndex
-    bmi     SkipUpdate
-        ldy.w   Resources.AnimatedTileset.displayHoffset
-        sty.b   BG1HOFS,x
-        ldy.w   Resources.AnimatedTileset.displayHoffset + 1
-        sty.b   BG1HOFS,x
-
-        ldy.w   Resources.AnimatedTileset.displayVoffset
-        sty.b   BG1VOFS,x
-        ldy.w   Resources.AnimatedTileset.displayVoffset + 1
-        sty.b   BG1VOFS,x
-    SkipUpdate:
 
     assert(Resources.SceneSettingsFunctionTable.tableSize < 256)  // Confirm 8 bit indexing is allowed on function table
     ldx.w   Resources.Scene.functionTableIndex
     jsr     (Resources.Format.SceneSettingsFunctionTable.VBlank_dp2100,x)
 }
-
 }
 
+namespace Scenes {
+
+// Set Animated Tileset BG1 scroll registers
+//
+// This routine should only be called in a Scene's `VBlank_dp2100` routine.
+//
+// REQUIRES: 16 bit A, 8 bit Index, DB = $80, DP = $2100
+a16()
+i8()
+code()
+function VBlank_dp2100_AnimatedTileset_Bg1 {
+    assertShadowRam(Resources.AnimatedTileset.bgIndex)
+    assertShadowRam(Resources.AnimatedTileset.displayHoffset)
+    assertShadowRam(Resources.AnimatedTileset.displayVoffset)
+
+    ldy.w   Resources.AnimatedTileset.displayHoffset
+    sty.b   BG1HOFS
+    ldy.w   Resources.AnimatedTileset.displayHoffset + 1
+    sty.b   BG1HOFS
+
+    ldy.w   Resources.AnimatedTileset.displayVoffset
+    sty.b   BG1VOFS
+    ldy.w   Resources.AnimatedTileset.displayVoffset + 1
+    sty.b   BG1VOFS
+
+    rts
+}
+
+// Set Animated Tileset BG2 scroll registers
+//
+// This routine should only be called in a Scene's `VBlank_dp2100` routine.
+//
+// REQUIRES: 16 bit A, 8 bit Index, DB = $80, DP = $2100
+a16()
+i8()
+code()
+function VBlank_dp2100_AnimatedTileset_Bg2 {
+    assertShadowRam(Resources.AnimatedTileset.bgIndex)
+    assertShadowRam(Resources.AnimatedTileset.displayHoffset)
+    assertShadowRam(Resources.AnimatedTileset.displayVoffset)
+
+    ldy.w   Resources.AnimatedTileset.displayHoffset
+    sty.b   BG2HOFS
+    ldy.w   Resources.AnimatedTileset.displayHoffset + 1
+    sty.b   BG2HOFS
+
+    ldy.w   Resources.AnimatedTileset.displayVoffset
+    sty.b   BG2VOFS
+    ldy.w   Resources.AnimatedTileset.displayVoffset + 1
+    sty.b   BG2VOFS
+
+    rts
+}
+
+
+
+// Set Animated Tileset BG3 scroll registers
+//
+// This routine should only be called in a Scene's `VBlank_dp2100` routine.
+//
+// REQUIRES: 16 bit A, 8 bit Index, DB = $80, DP = $2100
+a16()
+i8()
+code()
+function VBlank_dp2100_AnimatedTileset_Bg3 {
+    assertShadowRam(Resources.AnimatedTileset.bgIndex)
+    assertShadowRam(Resources.AnimatedTileset.displayHoffset)
+    assertShadowRam(Resources.AnimatedTileset.displayVoffset)
+
+    ldy.w   Resources.AnimatedTileset.displayHoffset
+    sty.b   BG3HOFS
+    ldy.w   Resources.AnimatedTileset.displayHoffset + 1
+    sty.b   BG3HOFS
+
+    ldy.w   Resources.AnimatedTileset.displayVoffset
+    sty.b   BG3VOFS
+    ldy.w   Resources.AnimatedTileset.displayVoffset + 1
+    sty.b   BG3VOFS
+
+    rts
+}
+
+}

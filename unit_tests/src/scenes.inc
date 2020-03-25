@@ -43,12 +43,7 @@ namespace Mode1_Bg2MT_NoImage {
         rts
     }
 
-    a16()
-    i8()
-    code()
-    function VBlank_dp2100 {
-        rts
-    }
+    constant VBlank_dp2100 = VBlank_dp2100_AnimatedTileset_Bg2
 }
 
 
@@ -102,7 +97,7 @@ namespace SettingSun {
         ldx.w   yPosition + 1
         stx.b   BG2VOFS
 
-        rts
+        jmp     VBlank_dp2100_AnimatedTileset_Bg1
     }
 }
 
