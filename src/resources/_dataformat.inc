@@ -141,7 +141,7 @@ namespace Format {
             field(VBlank_dp2100, 2)
         endstruct()
     }
-    assert(SceneLayoutData.count * SceneSettingsFunctionTable.size == SceneSettingsFunctionTable.tableSize)
+    assert(SceneSettingsFunctionTable.tableSize == SceneSettingsData.count * SceneSettingsFunctionTable.size)
     assert(SceneSettingsFunctionTable.tableSize < 256)  // allow 8 bit indexing
 
 
