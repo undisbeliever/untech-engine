@@ -7,6 +7,9 @@
 // Copyright (c) 2016 - 2019, Marcus Rowe <undisbeliever@gmail.com>.
 // Distributed under The MIT License: https://opensource.org/licenses/MIT
 
+
+RegisterBreakId(INVALID_SCENE_LAYOUT)
+
 namespace Resources {
 namespace SceneLayout {
 
@@ -28,16 +31,19 @@ macro _SetSceneLayout() {
     assert16a()
     assert16i()
 
+    assert(SceneLayoutData.count < 256)
+
+    and.w   #0xff
     cmp.w   #SceneLayoutData.count
     bcc     +
-        lda.w   #0
+    InvalidSceneLayout:
+        break(INVALID_SCENE_LAYOUT)
     +
 
     assert(Format.SceneLayout.size == 1 << 3)
     asl
     asl
     asl
-    assert(SceneLayoutData.count < 256)
 
     sta.w   SceneLayout.dataIndex
 }
