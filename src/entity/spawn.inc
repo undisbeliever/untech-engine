@@ -159,7 +159,7 @@ allocateTmpWord(yPos)
         // Assign an new instanceId to the entity
         sep     #$10
     i8()
-        Entity._InstanceIdTable._AssignInstanceId()
+        Entity._InstanceIdTable._AssignNewInstanceId()
         rep     #$30
     i16()
 
@@ -212,6 +212,195 @@ allocateTmpWord(yPos)
 
     sec
     rts
+}
+
+
+
+// Spawn a new room entity from an room entity group
+//
+// MUST ONLY BE INVOKED BY `Room.EntityGroups.SpawnEntityGroups`
+//
+// The newly created entity will be given an instanceId of `_currentEntityInstanceId` (if it is free).
+//
+// The newly created entity will be placed in either the:
+//
+//   * `activateNextFrame` special list if the Entity Init function
+//      returns carry set **or** the entity is inside the active window.
+//
+//   * `deactivated` special list if the Entity Init function returns
+//      carry clear and the entity is outside the active window.
+//
+// REQUIRES: 16 bit A, 16 bit Index, DB = $7E, DP unknown
+//
+// INPUT: Y = Room.Format.EntityGroup.Entities address
+//
+// INPUT: _currentEntityInstanceId - instanceId of the new entity (byte)
+//                                   Will be incremented when the entity is spawned
+//
+// OUTPUT: dp = entity
+//         _currentEntityInstanceId incremented to next value
+//
+// BRANCH: EntityPoolEmpty if no more entities can be spawned
+// MODIFIES: dp
+macro _SpawnRoomEntity() {
+    assert16a()
+    assert16i()
+
+    // Y = Room.Format.EntityGroup.Entities address
+
+    lda.w   Room.Format.EntityGroup.Entities.entityDataId,y
+    and.w   #0xff
+    cmp.w   #Entity.Data.EntityRomDataListCount
+    bcc     +
+        break(INVALID_ENTITY_ID)
+    +
+
+    asl
+    tax
+
+    lda.w   Entity.specialLists.free
+    beq     EntityPoolEmpty
+
+
+    // Remove Entity from free list
+
+    tcd
+    lda.b   BaseEntity.next
+    sta.w   Entity.specialLists.free
+    bne     +
+        // There are no more free entities left, clear lastFreeEntity
+        stz.w   Entity.lastFreeEntity
+    +
+
+    // Get Entity ROM Data
+
+    lda.l   Entity.Data.EntityRomDataList,x
+    tax
+    stx.b   BaseEntity.romPtr
+
+
+    lda.l   BaseEntityRomStruct.functionTable,x
+    sta.b   BaseEntity.functionTable
+
+
+    // Set BaseEntity position
+
+    // Confirm position is 3 bytes in size
+    assert(Room.Format.EntityGroup.Entities.position + 3 == Room.Format.EntityGroup.Entities.parameter)
+
+    lda.w   Room.Format.EntityGroup.Entities.position,y
+    and.w   #Room.Format.EntityGroup.Entities.POSITION_MASK
+    clc
+    adc.w   #Room.Format.EntityGroup.Entities.POSITION_X_OFFSET
+    sta.b   BaseEntity.xPos.px
+    stz.b   BaseEntity.xPos.sx
+
+    assert(Room.Format.EntityGroup.Entities.POSITION_SHIFT == 8 + 4)
+    lda.w   Room.Format.EntityGroup.Entities.position + 1,y
+    lsr
+    lsr
+    lsr
+    lsr
+    and.w   #Room.Format.EntityGroup.Entities.POSITION_MASK
+    clc
+    adc.w   #Room.Format.EntityGroup.Entities.POSITION_Y_OFFSET
+    sta.b   BaseEntity.yPos.px
+    stz.b   BaseEntity.yPos.sx
+
+
+    // Confirm parameter is byte
+    assert(Room.Format.EntityGroup.size - Room.Format.EntityGroup.Entities.parameter == 1)
+    lda.w   Room.Format.EntityGroup.Entities.parameter,y
+    and.w   #0xff
+    // Store parameter for later
+    pha
+
+    // Can now modify Y
+
+    // Confirm entity momentum is a 24 bit value
+    assert(BaseEntity.yMomentum.sx - BaseEntity.xMomentum.sx == 3)
+    stz.b   BaseEntity.xMomentum.sx
+    stz.b   BaseEntity.xMomentum.sx + 2
+    stz.b   BaseEntity.xMomentum.sx + 4
+
+    // ::TODO move into BaseEntityRomStruct::
+    // confirm it is safe to override the byte before movementState
+    assert(BaseEntity.movementState - 1 == BaseEntity.yMomentum.px)
+    stz.b   BaseEntity.movementState - 1
+
+
+    // Set projectileId and listId
+    assert(BaseEntity.projectileId + 1 == BaseEntity.listId)
+    assert(BaseEntityRomStruct.initialProjectileId + 1 == BaseEntityRomStruct.initialListId)
+    lda.l   BaseEntityRomStruct.initialProjectileId,x
+    sta.b   BaseEntity.projectileId
+
+
+    // Initiate the MetaSprite
+    lda.l   BaseEntityRomStruct.defaultPalette,x
+    tay
+    lda.l   BaseEntityRomStruct.frameSetId,x
+
+    MetaSprite._InitEntity()
+
+
+    // Assign and increment _currentEntityInstanceId
+    sep     #$10
+i8()
+    ldx.w   _currentEntityInstanceId
+    txy
+    iny
+    iny
+    sty.w   _currentEntityInstanceId
+
+    // X = new entity instanceId
+    Entity._InstanceIdTable._SetInstanceId()
+
+    rep     #$30
+i16()
+
+
+    // Call Entity Init function
+    ldx.b   BaseEntity.functionTable
+    pla
+    jsr     (BaseEntityFunctionTable.Init,x)
+
+    // entity is active if, either
+    //   A. The Init function returns carry set, or
+    //   B. entity is inside active window
+
+    bcs     SkipActiveWindowTest
+
+        Entity.BranchEntityOutsideActiveWindow(IsInactive)
+
+        SkipActiveWindowTest:
+            // We cannot move the entity into its entity list while
+            // the entity-loop is running.
+            // Instead we move it to the `activateNextFrame` special list,
+            // where it will be activated and moved to the correct
+            // entity list at the start of the next frame.
+
+            lda.w   Entity.specialLists.activateNextFrame
+            sta.b   BaseEntity.next
+            tdc
+            sta.w   Entity.specialLists.activateNextFrame
+
+            bra     EndIf
+
+
+        InvalidEntityListId:
+            break(INVALID_ENTITY_LIST_ID)
+
+
+        IsInactive:
+            // Insert the entity into the deactivated list
+
+            lda.w   Entity.specialLists.deactivated
+            sta.b   BaseEntity.next
+            tdc
+            sta.w   Entity.specialLists.deactivated
+
+        EndIf:
 }
 
 

@@ -9,6 +9,8 @@
 // Distributed under The MIT License: https://opensource.org/licenses/MIT
 
 
+Warnings.Register(DUPLICATE_INSTANCE_ID, 16, 8, 31)
+
 namespace Entity {
 namespace _InstanceIdTable {
 
@@ -16,7 +18,7 @@ namespace _InstanceIdTable {
 assertPowerOfTwo(MAX_INSTANCE_ID + 2)
 assert(MAX_INSTANCE_ID & 1 == 0)
 assert(MAX_INSTANCE_ID < 255)
-assert(MAX_INSTANCE_ID > N_ENTITIES)
+assert(MAX_INSTANCE_ID / INSTANCE_ID_INCREMENT - 1 > N_ENTITIES)
 
 
 // Initializes the instanceIdTable and _unusedEntity
@@ -52,8 +54,36 @@ macro _Init() {
     // set minimumInstanceId to 2
     assert(MAX_INSTANCE_ID < 256)
     assert(currentInstanceId + 1 == minimumInstanceId)
-    lda.w   #((MAX_INSTANCE_ID + 2) & 0xff) | (2 << 8)
+    lda.w   #((MAX_INSTANCE_ID + 2) & 0xff) | (FIRST_INSTANCE_ID << 8)
     sta.w   currentInstanceId
+}
+
+
+
+// Sets the number of room entities
+//
+// Populates `minimumInstanceId`.
+//
+// REQUIRES: 16 bit A, 16 bit Index, DB = 0x7e
+//
+// INPUT: A = number of room entities
+macro _SetNumberOfRoomEntities() {
+    assert16a()
+    assert16i()
+
+    assert(Entity.INSTANCE_ID_INCREMENT == 2)
+    asl
+    cmp.w   #Entity.MAX_INSTANCE_ID - 1
+    bcc     +
+        break(INVALID_ROOM_DATA)
+    +
+
+    sep     #$20
+a8()
+    sta.w   Entity.minimumInstanceId
+
+    rep     #$20
+a16()
 }
 
 
@@ -63,7 +93,7 @@ macro _Init() {
 // ASSUMES: the entity does not have an instanceId.
 // REQUIRES: 16 bit A, 8 bit Index, DB = 0x7e
 // INPUT: dp = entity
-macro _AssignInstanceId() {
+macro _AssignNewInstanceId() {
     assert16a()
     assert8i()
 
@@ -98,6 +128,44 @@ macro _AssignInstanceId() {
     stx.b   BaseEntity.instanceId
 
     stx.w   currentInstanceId
+}
+
+
+
+// Set a given instanceId to the entity
+//
+// Breaks if the instanceId is already assigned
+//
+// ASSUMES: the entity does not have an instanceId.
+// REQUIRES: 16 bit A, 8 bit Index, DB = 0x7e
+// INPUT: dp = entity
+// INPUT: X = entityId (must not be 0)
+macro _SetInstanceId() {
+    assert16a()
+    assert8i()
+
+    //  if instanceIdTable[id] >= 0x8000:
+    //      Warnings.Warn(DUPLICATE_INSTANCE_ID)
+    //      id = 0
+    //  else:
+    //      instanceIdTable[id] = dp
+    //
+    //  currentInstanceId = id
+
+    assert(Entity._unusedEntity & 0xffff > 0x8000)
+    lda.w   Entity.instanceIdTable,x
+    bmi     InstanceIdUnused
+        Warnings.Warn(DUPLICATE_INSTANCE_ID)
+
+        ldx.b   #0
+        bra     EndIf
+
+    InstanceIdUnused:
+        tdc
+        sta.w   Entity.instanceIdTable,x
+
+EndIf:
+    stx.b   BaseEntity.instanceId
 }
 
 

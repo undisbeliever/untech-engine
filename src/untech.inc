@@ -26,10 +26,14 @@ include "dma/_common.inc"
 
 include "math/_macros.inc"
 
-include "resources/_dataformat.inc"
 include "metatiles/_dataformat.inc"
+include "room/_variables.inc"
+
+include "resources/_dataformat.inc"
 include "metasprite/_dataformat.inc"
 include "entity/_dataformat.inc"
+
+include "room/_dataformat.inc"
 
 include "resources/_variables.inc"
 include "hdma/_variables.inc"
@@ -96,6 +100,10 @@ include "resources/images.inc"
 include "resources/palette.inc"
 include "resources/_common.inc"
 include "resources/_vblank.inc"
+
+include "room/maps.inc"
+include "room/entity-groups.inc"
+include "room/_common.inc"
 
 include "vblank/controller.inc"
 include "vblank/_common.inc"

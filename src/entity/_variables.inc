@@ -261,9 +261,12 @@ namespace Entity {
     // Instance Id Table
     // =================
 
+    constant INSTANCE_ID_INCREMENT = 2
+    constant FIRST_INSTANCE_ID = 2
+
     // The largest valid instanceId
     // NOTE: bit 0 of this value must be clear
-    constant MAX_INSTANCE_ID = 127 * 2
+    constant MAX_INSTANCE_ID = 127 * INSTANCE_ID_INCREMENT
 
     // Mapping of `instanceId`s to addresses
     // If the instanceId does not exist it points to `_emptyEntity`
@@ -288,10 +291,9 @@ namespace Entity {
     // (byte index)
     allocate(currentInstanceId, wram7e, 1)
 
-    // The minimum allowed instanceId when Spawning a new entity
+    // The minimum allowed instanceId when Spawning a new entity using `Entity.Spawn`.
     //
-    // This value will be set to the number of entities in the
-    // level.
+    // This allows the room subsystem to reserve `instanceId`s for the room entities.
     //
     // This value must be:
     //  * Non-zero

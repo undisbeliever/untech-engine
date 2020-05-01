@@ -23,12 +23,12 @@ namespace MetaTiles {
     namespace map {
         // Map width in metatiles
         // (uint8)
-        allocate(width, wram7e, 1)
+        constant width = Room.Format.Header.width
 
         // Map data
         //
         // (byte grid array column-major order)
-        allocate(data, wram7e, MAP_SIZE)
+        constant data = Room.Format.mapData
 
 
         // Calculated values

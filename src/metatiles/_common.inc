@@ -16,6 +16,65 @@ Warnings.Register(SET_MAP_CELL_ERROR, 24, 0, 12)
 
 namespace MetaTiles {
 
+
+// Setup the room variables
+//
+// REQUIRES: 16 bit A, 16 bit Index, DB = 0x7e, DP = 0
+// REQUIRES: room loaded into memory
+macro _LoadMap() {
+    assert16a()
+    assert16i()
+
+    // map.bytesPerColumn = room height <= MAP_HEIGHT_SMALL ? MAP_HEIGHT_SMALL : MAP_HEIGHT_LARGE
+    lda.w   Room.Format.Header.height
+    and.w   #0xff
+    cmp.w   #MetaTiles.MAP_HEIGHT_SMALL + 1
+    bcc     +
+        lda.w   #MetaTiles.MAP_HEIGHT_LARGE
+        bra     ++
+    +
+        lda.w   #MetaTiles.MAP_HEIGHT_SMALL
+    +
+    sta.w   MetaTiles.map.bytesPerColumn
+
+
+    // RDMPY = map.width * map.bytesPerColumn
+    assert(MetaTiles.MAP_HEIGHT_LARGE < 256)
+    lda.w   MetaTiles.map.width - 1
+    and.w   #0xff00
+    ora.w   MetaTiles.map.bytesPerColumn
+    sta.l   WRMPYA                      // also set WRMPYB
+
+
+    // Set map boundary
+    assert(1 << 4 == MetaTiles.METATILE_SIZE_PX)
+    lda.w   MetaTiles.map.width
+    and.w   #0xff
+    asl
+    asl
+    asl
+    asl
+    // Carry clear
+    adc.w   #MetaTiles.map.LEFT
+    sta.w   MetaTiles.map.right
+
+    lda.w   Room.Format.Header.height
+    and.w   #0xff
+    asl
+    asl
+    asl
+    asl
+    // Carry clear
+    adc.w   #MetaTiles.map.TOP
+    sta.w   MetaTiles.map.bottom
+
+
+    lda.l   RDMPY
+    sta.w   MetaTiles.map.dataSize
+}
+
+
+
 namespace SetMapCell {
 // DP unknown
 // P on stack
@@ -29,6 +88,8 @@ Return:
     plp
     rts
 }
+
+
 
 // Sets a map cell to a given value.
 //
