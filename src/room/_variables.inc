@@ -15,8 +15,10 @@ namespace Room {
 // Holds the decompressed room data
 //
 // (wram 7E data block)
-constant roomData.size = 16 * 1024
-allocate(roomData, wram7e, roomData.size)
+allocate(roomData, wram7e, Project.ROOM_DATA_SIZE)
+constant roomData.size = Project.ROOM_DATA_SIZE
+
+assert(roomData.size >= 1024)
 
 
 // Current room id
