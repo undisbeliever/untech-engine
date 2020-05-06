@@ -67,13 +67,19 @@ $(BINARY): $(call rwildcard_all, $(SRC_DIRS) $(UNTECH_DIR)/src)
 $(BINARY): $(TABLE_INCS)
 $(BINARY): $(RESOURCES)
 
-$(BINARY) $(BINARY:.sfc=.symbols): $(MAIN)
-  ifeq ($(VANILLA_BASS), n)
+BINARY_SYMBOLS := $(BINARY:.sfc=.symbols) $(BINARY:.sfc=.msl) $(BINARY:.sfc=.cpu.sym)
+
+ifeq ($(VANILLA_BASS), n)
+  $(BINARY) $(BINARY_SYMBOLS): $(MAIN) $(UNTECH_DIR)/tools/convert-symbols-file.py
 	$(bass) -strict -o $(BINARY) -sym $(BINARY:.sfc=.symbols) $(MAIN)
-  else
-	$(bass) -strict -o $(BINARY) $(MAIN)
-  endif
 	$(untech-write-sfc-checksum) --hirom $(BINARY)
+	python3 $(UNTECH_DIR)/tools/convert-symbols-file.py --mesen-s --hirom -o $(BINARY:.sfc=.msl) $(BINARY:.sfc=.symbols)
+	python3 $(UNTECH_DIR)/tools/convert-symbols-file.py --bsnes-plus --hirom -o $(BINARY:.sfc=.cpu.sym) $(BINARY:.sfc=.symbols)
+else
+  $(BINARY): $(MAIN)
+	$(bass) -strict -o $(BINARY) $(MAIN)
+	$(untech-write-sfc-checksum) --hirom $(BINARY)
+endif
 
 
 .PHONY: memory-usage
@@ -168,7 +174,7 @@ clean-all: clean
 
 .PHONY: clean
 clean:
-	$(RM) $(BINARY) $(BINARY:.sfc=.symbols)
+	$(RM) $(BINARY) $(BINARY_SYMBOLS)
 	$(RM) $(sort $(TABLE_INCS))
 	$(RM) $(sort $(RESOURCES))
 
