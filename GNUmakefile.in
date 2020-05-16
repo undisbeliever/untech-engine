@@ -67,14 +67,13 @@ $(BINARY): $(call rwildcard_all, $(SRC_DIRS) $(UNTECH_DIR)/src)
 $(BINARY): $(TABLE_INCS)
 $(BINARY): $(RESOURCES)
 
-BINARY_SYMBOLS := $(BINARY:.sfc=.symbols) $(BINARY:.sfc=.msl) $(BINARY:.sfc=.cpu.sym)
+BINARY_SYMBOLS := $(BINARY:.sfc=.sym) $(BINARY:.sfc=.cpu.sym)
 
 ifeq ($(VANILLA_BASS), n)
   $(BINARY) $(BINARY_SYMBOLS): $(MAIN) $(UNTECH_DIR)/tools/convert-symbols-file.py
-	$(bass) -strict -o $(BINARY) -sym $(BINARY:.sfc=.symbols) $(MAIN)
+	$(bass) -strict -o $(BINARY) -sym $(BINARY:.sfc=.sym) $(MAIN)
 	$(untech-write-sfc-checksum) --hirom $(BINARY)
-	python3 $(UNTECH_DIR)/tools/convert-symbols-file.py --mesen-s --hirom -o $(BINARY:.sfc=.msl) $(BINARY:.sfc=.symbols)
-	python3 $(UNTECH_DIR)/tools/convert-symbols-file.py --bsnes-plus --hirom -o $(BINARY:.sfc=.cpu.sym) $(BINARY:.sfc=.symbols)
+	python3 $(UNTECH_DIR)/tools/convert-symbols-file.py --bsnes-plus --hirom -o $(BINARY:.sfc=.cpu.sym) $(BINARY:.sfc=.sym)
 else
   $(BINARY): $(MAIN)
 	$(bass) -strict -o $(BINARY) $(MAIN)

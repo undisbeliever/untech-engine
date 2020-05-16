@@ -24,48 +24,6 @@ class BsnesPlus:
 
 
 
-class MesenS:
-    # Spec: https://www.mesen.ca/docs/debugging/debuggerintegration.html#mesen-label-files-mlb
-
-    def __init__(self, is_hirom):
-        self.is_hirom = is_hirom
-        self.lines = list()
-
-
-    def mapper(self, addr):
-        bank = addr >> 16
-
-        if bank == 0x7e or bank == 0x7f:
-            return 'WORK', addr - 0x7e0000
-
-        if bank & 0x7f <= 0x3f:
-            if addr & 0xffff < 0x8000:
-                a = addr & 0xfffff
-                if a < 0x2000:
-                    return 'WORK', a
-                else:
-                    return 'REG', a
-
-        if self.is_hirom:
-            return 'PRG', addr & 0x3fffff
-        else:
-            # lorom
-            return 'PRG', (addr & 0x3f0000) >> 1 | (addr & 0x7fff)
-
-
-    def add_symbol(self, addr, name):
-        region, address = self.mapper(addr)
-
-        name = name.replace('.', '_')
-
-        self.lines.append(f"{region}:{address:04x}:{name}\n")
-
-
-    def write(self, fp):
-        fp.writelines(self.lines)
-
-
-
 def parse_arguments():
     parser = argparse.ArgumentParser(
                 description='bass-untech symbol file converter')
@@ -86,9 +44,6 @@ def parse_arguments():
     format_group.add_argument('-b', '--bsnes-plus',
                               action='store_true',
                               help='output bsnes plus symbol file')
-    format_group.add_argument('-m', '--mesen-s',
-                              action='store_true',
-                              help='output mesen-s label file')
 
 
     parser.add_argument('-o', '--output',
@@ -107,8 +62,6 @@ def main():
 
     if args.bsnes_plus:
         exporter = BsnesPlus()
-    elif args.mesen_s:
-        exporter = MesenS(args.hirom)
     else:
         raise RuntimeError("Unknown output format")
 
