@@ -274,11 +274,13 @@ constant _rowIndex = Test.dpTmp + 2
     constant MAP_GRID_TILE_OFFSET = 16
     constant MAP_GRID_LINE_WIDTH = 16
 
+    constant MAP_SIZE = MAP_WIDTH * MAP_HEIGHT
+
     assert(MAP_WIDTH < 256)
     assert(MAP_HEIGHT == MetaTiles.MAP_HEIGHT_SMALL || MAP_HEIGHT == MetaTiles.MAP_HEIGHT_LARGE)
     assert(MAP_GRID_WIDTH * MAP_REPEAT_HORIZONTAL <= MAP_WIDTH)
     assert(MAP_GRID_HEIGHT * MAP_REPEAT_VERTICAL <= MAP_HEIGHT)
-    assert(MAP_WIDTH * MAP_HEIGHT < MetaTiles.MAP_SIZE)
+    assert(MAP_SIZE + 256 < Room.roomData.size)
 
 
     lda.w   #MAP_WIDTH
@@ -299,8 +301,8 @@ constant _rowIndex = Test.dpTmp + 2
 
     // clear tilemap
 
-    assert(MetaTiles.MAP_SIZE % 2 == 0)
-    ldx.w   #MetaTiles.MAP_SIZE - 2
+    assert(MAP_SIZE % 2 == 0)
+    ldx.w   #MAP_SIZE - 2
     ClearLoop:
         stz.w   MetaTiles.map.data,x
         dex

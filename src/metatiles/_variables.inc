@@ -10,8 +10,6 @@
 
 
 namespace MetaTiles {
-    assert(MAP_SIZE >= 1024)
-
     constant METATILE_SIZE = 2
     constant METATILE_SIZE_PX = 16
     constant METATILE_DISPLAY_WIDTH = 16

@@ -47,10 +47,5 @@ namespace EntityPool {
 define PLAYER_PROJECTILE_ENTITY_LIST = PlayerProjectiles
 define ENEMY_PROJECTILE_ENTITY_LIST  = EnemyProjectiles
 
-
-// MetaTile engine settings
-// ========================
-constant MetaTiles.MAP_SIZE = 16384
-
 // vim: ft=bass-65816 ts=4 sw=4 et:
 
