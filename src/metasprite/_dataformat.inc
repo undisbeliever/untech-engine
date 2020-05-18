@@ -49,7 +49,6 @@ namespace Data {
     constant FrameData = Project.MS_FrameData;
     constant FrameObjectsData = Project.MS_FrameObjectsData;
     constant EntityHitboxData = Project.MS_EntityHitboxData;
-    constant TileHitboxData = Project.MS_TileHitboxData;
     constant ActionPointsData = Project.MS_ActionPointsData;
     constant AnimationData = Project.MS_AnimationData;
 
