@@ -10,25 +10,37 @@
 
 
 // Data format may be subject to changes
-if Entity.Data.ENTITY_FORMAT_VERSION != 3 {
+if Entity.Data.ENTITY_FORMAT_VERSION != 4 {
     error "Invalid UnTech Entity Format"
 }
 
 namespace Entity {
 namespace Data {
-    // List of entities
-    // Word indexes within the EntityRomData data
-    constant EntityRomDataList = Project.EntityRomDataList
-
     // Number of entities in the EntityRomDataList
     constant EntityRomDataListCount = Project.EntityIds.count
 
-    // List of projectiles
-    // Word indexes within the EntityRomData data
-    constant ProjectileRomDataList = Project.ProjectileRomDataList
-
     // Number of entities in the ProjectileRomDataList
     constant ProjectileRomDataListCount = Project.ProjectileIds.count
+
+
+    // Entity function table address for each entity and projectile
+    //
+    // Contains entity and projectile FunctionTables.
+    // Projectile data is stored directly after entity data.
+    //
+    // (word addr array, points to `BaseEntityFunctionTable` in code bank)
+    constant FunctionTables = Project.EntityFunctionTables
+    assert(Project.EntityFunctionTables.size == (EntityRomDataListCount + ProjectileRomDataListCount) * 2)
+
+
+    // EntityRomData table
+    //
+    // Data contains entity and projectile EntityRomData.
+    //
+    // Indexes for `EntityRomDataList` match the `FunctionTables` array.
+    //
+    // (word index array - points EntityRomData data)
+    constant EntityRomDataList = Project.EntityRomDataList
 }
 }
 
@@ -38,10 +50,6 @@ namespace Data {
 // store entity parameters.
 namespace BaseEntityRomStruct {
     basestruct_offset(Project.EntityRomData)
-        // Location of the entity's `functionPtr` table
-        // (word addr - code bank)
-        field(functionTable, 2)
-
         // Initial palette of the entity
         // (byte)
         field(defaultPalette, 1)
@@ -63,7 +71,6 @@ namespace BaseEntityRomStruct {
     endstruct()
 
     // Ensure untech-editor BaseEntityRomStruct matches untech-engine BaseEntityRomStruct
-    assert(BaseEntityRomStruct.functionTable == Project.EntityRomStructs.BaseEntityRomStruct.functionTable)
     assert(BaseEntityRomStruct.defaultPalette == Project.EntityRomStructs.BaseEntityRomStruct.defaultPalette)
     assert(BaseEntityRomStruct.initialProjectileId == Project.EntityRomStructs.BaseEntityRomStruct.initialProjectileId)
     assert(BaseEntityRomStruct.initialListId == Project.EntityRomStructs.BaseEntityRomStruct.initialListId)

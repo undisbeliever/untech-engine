@@ -109,6 +109,12 @@ allocateTmpWord(yPos)
             stz.w   lastFreeEntity
         +
 
+        // Get Function Table
+        // X = Entity Data Id * 2
+        lda.l   Entity.Data.FunctionTables,x
+        sta.b   BaseEntity.functionTable
+
+
         // Get Entity ROM Data
 
         lda.l   Entity.Data.EntityRomDataList,x
@@ -117,9 +123,6 @@ allocateTmpWord(yPos)
 
 
         // Setup BaseEntity
-
-        lda.l   BaseEntityRomStruct.functionTable,x
-        sta.b   BaseEntity.functionTable
 
         lda.w   xPos
         sta.b   BaseEntity.xPos.px
@@ -272,15 +275,17 @@ macro _SpawnRoomEntity() {
         stz.w   Entity.lastFreeEntity
     +
 
+    // Get Function Table
+    // X = entity Data Id * 2
+    lda.l   Entity.Data.FunctionTables,x
+    sta.b   BaseEntity.functionTable
+
+
     // Get Entity ROM Data
 
     lda.l   Entity.Data.EntityRomDataList,x
     tax
     stx.b   BaseEntity.romPtr
-
-
-    lda.l   BaseEntityRomStruct.functionTable,x
-    sta.b   BaseEntity.functionTable
 
 
     // Set BaseEntity position
@@ -529,7 +534,7 @@ function SpawnManualEnemyProjectiles {
 // REQUIRES: 16 bit A, 16 bit Index, DB = 0x7e
 //
 // INPUT: DP - entity
-//         Y - Entity RomData Id
+//         Y - Entity Data Id
 //         A - action point positionPair (int_ms8 pair)
 function SpawnEntityAtActionPoint {
 
@@ -541,13 +546,9 @@ function SpawnEntityAtActionPoint {
     sta.w   MetaSprite.ActionPoint.positionPair
 
     tya
-    asl
-    tax
-    lda.l   Entity.Data.EntityRomDataList,x
-    tax
 
-    lda.l   BaseEntityRomStruct.initialListId,x
-    tay
+    // get listId from BaseEntityRomStruct
+    ldy.w   #0xffff
 
     bra     __SpawnAtActionPoint
 }
@@ -611,10 +612,9 @@ function __SpawnProjectileAtActionPoint {
     cmp.w   #Entity.Data.ProjectileRomDataListCount
     bcs     SkipProjectile
 
-    asl
-    tax
-    lda.l   Entity.Data.ProjectileRomDataList,x
-    tax
+    // Projectiles are stored directly after entity data
+    // Carry clear
+    adc.w   #Entity.Data.EntityRomDataListCount
 
 FallThrough:
 }
@@ -635,9 +635,8 @@ FallThrough:
 //
 // REQUIRES: 16 bit A, 16 bit Index, DB = 0x7e
 // INPUT: DP - entity
-//         A - action point positionPair (int_ms8 pair)
-//         Y - enemy projectile list id
-//         X - EntityRomData address
+//         A - entity Rom Id (bound checked)
+//         Y - enemy projectile list id (if negative then BaseEntityRomStruct.initialListId is used instead)
 //        MetaSprite.ActionPoint.positionPair = action point position
 a16()
 i16()
@@ -646,6 +645,9 @@ function __SpawnAtActionPoint {
     assert(__SpawnProjectileAtActionPoint.FallThrough == pc())
 
     constant EntityPoolEmpty = __SpawnProjectileAtActionPoint.SkipProjectile
+
+    asl
+    tax
 
     // Get new entity address
     lda.w   Entity.specialLists.free
@@ -661,9 +663,31 @@ function __SpawnAtActionPoint {
             stz.w   lastFreeEntity
         +
 
-        // save entity listId
+
+        // Get Function Table
+        // X = Entity Data Id * 2
+        lda.l   Entity.Data.FunctionTables,x
+        sta.b   BaseEntity.functionTable
+
+
+        // Get Entity ROM Data
+
+        lda.l   Entity.Data.EntityRomDataList,x
+        tax
+        stx.b   BaseEntity.romPtr
+
+
+        // HACK
+        // ::TODO remove when adding projectiles subsystem ::
+        // ::: replace with `Set projectileId and listId` from `SpawnEntity`::
+
         // Y = listId
-        sty.b   BaseEntity.listId
+        tya
+        bpl     +
+            // If Y was negative, use listId from BaseEntityRomStruct
+            lda.l   BaseEntityRomStruct.initialListId,x
+        +
+        sta.b   BaseEntity.listId
         // check if was safe to do a 16 bit write to listId
         assert(BaseEntity.listId + 1 == BaseEntity.MetaSprite.frameSet)
 
@@ -706,12 +730,6 @@ function __SpawnAtActionPoint {
 
 
         // Initiate entity data
-        // X = EntityRomData address
-        stx.b   BaseEntity.romPtr
-
-        lda.l   BaseEntityRomStruct.functionTable,x
-        sta.b   BaseEntity.functionTable
-
         assert(BaseEntityRomStruct.defaultPalette + 1 == BaseEntityRomStruct.initialProjectileId)
         lda.l   BaseEntityRomStruct.defaultPalette,x
         tay
