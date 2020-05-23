@@ -10,7 +10,7 @@
 
 
 // Data format may be subject to changes
-if MetaSprite.Data.METASPRITE_FORMAT_VERSION != 38 {
+if MetaSprite.Data.METASPRITE_FORMAT_VERSION != 39 {
     error "Invalid UnTech MetaSprite Format"
 }
 
@@ -40,7 +40,7 @@ namespace Data {
     // Table of word indexes within the AnimationData block
     constant AnimationList = Project.MS_AnimationList
 
-    // Table of word addresses that point to Palette data
+    // Table of word indexes within PaletteData
     constant PaletteList = Project.MS_PaletteList;
 
     constant FrameSetData = Project.MS_FrameSetData;
@@ -54,8 +54,7 @@ namespace Data {
 
     // Palette Data
     // (30 bytes per palette)
-    constant PaletteBank = Project.MS_PaletteData >> 16
-    constant PaletteOffset = Project.MS_PaletteData & 0xff0000
+    constant PaletteData = Project.MS_PaletteData
 
     code()
 }

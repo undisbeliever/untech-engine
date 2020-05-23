@@ -165,19 +165,6 @@ ReturnFalse:
 }
 
 
-code()
-namespace _ProcessSlots {
-a16()
-i8()
-NoSlotsFound:
-    Warnings.Warn(NO_MS_PALETTE_SLOTS)
-
-    // Return false
-    rep     #$31
-    sep     #$20
-    rts
-}
-
 
 // Processes the palette slots for the entity, sets the charattr bits and
 // and uploads the palette to the Palette Buffer if necessary
@@ -240,9 +227,9 @@ i8()
             lda.w   tmp_paletteAddr
 
 
-SearchForDuplicateSlot:
 a16()
 i8()
+SearchForDuplicateSlot:
     // A = palette address
 
     // search for a duplicate used palette slot
@@ -261,6 +248,62 @@ i8()
         ldx.w   slots.next,y
         bpl     -
 
+    bra     NotFound
+
+
+// Existing slot was Found
+// increment the reference counter
+Found_Y:
+    tyx
+Found_X:
+    stx.w   tmp_slotIndex
+
+    // can do this in 16 bit mode ad count is 16 bit here
+    inc.w   slots.count,x
+
+SetMetaSpriteState:
+    // Set palette bits in offsets
+    // INPUT: tmp_slotIndex - the slot index
+
+    // luckally palette bits match the palette slot index and slotIndex always <= 7 * 2
+
+    sep     #$31
+a8()
+i8()
+    lda.b   BaseEntity.MetaSprite.blockOneCharAttrOffset + 1
+    and.b   #~OamFormat.attr.palette.mask
+    ora.w   tmp_slotIndex
+    sta.b   BaseEntity.MetaSprite.blockOneCharAttrOffset + 1
+
+    lda.b   BaseEntity.MetaSprite.blockTwoCharAttrOffset + 1
+    and.b   #~OamFormat.attr.palette.mask
+    ora.w   tmp_slotIndex
+    sta.b   BaseEntity.MetaSprite.blockTwoCharAttrOffset + 1
+
+    lda.b   #MetaSprite.StatusFlags.paletteSet
+    tsb.b   BaseEntity.MetaSprite.status
+
+    // Return True - C set by sep above
+    rep     #$10
+i16()
+    rts
+
+
+// No slot contains the palette and there are no free slots remaining
+a16()
+i8()
+NoSlotsFound:
+    Warnings.Warn(NO_MS_PALETTE_SLOTS)
+
+    // Return false
+    rep     #$31
+    sep     #$20
+    rts
+
+
+// No slot contains the palette, create a new slot and copy the palette data to the buffer
+a16()
+i8()
 NotFound:
     ldx.w   slotPool.free
     bmi     NoSlotsFound
@@ -311,62 +354,29 @@ a16()
 
     // Copy Palette to object palette buffer
     // A = slot index
+    assert(slots.ARRAY_INCREMENT << 4 == 32)
     asl
     asl
     asl
     asl
-    adc.w   #Dma.ObjPalette.buffer + 2
     tay
 
     ldx.w   tmp_paletteAddr
-    lda.w   #15 * 2 - 1
-    mvn     0x7e=MetaSprite.Data.PaletteBank
+
+evaluate n = 0
+while {n} < 15 {
+    lda.l   Data.PaletteData + 2 * {n},x
+    sta.w   Dma.ObjPalette.buffer + 2 * ({n} + 1),y
+
+    evaluate n = {n} + 1
+}
 
     sep     #$30
 a8()
 i8()
     Dma.ObjPalette.MarkDirty()
 
-    bra     SetMetaSpriteState
-
-
-
-// Existing slot was Found
-// increment the reference counter
-Found_Y:
-    tyx
-Found_X:
-    stx.w   tmp_slotIndex
-
-    // can do this in 16 bit mode ad count is 16 bit here
-    inc.w   slots.count,x
-
-SetMetaSpriteState:
-    // Set palette bits in offsets
-    // INPUT: tmp_slotIndex - the slot index
-
-    // luckally palette bits match the palette slot index and slotIndex always <= 7 * 2
-
-    sep     #$31
-a8()
-i8()
-    lda.b   BaseEntity.MetaSprite.blockOneCharAttrOffset + 1
-    and.b   #~OamFormat.attr.palette.mask
-    ora.w   tmp_slotIndex
-    sta.b   BaseEntity.MetaSprite.blockOneCharAttrOffset + 1
-
-    lda.b   BaseEntity.MetaSprite.blockTwoCharAttrOffset + 1
-    and.b   #~OamFormat.attr.palette.mask
-    ora.w   tmp_slotIndex
-    sta.b   BaseEntity.MetaSprite.blockTwoCharAttrOffset + 1
-
-    lda.b   #MetaSprite.StatusFlags.paletteSet
-    tsb.b   BaseEntity.MetaSprite.status
-
-    // Return True - C set by sep above
-    rep     #$10
-i16()
-    rts
+    jmp     SetMetaSpriteState
 }
 
 }
