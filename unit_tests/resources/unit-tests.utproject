@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF_8"?>
 <!DOCTYPE untech>
 <project>
-  <block-settings block-size="8192" block-count="7"/>
+  <memory-map mode="hirom" first-bank="c1" n-banks="1"/>
   <room-settings room-data-size="16384"/>
   <entity-rom-data>
     <listid name="Particles"/>
