@@ -235,11 +235,8 @@ a16()
 i16()
 code()
 namespace _ProcessDMA {
-    constant ContinueLoop = WaitFrame.Dma.VBlank_dp4300.Dma.Tile16._VBlank_dp4300.ContinueLoop
-    constant EndLoopFunction = WaitFrame.Dma.VBlank_dp4300.Dma.Tile16._VBlank_dp4300.EndLoopFunction
-
     FunctionTable: {
-        dw  EndLoopFunction
+        dw  WaitFrame.Dma.VBlank_dp4300.Dma.Tile16._VBlank_dp4300.EndLoopFunction
         dw  Transfer1
         dw  Transfer2
         dw  Transfer3
@@ -304,7 +301,7 @@ namespace _ProcessDMA {
 
             sty.w   MDMAEN
 
-            jmp     ContinueLoop
+            jmp     WaitFrame.Dma.VBlank_dp4300.Dma.Tile16._VBlank_dp4300.ContinueLoop
         }
     }
 
@@ -324,7 +321,7 @@ rodata(rom0)
 DmaTransferTimeTable:
 namespace DmaTransferTimeTable {
 
-expression _DmaTime_Single(n) = CalcDmaTime(n * 128, n * 21 + 55 + (n == 1 ? 8 : 12) + (n < 8 ? 17 : 0))
+expression _DmaTime_Single(n) = Dma.CalcDmaTime(n * 128, n * 21 + 55 + (n == 1 ? 8 : 12) + (n < 8 ? 17 : 0))
 expression _DmaTime_Dual(n) = _DmaTime_Single(8) + _DmaTime_Single(n - 8)
 expression _DmaTime(n) = n <= 8 ? _DmaTime_Single(n) : _DmaTime_Dual(n)
 

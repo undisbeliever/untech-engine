@@ -15,8 +15,8 @@ Test.add("Dma.Tile16.QueueOneTileFromList")
 function QueueOneTileFromList {
     constant VRAM_1 = VRAM_BLOCK + 32 * 2
 
-    jsr     Dma.Init
-    jsr     WaitFrame       // Reset Dma.transfersLeft
+    jsr     _Init
+    jsr     _ProcessDma16Queue      // Reset Dma.transfersLeft
 
     ldx.w   #TileData.TileList2
     stx.w   Dma.Tile16.tileListAddr
@@ -31,7 +31,7 @@ au()
     rep     #$30
 a16()
 
-    jsr     WaitFrame
+    jsr     _ProcessDma16Queue
 
     ldx.w   #TileData.Tile2
     ldy.w   #VRAM_1 + 32 * 0
@@ -56,7 +56,7 @@ function QueueTwoTilesFromList {
     constant VRAM_2 = VRAM_BLOCK + 32 * 6
 
     jsr     Dma.Init
-    jsr     WaitFrame       // Reset Dma.transfersLeft
+    jsr     _ProcessDma16Queue      // Reset Dma.transfersLeft
 
     ldx.w   #TileData.TileList10
     stx.w   Dma.Tile16.tileListAddr
@@ -73,7 +73,7 @@ au()
 
     rep     #$30
 a16()
-    jsr     WaitFrame
+    jsr     _ProcessDma16Queue
 
 
     ldx.w   #TileData.Tile7
@@ -104,7 +104,7 @@ function QueueOneRowFromList {
     constant VRAM_1 = VRAM_BLOCK
 
     jsr     Dma.Init
-    jsr     WaitFrame       // Reset Dma.transfersLeft
+    jsr     _ProcessDma16Queue      // Reset Dma.transfersLeft
 
     ldx.w   #TileData.TileList3
     stx.w   Dma.Tile16.tileListAddr
@@ -117,7 +117,7 @@ au()
 
     rep     #$30
 a16()
-    jsr     WaitFrame
+    jsr     _ProcessDma16Queue
 
     ldx.w   #TileData.Tile4
     ldy.w   #VRAM_1 + 32 * 0
@@ -151,7 +151,7 @@ function QueueTwoRowsFromList_one {
     constant VRAM_1 = VRAM_BLOCK + 32 * 4
 
     jsr     Dma.Init
-    jsr     WaitFrame       // Reset Dma.transfersLeft
+    jsr     _ProcessDma16Queue      // Reset Dma.transfersLeft
 
     ldx.w   #TileData.TileList2
     stx.w   Dma.Tile16.tileListAddr
@@ -168,7 +168,7 @@ au()
 
     rep     #$30
 a16()
-    jsr     WaitFrame
+    jsr     _ProcessDma16Queue
 
     ldx.w   #TileData.Tile2
     ldy.w   #VRAM_1 + 32 * 0
@@ -198,7 +198,7 @@ function QueueTwoRowsFromList_two {
     constant VRAM_2 = VRAM_BLOCK + 3 * 32 * 16
 
     jsr     Dma.Init
-    jsr     WaitFrame       // Reset Dma.transfersLeft
+    jsr     _ProcessDma16Queue      // Reset Dma.transfersLeft
 
     ldx.w   #TileData.TileList10
     stx.w   Dma.Tile16.tileListAddr
@@ -215,7 +215,7 @@ au()
 
     rep     #$30
 a16()
-    jsr     WaitFrame
+    jsr     _ProcessDma16Queue
 
     rep     #$30
 a16()
@@ -290,7 +290,7 @@ function QueueListAtEndOfRow {
     constant VRAM_1 = VRAM_BLOCK + 10 * 32 * 16
 
     jsr     Dma.Init
-    jsr     WaitFrame       // Reset Dma.transfersLeft
+    jsr     _ProcessDma16Queue      // Reset Dma.transfersLeft
 
     ldx.w   #TileData.TileList5
     stx.w   Dma.Tile16.tileListAddr
@@ -304,7 +304,7 @@ au()
 
     rep     #$30
 a16()
-    jsr     WaitFrame
+    jsr     _ProcessDma16Queue
 
     ldx.w   #TileData.Tile4
     ldy.w   #VRAM_1 + 32 * 7
@@ -351,7 +351,7 @@ function QueueListAtEndOfTwoRows_one {
     constant VRAM_2 = VRAM_BLOCK + 14 * 32 * 16
 
     jsr     Dma.Init
-    jsr     WaitFrame       // Reset Dma.transfersLeft
+    jsr     _ProcessDma16Queue      // Reset Dma.transfersLeft
 
     ldx.w   #TileData.TileList2
     stx.w   Dma.Tile16.tileListAddr
@@ -368,7 +368,7 @@ au()
 
     rep     #$30
 a16()
-    jsr     WaitFrame
+    jsr     _ProcessDma16Queue
 
     ldx.w   #TileData.Tile2
     ldy.w   #VRAM_2 + 32 * 6
@@ -398,7 +398,7 @@ function QueueListAtEndOfTwoRows_two {
     constant VRAM_2 = VRAM_BLOCK +  6 * 32 * 16
 
     jsr     Dma.Init
-    jsr     WaitFrame       // Reset Dma.transfersLeft
+    jsr     _ProcessDma16Queue      // Reset Dma.transfersLeft
 
     ldx.w   #TileData.TileList10
     stx.w   Dma.Tile16.tileListAddr
@@ -415,7 +415,7 @@ au()
 
     rep     #$30
 a16()
-    jsr     WaitFrame
+    jsr     _ProcessDma16Queue
 
     ldx.w   #TileData.Tile7
     ldy.w   #VRAM_1 + 32 * 6
@@ -488,13 +488,15 @@ code()
 function _CheckTile {
     allocate(tmp, wram7e, 2)
 
-    phx
-    phy
+    // Using INIDISP instead of ForceBlank as we do not want to process the
+    // normal Dma16 queue.
+    sep     #$20
+a8()
+    lda.b   #INIDISP.force
+    sta.l   INIDISP
 
-        jsr     ForceBlank
-
-    ply
-    plx
+    rep     #$20
+a16()
 
     sty.w   tmp
     tya
@@ -614,23 +616,21 @@ Tile7:
 
 
 rodata(rom0)
-assert((pc() >> 16) == (Dma.Tile16.TileListData >> 16))
-assert(pc() > Dma.Tile16.TileListData)
-
-constant TileList2 = pc() - Dma.Tile16.TileListData + 1
+DMA_Tile16Data:
+constant TileList2 = pc() - DMA_Tile16Data + 1
     db  2
     dw  Tile2 >> 7
     dw  Tile3 >> 7
 
 
-constant TileList3 = pc() - Dma.Tile16.TileListData + 1
+constant TileList3 = pc() - DMA_Tile16Data + 1
     db  3
     dw  Tile4 >> 7
     dw  Tile5 >> 7
     dw  Tile6 >> 7
 
 
-constant TileList5 = pc() - Dma.Tile16.TileListData + 1
+constant TileList5 = pc() - DMA_Tile16Data + 1
     db  5
     dw  Tile0 >> 7
     dw  Tile1 >> 7
@@ -639,7 +639,7 @@ constant TileList5 = pc() - Dma.Tile16.TileListData + 1
     dw  Tile4 >> 7
 
 
-constant TileList10 = pc() - Dma.Tile16.TileListData + 1
+constant TileList10 = pc() - DMA_Tile16Data + 1
     db  10
     dw  Tile7 >> 7
     dw  Tile6 >> 7
@@ -651,6 +651,73 @@ constant TileList10 = pc() - Dma.Tile16.TileListData + 1
     dw  Tile0 >> 7
     dw  Tile1 >> 7
     dw  Tile2 >> 7
+}
+
+
+// The following is an ugly series of hacks to get the Tile16 code to use the test data
+// ------------------------------------------------------------------------------------
+
+constant Project.DMA_Tile16Data = TileData.DMA_Tile16Data
+include "../../../../src/dma/tile16.inc"
+
+
+// Initialize the DmaTest.Tile16.Dma.Tile16 module
+//
+// REQUIRES: 16 bit A, 16 bit Index, DB = 0x7e
+a16()
+i16()
+code()
+function _Init {
+    Dma.Tile16._Init()
+    rts
+}
+
+
+// Transfer data in DmaTest.Tile16.Dma.Tile16 queue to VRAM and reset the queue.
+//
+// REQUIRES: 16 bit A, 16 bit Index
+a16()
+i16()
+code()
+_ProcessDma16Queue:
+namespace WaitFrame {
+    // NOTE: The annoy namespace statements are required to make Dma.Tile16._VBlank_dp4300() work.
+
+    php
+    phb
+    phd
+
+    sep     #$30
+    rep     #$20
+a16()
+i8()
+    ldx.b   #0x80
+    phx
+    plb
+// DB = 0x80
+
+    lda.w   #0x4300
+    tcd
+// DP = 0x4300
+
+    Dma.Tile16._FinalizeFrame()
+
+    ldx.b   #INIDISP.force
+    stx.w   INIDISP
+
+    namespace Dma.VBlank_dp4300 {
+        Dma.Tile16._VBlank_dp4300()
+    }
+
+    ldx.b   #0xf
+    stx.w   INIDISP
+
+    Dma.Tile16._ResetQueue()
+
+    pld
+    plb
+    plp
+    rts
 }
 
 }
