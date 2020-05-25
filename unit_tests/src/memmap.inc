@@ -7,10 +7,9 @@ createDataBlock(breakIdStrings,         0xc00000, 0xc004ff)
 createDataBlock(testNameBlock,          0xc00500, 0xc01fff)
 createDataBlock(testTableBlock,         0xc02000, 0xc021ff)
 
-createDataBlock(RES_Lists,              0xc02200, 0xc027ff)
-createDataBlock(rom0,                   0xc02800, 0xc05fff)
+createDataBlock(rom0,                   0xc02200, 0xc059ff)
 
-createCodeBlock(code,                   0xc06000, 0xc0ff8f)
+createCodeBlock(code,                   0xc05a00, 0xc0ff8f)
 createCodeBlock(interrupt_code,         0xc0ff90, 0xc0ffaf)
 
 createDataBlock(RES_Block0,             0xc10000, 0xc1ffff)
