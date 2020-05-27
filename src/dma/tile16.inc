@@ -69,6 +69,16 @@ namespace tileQueue {
 
     // tile location in ROM
     allocate(address, shadow, TILE_QUEUE_SIZE * 2)
+
+    // Tile bank in ROM
+    //
+    // The bank byte will always point to the upper-half of the address
+    // space (banks 0x80-0xff) in order for the queue to access tiles at
+    // the end of a 4 MiB ROM.
+    //
+    // Second byte contains the size of the top half of a 16x16 4bpp tile
+    // (used to speedup the VBlank code).
+    //
     allocate(bank, shadow, TILE_QUEUE_SIZE * 2)
 
     // constant variable - speeds up VBlank
@@ -400,14 +410,16 @@ a16()
     sty.w   transferQueueIndex
 
 
-    sep     #$20
-a8()
     ldy.w   tileQueueIndex
 
-    // bank = (tileList.addr << 7) >> 16
+    // bank = (tileList.addr << 7) >> 16 | 0x80
     // address = word(tileList.addr << 7)
+
+    sep     #$21
+a8()
+    // carry set
     lda.l   TileListData.addr.h,x
-    lsr
+    ror
     sta.w   tileQueue.bank,y
 
     lda.l   TileListData.addr,x
@@ -502,17 +514,18 @@ a16()
     adc.w   #4
     sta.w   transferQueueIndex
 
-    sep     #$20
-a8()
+
     ldy.w   tileQueueIndex
 
-    // bank = (tileList.addr << 7) >> 16
+    // bank = (tileList.addr << 7) >> 16 | 0x80
     // address = word(tileList.addr << 7)
 
     // First tile
-
+    sep     #$21
+a8()
+    // carry set
     lda.l   TileListData.addr.h,x
-    lsr
+    ror
     sta.w   tileQueue.bank,y
 
     lda.l   TileListData.addr,x
@@ -527,10 +540,11 @@ a16()
 
 
     // Second tile
-    sep     #$20
+    sep     #$21
 a8()
+    // carry set
     lda.l   TileListData.addr + 2 + 1,x
-    lsr
+    ror
     sta.w   tileQueue.bank + 2,y
 
     lda.l   TileListData.addr + 2,x
@@ -681,18 +695,19 @@ a16()
 
 
 BuildDmaQueue:
-    sep     #$20
+    sep     #$21
 a8()
+    // carry set
 
     ldx.w   tileListAddr
     ldy.w   tileQueueIndex
 
     Loop:
-        // bank = (tileList.addr << 7) >> 16
+        // bank = (tileList.addr << 7) >> 16 | 0x80
         // address = word(tileList.addr << 7)
 
         lda.l   TileListData.addr.h,x
-        lsr
+        ror
         sta.w   tileQueue.bank,y
 
         lda.l   TileListData.addr,x
@@ -704,8 +719,12 @@ a16()
         and.w   #0xff80
         sta.w   tileQueue.address,y
 
-        sep     #$20
+        sep     #$21
 a8()
+        // carry set
+
+        // MUST NOT MODIFY CARRY
+
         inx
         inx
 

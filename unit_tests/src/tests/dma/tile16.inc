@@ -673,6 +673,40 @@ function _Init {
 }
 
 
+// Verify the bank word of the tile queue is valid
+//
+// REQUIRES: 16 bit A, 16 bit Index, DB = 0x7e
+macro _CheckTileQueueBankWords() {
+    assert16a()
+    assert16i()
+
+    ldy.w   Dma.Tile16.tileQueueIndex
+    beq     SkipLoop
+
+    dey
+    dey
+
+    Loop:
+        // Dma.Tile16.tileQueue.bank is valid if its MSB is set
+        // Dma.Tile16.tileQueue.tileHalfSize is valid if it is equal to TILE_HALF_SIZE
+
+        assert  (Dma.Tile16.tileQueue.bank + 1 == Dma.Tile16.tileQueue.tileHalfSize)
+
+        lda.w   Dma.Tile16.tileQueue.bank,y
+        and.w   #0xff80
+        cmp.w   #0x80 | (Dma.Tile16.tileQueue.TILE_HALF_SIZE << 8)
+        beq     +
+            jmp     Test.Fail
+        +
+
+        dey
+        dey
+        bpl     Loop
+
+SkipLoop:
+}
+
+
 // Transfer data in DmaTest.Tile16.Dma.Tile16 queue to VRAM and reset the queue.
 //
 // REQUIRES: 16 bit A, 16 bit Index
@@ -681,7 +715,9 @@ i16()
 code()
 _ProcessDma16Queue:
 namespace WaitFrame {
-    // NOTE: The annoy namespace statements are required to make Dma.Tile16._VBlank_dp4300() work.
+    // ::ANNOY namespace statements are required to make Dma.Tile16._VBlank_dp4300() work::
+
+    _CheckTileQueueBankWords()
 
     php
     phb
