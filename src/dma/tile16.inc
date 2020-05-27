@@ -415,18 +415,17 @@ a16()
     // bank = (tileList.addr << 7) >> 16 | 0x80
     // address = word(tileList.addr << 7)
 
+    lda.l   TileListData.addr,x
+    xba
+
     sep     #$21
 a8()
     // carry set
-    lda.l   TileListData.addr.h,x
     ror
     sta.w   tileQueue.bank,y
 
-    lda.l   TileListData.addr,x
-
     rep     #$30
 a16()
-    xba
     ror
     and.w   #0xff80
     sta.w   tileQueue.address,y
@@ -521,18 +520,17 @@ a16()
     // address = word(tileList.addr << 7)
 
     // First tile
+    lda.l   TileListData.addr,x
+    xba
+
     sep     #$21
 a8()
     // carry set
-    lda.l   TileListData.addr.h,x
     ror
     sta.w   tileQueue.bank,y
 
-    lda.l   TileListData.addr,x
-
     rep     #$30
 a16()
-    xba
     ror
     and.w   #0xff80
     sta.w   tileQueue.address,y
@@ -540,18 +538,17 @@ a16()
 
 
     // Second tile
+    lda.l   TileListData.addr + 2,x
+    xba
+
     sep     #$21
 a8()
     // carry set
-    lda.l   TileListData.addr + 2 + 1,x
     ror
     sta.w   tileQueue.bank + 2,y
 
-    lda.l   TileListData.addr + 2,x
-
     rep     #$30
 a16()
-    xba
     ror
     and.w   #0xff80
     sta.w   tileQueue.address + 2,y
@@ -695,29 +692,34 @@ a16()
 
 
 BuildDmaQueue:
-    sep     #$21
-a8()
-    // carry set
-
     ldx.w   tileListAddr
     ldy.w   tileQueueIndex
 
+    lda.l   TileListData.addr,x
+
+    sep     #$21
+    // carry set
+a8()
     Loop:
+        // Starting the loop with an 8 bit A is faster when processing more than 4 tiles.
+
+        // A = tileListData.addr,x
+
         // bank = (tileList.addr << 7) >> 16 | 0x80
         // address = word(tileList.addr << 7)
+        xba
 
-        lda.l   TileListData.addr.h,x
+        // carry set
         ror
         sta.w   tileQueue.bank,y
 
-        lda.l   TileListData.addr,x
-
         rep     #$30
 a16()
-        xba
         ror
         and.w   #0xff80
         sta.w   tileQueue.address,y
+
+        lda.l   TileListData.addr + 2,x
 
         sep     #$21
 a8()
