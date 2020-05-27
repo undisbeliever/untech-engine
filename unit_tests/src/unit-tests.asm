@@ -6,7 +6,7 @@
 define MEMORY_MAP = HIROM
 define ROM_SIZE = 1
 define ROM_SPEED = slow
-define REGION = Australia
+define REGION = US
 define ROM_NAME = "UNTECH UNIT TESTS"
 define VERSION = 0
 
