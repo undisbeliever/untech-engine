@@ -356,13 +356,13 @@ macro PrintBreakpoint() {
 
     // Break String and Break Id
     SetCursor(2, 3)
-    lda     13,s
+    lda     14,s
     pha
     plb
 
     rep     #$30
 a16()
-    lda     11,s
+    lda     12,s
     dec
     tax
 
