@@ -131,7 +131,7 @@ namespace EhCollisionTest_Player {
 
         EndIf:
 
-        jmp     Entity.DrawAndGotoNextEntity
+        jmp     Entity.GotoNextEntity
     }
 }
 
@@ -358,11 +358,12 @@ rodata(rom0)
 namespace EnemyTable {
 constant Y_DELTA = 20
 constant N_COLUMNS = 4
-constant Y_BOTTOM = Camera.ORIGIN + Camera.DISPLAY_HEIGHT - 30
 
-constant X_LEFT = Camera.ORIGIN + Camera.DISPLAY_WIDTH / 3 + 20
-constant X_RIGHT = Camera.ORIGIN + Camera.DISPLAY_WIDTH / 2 + 10
-constant X_CENTER = Camera.ORIGIN + Camera.DISPLAY_WIDTH / 2
+constant Y_BOTTOM = MetaTiles.map.TOP + Camera.DISPLAY_HEIGHT - 30
+
+constant X_LEFT = MetaTiles.map.LEFT + Camera.DISPLAY_WIDTH / 3 + 20
+constant X_RIGHT = MetaTiles.map.LEFT + Camera.DISPLAY_WIDTH / 2 + 10
+constant X_CENTER = MetaTiles.map.LEFT + Camera.DISPLAY_WIDTH / 2
 
     struct(pc())
         field(entityDataId, 2)

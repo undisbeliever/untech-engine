@@ -91,7 +91,7 @@ constant N_ENTITIES = InteractiveTests.MetaSpriteInteractiveTest.EntityTable.N_E
     cmp.w   #0
     bne     Fail
 
-    Entity.CountEntitiesInList(Players)
+    Entity.CountEntitiesInList(Particles)
     cmp.w   #N_ENTITIES
     bne     Fail
 

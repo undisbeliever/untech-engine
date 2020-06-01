@@ -58,13 +58,13 @@
       <entry name="DeleteAfterDelay_Enemy" function-table="DeleteAfterDelay" listid="Enemies" frameset="FST_OneTileFixed1" frame="frame" palette="0"/>
       <entry name="DeleteIfAnimationEnds" function-table="DeleteIfAnimationEnds" listid="Particles" frameset="DeleteIfAnimationEnds" frame="frame1" palette="0"/>
       <entry name="SpawnAndChangeList" function-table="SpawnAndChangeList" listid="Particles" frameset="FST_OneTileFixed1" frame="frame" palette="0"/>
-      <entry name="ShowAllFrames" function-table="ShowAllFrames" listid="Players" frameset="FST_OneTileFixed1" frame="frame" palette="0"/>
+      <entry name="ShowAllFrames" function-table="ShowAllFrames" listid="Particles" frameset="FST_OneTileFixed1" frame="frame" palette="0"/>
       <entry name="ActionPointSpawner" function-table="ActionPointSpawner" projectileid="EightDirectionRedProjectile" listid="Enemies" frameset="ActionPointSpawner" frame="playerProjectile0" palette="0"/>
       <entry name="EightDirectionProjectile" function-table="EightDirectionProjectile" listid="Particles" frameset="Projectile" frame="frame" palette="0"/>
       <entry name="EhCollisionTest_Player" function-table="EhCollisionTest_Player" listid="Players" frameset="EhCollisionTest_Player" frame="frame1" palette="0"/>
       <entry name="EhCollisionTest_Enemy" function-table="EhCollisionTest_Enemy" listid="Enemies" frameset="EhCollisionTest_Enemy" frame="box" palette="0"/>
       <entry name="EhCollisionTest_CollisionCentre" function-table="EhCollisionTest_CollisionCentre" listid="Particles" frameset="EhCollisionTest_Centre" frame="frame" palette="0"/>
-      <entry name="MapCursor" function-table="MapCursor" listid="Particles" frameset="Cursor" frame="frame" palette="0"/>
+      <entry name="MapCursor" function-table="MapCursor" listid="Players" frameset="Cursor" frame="frame" palette="0"/>
       <entry name="TileCollisionTestPlayer" function-table="TileCollisionTestPlayer" listid="Players" frameset="TileCollisionTestPlayer" frame="frame1" palette="0"/>
     </entities>
     <projectiles>

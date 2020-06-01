@@ -132,8 +132,8 @@ namespace EntityTable {
     macro data(frameSet, frameDelay, xPos, yPos) {
         dw  MSFS.{frameSet}
         dw  {frameDelay}
-        dw  {xPos} + Camera.ORIGIN
-        dw  {yPos} + Camera.ORIGIN
+        dw  {xPos} + MetaTiles.map.LEFT
+        dw  {yPos} + MetaTiles.map.TOP
     }
 
 Data:

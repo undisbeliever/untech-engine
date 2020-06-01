@@ -253,10 +253,10 @@ function Test {
 
     // Load the entity
 
-    lda.w   #Camera.ORIGIN + Camera.DISPLAY_WIDTH / 2
+    lda.w   #MetaTiles.map.LEFT + Camera.DISPLAY_WIDTH / 2
     sta.w   Entity.Spawn.xPos
 
-    lda.w   #Camera.ORIGIN + Camera.DISPLAY_HEIGHT / 2
+    lda.w   #MetaTiles.map.TOP + Camera.DISPLAY_HEIGHT / 2
     sta.w   Entity.Spawn.yPos
 
     lda.w   #Project.EntityIds.ActionPointSpawner

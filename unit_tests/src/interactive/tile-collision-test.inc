@@ -186,41 +186,10 @@ namespace TileCollisionTestPlayer {
 
 
         // Move camera to center of entity
-        rep     #$31
+        rep     #$30
     a16()
-        lda.b   EntityStruct.xPos.px
-        // Carry clear
-        adc.w   #Camera.DISPLAY_WIDTH / 2
-        cmp.w   MetaTiles.map.right
-        bcc     +
-            lda.w   MetaTiles.map.right
-        +
-        sec
-        sbc.w   #Camera.DISPLAY_WIDTH
-        cmp.w   #MetaTiles.map.LEFT
-        bcs     +
-            lda.w   #MetaTiles.map.LEFT
-        +
-        sta.w   Camera.xPos
 
-
-        lda.b   EntityStruct.yPos.px
-        clc
-        adc.w   #Camera.DISPLAY_HEIGHT / 2
-        cmp.w   MetaTiles.map.bottom
-        bcc     +
-            lda.w   MetaTiles.map.bottom
-        +
-        sec
-        sbc.w   #Camera.DISPLAY_HEIGHT
-        cmp.w   #MetaTiles.map.TOP
-        bcs     +
-            lda.w   #MetaTiles.map.TOP
-        +
-        sta.w   Camera.yPos
-
-
-        jmp     Entity.DrawAndGotoNextEntity
+        jmp     Entity.GotoNextEntity
     }
 }
 }
@@ -275,12 +244,6 @@ constant _entity = Test.tmp + 0
     lda.w   #GRAVITY
     sta.w   Room.gravity_sx
 
-    lda.w   #MetaTiles.map.LEFT
-    sta.w   Camera.xPos
-
-    lda.w   #MetaTiles.map.TOP
-    sta.w   Camera.yPos
-
 
     // ::TODO move elsewhere::
     lda.w   #0xff
@@ -327,6 +290,7 @@ a16()
 
     Loop:
         jsr     WaitFrame_PrintFreeCycles
+
         jsr     MetaSprite.Render.InitLoop
 
         jsr     EntityLoop.ProcessFrame

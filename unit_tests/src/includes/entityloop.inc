@@ -15,6 +15,16 @@ code()
 function Init {
     jsr     Entity.Init
 
+
+    // Reset map size so camera is a single screen by default
+    lda.w   #MetaTiles.map.LEFT + Camera.DISPLAY_WIDTH
+    sta.w   MetaTiles.map.right
+
+    lda.w   #MetaTiles.map.TOP + Camera.DISPLAY_HEIGHT
+    sta.w   MetaTiles.map.bottom
+
+    jsr     Camera.Init
+
     rts
 }
 
@@ -57,6 +67,25 @@ function ProcessUntilButtonPress {
 }
 
 
+// Draw the first player entity on the screen
+// REQUIRES: 16 bit A, 16 bit Index, DB = 0x7e, Init called
+macro _DrawPlayer() {
+    assert16a()
+    assert16i()
+
+    // Assumes only one player
+    // Assumes player has no custom drawing routine
+    lda.w   {Entity.listAddress(Players)}
+    beq     Skip{#}
+        tcd
+        jsr     MetaSprite.Render.RenderEntity
+
+        lda.w   #0
+        tcd
+Skip{#}:
+}
+
+
 // Processes a single frame of the Entity Loop.
 //
 // This routine will also validate the entity lists after
@@ -69,8 +98,6 @@ a16()
 i16()
 code()
 function ProcessFrame {
-    jsr     MetaSprite.Render.InitLoop
-
     Entity.ProcessSpecialLists()
 
     MetaSprite.EntityHitbox.Begin()
@@ -78,12 +105,32 @@ function ProcessFrame {
         MetaSprite.EntityHitbox.TestCollisions(Players,             EnemyProjectiles, Enemies)
     MetaSprite.EntityHitbox.End()
 
-    Entity.ProcessEntityList(Particles)
-    Entity.ProcessEntityList(PlayerProjectiles)
-    Entity.ProcessEntityList(EnemyProjectiles)
-    Entity.ProcessEntityList(Platforms)
+
+    // ::KUDOS NovaSquirrel::
+    // ::: For making Nova the Squirrel 2 open source and showing me how to fix a camera/player-sprite desync::
+
+    // Player entities do not draw MetaSprites in their Process routine, that happens later.
     Entity.ProcessEntityList(Players)
-    Entity.ProcessEntityList(Enemies)
+
+    // Update camera based on player's position
+    // This is done outside the render loop to prevent a desync between the player sprites and camera
+    ldx.w   {Entity.listAddress(Players)}
+    beq     +
+        // Assumes only one player
+        jsr     Camera.CenterOnEntity_X
+    +
+
+
+    jsr     MetaSprite.Render.InitLoop
+
+        Entity.ProcessEntityList(Particles)
+        Entity.ProcessEntityList(PlayerProjectiles)
+        Entity.ProcessEntityList(EnemyProjectiles)
+
+        _DrawPlayer()
+
+        Entity.ProcessEntityList(Platforms)
+        Entity.ProcessEntityList(Enemies)
 
     jsr     MetaSprite.Render.EndLoop
 

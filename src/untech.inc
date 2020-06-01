@@ -65,6 +65,7 @@ include "text/string.inc"
 include "util/lz4.inc"
 
 include "camera/_common.inc"
+include "camera/center-on-entity.inc"
 
 include "metasprite/animation.inc"
 include "metasprite/entityhitbox.inc"

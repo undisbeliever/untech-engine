@@ -116,12 +116,7 @@ namespace MapCursor {
             //  if pos < minMap:
             //      pos = minMap
             //  else if pos >= maxMap:
-            //      pos = mapMap - 1
-            //
-            //  if pos < Camera.pos:
-            //      Camera.pos = Pos
-            //  else if pos - displaySize > Camera.pos:
-            //      Camera.pos = pos - displaySize
+            //      pos = maxMap - 1
 
             lda.b   EntityStruct.{c}Pos.px
             cmp.w   #MetaTiles.map.{minMap}
@@ -135,16 +130,6 @@ namespace MapCursor {
                 dec
             +
             sta.b   EntityStruct.{c}Pos.px
-
-            cmp.w   Camera.{c}Pos
-            bcc     +
-            sec
-            sbc.w   #Camera.{displaySize}
-            cmp.w   Camera.{c}Pos
-            bcc     ++
-            +
-                sta.w   Camera.{c}Pos
-            +
         }
         _processAxis(x, LEFT, right, DISPLAY_WIDTH)
         _processAxis(y, TOP, bottom, DISPLAY_HEIGHT)
@@ -391,7 +376,9 @@ a16()
 i16()
 code()
 function DoTest {
-    jsr     Entity.Init
+
+    jsr     Camera.Init
+
 
     lda.w   #Project.Scenes.MetaTileRenderTest
     jsr     Resources.LoadScene
@@ -492,6 +479,8 @@ function SmallMapHeightTest {
     constant MAP_REPEAT_HORIZONTAL = 24
     constant MAP_REPEAT_VERTICAL = 19
 
+    jsr     Entity.Init
+
     GenerateMap()
 
     jmp     DoTest
@@ -508,6 +497,8 @@ function LargeMapHeightTest {
 
     constant MAP_REPEAT_HORIZONTAL = 24
     constant MAP_REPEAT_VERTICAL = 40
+
+    jsr     Entity.Init
 
     GenerateMap()
 
