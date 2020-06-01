@@ -78,7 +78,12 @@ function ProcessFrame {
         MetaSprite.EntityHitbox.TestCollisions(Players,             EnemyProjectiles, Enemies)
     MetaSprite.EntityHitbox.End()
 
-    Entity.ProcessEntityLists()
+    Entity.ProcessEntityList(Particles)
+    Entity.ProcessEntityList(PlayerProjectiles)
+    Entity.ProcessEntityList(EnemyProjectiles)
+    Entity.ProcessEntityList(Platforms)
+    Entity.ProcessEntityList(Players)
+    Entity.ProcessEntityList(Enemies)
 
     jsr     MetaSprite.Render.EndLoop
 

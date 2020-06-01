@@ -15,7 +15,13 @@ function ProcessEntityGameLoop {
     tcd
 
     Entity.ProcessSpecialLists()
-    Entity.ProcessEntityLists()
+
+    Entity.ProcessEntityList(Particles)
+    Entity.ProcessEntityList(PlayerProjectiles)
+    Entity.ProcessEntityList(EnemyProjectiles)
+    Entity.ProcessEntityList(Platforms)
+    Entity.ProcessEntityList(Players)
+    Entity.ProcessEntityList(Enemies)
 
     jmp     Entity.ValidateEntityLists
 }

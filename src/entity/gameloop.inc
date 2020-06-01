@@ -4,7 +4,7 @@
 // Entity Game-Loop routines.
 //
 // The Game-Loop exists as two macros, `ProcessSpecialLists` and
-// `ProcessEntityLists`, both of which need to be invoked by the
+// `ProcessEntityList`, both of which need to be invoked by the
 // subproject.
 //
 // The design of the entity loop and the `@EndEntityProcess` routines
@@ -27,15 +27,9 @@ namespace Entity {
 
 
 // Previous entity being processed
-// Used in _ProcessActivateNextFrameList, _ProcessActiveWindow and __ProcessEntityLists
+// Used in _ProcessActivateNextFrameList, _ProcessActiveWindow and __ProcessEntityList
 // (word address)
 allocateTmpWord(_previousEntity)
-
-
-// The current entity list being processed
-// Used in __ProcessEntityLists
-// (word address)
-allocateTmpWord(_currentEntityList)
 
 
 // Move the current entity to a given special list.
@@ -106,7 +100,7 @@ macro __MoveEntityToSpecialList(list) {
 //         z set if the current entity has no next entity
 //               (ie, there is no more entities in the current list)
 //
-// NOTE: You MUST NOT set the `_previousEntity` variable after invoking
+// NOTE: You MUST NOT change the `_previousEntity` variable after invoking
 // this macro.
 macro __ChangeEntityList_Y() {
     assert16a()
@@ -300,70 +294,40 @@ SkipTests:
 }
 
 
+
 // Process an entity list
 //
-// REQUIRES: 16 bit A, 16 bit Index, DB = 0x7e
+// NOTE: This routine MUST NOT be called on an empty entity list.
 //
-// PARAM: list: the name of the entity list to process
+// REQUIRES: 16 bit A, 16 bit Index, DB = 0x7e, DP = 0
 //
-// MODIFIES: DP
-macro _ProcessEntityList(list) {
-    assert16a()
-    assert16i()
+// INPUT: A - address of the first entity in the list (NOT NULL)
+//        X - address of the entity list
+function __ProcessEntityList {
 
-    lda.w   Entity.lists.{list}
-    beq     _{list}_Empty
-        ldy.w   #Entity.lists.{list}
-        jsr     Entity.__ProcessEntityList
+    stx.w   _previousEntity
 
-_{list}_Empty:
-}
+    tcd
+    ldx.b   BaseEntity.functionTable
+    beq     NoFunctionPointer
+    jsr     (BaseEntityFunctionTable.Process,x)
 
-// Processes the entity lists.
-//
-// REQUIRES: 16 bit A, 16 bit Index, DB = 0x7e
-//
-// MODIFIES: DP
-function __ProcessEntityLists {
+    AfterJSR:
+        // The entity process routine should eventually jump to
+        // `Entity.GotoNextEntity` and therefore we should not
+        // be here.
 
-    ldx.w   #lists.FIRST
+        // I am using JSR above so the engine can panic if an entity's Process
+        // routine exits using an RTS instruction.
 
-    Repeat:
-        lda.w   0,x
-        beq     ListEmpty
-            stx.w   _currentEntityList
-            stx.w   _previousEntity
+        // Get the Process routine that failed to make it easier to find the invalid entity.
+        ldx.b   BaseEntity.functionTable
+        lda.l   BaseEntityFunctionTable.Process,x
 
-            tcd
-            ldx.b   BaseEntity.functionTable
-            beq     NoFunctionPointer
-            jsr     (BaseEntityFunctionTable.Process,x)
-
-            AfterJSR:
-                // The entity process routine should eventually jump to
-                // `Entity.GotoNextEntity` and therefore we should not
-                // be here.
-
-                // I am using JSR above so the engine can panic if an entity's Process
-                // routine exits using an RTS instruction.
-
-                // Get Process routine that failed, to make it easier to find the invalid entity.
-                ldx.b   BaseEntity.functionTable
-                lda.l   BaseEntityFunctionTable.Process,x
-
-                // X = entity function table
-                // A = entity process routine
-
-                break(INVALID_PROCESS_ENTITY_RETURN)
-
-    ListEmpty:
-        inx
-        inx
-        cpx.w   #lists.LAST + 2
-        bcc     Repeat
-
-    // There are no entities
-    rts
+    InvalidProcessEntityReturn:
+        // X = entity function table
+        // A = entity process routine
+        break(INVALID_PROCESS_ENTITY_RETURN)
 
 NoFunctionPointer:
     break(NO_FUNCTION_POINTER)
@@ -380,6 +344,7 @@ NoFunctionPointer:
 // INPUT: dp = current entity
 //
 // RETURN: invokes RTS or BRK
+// MODIFIES: DP to next entity in list or 0 if no more entities in list
 inline __GotoNextEntity() {
     assert16a()
     assert16i()
@@ -392,7 +357,7 @@ inline __GotoNextEntity() {
 // A = next entity
 // z set if there are no more entities in the list
 EntityListChanged:
-    beq     NoMoreEntitiesInCurrentList
+    beq     NoMoreEntitiesInList
 
         tcd
         ldx.b   BaseEntity.functionTable
@@ -400,38 +365,19 @@ EntityListChanged:
         jmp     (BaseEntityFunctionTable.Process,x)
 
 
-NoMoreEntitiesInCurrentList:
-    // Process the next entity list
-    ldx.w   _currentEntityList
-    Repeat:
-        cpx.w   #lists.LAST
-        bcs     NoMoreLists
-
-        inx
-        inx
-
-        lda.w   0,x
-        beq     Repeat
-
-    // X = next list that is not empty
-    // A = first entity in list
-    stx.w   _currentEntityList
-    stx.w   _previousEntity
-
-    tcd
-    ldx.b   BaseEntity.functionTable
-    beq     NoFunctionPointer
-    jmp     (BaseEntityFunctionTable.Process,x)
-
-
-NoMoreLists:
+NoMoreEntitiesInList:
     // The last entity has been processed.
     // Verify the stack is unchanged.
     // This should never happen, but I decided to test for it anyway.
 
     plx
-    cpx.w   #__ProcessEntityLists.AfterJSR - 1
+    cpx.w   #__ProcessEntityList.AfterJSR - 1
     bne     StackSmashed
+
+    // reset DP
+    lda.w   #0
+    tcd
+// DP = 0
 
     rts
 
@@ -457,7 +403,7 @@ StackSmashed:
 //
 // This macro should be invoked either:
 //  * Before Processing entity hitboxes, or
-//  * After `ProcessEntityLists`
+//  * After Processing entity lists
 //
 // REQUIRES: 16 bit A, 16 bit Index, DB = 0x7e, DP = 0
 macro ProcessSpecialLists() {
@@ -475,28 +421,31 @@ macro ProcessSpecialLists() {
     tcd
 }
 
-// Process the entity lists.
+
+
+// Process an entity list.
 //
 // The macro will call the `BaseEntityFunctionTable.Process` routine on
-// every entity in all entity lists.
+// every entity in the given entity list.
 //
 // This macro should be invoked after the `MetaSprite.EntityHitbox` tests.
 //
 // REQUIRES: 16 bit A, 16 bit Index, DB = 0x7e, DP = 0
+// PARAM: listName - name of entity list to process
 a16()
 i16()
 code()
-macro ProcessEntityLists() {
+macro ProcessEntityList(listName) {
     assert16a()
     assert16i()
 
-    // ::TODO move into Camera Module::
-    jsr     Entity._UpdateActiveWindows
+    lda.w   {Entity.listAddress({listName})}
+    beq     SkipList{#}
 
-    jsr     Entity.__ProcessEntityLists
+        ldx.w   #{Entity.listAddress({listName})}
+        jsr     Entity.__ProcessEntityList
 
-    lda.w   #0
-    tcd
+SkipList{#}:
 }
 
 
@@ -531,7 +480,7 @@ function DeleteAndGotoNextEntity {
     //
     //  lastFreeEntity = dp
     //
-    //  set A/n to _previousEntity->next
+    //  set A/z to _previousEntity->next
     //  Goto GotoNextEntity.EntityListChanged
 
 
