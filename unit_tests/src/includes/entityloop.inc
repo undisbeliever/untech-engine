@@ -5,28 +5,52 @@
 namespace InteractiveTests {
 namespace EntityLoop {
 
-// Initialize the Entity Loop
+// If non-zero then MetaTiles and Resource Animations will be updated in `ProcessFrame`
+// (word flag)
+allocateTmpWord(updateMetaTilesFlag)
+
+
+// Initialize the Entity Loop and load a room
 //
-// REQUIRES: 16 bit A, 16 bit Index, Autojoy enabled
-// MODIFIES: DB = 0x7e
+// REQUIRES: 16 bit A, 16 bit Index, Autojoy enabled, DB = 0x7e
+//
+// INPUT: A = roomId
 a16()
 i16()
 code()
-function Init {
-    jsr     Entity.Init
+function Init_LoadRoom {
+    ldx.w   #0xffff
+    stx.w   updateMetaTilesFlag
+
+    // LoadRoom also resets Entity and Camera modules
+    jmp     Room.LoadRoom
+}
 
 
-    // Reset map size so camera is a single screen by default
+
+// Initialize the Entity Loop without loading a room
+//
+// REQUIRES: 16 bit A, 16 bit Index, Autojoy enabled, DB = 0x7e
+a16()
+i16()
+code()
+function Init_NoRoom {
+    stz.w   updateMetaTilesFlag
+
+    // Set map boundary to a single screen
+    // (ensures camera boundary is a single screen)
     lda.w   #MetaTiles.map.LEFT + Camera.DISPLAY_WIDTH
     sta.w   MetaTiles.map.right
 
     lda.w   #MetaTiles.map.TOP + Camera.DISPLAY_HEIGHT
     sta.w   MetaTiles.map.bottom
 
+
     jsr     Camera.Init
 
-    rts
+    jmp     Entity.Init
 }
+
 
 
 // Cleans up the screen
@@ -41,6 +65,30 @@ function Cleanup {
     jsr     Test.ResetPpuState
 
     sec
+    rts
+}
+
+
+// Spawn all entities in the room
+//
+// REQUIRES: 16 bit A, 16 bit Index, DB = 0x7e, Init called
+a16()
+i16()
+code()
+function SpawnAllEntitiesInRoom {
+    lda.w   updateMetaTilesFlag
+    beq     Return
+        lda.w   #0xff
+        tsb.w   Room.EntityGroups.toActivateBitfield
+
+        jsr     Room.EntityGroups.SpawnEntityGroups
+
+        ldx.w   {Entity.listAddress(Players)}
+        beq     +
+            // Assumes only one player
+            jsr     Camera.CenterOnEntity_X
+        +
+Return:
     rts
 }
 
@@ -118,6 +166,14 @@ function ProcessFrame {
     beq     +
         // Assumes only one player
         jsr     Camera.CenterOnEntity_X
+    +
+
+
+    // Update MetaTiles (if room is loaded in memory)
+    lda.w   updateMetaTilesFlag
+    beq     +
+        jsr     MetaTiles.Render.Update
+        jsr     Resources.ProcessAnimations
     +
 
 

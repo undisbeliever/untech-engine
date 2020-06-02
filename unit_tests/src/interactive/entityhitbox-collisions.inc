@@ -426,7 +426,7 @@ function Test {
     sta.w   _processCollisionArgumentsOk
 
 
-    jsr     EntityLoop.Init
+    jsr     EntityLoop.Init_NoRoom
 
     jsr     EnableDisplay_Full
 

@@ -277,13 +277,8 @@ a16()
 i16()
 code()
 function DoTest {
-    jsr     Room.LoadRoom
-
-    lda.w   #0xff
-    tsb.w   Room.EntityGroups.toActivateBitfield
-
-    jsr     Room.EntityGroups.SpawnEntityGroups
-
+    jsr     EntityLoop.Init_LoadRoom
+    jsr     EntityLoop.SpawnAllEntitiesInRoom
 
     jsr     Test.PrintCurrentTestName
 
@@ -309,7 +304,6 @@ a16()
 
     Loop:
         jsr     WaitFrame_PrintFreeCycles
-        jsr     MetaSprite.Render.InitLoop
 
         // Flash of black when the map is redrawn is too fast
         // Constantly redraw the map whenever select is held
@@ -317,11 +311,9 @@ a16()
         bit.w   #JOY.select
         bne     RedrawMap
 
+
         jsr     EntityLoop.ProcessFrame
 
-        jsr     Resources.ProcessAnimations
-
-        jsr     MetaTiles.Render.Update
 
         sep     #$20
     a8()
@@ -329,9 +321,6 @@ a16()
 
         rep     #$30
     a16()
-        jsr     MetaSprite.Render.EndLoop
-
-
         lda.w   Controller.Joy1.pressed
         and.w   #JOY.buttons
         bne     Pass

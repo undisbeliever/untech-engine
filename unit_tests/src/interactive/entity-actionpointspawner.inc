@@ -246,7 +246,7 @@ function Test {
     Text.Console.SetCursor(0, 7)
     Text.Console.PrintConstString("Press L/R to spawn\n  Manual Projectiles")
 
-    jsr     EntityLoop.Init
+    jsr     EntityLoop.Init_NoRoom
 
     jsr     EnableDisplay_Full
 

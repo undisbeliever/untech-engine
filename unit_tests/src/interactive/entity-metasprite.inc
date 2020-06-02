@@ -212,7 +212,7 @@ i16()
 code()
 Test.add("Entity/MetaSprite Test")
 function Test {
-    jsr     EntityLoop.Init
+    jsr     EntityLoop.Init_NoRoom
 
     jsr     EnableDisplay_Full
 

@@ -238,18 +238,12 @@ code()
 function Test {
 constant _entity = Test.tmp + 0
 
+    jsr     EntityLoop.Init_LoadRoom
 
-    jsr     Room.LoadRoom
+    jsr     EntityLoop.SpawnAllEntitiesInRoom
 
     lda.w   #GRAVITY
     sta.w   Room.gravity_sx
-
-
-    // ::TODO move elsewhere::
-    lda.w   #0xff
-    tsb.w   Room.EntityGroups.toActivateBitfield
-
-    jsr     Room.EntityGroups.SpawnEntityGroups
 
 
     // Find the address of the first entity in the room
@@ -291,15 +285,8 @@ a16()
     Loop:
         jsr     WaitFrame_PrintFreeCycles
 
-        jsr     MetaSprite.Render.InitLoop
-
         jsr     EntityLoop.ProcessFrame
 
-        jsr     Resources.ProcessAnimations
-
-        jsr     MetaTiles.Render.Update
-
-        jsr     MetaSprite.Render.EndLoop
 
         sep     #$20
     a8()
