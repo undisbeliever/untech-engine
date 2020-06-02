@@ -25,7 +25,7 @@ include "../../src/untech.inc"
 
 include "includes/test-framework.inc"
 include "includes/utils.inc"
-include "includes/entityloop.inc"
+include "includes/gameloop.inc"
 
 
 // A simple test that always succeeds

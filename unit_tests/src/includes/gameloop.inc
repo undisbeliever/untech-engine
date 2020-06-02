@@ -3,14 +3,14 @@
 // Distributed under The MIT License: https://opensource.org/licenses/MIT
 
 namespace InteractiveTests {
-namespace EntityLoop {
+namespace GameLoop {
 
 // If non-zero then MetaTiles and Resource Animations will be updated in `ProcessFrame`
 // (word flag)
 allocateTmpWord(updateMetaTilesFlag)
 
 
-// Initialize the Entity Loop and load a room
+// Initialize the Game Loop and load a room
 //
 // REQUIRES: 16 bit A, 16 bit Index, Autojoy enabled, DB = 0x7e
 //
@@ -28,7 +28,7 @@ function Init_LoadRoom {
 
 
 
-// Initialize the Entity Loop without loading a room
+// Initialize the Game Loop without loading a room
 //
 // REQUIRES: 16 bit A, 16 bit Index, Autojoy enabled, DB = 0x7e
 a16()
@@ -93,7 +93,7 @@ Return:
 }
 
 
-// Process the Entity Loop until a joypad button has been pressed
+// Process the Game Loop until a joypad button has been pressed
 //
 // REQUIRES: 16 bit A, 16 bit Index, DB = 0x7e, Init called
 //
@@ -134,12 +134,12 @@ Skip{#}:
 }
 
 
-// Processes a single frame of the Entity Loop.
+// Processes a single frame of the Game Loop.
 //
-// This routine will also validate the entity lists after
-// the entity loop has ended.
+// This routine will also validate the entity lists at the end of the
+// game loop.
 //
-// REQUIRES: 16 bit A, 16 bit Index, DB = 0x7e, Init called
+// REQUIRES: 16 bit A, 16 bit Index, DB = 0x7e, DP = 0, Init called
 //
 // OUTPUT: z clear if a button has been pressed
 a16()

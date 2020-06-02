@@ -3,7 +3,7 @@
 // Distributed under The MIT License: https://opensource.org/licenses/MIT
 
 // Tests:
-//  * EntityLoop
+//  * The Entity Loop
 //  * MetaSprite ActionPoints
 //  * ActionPoints.PlayerProjectiles
 //  * ActionPoints.EnemyProjectiles
@@ -246,7 +246,7 @@ function Test {
     Text.Console.SetCursor(0, 7)
     Text.Console.PrintConstString("Press L/R to spawn\n  Manual Projectiles")
 
-    jsr     EntityLoop.Init_NoRoom
+    jsr     GameLoop.Init_NoRoom
 
     jsr     EnableDisplay_Full
 
@@ -265,11 +265,11 @@ function Test {
     bcc     Fail
 
 
-    // Process the Entity Loop
-    // -----------------------
+    // Process the Game Loop
+    // ---------------------
 
-    GameLoop:
-        jsr     EntityLoop.ProcessFrame
+    Loop:
+        jsr     GameLoop.ProcessFrame
 
         PrintListSizes()
 
@@ -277,10 +277,10 @@ function Test {
 
         lda.w   Controller.Joy1.pressed
         and.w   #JOY.buttons
-        beq     GameLoop
+        beq     Loop
 
 
-    jmp     EntityLoop.Cleanup
+    jmp     GameLoop.Cleanup
 
 Fail:
     clc

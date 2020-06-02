@@ -277,8 +277,8 @@ a16()
 i16()
 code()
 function DoTest {
-    jsr     EntityLoop.Init_LoadRoom
-    jsr     EntityLoop.SpawnAllEntitiesInRoom
+    jsr     GameLoop.Init_LoadRoom
+    jsr     GameLoop.SpawnAllEntitiesInRoom
 
     jsr     Test.PrintCurrentTestName
 
@@ -312,7 +312,7 @@ a16()
         bne     RedrawMap
 
 
-        jsr     EntityLoop.ProcessFrame
+        jsr     GameLoop.ProcessFrame
 
 
         sep     #$20

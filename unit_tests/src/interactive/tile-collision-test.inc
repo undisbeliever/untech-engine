@@ -238,9 +238,9 @@ code()
 function Test {
 constant _entity = Test.tmp + 0
 
-    jsr     EntityLoop.Init_LoadRoom
+    jsr     GameLoop.Init_LoadRoom
 
-    jsr     EntityLoop.SpawnAllEntitiesInRoom
+    jsr     GameLoop.SpawnAllEntitiesInRoom
 
     lda.w   #GRAVITY
     sta.w   Room.gravity_sx
@@ -285,7 +285,7 @@ a16()
     Loop:
         jsr     WaitFrame_PrintFreeCycles
 
-        jsr     EntityLoop.ProcessFrame
+        jsr     GameLoop.ProcessFrame
 
 
         sep     #$20

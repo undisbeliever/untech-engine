@@ -14,7 +14,7 @@
 // centre.
 //
 // Tests:
-//  * EntityLoop
+//  * The Entity Loop
 //  * MetaSprite EntityHitbox Collisions
 //  * Entity.SpawnAtMetaSpriteCollisionCentre
 
@@ -426,7 +426,7 @@ function Test {
     sta.w   _processCollisionArgumentsOk
 
 
-    jsr     EntityLoop.Init_NoRoom
+    jsr     GameLoop.Init_NoRoom
 
     jsr     EnableDisplay_Full
 
@@ -459,10 +459,10 @@ function Test {
         bcc     SpawnEnemyLoop
 
 
-    // Process the Entity Loop
-    // -----------------------
+    // Process the Game Loop
+    // ---------------------
 
-    GameLoop:
+    Loop:
         jsr     Text.Console.ClearBuffer
         Text.Console.PrintConstString("EntityHitbox Collision Test")
         Text.Console.SetCursor(0, 2)
@@ -475,7 +475,7 @@ function Test {
 
         Text.Console.SetCursor(0, 7)
 
-        jsr     EntityLoop.ProcessFrame
+        jsr     GameLoop.ProcessFrame
 
         jsr     _DirtyUtDpTmp
 
@@ -487,10 +487,10 @@ function Test {
 
         lda.w   Controller.Joy1.pressed
         and.w   #JOY.buttons
-        beq     GameLoop
+        beq     Loop
 
 
-    jmp     EntityLoop.Cleanup
+    jmp     GameLoop.Cleanup
 
 Fail:
     clc

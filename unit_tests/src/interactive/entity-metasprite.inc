@@ -212,7 +212,7 @@ i16()
 code()
 Test.add("Entity/MetaSprite Test")
 function Test {
-    jsr     EntityLoop.Init_NoRoom
+    jsr     GameLoop.Init_NoRoom
 
     jsr     EnableDisplay_Full
 
@@ -220,7 +220,7 @@ function Test {
     jsr     SpawnEntities
     bcc     Fail
 
-    jmp     EntityLoop.ProcessUntilButtonPress
+    jmp     GameLoop.ProcessUntilButtonPress
 
 
 Fail:
