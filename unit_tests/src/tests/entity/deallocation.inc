@@ -12,6 +12,12 @@ Test.add("Entities.DeleteEntitiesInActivateNextFrameList")
 function DeleteEntitiesInActivateNextFrameList {
 constant tmp = Test.tmp
 
+constant FIRST_ENTITY_ID = Project.EntityIds.Blank_0
+constant LAST_ENTITY_ID = Project.EntityIds.Blank_9
+
+constant N_ENTITIES_SPAWNED = LAST_ENTITY_ID - FIRST_ENTITY_ID + 1
+assert(Entity.N_ENTITIES >= Entity.N_ENTITY_LISTS)
+
     jsr     Entity.Init
 
     // Prevent the entities from spawning
@@ -24,12 +30,6 @@ constant tmp = Test.tmp
     lda.w   #0x1000
     sta.w   Entity.Spawn.xPos
     sta.w   Entity.Spawn.yPos
-
-    assert(Entity.N_ENTITIES >= Entity.N_ENTITY_LISTS)
-    assert(EntityLists.Particles == 0)
-    constant FIRST_ENTITY_ID = Project.EntityIds.Blank_Particle
-    assert(EntityLists.Enemies == Entity.N_ENTITY_LISTS - 1)
-    constant LAST_ENTITY_ID = Project.EntityIds.Blank_Enemy
 
     lda.w   #FIRST_ENTITY_ID
     Loop:
@@ -45,7 +45,7 @@ constant tmp = Test.tmp
 
 
     jsr     _ActivateNextFrameListLength
-    cmp.w   #Entity.N_ENTITY_LISTS
+    cmp.w   #N_ENTITIES_SPAWNED
     bne     Fail
 
 
@@ -98,7 +98,7 @@ assert(N_ENTITIES_TO_SPAWN < Entity.N_ENTITIES + 2)
         sta.w   Entity.Spawn.xPos
         sta.w   Entity.Spawn.yPos
 
-        lda.w   #Project.EntityIds.DeactivateIfOutside_Particle
+        lda.w   #Project.EntityIds.DeactivateIfOutside_0
         jsr     Entity.Spawn
         bcc     Fail
 
@@ -136,15 +136,16 @@ function DeleteEntitiesInList {
 constant tmp = Test.tmp
 
 constant ENTITIES_PER_LIST = 3
-constant TEST_LIST_ID = 2
+constant TEST_LIST_ID = EntityLists.EntityList_2
 
 assert(Entity.N_ENTITY_LISTS * ENTITIES_PER_LIST < Entity.N_ENTITIES + 2)
 assert(Entity.N_ENTITY_LISTS > 2)
 
-assert(EntityLists.Particles == 0)
-constant FIRST_ENTITY_ID = Project.EntityIds.Blank_Particle
-assert(EntityLists.Enemies == Entity.N_ENTITY_LISTS - 1)
-constant LAST_ENTITY_ID = Project.EntityIds.Blank_Enemy
+constant FIRST_ENTITY_ID = Project.EntityIds.Blank_0
+constant LAST_ENTITY_ID = Project.EntityIds.Blank_9
+
+assert(LAST_ENTITY_ID - FIRST_ENTITY_ID + 1 == 10)
+assert(Entity.N_ENTITIES >= Entity.N_ENTITY_LISTS)
 
     jsr     Entity.Init
 
@@ -210,6 +211,10 @@ Fail:
 rodata(rom0)
 ListLengthTable_Initial:
     evaluate n = 0
+    while {n} < EntityLists.EntityList_0 {
+        dw  0
+        evaluate n = {n} + 1
+    }
     while {n} < Entity.N_ENTITY_LISTS {
         dw  ENTITIES_PER_LIST
         evaluate n = {n} + 1
@@ -218,6 +223,10 @@ ListLengthTable_Initial:
 rodata(rom0)
 ListLengthTable_AfterDelete:
     evaluate n = 0
+    while {n} < EntityLists.EntityList_0 {
+        dw  0
+        evaluate n = {n} + 1
+    }
     while {n} < Entity.N_ENTITY_LISTS {
         dw {n} != TEST_LIST_ID ? ENTITIES_PER_LIST : 0
         evaluate n = {n} + 1

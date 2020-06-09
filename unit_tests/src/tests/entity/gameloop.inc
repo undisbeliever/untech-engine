@@ -65,35 +65,64 @@ SpawnList: {
     define C = Project.EntityIds.ChangeToParticle_
     define B = Project.EntityIds.Blank_
 
-    assert(EntityLists.Particles == 0)
-    assert(Entity.N_ENTITY_LISTS == 6)
-
     evaluate currentList = 0
-    inline row(listName, suffix, a, b, c, d, e) {
-        assert(EntityLists.{listName} == {currentList})
-        evaluate currentList = {currentList} + 1
-
+    inline row(suffix, a, b, c, d, e) {
         dw {a}{suffix}, {b}{suffix}, {c}{suffix}, {d}{suffix}, {e}{suffix}
+
+        updateCount({suffix}, {a})
+        updateCount({suffix}, {b})
+        updateCount({suffix}, {c})
+        updateCount({suffix}, {d})
+        updateCount({suffix}, {e})
     }
 
-    row(Particles,          Particle,           {C}, {C}, {B}, {B}, {B})
-    row(PlayerProjectiles,  PlayerProjectile,   {B}, {C}, {C}, {B}, {B}) 
-    row(EnemyProjectiles,   EnemyProjectile,    {B}, {C}, {B}, {C}, {B})
-    row(Platforms,          Platform,           {B}, {B}, {B}, {C}, {C})
-    row(Players,            Player,             {C}, {C}, {C}, {C}, {C})    // change all
-    row(Enemies,            Enemy,              {B}, {B}, {B}, {B}, {B})    // change none
+    variable count_Particles = 0
+    variable count_PlayerProjectiles = 0
+    variable count_EnemyProjectiles = 0
+    variable count_Players = 0
+    variable count_Enemies = 0
+
+    evaluate n = 0
+    while {n} < 10 {
+        variable count_{n} = 0
+        evaluate n = {n} + 1
+    }
+
+    inline updateCount(suffix, e) {
+        if {e}0 == Project.EntityIds.ChangeToParticle_0 {
+            // Change to particle
+            count_Particles = count_Particles + 1
+        } else {
+            count_{suffix} = count_{suffix} + 1
+        }
+    }
+
+    row(0,  {C}, {C}, {B}, {B}, {B})
+    row(1,  {B}, {B}, {B}, {C}, {C})
+    row(2,  {C}, {B}, {B}, {B}, {B})
+    row(3,  {B}, {B}, {C}, {B}, {B})
+    row(4,  {C}, {C}, {C}, {C}, {C})    // change all
+    row(5,  {C}, {B}, {C}, {B}, {C})
+    row(6,  {B}, {C}, {B}, {C}, {B})
+    row(6,  {B}, {B}, {B}, {B}, {B})    // change none
+    row(8,  {B}, {C}, {C}, {C}, {C})
+    row(9,  {C}, {C}, {C}, {C}, {B})
 
     constant SpawnList.size = pc() - SpawnList
     assert(SpawnList.size/2 <= Entity.N_ENTITIES)
 }
 
 ExpectedSizes: {
-    dw  (5 * 5) - (3 * 3)   // particles
-    dw  3
-    dw  3
-    dw  3
-    dw  0                   // Change all to particles
-    dw  5                   // Change none
+    dw count_Particles
+    dw count_PlayerProjectiles
+    dw count_EnemyProjectiles
+    dw count_Players
+    dw count_Enemies
+    evaluate n = 0
+    while {n} < 10 {
+        dw count_{n}
+        evaluate n = {n} + 1
+    }
 
     constant ExpectedSizes.size = pc() - ExpectedSizes
     assert(ExpectedSizes.size / 2 == Entity.N_ENTITY_LISTS)
@@ -109,12 +138,13 @@ Test.add("Entity.GameLoop (Delete)")
 function GameLoop_Delete {
 constant tmp = Test.tmp
 
-assert(Entity.N_ENTITY_LISTS * 3 <= Entity.N_ENTITIES)
+constant FIRST_ENTITY_ID = Project.EntityIds.DeleteAfterDelay_0
+constant LAST_ENTITY_ID = Project.EntityIds.DeleteAfterDelay_9
 
-assert(EntityLists.Particles == 0)
-constant FIRST_ENTITY_ID = Project.EntityIds.DeleteAfterDelay_Particle
-assert(EntityLists.Enemies == Entity.N_ENTITY_LISTS - 1)
-constant LAST_ENTITY_ID = Project.EntityIds.DeleteAfterDelay_Enemy
+constant N_SPAWNED_LISTS = LAST_ENTITY_ID - FIRST_ENTITY_ID + 1
+
+assert(N_SPAWNED_LISTS == 10)
+assert(N_SPAWNED_LISTS * 4 <= Entity.N_ENTITIES)
 
     jsr     Entity.Init
 
@@ -155,37 +185,37 @@ constant LAST_ENTITY_ID = Project.EntityIds.DeleteAfterDelay_Enemy
     // Test list lengths
 
     jsr     _FreeListLength
-    cmp.w   #Entity.N_ENTITIES - Entity.N_ENTITY_LISTS * 4
+    cmp.w   #Entity.N_ENTITIES - N_SPAWNED_LISTS * 4
     bne     Fail
 
     // frame 1 - 1 list of entities deleted
     jsr     ProcessEntityGameLoop
     jsr     _FreeListLength
-    cmp.w   #Entity.N_ENTITIES - Entity.N_ENTITY_LISTS * 3
+    cmp.w   #Entity.N_ENTITIES - N_SPAWNED_LISTS * 3
     bne     Fail
 
     // frame 2 - 2 lists of entities deleted
     jsr     ProcessEntityGameLoop
     jsr     _FreeListLength
-    cmp.w   #Entity.N_ENTITIES - Entity.N_ENTITY_LISTS * 1
+    cmp.w   #Entity.N_ENTITIES - N_SPAWNED_LISTS * 1
     bne     Fail
 
     // frame 3 - no entities deleted
     jsr     ProcessEntityGameLoop
     jsr     _FreeListLength
-    cmp.w   #Entity.N_ENTITIES - Entity.N_ENTITY_LISTS * 1
+    cmp.w   #Entity.N_ENTITIES - N_SPAWNED_LISTS * 1
     bne     Fail
 
     // frame 4 - 1 list of entities deleted
     jsr     ProcessEntityGameLoop
     jsr     _FreeListLength
-    cmp.w   #Entity.N_ENTITIES - Entity.N_ENTITY_LISTS * 0
+    cmp.w   #Entity.N_ENTITIES - 0
     bne     Fail
 
     // frame 5 - no entities deleted
     jsr     ProcessEntityGameLoop
     jsr     _FreeListLength
-    cmp.w   #Entity.N_ENTITIES - Entity.N_ENTITY_LISTS * 0
+    cmp.w   #Entity.N_ENTITIES - 0
     bne     Fail
 
     jmp     _TestEntityListsValid
@@ -204,10 +234,14 @@ Test.add("Entity.GameLoop.ActivateNextFrame")
 function GameLoop_ActivateNextFrame {
 constant tmp = Test.tmp
 
-assert(EntityLists.Particles == 0)
-constant FIRST_ENTITY_ID = Project.EntityIds.DeleteAfterDelay_Particle
-assert(EntityLists.Enemies == Entity.N_ENTITY_LISTS - 1)
-constant LAST_ENTITY_ID = Project.EntityIds.DeleteAfterDelay_Enemy
+constant FIRST_ENTITY_LIST_ID = EntityLists.EntityList_0
+constant LAST_ENTITY_LIST_ID  = EntityLists.EntityList_9
+
+constant FIRST_ENTITY_ID = Project.EntityIds.DeleteAfterDelay_0
+constant LAST_ENTITY_ID = Project.EntityIds.DeleteAfterDelay_9
+
+constant N_SPAWNED_LISTS = LAST_ENTITY_ID - FIRST_ENTITY_ID + 1
+assert(N_SPAWNED_LISTS == 10)
 
     jsr     Entity.Init
 
@@ -237,11 +271,11 @@ constant LAST_ENTITY_ID = Project.EntityIds.DeleteAfterDelay_Enemy
 
 
         jsr     _ActivateNextFrameListLength
-        cmp.w   #Entity.N_ENTITY_LISTS
+        cmp.w   #N_SPAWNED_LISTS
         bne     Fail
 
         // Test each list has no entities in them (not active)
-        lda.w   #0
+        lda.w   #FIRST_ENTITY_LIST_ID
         ListLoop:
             pha
                 jsr     Entity.CountEntitiesInList
@@ -252,7 +286,7 @@ constant LAST_ENTITY_ID = Project.EntityIds.DeleteAfterDelay_Enemy
 
             tya
             inc
-            cmp.w   #Entity.N_ENTITY_LISTS
+            cmp.w   #LAST_ENTITY_LIST_ID + 1
             bcc     ListLoop
 
         jsr     _TestEntityListsValid
@@ -271,7 +305,7 @@ constant LAST_ENTITY_ID = Project.EntityIds.DeleteAfterDelay_Enemy
         bne     Fail
 
         // Test each list has no entities in them (not active)
-        lda.w   #0
+        lda.w   #FIRST_ENTITY_LIST_ID
         Loop:
             pha
                 jsr     Entity.CountEntitiesInList
@@ -282,7 +316,7 @@ constant LAST_ENTITY_ID = Project.EntityIds.DeleteAfterDelay_Enemy
 
             tya
             inc
-            cmp.w   #Entity.N_ENTITY_LISTS
+            cmp.w   #LAST_ENTITY_LIST_ID + 1
             bcc     Loop
 
         jsr     _TestEntityListsValid
@@ -403,7 +437,7 @@ constant tmp_spawnIndex = Test.tmp + 2
     // Spawn 4 entities at different point on the screen
     assert(Entity.N_ENTITIES >= Entity.N_ENTITY_LISTS * 4)
 
-    lda.w   #Entity.N_ENTITY_LISTS - 1
+    lda.w   #SpawnTable.size - 1
     sta.w   tmp_spawnIndex
 
     Loop:
@@ -509,23 +543,38 @@ function SpawnEntity_XY {
 rodata(rom0)
 
 SpawnTable:
-    db  Project.EntityIds.Blank_Particle
-    db  Project.EntityIds.DeleteIfOutside_PlayerProjectile
-    db  Project.EntityIds.DeleteIfOutside_EnemyProjectile
-    db  Project.EntityIds.DeactivateIfOutside_Platform
-    db  Project.EntityIds.Blank_Player
-    db  Project.EntityIds.DeactivateIfOutside_Enemy
+    db  Project.EntityIds.Blank_0
+    db  Project.EntityIds.DeleteIfOutside_1
+    db  Project.EntityIds.DeleteIfOutside_2
+    db  Project.EntityIds.DeactivateIfOutside_3
+    db  Project.EntityIds.Blank_4
+    db  Project.EntityIds.DeactivateIfOutside_5
+    db  Project.EntityIds.Blank_6
+    db  Project.EntityIds.DeleteIfOutside_7
+    db  Project.EntityIds.DeactivateIfOutside_8
+    // 9 empty
 
 constant SpawnTable.size = pc() - SpawnTable
-assert(SpawnTable.size == Entity.N_ENTITY_LISTS)
+assert(SpawnTable.size < Entity.N_ENTITY_LISTS)
 
 InitialExpectedSizes: {
-    dw  4   // particles
-    dw  1   // player projectiles
-    dw  1   // enemy projectiles
-    dw  1   // platforms
-    dw  4   // players
-    dw  1   // enemies
+    dw  0
+    dw  0
+    dw  0
+    dw  0
+    dw  0
+    assert(EntityLists.EntityList_0 == (pc() - InitialExpectedSizes) / 2)
+
+    dw  4   // blank
+    dw  1   // delete if outside
+    dw  1   // delete if outside
+    dw  1   // deactivate if outside
+    dw  4   // blank
+    dw  1   // deactivate if outside
+    dw  4   // blank
+    dw  1   // delete if outside
+    dw  1   // deactivate if outside
+    dw  0   // empty
 
     assert((pc() - InitialExpectedSizes) / 2 == Entity.N_ENTITY_LISTS)
 }
@@ -534,15 +583,11 @@ rodata(rom0)
 MoveCameraTable: {
     macro _row(xPos, yPos, e, activated, deactivated) {
         dw  {xPos}, {yPos}
-        dw  {activated} * 2
-        dw  {deactivated} * 2
+        dw  {activated} * 3
+        dw  {deactivated} * 3
 
-        dw  4   // particles
-        dw  0   // player projectiles
-        dw  0   // enemy projectiles
-        dw  {e} // platforms
-        dw  4   // players
-        dw  {e} // enemies
+        dw  0, 0, 0, 0, 0
+        dw  4, 0, 0, {e}, 4, {e}, 4, 0, {e}, 0
     }
 
     //   xPos    yPos    count  activated   deactivated

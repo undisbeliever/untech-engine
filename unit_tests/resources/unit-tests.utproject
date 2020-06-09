@@ -7,9 +7,18 @@
     <listid name="Particles"/>
     <listid name="PlayerProjectiles"/>
     <listid name="EnemyProjectiles"/>
-    <listid name="Platforms"/>
     <listid name="Players"/>
     <listid name="Enemies"/>
+    <listid name="EntityList_0"/>
+    <listid name="EntityList_1"/>
+    <listid name="EntityList_2"/>
+    <listid name="EntityList_3"/>
+    <listid name="EntityList_4"/>
+    <listid name="EntityList_5"/>
+    <listid name="EntityList_6"/>
+    <listid name="EntityList_7"/>
+    <listid name="EntityList_8"/>
+    <listid name="EntityList_9"/>
     <function-table name="Blank" export-order="OneFrame" parameter-type="unused"/>
     <function-table name="ChangeToParticle" export-order="OneFrame" parameter-type="unused"/>
     <function-table name="DeactivateIfOutside" export-order="OneFrame" parameter-type="unused"/>
@@ -26,43 +35,64 @@
     <function-table name="MapCursor" export-order="OneFrame" parameter-type="unused"/>
     <function-table name="TileCollisionTestPlayer" export-order="EhCollisionTest_Player" parameter-type="unused"/>
     <entities>
-      <entry name="Blank_Particle" function-table="Blank" listid="Particles" frameset="FST_OneTileFixed1" frame="frame" palette="0"/>
-      <entry name="Blank_PlayerProjectile" function-table="Blank" listid="PlayerProjectiles" frameset="FST_OneTileFixed1" frame="frame" palette="0"/>
-      <entry name="Blank_EnemyProjectile" function-table="Blank" listid="EnemyProjectiles" frameset="FST_OneTileFixed1" frame="frame" palette="0"/>
-      <entry name="Blank_Platform" function-table="Blank" listid="Platforms" frameset="FST_OneTileFixed1" frame="frame" palette="0"/>
-      <entry name="Blank_Player" function-table="Blank" listid="Players" frameset="FST_OneTileFixed1" frame="frame" palette="0"/>
-      <entry name="Blank_Enemy" function-table="Blank" listid="Enemies" frameset="FST_OneTileFixed1" frame="frame" palette="0"/>
-      <entry name="ChangeToParticle_Particle" function-table="ChangeToParticle" listid="Particles" frameset="FST_OneTileFixed1" frame="frame" palette="0"/>
-      <entry name="ChangeToParticle_PlayerProjectile" function-table="ChangeToParticle" listid="PlayerProjectiles" frameset="FST_OneTileFixed1" frame="frame" palette="0"/>
-      <entry name="ChangeToParticle_EnemyProjectile" function-table="ChangeToParticle" listid="EnemyProjectiles" frameset="FST_OneTileFixed1" frame="frame" palette="0"/>
-      <entry name="ChangeToParticle_Platform" function-table="ChangeToParticle" listid="Platforms" frameset="FST_OneTileFixed1" frame="frame" palette="0"/>
-      <entry name="ChangeToParticle_Player" function-table="ChangeToParticle" listid="Players" frameset="FST_OneTileFixed1" frame="frame" palette="0"/>
-      <entry name="ChangeToParticle_Enemy" function-table="ChangeToParticle" listid="Enemies" frameset="FST_OneTileFixed1" frame="frame" palette="0"/>
-      <entry name="DeactivateIfOutside_Particle" function-table="DeactivateIfOutside" listid="Particles" frameset="FST_OneTileFixed1" frame="frame" palette="0"/>
-      <entry name="DeactivateIfOutside_PlayerProjectile" function-table="DeactivateIfOutside" listid="PlayerProjectiles" frameset="FST_OneTileFixed1" frame="frame" palette="0"/>
-      <entry name="DeactivateIfOutside_EnemyProjectile" function-table="DeactivateIfOutside" listid="EnemyProjectiles" frameset="FST_OneTileFixed1" frame="frame" palette="0"/>
-      <entry name="DeactivateIfOutside_Platform" function-table="DeactivateIfOutside" listid="Platforms" frameset="FST_OneTileFixed1" frame="frame" palette="0"/>
-      <entry name="DeactivateIfOutside_Player" function-table="DeactivateIfOutside" listid="Players" frameset="FST_OneTileFixed1" frame="frame" palette="0"/>
-      <entry name="DeactivateIfOutside_Enemy" function-table="DeactivateIfOutside" listid="Enemies" frameset="FST_OneTileFixed1" frame="frame" palette="0"/>
-      <entry name="DeleteIfOutside_Particle" function-table="DeleteIfOutside" listid="Particles" frameset="FST_OneTileFixed1" frame="frame" palette="0"/>
-      <entry name="DeleteIfOutside_PlayerProjectile" function-table="DeleteIfOutside" listid="PlayerProjectiles" frameset="FST_OneTileFixed1" frame="frame" palette="0"/>
-      <entry name="DeleteIfOutside_EnemyProjectile" function-table="DeleteIfOutside" listid="EnemyProjectiles" frameset="FST_OneTileFixed1" frame="frame" palette="0"/>
-      <entry name="DeleteIfOutside_Platform" function-table="DeleteIfOutside" listid="Platforms" frameset="FST_OneTileFixed1" frame="frame" palette="0"/>
-      <entry name="DeleteIfOutside_Player" function-table="DeleteIfOutside" listid="Players" frameset="FST_OneTileFixed1" frame="frame" palette="0"/>
-      <entry name="DeleteIfOutside_Enemy" function-table="DeleteIfOutside" listid="Enemies" frameset="FST_OneTileFixed1" frame="frame" palette="0"/>
-      <entry name="DeleteAfterDelay_Particle" function-table="DeleteAfterDelay" listid="Particles" frameset="FST_OneTileFixed1" frame="frame" palette="0"/>
-      <entry name="DeleteAfterDelay_PlayerProjectile" function-table="DeleteAfterDelay" listid="PlayerProjectiles" frameset="FST_OneTileFixed1" frame="frame" palette="0"/>
-      <entry name="DeleteAfterDelay_EnemyProjectile" function-table="DeleteAfterDelay" listid="EnemyProjectiles" frameset="FST_OneTileFixed1" frame="frame" palette="0"/>
-      <entry name="DeleteAfterDelay_Platform" function-table="DeleteAfterDelay" listid="Platforms" frameset="FST_OneTileFixed1" frame="frame" palette="0"/>
-      <entry name="DeleteAfterDelay_Player" function-table="DeleteAfterDelay" listid="Players" frameset="FST_OneTileFixed1" frame="frame" palette="0"/>
-      <entry name="DeleteAfterDelay_Enemy" function-table="DeleteAfterDelay" listid="Enemies" frameset="FST_OneTileFixed1" frame="frame" palette="0"/>
-      <entry name="DeleteIfAnimationEnds" function-table="DeleteIfAnimationEnds" listid="Particles" frameset="DeleteIfAnimationEnds" frame="frame1" palette="0"/>
-      <entry name="SpawnAndChangeList" function-table="SpawnAndChangeList" listid="Particles" frameset="FST_OneTileFixed1" frame="frame" palette="0"/>
-      <entry name="ShowAllFrames" function-table="ShowAllFrames" listid="Particles" frameset="FST_OneTileFixed1" frame="frame" palette="0"/>
+      <entry name="Blank_0" function-table="Blank" listid="EntityList_0" frameset="FST_OneTileFixed1" frame="frame" palette="0"/>
+      <entry name="Blank_1" function-table="Blank" listid="EntityList_1" frameset="FST_OneTileFixed1" frame="frame" palette="0"/>
+      <entry name="Blank_2" function-table="Blank" listid="EntityList_2" frameset="FST_OneTileFixed1" frame="frame" palette="0"/>
+      <entry name="Blank_3" function-table="Blank" listid="EntityList_3" frameset="FST_OneTileFixed1" frame="frame" palette="0"/>
+      <entry name="Blank_4" function-table="Blank" listid="EntityList_4" frameset="FST_OneTileFixed1" frame="frame" palette="0"/>
+      <entry name="Blank_5" function-table="Blank" listid="EntityList_5" frameset="FST_OneTileFixed1" frame="frame" palette="0"/>
+      <entry name="Blank_6" function-table="Blank" listid="EntityList_6" frameset="FST_OneTileFixed1" frame="frame" palette="0"/>
+      <entry name="Blank_7" function-table="Blank" listid="EntityList_7" frameset="FST_OneTileFixed1" frame="frame" palette="0"/>
+      <entry name="Blank_8" function-table="Blank" listid="EntityList_8" frameset="FST_OneTileFixed1" frame="frame" palette="0"/>
+      <entry name="Blank_9" function-table="Blank" listid="EntityList_9" frameset="FST_OneTileFixed1" frame="frame" palette="0"/>
+      <entry name="ChangeToParticle_0" function-table="ChangeToParticle" listid="EntityList_0" frameset="FST_OneTileFixed1" frame="frame" palette="0"/>
+      <entry name="ChangeToParticle_1" function-table="ChangeToParticle" listid="EntityList_1" frameset="FST_OneTileFixed1" frame="frame" palette="0"/>
+      <entry name="ChangeToParticle_2" function-table="ChangeToParticle" listid="EntityList_2" frameset="FST_OneTileFixed1" frame="frame" palette="0"/>
+      <entry name="ChangeToParticle_3" function-table="ChangeToParticle" listid="EntityList_3" frameset="FST_OneTileFixed1" frame="frame" palette="0"/>
+      <entry name="ChangeToParticle_4" function-table="ChangeToParticle" listid="EntityList_4" frameset="FST_OneTileFixed1" frame="frame" palette="0"/>
+      <entry name="ChangeToParticle_5" function-table="ChangeToParticle" listid="EntityList_5" frameset="FST_OneTileFixed1" frame="frame" palette="0"/>
+      <entry name="ChangeToParticle_6" function-table="ChangeToParticle" listid="EntityList_6" frameset="FST_OneTileFixed1" frame="frame" palette="0"/>
+      <entry name="ChangeToParticle_7" function-table="ChangeToParticle" listid="EntityList_7" frameset="FST_OneTileFixed1" frame="frame" palette="0"/>
+      <entry name="ChangeToParticle_8" function-table="ChangeToParticle" listid="EntityList_8" frameset="FST_OneTileFixed1" frame="frame" palette="0"/>
+      <entry name="ChangeToParticle_9" function-table="ChangeToParticle" listid="EntityList_9" frameset="FST_OneTileFixed1" frame="frame" palette="0"/>
+      <entry name="DeactivateIfOutside_0" function-table="DeactivateIfOutside" listid="EntityList_0" frameset="FST_OneTileFixed1" frame="frame" palette="0"/>
+      <entry name="DeactivateIfOutside_1" function-table="DeactivateIfOutside" listid="EntityList_1" frameset="FST_OneTileFixed1" frame="frame" palette="0"/>
+      <entry name="DeactivateIfOutside_2" function-table="DeactivateIfOutside" listid="EntityList_2" frameset="FST_OneTileFixed1" frame="frame" palette="0"/>
+      <entry name="DeactivateIfOutside_3" function-table="DeactivateIfOutside" listid="EntityList_3" frameset="FST_OneTileFixed1" frame="frame" palette="0"/>
+      <entry name="DeactivateIfOutside_4" function-table="DeactivateIfOutside" listid="EntityList_4" frameset="FST_OneTileFixed1" frame="frame" palette="0"/>
+      <entry name="DeactivateIfOutside_5" function-table="DeactivateIfOutside" listid="EntityList_5" frameset="FST_OneTileFixed1" frame="frame" palette="0"/>
+      <entry name="DeactivateIfOutside_6" function-table="DeactivateIfOutside" listid="EntityList_6" frameset="FST_OneTileFixed1" frame="frame" palette="0"/>
+      <entry name="DeactivateIfOutside_7" function-table="DeactivateIfOutside" listid="EntityList_7" frameset="FST_OneTileFixed1" frame="frame" palette="0"/>
+      <entry name="DeactivateIfOutside_8" function-table="DeactivateIfOutside" listid="EntityList_8" frameset="FST_OneTileFixed1" frame="frame" palette="0"/>
+      <entry name="DeactivateIfOutside_9" function-table="DeactivateIfOutside" listid="EntityList_9" frameset="FST_OneTileFixed1" frame="frame" palette="0"/>
+      <entry name="DeleteIfOutside_0" function-table="DeleteIfOutside" listid="EntityList_0" frameset="FST_OneTileFixed1" frame="frame" palette="0"/>
+      <entry name="DeleteIfOutside_1" function-table="DeleteIfOutside" listid="EntityList_1" frameset="FST_OneTileFixed1" frame="frame" palette="0"/>
+      <entry name="DeleteIfOutside_2" function-table="DeleteIfOutside" listid="EntityList_2" frameset="FST_OneTileFixed1" frame="frame" palette="0"/>
+      <entry name="DeleteIfOutside_3" function-table="DeleteIfOutside" listid="EntityList_3" frameset="FST_OneTileFixed1" frame="frame" palette="0"/>
+      <entry name="DeleteIfOutside_4" function-table="DeleteIfOutside" listid="EntityList_4" frameset="FST_OneTileFixed1" frame="frame" palette="0"/>
+      <entry name="DeleteIfOutside_5" function-table="DeleteIfOutside" listid="EntityList_5" frameset="FST_OneTileFixed1" frame="frame" palette="0"/>
+      <entry name="DeleteIfOutside_6" function-table="DeleteIfOutside" listid="EntityList_6" frameset="FST_OneTileFixed1" frame="frame" palette="0"/>
+      <entry name="DeleteIfOutside_7" function-table="DeleteIfOutside" listid="EntityList_7" frameset="FST_OneTileFixed1" frame="frame" palette="0"/>
+      <entry name="DeleteIfOutside_8" function-table="DeleteIfOutside" listid="EntityList_8" frameset="FST_OneTileFixed1" frame="frame" palette="0"/>
+      <entry name="DeleteIfOutside_9" function-table="DeleteIfOutside" listid="EntityList_9" frameset="FST_OneTileFixed1" frame="frame" palette="0"/>
+      <entry name="DeleteAfterDelay_0" function-table="DeleteAfterDelay" listid="EntityList_0" frameset="FST_OneTileFixed1" frame="frame" palette="0"/>
+      <entry name="DeleteAfterDelay_1" function-table="DeleteAfterDelay" listid="EntityList_1" frameset="FST_OneTileFixed1" frame="frame" palette="0"/>
+      <entry name="DeleteAfterDelay_2" function-table="DeleteAfterDelay" listid="EntityList_2" frameset="FST_OneTileFixed1" frame="frame" palette="0"/>
+      <entry name="DeleteAfterDelay_3" function-table="DeleteAfterDelay" listid="EntityList_3" frameset="FST_OneTileFixed1" frame="frame" palette="0"/>
+      <entry name="DeleteAfterDelay_4" function-table="DeleteAfterDelay" listid="EntityList_4" frameset="FST_OneTileFixed1" frame="frame" palette="0"/>
+      <entry name="DeleteAfterDelay_5" function-table="DeleteAfterDelay" listid="EntityList_5" frameset="FST_OneTileFixed1" frame="frame" palette="0"/>
+      <entry name="DeleteAfterDelay_6" function-table="DeleteAfterDelay" listid="EntityList_6" frameset="FST_OneTileFixed1" frame="frame" palette="0"/>
+      <entry name="DeleteAfterDelay_7" function-table="DeleteAfterDelay" listid="EntityList_7" frameset="FST_OneTileFixed1" frame="frame" palette="0"/>
+      <entry name="DeleteAfterDelay_8" function-table="DeleteAfterDelay" listid="EntityList_8" frameset="FST_OneTileFixed1" frame="frame" palette="0"/>
+      <entry name="DeleteAfterDelay_9" function-table="DeleteAfterDelay" listid="EntityList_9" frameset="FST_OneTileFixed1" frame="frame" palette="0"/>
+      <entry name="DeleteIfAnimationEnds" function-table="DeleteIfAnimationEnds" listid="EntityList_0" frameset="DeleteIfAnimationEnds" frame="frame1" palette="0"/>
+      <entry name="SpawnAndChangeList" function-table="SpawnAndChangeList" listid="EntityList_0" frameset="FST_OneTileFixed1" frame="frame" palette="0"/>
+      <entry name="ShowAllFrames" function-table="ShowAllFrames" listid="EntityList_0" frameset="FST_OneTileFixed1" frame="frame" palette="0"/>
       <entry name="ActionPointSpawner" function-table="ActionPointSpawner" projectileid="EightDirectionRedProjectile" listid="Enemies" frameset="ActionPointSpawner" frame="playerProjectile0" palette="0"/>
       <entry name="EightDirectionProjectile" function-table="EightDirectionProjectile" listid="Particles" frameset="Projectile" frame="frame" palette="0"/>
       <entry name="EhCollisionTest_Player" function-table="EhCollisionTest_Player" listid="Players" frameset="EhCollisionTest_Player" frame="frame1" palette="0"/>
       <entry name="EhCollisionTest_Enemy" function-table="EhCollisionTest_Enemy" listid="Enemies" frameset="EhCollisionTest_Enemy" frame="box" palette="0"/>
+      <entry name="EhCollisionTest_BlankEnemy" function-table="Blank" listid="Enemies" frameset="FST_OneTileFixed1" frame="frame" palette="0"/>
       <entry name="EhCollisionTest_CollisionCentre" function-table="EhCollisionTest_CollisionCentre" listid="Particles" frameset="EhCollisionTest_Centre" frame="frame" palette="0"/>
       <entry name="MapCursor" function-table="MapCursor" listid="Players" frameset="Cursor" frame="frame" palette="0"/>
       <entry name="TileCollisionTestPlayer" function-table="TileCollisionTestPlayer" listid="Players" frameset="TileCollisionTestPlayer" frame="frame1" palette="0"/>

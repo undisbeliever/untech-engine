@@ -185,8 +185,13 @@ function ProcessFrame {
 
         _DrawPlayer()
 
-        Entity.ProcessEntityList(Platforms)
         Entity.ProcessEntityList(Enemies)
+
+        evaluate n = 0
+        while {n} < 10 {
+            Entity.ProcessEntityList(EntityList_{n})
+            evaluate n = {n} + 1
+        }
 
     jsr     MetaSprite.Render.EndLoop
 

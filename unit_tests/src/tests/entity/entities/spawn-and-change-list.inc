@@ -79,18 +79,19 @@ namespace SpawnAndChangeList {
         stx.w   Entity.Spawn.yPos
 
         // wrap list id if necessary
-        tay
-        bpl     +
-            // A < 0
-            lda.w   #Entity.N_ENTITY_LISTS - 1
+        cmp.w   #EntityLists.EntityList_0
+        bcs     +
+            // A < EntityList_0
+            lda.w   #EntityLists.EntityList_9
         +
-        cmp.w   #Entity.N_ENTITY_LISTS
+        cmp.w   #EntityLists.EntityList_9
         bcc     +
-            lda.w   #0
+            // A >= EntityList_9
+            lda.w   #EntityLists.EntityList_0
         +
 
         clc
-        adc.w   #Project.EntityIds.DeleteAfterDelay_Particle
+        adc.w   #Project.EntityIds.DeleteAfterDelay_0
         ldy.w   #DELETE_DELAY
         jmp     Entity.Spawn
     }

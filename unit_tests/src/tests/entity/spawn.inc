@@ -18,7 +18,7 @@ function Spawn {
     lda.w   #0x5678
     sta.w   Entity.Spawn.yPos
 
-    lda.w   #Project.EntityIds.Blank_Particle
+    lda.w   #Project.EntityIds.Blank_0
     ldy.w   #0x1337
     jsr     Entity.Spawn
     bcc     Fail
@@ -46,7 +46,7 @@ function Spawn {
     jsr     ProcessEntityGameLoop
 
     // Test first list length
-    jsr     _FirstListLength
+    Entity.CountEntitiesInList(EntityList_0)
     cmp.w   #1
     bne     Fail
 
@@ -74,7 +74,7 @@ constant tmp = Test.tmp
     Loop:
         stx.w   tmp
 
-        lda.w   #Project.EntityIds.Blank_Particle
+        lda.w   #Project.EntityIds.Blank_0
         ldy.w   #5
         jsr     Entity.Spawn
         bcc     Fail
@@ -88,7 +88,7 @@ constant tmp = Test.tmp
     bcc     Fail
 
     // Test cannot make new entity
-    lda.w   #Project.EntityIds.Blank_Particle
+    lda.w   #Project.EntityIds.Blank_0
     jsr     Entity.Spawn
     bcs     Fail
 
@@ -111,7 +111,7 @@ constant tmp = Test.tmp
     bne     Fail
 
     // Test first list length
-    jsr     _FirstListLength
+    Entity.CountEntitiesInList(EntityList_0)
     cmp.w   #Entity.N_ENTITIES
     bne     Fail
 
@@ -130,6 +130,10 @@ Test.add("Entity.Spawn (Multiple Lists)")
 function Spawn_MultipleLists {
 constant tmp = Test.tmp
 
+constant FIRST_ENTITY = Project.EntityIds.Blank_0
+constant LAST_ENTITY = Project.EntityIds.Blank_9
+constant N_ENTITIES_SPAWNED = (LAST_ENTITY - FIRST_ENTITY + 1) * 2
+
     jsr     Entity.Init
 
     stz.w   Entities.Blank.parameterSum
@@ -138,10 +142,8 @@ constant tmp = Test.tmp
     sta.w   Entity.Spawn.xPos
     sta.w   Entity.Spawn.yPos
 
-    assert(Entity.N_ENTITIES >= Entity.N_ENTITY_LISTS * 2)
-
-    // spawn 2 entities per list
-    lda.w   #Project.EntityIds.Blank_Particle
+    // spawn each entity twice
+    lda.w   #FIRST_ENTITY
     Loop:
         sta.w   tmp
 
@@ -156,13 +158,13 @@ constant tmp = Test.tmp
 
         lda.w   tmp
         inc
-        cmp.w   #Project.EntityIds.Blank_Particle + Entity.N_ENTITY_LISTS
+        cmp.w   #LAST_ENTITY + 1
         bcc     Loop
 
 
     // Test parameter Sum is correct value
     lda.w   Entities.Blank.parameterSum
-    cmp.w   #2 * Entity.N_ENTITY_LISTS
+    cmp.w   #N_ENTITIES_SPAWNED
     bne     Fail
 
 
@@ -171,11 +173,11 @@ constant tmp = Test.tmp
 
     // test list decreased by N_LISTS
     jsr     _FreeListLength
-    cmp.w   #Entity.N_ENTITIES - Entity.N_ENTITY_LISTS * 2
+    cmp.w   #Entity.N_ENTITIES - N_ENTITIES_SPAWNED
     bne     Fail
 
     // Test each list length
-    lda.w   #0
+    lda.w   #EntityLists.EntityList_0
     ListLoop:
         pha
             jsr     Entity.CountEntitiesInList
@@ -186,7 +188,7 @@ constant tmp = Test.tmp
 
         tya
         inc
-        cmp.w   #Entity.N_ENTITY_LISTS
+        cmp.w   #EntityLists.EntityList_9 + 1
         bcc     ListLoop
 
     jmp     _TestEntityListsValid
@@ -276,13 +278,13 @@ function SpawnEntities_XY {
 
     lda.w   tmp_listId
     clc
-    adc.w   #Project.EntityIds.Blank_Particle
+    adc.w   #Project.EntityIds.Blank_0
     jsr     Entity.Spawn
     bcc     Return
 
     lda.w   tmp_listId
     clc
-    adc.w   #Project.EntityIds.DeactivateIfOutside_Particle
+    adc.w   #Project.EntityIds.DeactivateIfOutside_0
     jsr     Entity.Spawn
 
 Return:
@@ -294,7 +296,7 @@ ExpectedSizes:
 namespace ExpectedSizes {
     evaluate n = 0
     while {n} < Entity.N_ENTITY_LISTS {
-        if {n} < {N_LISTS_TESTED} {
+        if {n} >= EntityLists.EntityList_0 && {n} - EntityLists.EntityList_0 < {N_LISTS_TESTED} {
             dw  ACTIVE_PER_LIST
         } else {
             dw  0

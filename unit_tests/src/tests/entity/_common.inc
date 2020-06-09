@@ -16,12 +16,18 @@ function ProcessEntityGameLoop {
 
     Entity.ProcessSpecialLists()
 
+    Entity.ProcessEntityList(Players)
+
     Entity.ProcessEntityList(Particles)
     Entity.ProcessEntityList(PlayerProjectiles)
     Entity.ProcessEntityList(EnemyProjectiles)
-    Entity.ProcessEntityList(Platforms)
-    Entity.ProcessEntityList(Players)
     Entity.ProcessEntityList(Enemies)
+
+    evaluate n = 0
+    while {n} < 10 {
+        Entity.ProcessEntityList(EntityList_{n})
+        evaluate n = {n} + 1
+    }
 
     jmp     Entity.ValidateEntityLists
 }
@@ -55,18 +61,6 @@ function _ActivateNextFrameListLength {
     ldx.w   #Entity.specialLists.ACTIVATE_NEXT_FRAME_INDEX
     jmp     Entity._CountEntitiesInListIndexX
 }
-
-
-// REQUIRES: 16 bit A, 16 bit Index, DB = 0x7e
-// OUT: A = number of entities in player list
-a16()
-i16()
-code()
-function _FirstListLength {
-    ldx.w   #0
-    jmp     Entity._CountEntitiesInListIndexX
-}
-
 
 
 // Tests that:

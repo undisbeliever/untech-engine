@@ -376,7 +376,7 @@ evaluate EN_ID = EntityLists.Enemies
 
 constant PLAYER = Project.EntityIds.EhCollisionTest_Player
 constant ENEMY  = Project.EntityIds.EhCollisionTest_Enemy
-constant BLANK  = Project.EntityIds.Blank_Enemy
+constant BLANK  = Project.EntityIds.EhCollisionTest_BlankEnemy
 
 
 Data:

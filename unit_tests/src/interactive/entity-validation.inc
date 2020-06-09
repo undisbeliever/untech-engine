@@ -175,39 +175,42 @@ function MenuRoutine0 {
 }
 
 // Test last list
-assert(EntityLists.Enemies == Entity.N_ENTITY_LISTS - 1)
+define ENTITY_LIST_ID = {EntityTest._SetupCounterTest.ENTITY_LIST_ID}
+
+// Test ENTITY_LIST_ID is the last list
+assert(EntityLists.{ENTITY_LIST_ID} == Entity.N_ENTITY_LISTS - 1)
 
 
 rodata(rom0)
 MenuText1:
-    db  "InfiniteLoop (1st enemy)", 0
+    db  "InfiniteLoop (1st in list", 0
 
 // REQUITES: 16 bit A, 16 bit Index, DB = 0x7e, DP = 0
 a16()
 i16()
 code()
 function MenuRoutine1 {
-    ldx.w   {Entity.listAddress(Enemies)}
+    ldx.w   {Entity.listAddress({ENTITY_LIST_ID})}
     beq     Fail
 
     jmp     _CreateInfiniteLoop_Y
 
 Fail:
-    // enemy list empty
+    // list empty
     break(ASSERT_FAILURE)
 }
 
 
 rodata(rom0)
 MenuText2:
-    db  "InfiniteLoop (2nd enemy)", 0
+    db  "InfiniteLoop (2nd in list", 0
 
 // REQUITES: 16 bit A, 16 bit Index, DB = 0x7e, DP = 0
 a16()
 i16()
 code()
 function MenuRoutine2 {
-    ldx.w   {Entity.listAddress(Enemies)}
+    ldx.w   {Entity.listAddress({ENTITY_LIST_ID})}
     beq     Fail
 
     ldy.b   BaseEntity.next,x
@@ -238,25 +241,25 @@ function MenuRoutine3 {
 
 rodata(rom0)
 MenuText4:
-    db  "Drop Entity (enemy)", 0
+    db  "Drop Entity", 0
 
 // REQUITES: 16 bit A, 16 bit Index, DB = 0x7e, DP = 0
 a16()
 i16()
 code()
 function MenuRoutine4 {
-    // enemy->first = enemy->first->next
+    // entityList->first = entityList->first->next
 
-    ldx.w   {Entity.listAddress(Enemies)}
+    ldx.w   {Entity.listAddress({ENTITY_LIST_ID})}
     beq     Fail
 
     lda.b   BaseEntity.next,x
-    sta.w   {Entity.listAddress(Enemies)}
+    sta.w   {Entity.listAddress({ENTITY_LIST_ID})}
 
     rts
 
 Fail:
-    // enemy list empty
+    // list empty
     break(ASSERT_FAILURE)
 }
 
@@ -288,21 +291,21 @@ Fail:
 
 rodata(rom0)
 MenuText6:
-    db  "Deactivated in platforms", 0
+    db  "Deactivated in list 0", 0
 
 // REQUITES: 16 bit A, 16 bit Index, DB = 0x7e, DP = 0
 a16()
 i16()
 code()
 function MenuRoutine6 {
-    sta.w   {Entity.listAddress(Platforms)}
+    sta.w   {Entity.listAddress(EntityList_0)}
     beq     Fail
 
     // bosses->first = deactivated->first
     // deactivated->first = null
 
     lda.w   Entity.specialLists.deactivated
-    sta.w   {Entity.listAddress(Platforms)}
+    sta.w   {Entity.listAddress(EntityList_0)}
 
     stz.w   Entity.specialLists.deactivated
 
@@ -324,7 +327,7 @@ i16()
 code()
 function MenuRoutine7 {
     // test activateNextFrame empty
-    // swap activateNextFrame and enemy lists
+    // swap activateNextFrame and ENTITY_LIST_ID entity list
 
     // I want to test the list before the free list
     assert(Entity.specialLists.activateNextFrame == Entity.specialLists.free - 2)
@@ -332,8 +335,8 @@ function MenuRoutine7 {
     ldy.w   Entity.specialLists.activateNextFrame
     bne     Fail
 
-    lda.w   {Entity.listAddress(Enemies)}
-    sty.w   {Entity.listAddress(Enemies)}
+    lda.w   {Entity.listAddress({ENTITY_LIST_ID})}
+    sty.w   {Entity.listAddress({ENTITY_LIST_ID})}
 
     sta.w   Entity.specialLists.activateNextFrame
 
@@ -347,22 +350,22 @@ Fail:
 
 rodata(rom0)
 MenuText8:
-    db  "Invalidate enemy listId", 0
+    db  "Invalidate listId", 0
 
 // REQUITES: 16 bit A, 16 bit Index, DB = 0x7e, DP = 0
 a16()
 i16()
 code()
 function MenuRoutine8 {
-    // enemies->next->listId = EntityLists.Players
+    // list->next->listId = EntityLists.Players
 
-    ldy.w   {Entity.listAddress(Players)}
+    ldy.w   {Entity.listAddress({ENTITY_LIST_ID})}
     beq     Fail
 
     ldx.b   BaseEntity.next,y
     beq     Fail
 
-    // X = second entity in enemy list
+    // X = second entity in list
 
     sep     #$20
 a8()
@@ -389,7 +392,7 @@ a16()
 i16()
 code()
 function MenuRoutine9 {
-    // free->last->next = enemies->first
+    // free->last->next = entityList->first
     // enemies->first = null
 
     ldy.w   Entity.specialLists.free
@@ -401,10 +404,10 @@ function MenuRoutine9 {
         bne     Loop
 
     // X = last item in free list
-    lda.w   {Entity.listAddress(Enemies)}
+    lda.w   {Entity.listAddress({ENTITY_LIST_ID})}
     sta.b   BaseEntity.next,x
 
-    stz.w   {Entity.listAddress(Enemies)}
+    stz.w   {Entity.listAddress({ENTITY_LIST_ID})}
 
     rts
 
@@ -553,9 +556,9 @@ a16()
 i16()
 code()
 function MenuRoutine15 {
-    // enemies.first->next->instanceId++
+    // entityList.first->next->instanceId++
 
-    ldy.w   {Entity.listAddress(Enemies)}
+    ldy.w   {Entity.listAddress({ENTITY_LIST_ID})}
     beq     Fail
 
     ldx.w   BaseEntity.next,y
@@ -584,9 +587,9 @@ a16()
 i16()
 code()
 function MenuRoutine16 {
-    // enemies.first->next->instanceId = enemies.first->instanceId
+    // entityList.first->next->instanceId = entityList.first->instanceId
 
-    ldx.w   {Entity.listAddress(Enemies)}
+    ldx.w   {Entity.listAddress({ENTITY_LIST_ID})}
     beq     Fail
 
     ldy.w   BaseEntity.next,x
