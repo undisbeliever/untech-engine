@@ -103,6 +103,7 @@ include "resources/_common.inc"
 include "resources/_vblank.inc"
 
 include "room/maps.inc"
+include "room/entrances.inc"
 include "room/entity-groups.inc"
 include "room/_common.inc"
 

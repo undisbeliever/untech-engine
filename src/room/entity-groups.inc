@@ -28,7 +28,7 @@ macro _Init() {
 
 // Load and verify the EntityGroup data
 //
-// REQUITES: 16 bit A, 16 bit Index, DB = 0x7e
+// REQUITES: 16 bit A, 16 bit Index, DB = 0x7e, DP = 0
 //
 // INPUT: X = address of the entity group data
 // OUTPUT: X = address after entity group data

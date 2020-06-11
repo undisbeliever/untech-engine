@@ -24,7 +24,7 @@ assert(EntityGroups.N_ENTITY_GROUPS == MAX_ENTITY_GROUPS)
 
 
 namespace Format {
-    if Room.ROOM_FORMAT_VERSION != 1 {
+    if Room.ROOM_FORMAT_VERSION != 2 {
         error "Invalid untech-compiler Room Format"
     }
 
@@ -50,6 +50,9 @@ namespace Format {
             // The sceneId for this room
             // (byte)
             field(sceneId, 1)
+
+            // Number of Room Entrances for this room
+            field(nEntrances, 1)
         endstruct()
     }
 
@@ -59,6 +62,47 @@ namespace Format {
     //
     // (byte grid array column-major order, exactly width * bytesPerColumn bytes in size)
     constant mapData = roomData + Header.size
+
+
+    // Room Entrance data
+    //
+    // Repeated `Header.nEntrances` times
+    namespace RoomEntrance {
+        constant IDENTIFIER = 0x4e // "N"
+
+        struct()
+            // The position of the player
+            //
+            // xxxxxxxx xxxxyyyy yyyyyyyy
+            //
+            //      xxxxxxxxxxxx = Player X position (offset by MetaTiles.map.LEFT)
+            //      yyyyyyyyyyyy = Player Y position (offset by MetaTiles.map.TOP)
+            //
+            // (2x 12 bit position)
+            field(position, 3)
+
+            constant POSITION_MASK  = 0x0fff
+            constant POSITION_SHIFT = 12
+
+            // The orientation of the player
+            // (Orientation enum byte)
+            field(orientation, 1)
+        endstruct()
+
+
+        // The orientation of the player at the start of the room
+        namespace Orientation {
+            createEnum()
+                enum(DOWN_RIGHT)
+                enum(DOWN_LEFT)
+                enum(UP_RIGHT)
+                enum(UP_LEFT)
+            endEnum()
+
+        }
+        assertPowerOfTwo(Orientation.__ENUM__.count)
+        constant ORIENTATION_MASK = Orientation.__ENUM__.count - 1
+    }
 
 
     // Entity Group data

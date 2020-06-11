@@ -89,7 +89,8 @@
     ERERIBUAAAAAAAAAAAAAAAAAAAAAAAAAAAAAFCARERERERERERERERERERERERER
     EREREREREREREREREREREQ==
   </map>
-  <entity-group name="main">
-    <entity entity="TileCollisionTestPlayer" x="128" y="112"/>
-  </entity-group>
+  <entrance name="False_1" x="500" y="500" orientation="down-right"/>
+  <entrance name="False_2" x="500" y="500" orientation="down-right"/>
+  <entrance name="Start" x="128" y="112" orientation="down-right"/>
+  <entrance name="False_3" x="500" y="500" orientation="down-right"/>
 </room>

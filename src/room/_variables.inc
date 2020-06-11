@@ -25,6 +25,22 @@ assert(roomData.size >= 1024)
 // (byte)
 allocate(roomId, wram7e, 1)
 
+// The entrance to start the room in
+// (byte)
+allocate(entranceId, wram7e, 1)
+
+// The player's entity data id
+// (byte)
+allocate(playerEntityDataId, wram7e, 1)
+
+
+namespace Entrances {
+    // Word address of the room entrances data
+    //
+    // (word addr)
+    allocate(dataAddr, wram7e, 2)
+}
+
 
 namespace EntityGroups {
     constant N_ENTITY_GROUPS = 8

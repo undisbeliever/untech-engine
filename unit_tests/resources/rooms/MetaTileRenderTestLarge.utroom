@@ -230,7 +230,5 @@
     AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
     AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=
   </map>
-  <entity-group name="entities">
-    <entity entity="MapCursor" x="680" y="1024"/>
-  </entity-group>
+  <entrance name="Start" x="680" y="1024" orientation="down-right"/>
 </room>

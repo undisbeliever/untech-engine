@@ -117,7 +117,5 @@
     AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
     AAAAAAAAAAAAAAAAAAAAAA==
   </map>
-  <entity-group name="entities">
-    <entity entity="MapCursor" x="680" y="512"/>
-  </entity-group>
+  <entrance name="Start" x="680" y="512" orientation="down-right"/>
 </room>

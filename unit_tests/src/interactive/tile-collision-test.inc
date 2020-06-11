@@ -236,7 +236,19 @@ a16()
 i16()
 code()
 function Test {
-constant _entity = Test.tmp + 0
+    pha
+        sep     #$20
+    a8()
+        lda.b   #Project.EntityIds.TileCollisionTestPlayer
+        sta.w   Room.playerEntityDataId
+
+        // Test loading a non-zero entranceId
+        lda.b   #2
+        sta.w   Room.entranceId
+
+        rep     #$30
+a16()
+    pla
 
     jsr     GameLoop.Init_LoadRoom
 
@@ -244,13 +256,6 @@ constant _entity = Test.tmp + 0
 
     lda.w   #GRAVITY
     sta.w   Room.gravity_sx
-
-
-    // Find the address of the first entity in the room
-    lda.w   #Entity.FIRST_INSTANCE_ID
-    Entities.GetEntityWithIdOrBranchIfEmpty_X(Fail)
-    stx.w   _entity
-
 
 
     jsr     Test.PrintCurrentTestName
@@ -292,12 +297,12 @@ a16()
     a8()
         Text.Console.SetCursor(25, 2)
 
-        ldx.w   _entity
+        ldx.w   {Entity.listAddress(Players)}
         lda.b   BaseEntity.movementState,x
         jsr     Text.Console.PrintHex8A
 
         Text.Console.SetCursor(21, 3)
-        ldx.w   _entity
+        ldx.w   {Entity.listAddress(Players)}
         lda.b   Entities.TileCollisionTestPlayer.EntityStruct.tcReturnCarry,x
         beq     +
             Text.Console.PrintConstString("C ")
@@ -306,7 +311,7 @@ a16()
             Text.Console.PrintConstString("  ")
         +
 
-        ldx.w   _entity
+        ldx.w   {Entity.listAddress(Players)}
         ldy.b   Entities.TileCollisionTestPlayer.EntityStruct.tcReturnY,x
         jsr     Text.Console.PrintHex16Y
 

@@ -29,9 +29,12 @@ namespace Room {
 //        * MetaSprite buffer
 //        * Entity Subsystem
 //
-// REQUIRES: 16 bit A, 16 bit Index, DB = 0x7e
+// REQUIRES: 16 bit A, 16 bit Index, DB = 0x7e, DP = 0
 //
 // INPUT: A = room Id
+//
+// INPUT: entranceId = entrance to load
+// INPUT: playerEntityDataId = player entity data id
 a16()
 i16()
 code()
@@ -87,13 +90,18 @@ a16()
 
     // Load and verify room data
 
+    // NOTE: These macros use the DP temporary variables
+    //       They MUST NOT be accessed beyond this point.
+
     Maps._Load()
     // X = address of data after map
 
+    Entrances._Load()
+    // X = address of data after room entrances
+
     EntityGroups._Load()
+    // X = address at end of entity groups
 
-
-    // X = address at end of map
 
     // Check footer (and confirm all data is read with the correct offsets/sizes)
     assert(Format.FOOTER_SIZE == 4)
@@ -109,6 +117,8 @@ a16()
 
 
     jsr     Camera.Init
+
+    jsr     Room.Entrances.SpawnPlayer
 
 
     lda.w   Format.Header.sceneId

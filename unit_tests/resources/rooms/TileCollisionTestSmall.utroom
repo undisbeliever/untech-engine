@@ -13,7 +13,7 @@
     ERgZEBERIBURFCARERAQEBIQEBYXICAgIBEQEBAQFhERERERERERERERERERERER
     EREREREREREREREREREREQ==
   </map>
-  <entity-group name="main">
-    <entity entity="TileCollisionTestPlayer" x="32" y="48"/>
-  </entity-group>
+  <entrance name="False_1" x="200" y="200" orientation="up-right"/>
+  <entrance name="False_2" x="200" y="200" orientation="up-right"/>
+  <entrance name="Start" x="80" y="160" orientation="up-right"/>
 </room>
