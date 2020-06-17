@@ -360,29 +360,33 @@ macro __ValidateInstanceIdTable() {
     assert16a()
     assert16i()
 
+    // Show correct X value on Break BSOD if the first entry is invalid
+    ldx.w   #0
+
     // instanceId 0 MUST BE unused
-    lda.w   instanceIdTable
-    cmp.w   #_unusedEntity
+    ldy.w   instanceIdTable
+    cpy.w   #_unusedEntity
     bne     InstanceIdTableInvalid
 
+    inx
+    inx
 
-    ldx.w   #2
     Loop:
         // X = instanceIdTable index
 
-        lda.w   instanceIdTable,x
-        cmp.w   #_unusedEntity
+        ldy.w   instanceIdTable,x
+        cpy.w   #_unusedEntity
         beq     UnusedEntity
-            tay
             // Y = entity address
 
             // test entity address is valid
-            cmp.w   #entityPool
+            cpy.w   #entityPool
             bcc     InstanceIdTableInvalid
-            cmp.w   #entityPool + ENTITY_SIZE * N_ENTITIES
+            cpy.w   #entityPool + ENTITY_SIZE * N_ENTITIES
             bcs     InstanceIdTableInvalid
 
             assertPowerOfTwo(ENTITY_SIZE)
+            tya
             and.w   #(ENTITY_SIZE - 1)
             bne     InstanceIdTableInvalid
 
