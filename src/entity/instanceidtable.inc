@@ -71,6 +71,10 @@ macro _SetNumberOfRoomEntities() {
     assert16a()
     assert16i()
 
+    // instanceId 0 is always unused
+    assert(Entity.FIRST_INSTANCE_ID == 1 * Entity.INSTANCE_ID_INCREMENT)
+    inc
+
     assert(Entity.INSTANCE_ID_INCREMENT == 2)
     asl
     cmp.w   #Entity.MAX_INSTANCE_ID - 1

@@ -355,10 +355,21 @@ macro __ValidateFreeList() {
 //
 // BRANCH: `InstanceIdTableInvalid` if a value in the instanceIdTable is invalid
 // BRANCH: `InstanceIdInvalid` if an entity's instanceId does not match the instanceIdTable value
+// BRANCH: `InvalidMinimimInstaceId` if InvalidMinimimInstaceId is invalid
 macro __ValidateInstanceIdTable() {
-
     assert16a()
     assert16i()
+
+    // The minimumInstanceId must be >= Entity.FIRST_INSTANCE_ID
+    sep     #$20
+a8()
+    lda.w   minimumInstanceId
+    cmp.b   #Entity.FIRST_INSTANCE_ID
+    bcc     InvalidMinimimInstaceId
+
+    rep     #$30
+a16()
+
 
     // Show correct X value on Break BSOD if the first entry is invalid
     ldx.w   #0
@@ -494,6 +505,9 @@ function ValidateEntityLists {
             break(INSTANCE_ID_TABLE_INVALID)
 
         InstanceIdInvalid:
+            break(INSTANCE_ID_INVALID)
+
+        InvalidMinimimInstaceId:
             break(INSTANCE_ID_INVALID)
     +
 
