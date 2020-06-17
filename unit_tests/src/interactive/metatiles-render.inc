@@ -277,20 +277,13 @@ a16()
 i16()
 code()
 function DoTest {
-    pha
-        sep     #$20
-    a8()
-        lda.b   #Project.EntityIds.MapCursor
-        sta.w   Room.playerEntityDataId
-
-        stz.w   Room.entranceId
-
-        rep     #$30
-a16()
-    pla
-
+    // A = room Id
+    ldx.w   #Project.EntityIds.MapCursor
+    ldy.w   #0
     jsr     GameLoop.Init_LoadRoom
+
     jsr     GameLoop.SpawnAllEntitiesInRoom
+
 
     jsr     Test.PrintCurrentTestName
 

@@ -236,23 +236,14 @@ a16()
 i16()
 code()
 function Test {
-    pha
-        sep     #$20
-    a8()
-        lda.b   #Project.EntityIds.TileCollisionTestPlayer
-        sta.w   Room.playerEntityDataId
 
-        // Test loading a non-zero entranceId
-        lda.b   #2
-        sta.w   Room.entranceId
-
-        rep     #$30
-a16()
-    pla
-
+    // A = room Id
+    ldx.w   #Project.EntityIds.TileCollisionTestPlayer
+    ldy.w   #2              // Test loading a non-zero entranceId
     jsr     GameLoop.Init_LoadRoom
 
     jsr     GameLoop.SpawnAllEntitiesInRoom
+
 
     lda.w   #GRAVITY
     sta.w   Room.gravity_sx

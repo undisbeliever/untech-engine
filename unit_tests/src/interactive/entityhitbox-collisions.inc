@@ -374,15 +374,12 @@ constant X_CENTER = MetaTiles.map.LEFT + Camera.DISPLAY_WIDTH / 2
 
 evaluate EN_ID = EntityLists.Enemies
 
-constant PLAYER = Project.EntityIds.EhCollisionTest_Player
 constant ENEMY  = Project.EntityIds.EhCollisionTest_Enemy
 constant BLANK  = Project.EntityIds.EhCollisionTest_BlankEnemy
 
 
 Data:
     //  entity, xPos,           yPos,                       frameId
-
-    dw  PLAYER, X_CENTER,       Y_BOTTOM - Y_DELTA * 2,     0
 
     dw  BLANK,  X_CENTER,       Y_BOTTOM - Y_DELTA * 2,     0
     dw  BLANK,  X_CENTER,       Y_BOTTOM - Y_DELTA * 2,     0
@@ -426,7 +423,15 @@ function Test {
     sta.w   _processCollisionArgumentsOk
 
 
-    jsr     GameLoop.Init_NoRoom
+    lda.w   #Project.RoomList.EmptyRoom
+    ldx.w   #Project.EntityIds.EhCollisionTest_Player
+    ldy.w   #0
+    jsr     GameLoop.Init_LoadRoom
+
+
+    jsr     Resources.TransferToPpu
+    jsr     MetaTiles.Render.DrawFullScreen_ForceBlank
+
 
     jsr     EnableDisplay_Full
 

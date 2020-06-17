@@ -212,13 +212,23 @@ i16()
 code()
 Test.add("Entity/MetaSprite Test")
 function Test {
-    jsr     GameLoop.Init_NoRoom
+    lda.w   #Project.RoomList.EmptyRoom
+    ldx.w   #Project.EntityIds.Blank_0
+    ldy.w   #0
+    jsr     GameLoop.Init_LoadRoom
+
+
+    jsr     Resources.TransferToPpu
+    jsr     MetaTiles.Render.DrawFullScreen_ForceBlank
+
+    jsr     Test.PrintCurrentTestName
 
     jsr     EnableDisplay_Full
 
 
     jsr     SpawnEntities
     bcc     Fail
+
 
     jmp     GameLoop.ProcessUntilButtonPress
 

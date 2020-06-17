@@ -5,50 +5,28 @@
 namespace InteractiveTests {
 namespace GameLoop {
 
-// If non-zero then MetaTiles and Resource Animations will be updated in `ProcessFrame`
-// (word flag)
-allocateTmpWord(updateMetaTilesFlag)
-
 
 // Initialize the Game Loop and load a room
 //
 // REQUIRES: 16 bit A, 16 bit Index, Autojoy enabled, DB = 0x7e
 //
 // INPUT: A = roomId
+//        X = playerEntityDataId
+//        Y = entranceId
 a16()
 i16()
 code()
 function Init_LoadRoom {
-    ldx.w   #0xffff
-    stx.w   updateMetaTilesFlag
+    sep     #$10
+i8()
+    stx.w   Room.playerEntityDataId
+    sty.w   Room.entranceId
+
+    rep     #$30
+i16()
 
     // LoadRoom also resets Entity and Camera modules
     jmp     Room.LoadRoom
-}
-
-
-
-// Initialize the Game Loop without loading a room
-//
-// REQUIRES: 16 bit A, 16 bit Index, Autojoy enabled, DB = 0x7e
-a16()
-i16()
-code()
-function Init_NoRoom {
-    stz.w   updateMetaTilesFlag
-
-    // Set map boundary to a single screen
-    // (ensures camera boundary is a single screen)
-    lda.w   #MetaTiles.map.LEFT + Camera.DISPLAY_WIDTH
-    sta.w   MetaTiles.map.right
-
-    lda.w   #MetaTiles.map.TOP + Camera.DISPLAY_HEIGHT
-    sta.w   MetaTiles.map.bottom
-
-
-    jsr     Camera.Init
-
-    jmp     Entity.Init
 }
 
 
@@ -76,19 +54,16 @@ a16()
 i16()
 code()
 function SpawnAllEntitiesInRoom {
-    lda.w   updateMetaTilesFlag
-    beq     Return
-        lda.w   #0xff
-        tsb.w   Room.EntityGroups.toActivateBitfield
+    lda.w   #0xff
+    tsb.w   Room.EntityGroups.toActivateBitfield
 
-        jsr     Room.EntityGroups.SpawnEntityGroups
+    jsr     Room.EntityGroups.SpawnEntityGroups
 
-        ldx.w   {Entity.listAddress(Players)}
-        beq     +
-            // Assumes only one player
-            jsr     Camera.CenterOnEntity_X
-        +
-Return:
+    ldx.w   {Entity.listAddress(Players)}
+    beq     +
+        // Assumes only one player
+        jsr     Camera.CenterOnEntity_X
+    +
     rts
 }
 
@@ -170,11 +145,8 @@ function ProcessFrame {
 
 
     // Update MetaTiles (if room is loaded in memory)
-    lda.w   updateMetaTilesFlag
-    beq     +
-        jsr     MetaTiles.Render.Update
-        jsr     Resources.ProcessAnimations
-    +
+    jsr     MetaTiles.Render.Update
+    jsr     Resources.ProcessAnimations
 
 
     jsr     MetaSprite.Render.InitLoop

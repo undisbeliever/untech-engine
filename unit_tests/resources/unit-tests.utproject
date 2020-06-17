@@ -152,6 +152,7 @@
   <room-file src="rooms/TileCollisionTestLarge.utroom"/>
   <room-file src="rooms/MetaTileRenderTestSmall.utroom"/>
   <room-file src="rooms/MetaTileRenderTestLarge.utroom"/>
+  <room-file src="rooms/EmptyRoom.utroom"/>
   <scene-setting name="UnitTests" bg-mode="0" layer0-type="text" layer1-type="" layer2-type="" layer3-type=""/>
   <scene-setting name="Mode1_Bg2MT_NoImage" bg-mode="1bg3" layer0-type="" layer1-type="mt-tileset" layer2-type="text" layer3-type=""/>
   <scene-setting name="SettingSun" bg-mode="1bg3" layer0-type="mt-tileset" layer1-type="bg-image" layer2-type="text" layer3-type=""/>

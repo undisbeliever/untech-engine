@@ -240,13 +240,22 @@ i16()
 code()
 Test.add("ActionPointSpawner Test")
 function Test {
+    lda.w   #Project.RoomList.EmptyRoom
+    ldx.w   #Project.EntityIds.Blank_0
+    ldy.w   #0
+    jsr     GameLoop.Init_LoadRoom
+
+
+    jsr     Resources.TransferToPpu
+    jsr     MetaTiles.Render.DrawFullScreen_ForceBlank
+
+    jsr     Test.PrintCurrentTestName
+
     Text.Console.SetCursor(0, 4)
     Text.Console.PrintConstString("Also tests:\n  DeleteAndGotoNextEntity")
 
     Text.Console.SetCursor(0, 7)
     Text.Console.PrintConstString("Press L/R to spawn\n  Manual Projectiles")
-
-    jsr     GameLoop.Init_NoRoom
 
     jsr     EnableDisplay_Full
 
