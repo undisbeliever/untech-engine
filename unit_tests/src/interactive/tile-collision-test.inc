@@ -9,6 +9,7 @@
 //  * MetaSprite Tile Collision Hitbox
 
 namespace Entities {
+namespace Players {
 
 namespace TileCollisionTestPlayer {
     buildFunctionTable(BasePlayerFunctionTable, TileCollisionTestPlayer)
@@ -191,6 +192,7 @@ namespace TileCollisionTestPlayer {
     }
 }
 }
+}
 
 
 namespace InteractiveTests {
@@ -290,7 +292,7 @@ a16()
         jsr     Text.Console.PrintHex8A
 
         Text.Console.SetCursor(21, 3)
-        lda.w   Entity.playerEntity + Entities.TileCollisionTestPlayer.EntityStruct.tcReturnCarry
+        lda.w   Entity.playerEntity + Entities.Players.TileCollisionTestPlayer.EntityStruct.tcReturnCarry
         beq     +
             Text.Console.PrintConstString("C ")
             bra     ++
@@ -298,7 +300,7 @@ a16()
             Text.Console.PrintConstString("  ")
         +
 
-        ldy.w   Entity.playerEntity + Entities.TileCollisionTestPlayer.EntityStruct.tcReturnY
+        ldy.w   Entity.playerEntity + Entities.Players.TileCollisionTestPlayer.EntityStruct.tcReturnY
         jsr     Text.Console.PrintHex16Y
 
         rep     #$20

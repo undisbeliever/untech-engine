@@ -17,6 +17,7 @@
 
 
 namespace Entities {
+namespace Projectiles {
 
 namespace EightDirectionProjectile {
     buildFunctionTable(BaseEntityFunctionTable, EightDirectionProjectile)
@@ -135,9 +136,13 @@ namespace EightDirectionProjectile {
         jmp     Entity.DeleteIfOutsideOrDrawAndGotoNextEntity
     }
 }
+}
+
+// Reuse EightDirectionProjectile code in EightDirectionEntity
+constant EightDirectionEntity.FunctionTable = Projectiles.EightDirectionProjectile.FunctionTable
 
 
-
+namespace Players {
 namespace ActionPointSpawner {
     buildFunctionTable(BasePlayerFunctionTable, ActionPointSpawner)
 
@@ -203,6 +208,7 @@ namespace ActionPointSpawner {
 
         jmp     MetaSprite.Animation.Process
     }
+}
 }
 }
 

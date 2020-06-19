@@ -12,6 +12,7 @@
 //  * Resource palette animations
 
 namespace Entities {
+namespace Players {
 
 namespace MapCursor {
     buildFunctionTable(BasePlayerFunctionTable, MapCursor)
@@ -233,6 +234,7 @@ namespace MapCursor {
     SkipSetCell:
         rts
     }
+}
 }
 }
 

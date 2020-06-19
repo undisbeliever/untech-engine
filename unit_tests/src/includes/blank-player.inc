@@ -4,6 +4,7 @@
 
 
 namespace Entities {
+namespace Players {
 namespace BlankPlayer {
     buildFunctionTable(BasePlayerFunctionTable, BlankPlayer)
 
@@ -18,7 +19,7 @@ namespace BlankPlayer {
     function Null {
         rts
     }
-
+}
 }
 }
 

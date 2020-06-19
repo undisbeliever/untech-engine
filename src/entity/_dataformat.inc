@@ -10,7 +10,7 @@
 
 
 // Data format may be subject to changes
-if Entity.Data.ENTITY_FORMAT_VERSION != 5 {
+if Entity.Data.ENTITY_FORMAT_VERSION != 6 {
     error "Invalid UnTech Entity Format"
 }
 

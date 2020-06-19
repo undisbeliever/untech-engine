@@ -19,6 +19,7 @@
 //  * Entity.SpawnAtMetaSpriteCollisionCentre
 
 namespace Entities {
+namespace Players {
 
 namespace EhCollisionTest_Player {
     buildFunctionTable(BasePlayerFunctionTable, EhCollisionTest_Player)
@@ -125,6 +126,7 @@ namespace EhCollisionTest_Player {
 
         rts
     }
+}
 }
 
 
