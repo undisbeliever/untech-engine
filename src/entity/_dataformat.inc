@@ -10,7 +10,7 @@
 
 
 // Data format may be subject to changes
-if Entity.Data.ENTITY_FORMAT_VERSION != 4 {
+if Entity.Data.ENTITY_FORMAT_VERSION != 5 {
     error "Invalid UnTech Entity Format"
 }
 
@@ -19,18 +19,26 @@ namespace Data {
     // Number of entities in the EntityRomDataList
     constant EntityRomDataListCount = Project.EntityIds.count
 
-    // Number of entities in the ProjectileRomDataList
+    // Number of projectiles in the ProjectileRomDataList
     constant ProjectileRomDataListCount = Project.ProjectileIds.count
+
+    // Number of players in the ProjectileRomDataList
+    constant PlayerRomDataListCount = Project.PlayerIds.count
+
+
+    // The offset between the playerId and the RomData tables
+    constant PlayerRomDataListOffset = EntityRomDataListCount + ProjectileRomDataListCount
 
 
     // Entity function table address for each entity and projectile
     //
-    // Contains entity and projectile FunctionTables.
+    // Contains entity, projectile and player FunctionTables.
     // Projectile data is stored directly after entity data.
+    // Player data is stored directly after projectile data.
     //
     // (word addr array, points to `BaseEntityFunctionTable` in code bank)
     constant FunctionTables = Project.EntityFunctionTables
-    assert(Project.EntityFunctionTables.size == (EntityRomDataListCount + ProjectileRomDataListCount) * 2)
+    assert(Project.EntityFunctionTables.size == (EntityRomDataListCount + ProjectileRomDataListCount + PlayerRomDataListCount) * 2)
 
 
     // EntityRomData table
@@ -170,6 +178,76 @@ namespace BaseEntityFunctionTable {
         //         Metasprite.Collision.yPos: the y-coordinate of the collision centre
         // Collision bits format: (this hitboxType << 4) | other hitboxType
         field(ProcessCollision, 2)
+    endstruct()
+}
+
+namespace BasePlayerFunctionTable {
+    basestruct()
+        // Initialise player variables.
+        //
+        // When this method is called the following is already set:
+        //    * Player position
+        //    * Player movementState
+        //    * Player momentum reset to 0
+        //    * MetaSprite frameSet and palette initialized
+        //
+        // After this method is called:
+        //    * The MetaSprite is activated
+        //    * Camera is updated
+        //
+        // REGS: 16 bit A, 16 bit Index, DB = $7e
+        // INPUT: dp = platerEntity
+        field(Init, 2)
+
+        // Room About to Change hook.
+        //
+        // This method is called just before a new room is loaded.
+        //
+        // REGS: 16 bit A, 16 bit Index, DB = $7e
+        // INPUT: dp = playerEntity
+        field(RoomAboutToChange, 2)
+        // ::TODO call RoomAboutToChange::
+
+        // Process the player entity.
+        //
+        // This method is responsible for setting the player's MetaSprite frame.
+        // There should be a call to either `MetaSprite.Animation.Process` or
+        // `MetaSprite.SetFrame` within this method.
+        //
+        // NOTE: This method MUST NOT draw any MetaSprites,
+        //       it is called outside the MetaSprites render loop.
+        //
+        // INPUT: dp = playerEntity
+        field(Process, 2)
+
+        // Draw the player entity.
+        //
+        // This method will be called after the camera has been updated and
+        // inside the Metasprite RenderLoop.
+        //
+        // REGS: 16 bit A, 16 bit Index, DB = 0x7e
+        //
+        // INPUIT: dp = playerEntity
+        field(DrawPlayer, 2)
+
+        // Process a collision between this entity and an other entity.
+        //
+        // This routine is the same as `BaseEntityFunctionTable.ProcessCollision`
+        //
+        // REGS: 16 bit A, 16 bit Index, DB = 0x7e
+        //
+        // INPUT: dp: entity
+        //         A: collision bits
+        //         Y: otherEntity address
+        //         Metasprite.Collision.bits: collision bits (MUST NOT BE MODIFIED)
+        //         Metasprite.Collision.otherEntity: the entity collided with (MUST NOT BE MODIFIED)
+        //         Metasprite.Collision.xPos: the x-coordinate of the collision centre
+        //         Metasprite.Collision.yPos: the y-coordinate of the collision centre
+        // Collision bits format: (this hitboxType << 4) | other hitboxType
+        field(ProcessCollision, 2)
+
+        assert(Init == BaseEntityFunctionTable.Init)
+        assert(ProcessCollision == BaseEntityFunctionTable.ProcessCollision)
     endstruct()
 }
 

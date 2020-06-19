@@ -14,7 +14,7 @@
 namespace Entities {
 
 namespace MapCursor {
-    buildFunctionTable(BaseEntityFunctionTable, MapCursor)
+    buildFunctionTable(BasePlayerFunctionTable, MapCursor)
 
     namespace EntityStruct {
         childstruct(BaseEntity)
@@ -25,17 +25,17 @@ namespace MapCursor {
     }
 
 
+    constant DrawPlayer = MetaSprite.Render.RenderEntity
+
+
     // REQUIRES: 16 bit A, 16 bit Index, DB = 0x7e
     // INPUT: DP = entity
-    // OUTPUT: C set = always activate entity
     a16()
     i16()
     code()
     function Init {
         SetFrame(frame)
 
-        // always activate
-        sec
         rts
     }
 
@@ -45,8 +45,7 @@ namespace MapCursor {
     a16()
     i16()
     code()
-    Destructor:
-    Deactivated:
+    RoomAboutToChange:
     ProcessCollision:
     function Null {
         rts
@@ -60,7 +59,6 @@ namespace MapCursor {
     i16()
     code()
     function Process {
-
         // Update entity position depending on joypad settings
 
         lda.w   Controller.Joy1.current
@@ -233,7 +231,7 @@ namespace MapCursor {
             +
 
     SkipSetCell:
-        jmp     Entity.DrawAndGotoNextEntity
+        rts
     }
 }
 }
@@ -278,7 +276,7 @@ i16()
 code()
 function DoTest {
     // A = room Id
-    ldx.w   #Project.EntityIds.MapCursor
+    ldx.w   #Project.PlayerIds.MapCursor
     ldy.w   #0
     jsr     GameLoop.Init_LoadRoom
 

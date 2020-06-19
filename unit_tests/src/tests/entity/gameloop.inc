@@ -79,7 +79,6 @@ SpawnList: {
     variable count_Particles = 0
     variable count_PlayerProjectiles = 0
     variable count_EnemyProjectiles = 0
-    variable count_Players = 0
     variable count_Enemies = 0
 
     evaluate n = 0
@@ -116,7 +115,6 @@ ExpectedSizes: {
     dw count_Particles
     dw count_PlayerProjectiles
     dw count_EnemyProjectiles
-    dw count_Players
     dw count_Enemies
     evaluate n = 0
     while {n} < 10 {
@@ -562,7 +560,6 @@ InitialExpectedSizes: {
     dw  0
     dw  0
     dw  0
-    dw  0
     assert(EntityLists.EntityList_0 == (pc() - InitialExpectedSizes) / 2)
 
     dw  4   // blank
@@ -586,8 +583,11 @@ MoveCameraTable: {
         dw  {activated} * 3
         dw  {deactivated} * 3
 
-        dw  0, 0, 0, 0, 0
+    ExpectedSizes{#}:
+        dw  0, 0, 0, 0
         dw  4, 0, 0, {e}, 4, {e}, 4, 0, {e}, 0
+
+        assert((pc() - ExpectedSizes{#}) / 2 == Entity.N_ENTITY_LISTS)
     }
 
     //   xPos    yPos    count  activated   deactivated

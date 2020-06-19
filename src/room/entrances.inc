@@ -62,12 +62,15 @@ a16()
 // REQUIRES: 16 bit A, 16 bit Index, DB = 0x7e, DP = 0
 // REQUIRES: Room loaded
 //
+// ASSUMES: MetaSprite Palette/VRAM slots empty
+// ASSUMES: Dma Queue empty
+//
 // INPUT: entranceId = entrance to load
-// INPUT: playerEntityDataId = player entity data id
-a16()
-i16()
-code()
-function SpawnPlayer {
+// INPUT: playerDataId = player entity data id
+macro _SpawnPlayer() {
+    assert16a()
+    assert16i()
+
     sep     #$20
 a8()
     lda.w   entranceId
@@ -85,12 +88,11 @@ a16()
     asl
     asl
     // carry clear
-    adc.w   dataAddr
+    adc.w   Entrances.dataAddr
     tax
 
     // X = RoomEntrance address
 
-    // ::TODO hard code player address::
     // ::TODO support multiple players::
 
     // Convert three byte position to entity position
@@ -98,7 +100,7 @@ a16()
     and.w   #Format.RoomEntrance.POSITION_MASK
     clc
     adc.w   #MetaTiles.map.LEFT
-    sta.w   Entity.Spawn.xPos
+    sta.w   Entity.Player.xPos.px
 
     assert(Format.RoomEntrance.POSITION_SHIFT == 8 + 4)
     lda.w   Format.RoomEntrance.position + 1,x
@@ -109,36 +111,16 @@ a16()
     and.w   #Format.RoomEntrance.POSITION_MASK
     clc
     adc.w   #MetaTiles.map.TOP
-    sta.w   Entity.Spawn.yPos
+    sta.w   Entity.Player.yPos.px
 
 
     lda.w   Format.RoomEntrance.orientation,x
     and.w   #Format.RoomEntrance.ORIENTATION_MASK
-    pha
+    tax
+    lda.l   Room.Entrances.OrientationTable,x
 
-        // Spawn player entity
-        lda.w   Room.playerEntityDataId
-        and.w   #0xff
-        ldy.w   #0
-        jsr     Entity.Spawn
-
-        // Y = entity address
-
-    // Set player orientation
-    // ::TODO move into spawn player code::
-    plx
-    sep     #$20
-a8()
-    lda.l   OrientationTable,x
-    sta.w   BaseEntity.movementState,y
-
-    rep     #$30
-a16()
-
-    // Center camera on player
-    // ::TODO define multiple cameras and select active camera::
-    tyx
-    jmp     Camera.CenterOnEntity_X
+    Entity._SpawnPlayer()
+}
 
 
 rodata(rom0)
@@ -149,7 +131,6 @@ OrientationTable:
     db  Entity.MovementState.FACING_RIGHT_FLAG | Entity.MovementState.UP_GRAVITY_FLAG  // UP_LEFT
 
 assert(pc() - OrientationTable == Format.RoomEntrance.ORIENTATION_MASK + 1)
-}
 
 }
 }

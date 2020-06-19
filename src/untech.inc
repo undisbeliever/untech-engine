@@ -75,6 +75,8 @@ include "metasprite/render.inc"
 include "metasprite/_common.inc"
 
 include "entity/instanceidtable.inc"
+include "entity/player.inc"
+
 include "entity/activewindow.inc"
 include "entity/allocation.inc"
 include "entity/counters.inc"

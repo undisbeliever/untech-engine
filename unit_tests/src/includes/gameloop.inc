@@ -11,7 +11,7 @@ namespace GameLoop {
 // REQUIRES: 16 bit A, 16 bit Index, Autojoy enabled, DB = 0x7e
 //
 // INPUT: A = roomId
-//        X = playerEntityDataId
+//        X = playerDataId
 //        Y = entranceId
 a16()
 i16()
@@ -19,7 +19,7 @@ code()
 function Init_LoadRoom {
     sep     #$10
 i8()
-    stx.w   Room.playerEntityDataId
+    stx.w   Room.playerDataId
     sty.w   Room.entranceId
 
     rep     #$30
@@ -59,11 +59,6 @@ function SpawnAllEntitiesInRoom {
 
     jsr     Room.EntityGroups.SpawnEntityGroups
 
-    ldx.w   {Entity.listAddress(Players)}
-    beq     +
-        // Assumes only one player
-        jsr     Camera.CenterOnEntity_X
-    +
     rts
 }
 
@@ -90,25 +85,6 @@ function ProcessUntilButtonPress {
 }
 
 
-// Draw the first player entity on the screen
-// REQUIRES: 16 bit A, 16 bit Index, DB = 0x7e, Init called
-macro _DrawPlayer() {
-    assert16a()
-    assert16i()
-
-    // Assumes only one player
-    // Assumes player has no custom drawing routine
-    lda.w   {Entity.listAddress(Players)}
-    beq     Skip{#}
-        tcd
-        jsr     MetaSprite.Render.RenderEntity
-
-        lda.w   #0
-        tcd
-Skip{#}:
-}
-
-
 // Processes a single frame of the Game Loop.
 //
 // This routine will also validate the entity lists at the end of the
@@ -124,25 +100,19 @@ function ProcessFrame {
     Entity.ProcessSpecialLists()
 
     MetaSprite.EntityHitbox.Begin()
+        MetaSprite.EntityHitbox.TestForCollisionsWithPlayer(EnemyProjectiles, Enemies)
         MetaSprite.EntityHitbox.TestCollisions(PlayerProjectiles,   Enemies)
-        MetaSprite.EntityHitbox.TestCollisions(Players,             EnemyProjectiles, Enemies)
     MetaSprite.EntityHitbox.End()
 
 
     // ::KUDOS NovaSquirrel::
     // ::: For making Nova the Squirrel 2 open source and showing me how to fix a camera/player-sprite desync::
 
-    // Player entities do not draw MetaSprites in their Process routine, that happens later.
-    Entity.ProcessEntityList(Players)
+    // The player does not draw MetaSprites in its Process routine, that happens later.
+    // ProcessPlayer is invoked outside the MetaSprite render loop to prevent a desync between the player sprites and camera
+    Entity.ProcessPlayer()
 
-    // Update camera based on player's position
-    // This is done outside the render loop to prevent a desync between the player sprites and camera
-    ldx.w   {Entity.listAddress(Players)}
-    beq     +
-        // Assumes only one player
-        jsr     Camera.CenterOnEntity_X
-    +
-
+    jsr     Camera.CenterOnPlayer
 
     // Update MetaTiles (if room is loaded in memory)
     jsr     MetaTiles.Render.Update
@@ -155,7 +125,7 @@ function ProcessFrame {
         Entity.ProcessEntityList(PlayerProjectiles)
         Entity.ProcessEntityList(EnemyProjectiles)
 
-        _DrawPlayer()
+        Entity.DrawPlayer()
 
         Entity.ProcessEntityList(Enemies)
 

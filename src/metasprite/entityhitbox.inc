@@ -65,6 +65,53 @@ macro End() {
 }
 
 
+// Preforms an EntityHitbox collision test between the player entity and an entity list
+//
+// This macro MUST BE invoked between a `MetaSprite.EntityHitbox.Begin()` and
+// `MetaSprite.EntityHitbox.End()` block.
+//
+// REQUIRES: 16 bit A, 16 bit Index, DP = 0, DB = EntityHitboxBank
+//
+// PARAM: entityList1 : entityListN - entity lists to test for collision with player
+macro TestForCollisionsWithPlayer(entityList) {
+    assert16a()
+    assert16i()
+
+    MetaSprite.EntityHitbox._TestInBlock()
+
+    MetaSprite.EntityHitbox._TestListWithPlayer({entityList})
+}
+macro TestForCollisionsWithPlayer(entityList1, entityList2) {
+    assert16a()
+    assert16i()
+
+    MetaSprite.EntityHitbox._TestInBlock()
+
+    MetaSprite.EntityHitbox._TestListWithPlayer({entityList1})
+    MetaSprite.EntityHitbox._TestListWithPlayer({entityList2})
+}
+macro TestForCollisionsWithPlayer(entityList1, entityList2, entityList3) {
+    assert16a()
+    assert16i()
+
+    MetaSprite.EntityHitbox._TestInBlock()
+
+    MetaSprite.EntityHitbox._TestListWithPlayer({entityList1})
+    MetaSprite.EntityHitbox._TestListWithPlayer({entityList2})
+    MetaSprite.EntityHitbox._TestListWithPlayer({entityList3})
+}
+macro TestForCollisionsWithPlayer(entityList1, entityList2, entityList3, entityList4) {
+    assert16a()
+    assert16i()
+
+    MetaSprite.EntityHitbox._TestInBlock()
+
+    MetaSprite.EntityHitbox._TestListWithPlayer({entityList1})
+    MetaSprite.EntityHitbox._TestListWithPlayer({entityList2})
+    MetaSprite.EntityHitbox._TestListWithPlayer({entityList3})
+    MetaSprite.EntityHitbox._TestListWithPlayer({entityList4})
+}
+
 
 // Preforms an EntityHitbox collision test between two entity lists.
 //
@@ -270,6 +317,25 @@ inline _TestInBlock() {
     MetaSprite.EntityHitbox.__EH_BLOCK = MetaSprite.EntityHitbox.__EH_BLOCK + 1
 }
 
+
+// Preforms the EntityHitbox collision test between the player and an entity list
+//
+// REQUIRES: 16 bit A, 16 bit Index, DP = 0, DB = EntityHitboxBank
+//
+// PARAM: entityList - the entityList
+inline _TestListWithPlayer(entityList) {
+    assert16a()
+    assert16i()
+
+    // ::TODO pre-calculate player entity OuterAabb::
+
+    lda.l   {Entity.listAddress({entityList})}
+    beq     EndIf{#}
+        tay
+        lda.w   #Entity.playerEntity
+        jsr     MetaSprite.EntityHitbox._TestTwoEntityLists
+    EndIf{#}:
+}
 
 
 // Preforms the EntityHitbox collision tests between two entity lists.
@@ -729,12 +795,12 @@ function _TestTwoEntityLists {
 
         if Data.FrameList >> 16 == EntityHitboxBank {
             ldy.w   Format.Frame.entityHitbox,x
-            beq     NoHitbox
+            beq     NoHitbox_A
 
             tax
         } else {
             lda.l   Format.Frame.entityHitbox,x
-            beq     NoHitbox
+            beq     NoHitbox_Y
 
             tyx
             tay
@@ -758,9 +824,16 @@ function _TestTwoEntityLists {
         jmp     _TestList_EntityA_MultipleHitboxes
 
 
-    NoHitbox:
+if Data.FrameList >> 16 == EntityHitboxBank {
+    NoHitbox_A:
+        // A = entityA
+        tax
+} else {
+    NoHitbox_Y:
         // Y = entityA
         tyx
+}
+        // X = entityA
         lda.b   BaseEntity.next,x
         bne     OuterLoop
 

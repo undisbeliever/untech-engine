@@ -21,7 +21,7 @@
 namespace Entities {
 
 namespace EhCollisionTest_Player {
-    buildFunctionTable(BaseEntityFunctionTable, EhCollisionTest_Player)
+    buildFunctionTable(BasePlayerFunctionTable, EhCollisionTest_Player)
 
     constant N_FRAMES = 8
 
@@ -30,6 +30,9 @@ namespace EhCollisionTest_Player {
             field(selectedFrame, 2)
         endstruct()
     }
+
+
+    constant DrawPlayer = MetaSprite.Render.RenderEntity
 
 
     // REQUIRES: 16 bit A, 16 bit Index, DB = 0x7e
@@ -55,19 +58,8 @@ namespace EhCollisionTest_Player {
     a16()
     i16()
     code()
-    function Destructor {
-        Text.Console.PrintConstString("Player.Destructor\n")
-        rts
-    }
-
-
-    // REQUIRES: 16 bit A, 16 bit Index, DB = 0x7e
-    // INPUT: DP = entity
-    a16()
-    i16()
-    code()
-    function Deactivated {
-        Text.Console.PrintConstString("Player.Deactivated\n")
+    function RoomAboutToChange {
+        Text.Console.PrintConstString("Player.RoomAboutToChange\n")
         rts
     }
 
@@ -131,7 +123,7 @@ namespace EhCollisionTest_Player {
 
         EndIf:
 
-        jmp     Entity.GotoNextEntity
+        rts
     }
 }
 
@@ -424,7 +416,7 @@ function Test {
 
 
     lda.w   #Project.RoomList.EmptyRoom
-    ldx.w   #Project.EntityIds.EhCollisionTest_Player
+    ldx.w   #Project.PlayerIds.EhCollisionTest_Player
     ldy.w   #0
     jsr     GameLoop.Init_LoadRoom
 

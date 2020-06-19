@@ -106,6 +106,8 @@ a16()
         bpl     -
 
 
+    Player._Init()
+
     _InstanceIdTable._Init()
 
     rts

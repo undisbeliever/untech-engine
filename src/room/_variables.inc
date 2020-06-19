@@ -29,9 +29,10 @@ allocate(roomId, wram7e, 1)
 // (byte)
 allocate(entranceId, wram7e, 1)
 
-// The player's entity data id
+// The player's Data id.
+// Used to determine which player to spawn when loading the game.
 // (byte)
-allocate(playerEntityDataId, wram7e, 1)
+allocate(playerDataId, wram7e, 1)
 
 
 namespace Entrances {

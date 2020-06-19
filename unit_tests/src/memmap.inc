@@ -28,7 +28,7 @@ createRamBlock(wram7f,      0x7f0000, 0x7fffff)
 // =============
 namespace Entity {
     constant ENTITY_SIZE = 64
-    constant N_ENTITIES = 64
+    constant N_ENTITIES = 63
 }
 
 // Allow tests to access entity pool

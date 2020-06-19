@@ -16,11 +16,49 @@ RegisterBreakId(ENTITY_IS_NOT_DEACTIVATED)
 RegisterBreakId(FREE_ENTITY_FUNC_TABLE_INVALID)
 RegisterBreakId(FREE_INSTANCE_ID_NOT_ZERO)
 RegisterBreakId(LAST_FREE_ENTITY_CORRUPT)
+RegisterBreakId(PLAYER_IS_INVALID)
 RegisterBreakId(INSTANCE_ID_INVALID)
 RegisterBreakId(INSTANCE_ID_TABLE_INVALID)
 
 
 namespace Entity {
+
+
+// Validate the player
+//
+// REQUIRES: 16 bit A, 16 bit Index, DB = 0x7e, DP = 0
+//
+// BRANCH: `PlayerIsInvalid` if the player is invalid
+macro __ValidatePlayer() {
+    assert16a()
+    assert16i()
+
+    sep     #$20
+a8()
+    // Player is not part of a linked list, its next field must be NULL
+    ldx.w   playerEntity + BaseEntity.next
+    bne     PlayerIsInvalid
+
+    // Player must not have an instanceId
+    lda.w   playerEntity + BaseEntity.instanceId
+    bne     PlayerIsInvalid
+
+    // Player's listId must be 0xff
+    lda.w   playerEntity + BaseEntity.listId
+    cmp.b   #0xff
+    bne     PlayerIsInvalid
+
+
+    // The player's MetaSprite state is not checked.
+    // The room might not be loaded, so the player might not have an active MetaSprite.
+    // (The entity unit tests do not load a room or spawn a player)
+
+
+    rep     #$30
+a16()
+}
+
+
 
 // Validates the number of entities in all the entity lists
 // and validates that the lists contain no infinite loop.
@@ -418,7 +456,11 @@ a16()
 }
 
 
+
 namespace ValidateEntityLists {
+
+PlayerIsInvalid:
+    break(PLAYER_IS_INVALID)
 
 InfiniteLoopDetected:
     break(INFINITE_LOOP)
@@ -472,6 +514,8 @@ a16()
 i16()
 code()
 function ValidateEntityLists {
+
+    __ValidatePlayer()
 
     __ValidateEntityLists()
 

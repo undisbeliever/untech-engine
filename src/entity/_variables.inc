@@ -31,11 +31,20 @@ namespace Entity {
     assert(ENTITY_SIZE > 0)
     assertPowerOfTwo(ENTITY_SIZE)
 
+    // Player entity data
+    //
+    // NOTE: The player entity is always active.
+    //
+    // NOTE: The player entity MUST HAVE its `next` field set to NULL (0)
+    //       (allows code reuse in entity hitbox collision tests).
+    allocate(playerEntity, entityBlock, ENTITY_SIZE)
+
+    // Pool from which all other entities are spawned from
     allocate(entityPool, entityBlock, ENTITY_SIZE * N_ENTITIES)
 
-    // assert that some entities will exist at the start of a page.
+    // Assert playerEntity is at the start of a page.
     // Entities that start on a page are faster than those that don't.
-    assert(entityPool & (ENTITY_SIZE - 1) == 0)
+    assert(playerEntity & 0xff == 0)
 }
 
 namespace BaseEntity {
@@ -120,6 +129,7 @@ namespace BaseEntity {
         field(movementState, 1)
     endstruct()
 }
+
 
 // Bitfield for the entity movement state
 namespace Entity.MovementState {
@@ -302,6 +312,22 @@ namespace Entity {
     //
     // (byte index)
     allocate(minimumInstanceId, wram7e, 1)
+
+
+    // Player
+    // ======
+    namespace Player {
+        // The position of the player entity
+        // (2 x unsigned 0:16:16 fixed point)
+        constant xPos.sx = playerEntity + BaseEntity.xPos.sx
+        constant xPos.px = playerEntity + BaseEntity.xPos.px
+        constant yPos.sx = playerEntity + BaseEntity.yPos.sx
+        constant yPos.px = playerEntity + BaseEntity.yPos.px
+
+        // The player's movement state
+        // (uint8, Entity.MovementState bitfield)
+        constant movementState = playerEntity + BaseEntity.movementState
+    }
 }
 
 // vim: ft=bass-65816 ts=4 sw=4 et:

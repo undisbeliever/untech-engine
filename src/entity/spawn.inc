@@ -219,6 +219,113 @@ allocateTmpWord(yPos)
 
 
 
+// Spawns the player entity
+//
+// NOTE: This function overrides the previous entity.
+//
+// NOTE: This function will always activate the entity.
+//
+// MUST ONLY BE INVOKED BY `Room.Entrances.SpawnPlayer`
+//
+// REQUIRES: 16 bit A, 16 bit Index, DB = $7E, DP = 0
+//
+// ASSUMES: MetaSprite Palette/VRAM slots empty
+// ASSUMES: Dma Queue empty
+//
+// INPUT: A = movementState of the player
+//        Room.playerDataId = the Data id of the player
+//        Entity.Player.xPos.px, Entity.Player.yPos.px = player position
+macro _SpawnPlayer() {
+    assert16a()
+    assert16i()
+
+    // Y = Room.Format.EntityGroup.Entities address
+
+    sep     #$20
+a8()
+    sta.w   Entity.playerEntity + BaseEntity.movementState
+
+    lda.w   Room.playerDataId
+    cmp.b   #Entity.Data.PlayerRomDataListCount
+    bcc     +
+        break(INVALID_ENTITY_ID)
+    +
+
+    rep     #$31
+a16()
+    and.w   #0xff
+    // carry clear
+    adc.w   #Entity.Data.PlayerRomDataListOffset
+    asl
+    tax
+
+
+    lda.w   #Entity.playerEntity
+    tcd
+// DP = playerEntity
+
+    // player entity has no next entity
+    stz.b   BaseEntity.next
+
+    // Get Function Table
+    // X = entity Data Id * 2
+    lda.l   Entity.Data.FunctionTables,x
+    sta.b   BaseEntity.functionTable
+
+    // Get Entity ROM Data
+    lda.l   Entity.Data.EntityRomDataList,x
+    tax
+    stx.b   BaseEntity.romPtr
+
+    // Reset player subpixel position (position set by Room.Entrances._SpawnPlayer)
+    stz.b   BaseEntity.xPos.sx
+    stz.b   BaseEntity.yPos.sx
+
+    // Reset momentum
+    assert(BaseEntity.yMomentum.sx - BaseEntity.xMomentum.sx == 3)
+    stz.b   BaseEntity.xMomentum.sx
+    stz.b   BaseEntity.xMomentum.sx + 2
+    stz.b   BaseEntity.xMomentum.sx + 4
+
+
+    // Player entities have no instanceId
+    assert(BaseEntity.instanceId + 1 == BaseEntity.projectileId) // check if safe to preform a 16 bit store here)
+    stz.b   BaseEntity.instanceId
+
+    // Set projectileId and clear listId
+    assert(BaseEntity.projectileId + 1 == BaseEntity.listId)
+    assert(BaseEntityRomStruct.initialProjectileId + 1 == BaseEntityRomStruct.initialListId)
+    lda.l   BaseEntityRomStruct.initialProjectileId,x
+    ora.w   #0xff00
+    sta.b   BaseEntity.projectileId
+
+    // Initiate the MetaSprite
+    lda.l   BaseEntityRomStruct.defaultPalette,x
+    tay
+    lda.l   BaseEntityRomStruct.frameSetId,x
+
+    MetaSprite._InitEntity()
+
+
+    // Call Player Init function
+    ldx.b   BaseEntity.functionTable
+    lda.w   #0
+    jsr     (BasePlayerFunctionTable.Init,x)
+
+
+    // Activate player
+    //
+    // This should always succeed as the first thing the room subsystem does is load the player entity
+    jsr     MetaSprite.Activate
+
+
+    lda.w   #0
+    tcd
+// DP = 0
+}
+
+
+
 // Spawn a new room entity from an room entity group
 //
 // MUST ONLY BE INVOKED BY `Room.EntityGroups.SpawnEntityGroups`

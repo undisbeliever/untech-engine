@@ -11,7 +11,7 @@
 //  * ActionPoints.ManualEnemyProjectile
 //  * Entity.BaseEntityRomStruct.initialProjectileId
 //  * Entity.SpawnManualEnemyProjectiles
-//  * Entity.DeleteIfOutsideAndGotoNextEntity
+//  * Entity.DeleteIfOutsideAndGotoNextEntity (in the EightDirectionRedProjectile)
 //  * Entity.CountEntitiesInList
 //  * Entity.MoveEntity() (Entity.MovementState.NO_GRAVITY_FLAG set)
 
@@ -139,7 +139,9 @@ namespace EightDirectionProjectile {
 
 
 namespace ActionPointSpawner {
-    buildFunctionTable(BaseEntityFunctionTable, ActionPointSpawner)
+    buildFunctionTable(BasePlayerFunctionTable, ActionPointSpawner)
+
+    constant DrawPlayer = MetaSprite.Render.RenderEntity
 
     // OUT: C set = always activate entity
     a16()
@@ -158,16 +160,13 @@ namespace ActionPointSpawner {
             break(ASSERT_FAILURE)
         +
 
-        // always activate
-        sec
         rts
     }
 
     a16()
     i16()
     code()
-    Destructor:
-    Deactivated:
+    RoomAboutToChange:
     ProcessCollision:
     function Null {
         rts
@@ -202,7 +201,7 @@ namespace ActionPointSpawner {
         i16()
         +
 
-        jmp     Entity.DrawAndGotoNextEntity
+        jmp     MetaSprite.Animation.Process
     }
 }
 }
@@ -241,7 +240,7 @@ code()
 Test.add("ActionPointSpawner Test")
 function Test {
     lda.w   #Project.RoomList.EmptyRoom
-    ldx.w   #Project.EntityIds.Blank_0
+    ldx.w   #Project.PlayerIds.ActionPointSpawner
     ldy.w   #0
     jsr     GameLoop.Init_LoadRoom
 
@@ -251,27 +250,10 @@ function Test {
 
     jsr     Test.PrintCurrentTestName
 
-    Text.Console.SetCursor(0, 4)
-    Text.Console.PrintConstString("Also tests:\n  DeleteAndGotoNextEntity")
-
     Text.Console.SetCursor(0, 7)
     Text.Console.PrintConstString("Press L/R to spawn\n  Manual Projectiles")
 
     jsr     EnableDisplay_Full
-
-
-    // Load the entity
-
-    lda.w   #MetaTiles.map.LEFT + Camera.DISPLAY_WIDTH / 2
-    sta.w   Entity.Spawn.xPos
-
-    lda.w   #MetaTiles.map.TOP + Camera.DISPLAY_HEIGHT / 2
-    sta.w   Entity.Spawn.yPos
-
-    lda.w   #Project.EntityIds.ActionPointSpawner
-
-    jsr     Entity.Spawn
-    bcc     Fail
 
 
     // Process the Game Loop

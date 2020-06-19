@@ -11,6 +11,31 @@
 
 namespace Camera {
 
+
+// Centers the camera on the player entity
+//
+// REQUIRES: 16 bit A, 16 bit Index, DB = $7E, DP = 0
+//
+// INPUT: X = entity
+a16()
+i16()
+code()
+function CenterOnPlayer {
+    lda.w   Entity.Player.xPos.px
+    sec
+    sbc.w   #DISPLAY_WIDTH / 2
+    tax
+
+    lda.w   Entity.Player.yPos.px
+    sec
+    sbc.w   #DISPLAY_HEIGHT / 2
+    tay
+
+    jmp     SetPosition_XY
+}
+
+
+
 // Centers the camera on a given entity
 //
 // REQUIRES: 16 bit A, 16 bit Index, DB = $7E, DP = 0

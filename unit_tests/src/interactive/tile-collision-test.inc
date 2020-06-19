@@ -11,7 +11,7 @@
 namespace Entities {
 
 namespace TileCollisionTestPlayer {
-    buildFunctionTable(BaseEntityFunctionTable, TileCollisionTestPlayer)
+    buildFunctionTable(BasePlayerFunctionTable, TileCollisionTestPlayer)
 
     namespace EntityStruct {
     childstruct(BaseEntity)
@@ -25,9 +25,11 @@ namespace TileCollisionTestPlayer {
     constant Y_MOMENTUM  = 0x010000
 
 
+    constant DrawPlayer = MetaSprite.Render.RenderEntity
+
+
     // REQUIRES: 16 bit A, 16 bit Index, DB = 0x7e
     // INPUT: DP = entity
-    // OUTPUT: C set = always activate entity
     a16()
     i16()
     code()
@@ -36,8 +38,6 @@ namespace TileCollisionTestPlayer {
         sta.b   EntityStruct.currentFrame
         SetFrame_A()
 
-        // always activate
-        sec
         rts
     }
 
@@ -47,8 +47,7 @@ namespace TileCollisionTestPlayer {
     a16()
     i16()
     code()
-    Destructor:
-    Deactivated:
+    RoomAboutToChange:
     ProcessCollision:
     function Null {
         rts
@@ -188,8 +187,7 @@ namespace TileCollisionTestPlayer {
         // Move camera to center of entity
         rep     #$30
     a16()
-
-        jmp     Entity.GotoNextEntity
+        rts
     }
 }
 }
@@ -238,7 +236,7 @@ code()
 function Test {
 
     // A = room Id
-    ldx.w   #Project.EntityIds.TileCollisionTestPlayer
+    ldx.w   #Project.PlayerIds.TileCollisionTestPlayer
     ldy.w   #2              // Test loading a non-zero entranceId
     jsr     GameLoop.Init_LoadRoom
 
@@ -288,13 +286,11 @@ a16()
     a8()
         Text.Console.SetCursor(25, 2)
 
-        ldx.w   {Entity.listAddress(Players)}
-        lda.b   BaseEntity.movementState,x
+        lda.w   Entity.Player.movementState
         jsr     Text.Console.PrintHex8A
 
         Text.Console.SetCursor(21, 3)
-        ldx.w   {Entity.listAddress(Players)}
-        lda.b   Entities.TileCollisionTestPlayer.EntityStruct.tcReturnCarry,x
+        lda.w   Entity.playerEntity + Entities.TileCollisionTestPlayer.EntityStruct.tcReturnCarry
         beq     +
             Text.Console.PrintConstString("C ")
             bra     ++
@@ -302,8 +298,7 @@ a16()
             Text.Console.PrintConstString("  ")
         +
 
-        ldx.w   {Entity.listAddress(Players)}
-        ldy.b   Entities.TileCollisionTestPlayer.EntityStruct.tcReturnY,x
+        ldy.w   Entity.playerEntity + Entities.TileCollisionTestPlayer.EntityStruct.tcReturnY
         jsr     Text.Console.PrintHex16Y
 
         rep     #$20

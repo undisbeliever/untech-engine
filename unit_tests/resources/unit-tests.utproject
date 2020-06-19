@@ -7,7 +7,6 @@
     <listid name="Particles"/>
     <listid name="PlayerProjectiles"/>
     <listid name="EnemyProjectiles"/>
-    <listid name="Players"/>
     <listid name="Enemies"/>
     <listid name="EntityList_0"/>
     <listid name="EntityList_1"/>
@@ -20,6 +19,7 @@
     <listid name="EntityList_8"/>
     <listid name="EntityList_9"/>
     <function-table name="Blank" export-order="OneFrame" parameter-type="unused"/>
+    <function-table name="BlankPlayer" export-order="OneFrame" parameter-type="unused"/>
     <function-table name="ChangeToParticle" export-order="OneFrame" parameter-type="unused"/>
     <function-table name="DeactivateIfOutside" export-order="OneFrame" parameter-type="unused"/>
     <function-table name="DeleteIfOutside" export-order="OneFrame" parameter-type="unused"/>
@@ -88,19 +88,22 @@
       <entry name="DeleteIfAnimationEnds" function-table="DeleteIfAnimationEnds" listid="EntityList_0" frameset="DeleteIfAnimationEnds" frame="frame1" palette="0"/>
       <entry name="SpawnAndChangeList" function-table="SpawnAndChangeList" listid="EntityList_0" frameset="FST_OneTileFixed1" frame="frame" palette="0"/>
       <entry name="ShowAllFrames" function-table="ShowAllFrames" listid="EntityList_0" frameset="FST_OneTileFixed1" frame="frame" palette="0"/>
-      <entry name="ActionPointSpawner" function-table="ActionPointSpawner" projectileid="EightDirectionRedProjectile" listid="Enemies" frameset="ActionPointSpawner" frame="playerProjectile0" palette="0"/>
       <entry name="EightDirectionProjectile" function-table="EightDirectionProjectile" listid="Particles" frameset="Projectile" frame="frame" palette="0"/>
-      <entry name="EhCollisionTest_Player" function-table="EhCollisionTest_Player" listid="Players" frameset="EhCollisionTest_Player" frame="frame1" palette="0"/>
       <entry name="EhCollisionTest_Enemy" function-table="EhCollisionTest_Enemy" listid="Enemies" frameset="EhCollisionTest_Enemy" frame="box" palette="0"/>
       <entry name="EhCollisionTest_BlankEnemy" function-table="Blank" listid="Enemies" frameset="FST_OneTileFixed1" frame="frame" palette="0"/>
       <entry name="EhCollisionTest_CollisionCentre" function-table="EhCollisionTest_CollisionCentre" listid="Particles" frameset="EhCollisionTest_Centre" frame="frame" palette="0"/>
-      <entry name="MapCursor" function-table="MapCursor" listid="Players" frameset="Cursor" frame="frame" palette="0"/>
-      <entry name="TileCollisionTestPlayer" function-table="TileCollisionTestPlayer" listid="Players" frameset="TileCollisionTestPlayer" frame="frame1" palette="0"/>
     </entities>
     <projectiles>
       <entry name="EightDirectionGreenProjectile" function-table="EightDirectionProjectile" listid="PlayerProjectiles" frameset="Projectile" frame="frame" palette="1"/>
       <entry name="EightDirectionRedProjectile" function-table="EightDirectionProjectile" listid="PlayerProjectiles" frameset="Projectile" frame="frame" palette="2"/>
     </projectiles>
+    <players>
+      <entry name="Blank" function-table="BlankPlayer" frameset="FST_OneTileFixed1" frame="frame" palette="0"/>
+      <entry name="TileCollisionTestPlayer" function-table="TileCollisionTestPlayer" frameset="TileCollisionTestPlayer" frame="frame1" palette="0"/>
+      <entry name="EhCollisionTest_Player" function-table="EhCollisionTest_Player" frameset="EhCollisionTest_Player" frame="frame1" palette="0"/>
+      <entry name="MapCursor" function-table="MapCursor" frameset="Cursor" frame="frame" palette="0"/>
+      <entry name="ActionPointSpawner" function-table="ActionPointSpawner" projectileid="EightDirectionRedProjectile" frameset="ActionPointSpawner" frame="playerProjectile0" palette="0"/>
+    </players>
   </entity-rom-data>
   <action-point-function name="PlayerProjectile"/>
   <action-point-function name="EnemyProjectile"/>

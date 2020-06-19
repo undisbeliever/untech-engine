@@ -213,7 +213,7 @@ code()
 Test.add("Entity/MetaSprite Test")
 function Test {
     lda.w   #Project.RoomList.EmptyRoom
-    ldx.w   #Project.EntityIds.Blank_0
+    ldx.w   #Project.PlayerIds.Blank
     ldy.w   #0
     jsr     GameLoop.Init_LoadRoom
 

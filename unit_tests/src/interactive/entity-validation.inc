@@ -357,7 +357,7 @@ a16()
 i16()
 code()
 function MenuRoutine8 {
-    // list->next->listId = EntityLists.Players
+    // list->next->listId = EntityLists.EntityList_4
 
     ldy.w   {Entity.listAddress({ENTITY_LIST_ID})}
     beq     Fail
@@ -367,9 +367,10 @@ function MenuRoutine8 {
 
     // X = second entity in list
 
+    assert(EntityLists.{ENTITY_LIST_ID} != EntityLists.EntityList_4)
     sep     #$20
 a8()
-    lda.b   #EntityLists.Players
+    lda.b   #EntityLists.EntityList_4
     sta.b   BaseEntity.listId,x
 
     rep     #$30

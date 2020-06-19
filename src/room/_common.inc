@@ -34,7 +34,7 @@ namespace Room {
 // INPUT: A = room Id
 //
 // INPUT: entranceId = entrance to load
-// INPUT: playerEntityDataId = player entity data id
+// INPUT: playerDataId = player entity data id
 a16()
 i16()
 code()
@@ -118,7 +118,12 @@ a16()
 
     jsr     Camera.Init
 
-    jsr     Room.Entrances.SpawnPlayer
+
+    Room.Entrances._SpawnPlayer()
+
+    // Center camera on player
+    // ::TODO define multiple cameras and select active camera::
+    jsr     Camera.CenterOnPlayer
 
 
     lda.w   Format.Header.sceneId

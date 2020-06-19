@@ -4,7 +4,9 @@
 
 namespace EntityTest {
 
-// Process the entity lists and special lists
+// Process the entity lists and special lists.
+//
+// NOTE: This routine DOES NOT process the player.
 //
 // REQUIRES: 16 bit A, 16 bit Index, DB = 0x7e, DP = 0
 a16()
@@ -15,8 +17,6 @@ function ProcessEntityGameLoop {
     tcd
 
     Entity.ProcessSpecialLists()
-
-    Entity.ProcessEntityList(Players)
 
     Entity.ProcessEntityList(Particles)
     Entity.ProcessEntityList(PlayerProjectiles)
