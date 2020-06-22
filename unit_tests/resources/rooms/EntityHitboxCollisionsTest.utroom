@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF_8"?>
+<!DOCTYPE untech>
+<room name="EntityHitboxCollisionsTest" scene="TileCollisionTest">
+  <map width="16" height="14">
+    AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+    AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+    AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+    AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+    AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=
+  </map>
+  <entrance name="Player" x="128" y="160" orientation="down-right"/>
+  <entity-group name="DoNotSpawn_1">
+    <entity entity="EightDirectionProjectile" x="128" y="80" parameter=""/>
+    <entity entity="EightDirectionProjectile" x="96" y="80" parameter=""/>
+    <entity entity="EightDirectionProjectile" x="160" y="80" parameter=""/>
+  </entity-group>
+  <entity-group name="DoNotSpawn_2">
+    <entity entity="EightDirectionProjectile" x="128" y="90" parameter=""/>
+    <entity entity="EightDirectionProjectile" x="96" y="90" parameter=""/>
+    <entity entity="EightDirectionProjectile" x="160" y="90" parameter=""/>
+  </entity-group>
+  <entity-group name="Enemies">
+    <entity entity="EhCollisionTest_Enemy" x="105" y="154" parameter="0"/>
+    <entity entity="EhCollisionTest_Enemy" x="138" y="134" parameter="1"/>
+    <entity entity="EhCollisionTest_Enemy" x="138" y="154" parameter="2"/>
+    <entity entity="EhCollisionTest_Enemy" x="138" y="174" parameter="3"/>
+    <entity entity="EhCollisionTest_Enemy" x="138" y="194" parameter="4"/>
+    <entity entity="EhCollisionTest_Enemy" x="114" y="161" parameter="0"/>
+    <entity entity="EhCollisionTest_Enemy" x="147" y="141" parameter="1"/>
+    <entity entity="EhCollisionTest_Enemy" x="147" y="161" parameter="2"/>
+    <entity entity="EhCollisionTest_Enemy" x="147" y="181" parameter="3"/>
+    <entity entity="EhCollisionTest_Enemy" x="147" y="201" parameter="4"/>
+  </entity-group>
+  <entity-group name="Blank">
+    <entity entity="EhCollisionTest_BlankEnemy" x="128" y="130" parameter=""/>
+    <entity entity="EhCollisionTest_BlankEnemy" x="128" y="140" parameter=""/>
+    <entity entity="EhCollisionTest_BlankEnemy" x="128" y="150" parameter=""/>
+    <entity entity="EhCollisionTest_BlankEnemy" x="128" y="160" parameter=""/>
+    <entity entity="EhCollisionTest_BlankEnemy" x="128" y="170" parameter=""/>
+    <entity entity="EhCollisionTest_BlankEnemy" x="128" y="180" parameter=""/>
+    <entity entity="EhCollisionTest_BlankEnemy" x="128" y="190" parameter=""/>
+    <entity entity="EhCollisionTest_BlankEnemy" x="128" y="200" parameter=""/>
+  </entity-group>
+  <entity-group name="DoNotSpawn_3">
+    <entity entity="EightDirectionProjectile" x="128" y="100" parameter=""/>
+    <entity entity="EightDirectionProjectile" x="96" y="100" parameter=""/>
+    <entity entity="EightDirectionProjectile" x="160" y="100" parameter=""/>
+  </entity-group>
+  <entity-group name="DoNotSpawn_4">
+    <entity entity="EightDirectionProjectile" x="128" y="110" parameter=""/>
+    <entity entity="EightDirectionProjectile" x="96" y="110" parameter=""/>
+    <entity entity="EightDirectionProjectile" x="160" y="110" parameter=""/>
+  </entity-group>
+</room>

@@ -15,6 +15,9 @@
 //
 // Tests:
 //  * The Entity Loop
+//  * Spawning Room Entities
+//  * Room Entity Parameters
+//  * Not Spawning Room Entity Groups
 //  * MetaSprite EntityHitbox Collisions
 //  * Entity.SpawnAtMetaSpriteCollisionCentre
 
@@ -253,9 +256,8 @@ namespace EhCollisionTest_CollisionCentre {
 namespace InteractiveTests {
 namespace EntityHitboxCollisionsTest {
 
-constant _tmp_index                   = Test.tmp + 0
-constant _collisionBits               = Test.tmp + 2
-constant _processCollisionArgumentsOk = Test.tmp + 4
+constant _collisionBits               = Test.tmp + 0
+constant _processCollisionArgumentsOk = Test.tmp + 2
 
 // Prints the ProcessCollision arguments to screen.
 //
@@ -348,62 +350,6 @@ BitsString:
 
 
 
-rodata(rom0)
-namespace EnemyTable {
-constant Y_DELTA = 20
-constant N_COLUMNS = 4
-
-constant Y_BOTTOM = MetaTiles.map.TOP + Camera.DISPLAY_HEIGHT - 30
-
-constant X_LEFT = MetaTiles.map.LEFT + Camera.DISPLAY_WIDTH / 3 + 20
-constant X_RIGHT = MetaTiles.map.LEFT + Camera.DISPLAY_WIDTH / 2 + 10
-constant X_CENTER = MetaTiles.map.LEFT + Camera.DISPLAY_WIDTH / 2
-
-    struct(pc())
-        field(entityDataId, 2)
-        field(xPos, 2)
-        field(yPos, 2)
-        field(parameter, 2)
-    endstruct()
-
-evaluate EN_ID = EntityLists.Enemies
-
-constant ENEMY  = Project.EntityIds.EhCollisionTest_Enemy
-constant BLANK  = Project.EntityIds.EhCollisionTest_BlankEnemy
-
-
-Data:
-    //  entity, xPos,           yPos,                       frameId
-
-    dw  BLANK,  X_CENTER,       Y_BOTTOM - Y_DELTA * 2,     0
-    dw  BLANK,  X_CENTER,       Y_BOTTOM - Y_DELTA * 2,     0
-    dw  BLANK,  X_CENTER,       Y_BOTTOM - Y_DELTA * 2,     0
-
-    dw  ENEMY,  X_LEFT,         Y_BOTTOM - Y_DELTA * 2,     MSEO.EhCollisionTest_Enemy.Frames.box
-    dw  ENEMY,  X_RIGHT,        Y_BOTTOM - Y_DELTA * 3,     MSEO.EhCollisionTest_Enemy.Frames.row1
-    dw  ENEMY,  X_RIGHT,        Y_BOTTOM - Y_DELTA * 2,     MSEO.EhCollisionTest_Enemy.Frames.row2
-    dw  ENEMY,  X_RIGHT,        Y_BOTTOM - Y_DELTA * 1,     MSEO.EhCollisionTest_Enemy.Frames.row3
-    dw  ENEMY,  X_RIGHT,        Y_BOTTOM - Y_DELTA * 0,     MSEO.EhCollisionTest_Enemy.Frames.row4
-
-    dw  BLANK,  X_CENTER,       Y_BOTTOM - Y_DELTA * 2,     0
-    dw  BLANK,  X_CENTER,       Y_BOTTOM - Y_DELTA * 2,     0
-    dw  BLANK,  X_CENTER,       Y_BOTTOM - Y_DELTA * 2,     0
-
-    dw  ENEMY,  X_LEFT  + 9,    Y_BOTTOM - Y_DELTA * 2 + 7, MSEO.EhCollisionTest_Enemy.Frames.box
-    dw  ENEMY,  X_RIGHT + 9,    Y_BOTTOM - Y_DELTA * 3 + 7, MSEO.EhCollisionTest_Enemy.Frames.row1
-    dw  ENEMY,  X_RIGHT + 9,    Y_BOTTOM - Y_DELTA * 2 + 7, MSEO.EhCollisionTest_Enemy.Frames.row2
-    dw  ENEMY,  X_RIGHT + 9,    Y_BOTTOM - Y_DELTA * 1 + 7, MSEO.EhCollisionTest_Enemy.Frames.row3
-    dw  ENEMY,  X_RIGHT + 9,    Y_BOTTOM - Y_DELTA * 0 + 7, MSEO.EhCollisionTest_Enemy.Frames.row4
-
-    dw  BLANK,  X_CENTER,       Y_BOTTOM - Y_DELTA * 2,     0
-    dw  BLANK,  X_CENTER,       Y_BOTTOM - Y_DELTA * 2,     0
-    dw  BLANK,  X_CENTER,       Y_BOTTOM - Y_DELTA * 2,     0
-
-constant N_ENEMIES = (pc() - Data) / size
-}
-
-
-
 // EntityHitbox Interactive test.
 //
 // REQUIRES: 16 bit A, 16 bit Index, DP = 0 DB = 0x7e
@@ -417,10 +363,18 @@ function Test {
     sta.w   _processCollisionArgumentsOk
 
 
-    lda.w   #Project.RoomList.EmptyRoom
+    lda.w   #Project.RoomList.EntityHitboxCollisionsTest
     ldx.w   #Project.PlayerIds.EhCollisionTest_Player
     ldy.w   #0
     jsr     GameLoop.Init_LoadRoom
+
+
+    // Only spawn entity groups 2 & 1.
+    // Do not spawn entity group 0, 1, 3, or 4.
+    lda.w   #0b001100
+    tsb.w   Room.EntityGroups.toActivateBitfield
+
+    jsr     Room.EntityGroups.SpawnEntityGroups
 
 
     jsr     Resources.TransferToPpu
@@ -428,34 +382,6 @@ function Test {
 
 
     jsr     EnableDisplay_Full
-
-
-    // Load the entities
-
-    ldx.w   #0
-    SpawnEnemyLoop:
-        stx.w   _tmp_index
-
-        lda.l   EnemyTable.xPos,x
-        sta.w   Entity.Spawn.xPos
-
-        lda.l   EnemyTable.yPos,x
-        sta.w   Entity.Spawn.yPos
-
-        lda.l   EnemyTable.parameter,x
-        tay
-
-        lda.l   EnemyTable.entityDataId,x
-
-        jsr     Entity.Spawn
-        bcc     Fail
-
-        lda.w   _tmp_index
-        clc
-        adc.w   #EnemyTable.size
-        tax
-        cpx.w   #EnemyTable.size * EnemyTable.N_ENEMIES
-        bcc     SpawnEnemyLoop
 
 
     // Process the Game Loop

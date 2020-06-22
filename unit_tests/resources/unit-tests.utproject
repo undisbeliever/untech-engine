@@ -22,11 +22,11 @@
     <function-table name="ChangeToParticle" type="entity" export-order="OneFrame" parameter-type="unused"/>
     <function-table name="DeactivateIfOutside" type="entity" export-order="OneFrame" parameter-type="unused"/>
     <function-table name="DeleteIfOutside" type="entity" export-order="OneFrame" parameter-type="unused"/>
-    <function-table name="DeleteAfterDelay" type="entity" export-order="OneFrame" parameter-type="word" comment="parameter is delay in frames"/>
+    <function-table name="DeleteAfterDelay" type="entity" export-order="OneFrame" parameter-type="unsigned" comment="parameter is delay in frames"/>
     <function-table name="DeleteIfAnimationEnds" type="entity" export-order="SingleAnimation" parameter-type="unused"/>
     <function-table name="SpawnAndChangeList" type="entity" export-order="OneFrame" parameter-type="unused"/>
-    <function-table name="ShowAllFrames" type="entity" export-order="OneFrame" parameter-type="word" comment="exportOrder ignored, Parameter is frameSet to display"/>
-    <function-table name="EhCollisionTest_Enemy" type="entity" export-order="EhCollisionTest_Enemy" parameter-type="unused"/>
+    <function-table name="ShowAllFrames" type="entity" export-order="OneFrame" parameter-type="unsigned" comment="exportOrder ignored, Parameter is frameSet to display"/>
+    <function-table name="EhCollisionTest_Enemy" type="entity" export-order="EhCollisionTest_Enemy" parameter-type="unsigned" comment="Parameter is the frame to display"/>
     <function-table name="EhCollisionTest_CollisionCentre" type="entity" export-order="OneFrame" parameter-type="unused"/>
     <function-table name="EightDirectionEntity" type="entity" export-order="OneFrame" parameter-type="unused"/>
     <function-table name="EightDirectionProjectile" type="projectile" export-order="OneFrame" parameter-type="unused"/>
@@ -90,7 +90,7 @@
       <entry name="SpawnAndChangeList" function-table="SpawnAndChangeList" listid="EntityList_0" frameset="FST_OneTileFixed1" frame="frame" palette="0"/>
       <entry name="ShowAllFrames" function-table="ShowAllFrames" listid="EntityList_0" frameset="FST_OneTileFixed1" frame="frame" palette="0"/>
       <entry name="EightDirectionProjectile" function-table="EightDirectionEntity" listid="Particles" frameset="Projectile" frame="frame" palette="0"/>
-      <entry name="EhCollisionTest_Enemy" function-table="EhCollisionTest_Enemy" listid="Enemies" frameset="EhCollisionTest_Enemy" frame="box" palette="0"/>
+      <entry name="EhCollisionTest_Enemy" function-table="EhCollisionTest_Enemy" listid="Enemies" frameset="EhCollisionTest_Enemy" frame="row1" palette="0"/>
       <entry name="EhCollisionTest_BlankEnemy" function-table="Blank" listid="Enemies" frameset="FST_OneTileFixed1" frame="frame" palette="0"/>
       <entry name="EhCollisionTest_CollisionCentre" function-table="EhCollisionTest_CollisionCentre" listid="Particles" frameset="EhCollisionTest_Centre" frame="frame" palette="0"/>
     </entities>
@@ -101,7 +101,7 @@
     <players>
       <entry name="Blank" function-table="BlankPlayer" frameset="FST_OneTileFixed1" frame="frame" palette="0"/>
       <entry name="TileCollisionTestPlayer" function-table="TileCollisionTestPlayer" frameset="TileCollisionTestPlayer" frame="frame1" palette="0"/>
-      <entry name="EhCollisionTest_Player" function-table="EhCollisionTest_Player" frameset="EhCollisionTest_Centre" frame="frame1" palette="0"/>
+      <entry name="EhCollisionTest_Player" function-table="EhCollisionTest_Player" frameset="EhCollisionTest_Player" frame="frame1" palette="0"/>
       <entry name="MapCursor" function-table="MapCursor" frameset="Cursor" frame="frame" palette="0"/>
       <entry name="ActionPointSpawner" function-table="ActionPointSpawner" projectileid="EightDirectionRedProjectile" frameset="ActionPointSpawner" frame="playerProjectile0" palette="0"/>
     </players>
@@ -157,6 +157,7 @@
   <room-file src="rooms/MetaTileRenderTestSmall.utroom"/>
   <room-file src="rooms/MetaTileRenderTestLarge.utroom"/>
   <room-file src="rooms/EmptyRoom.utroom"/>
+  <room-file src="rooms/EntityHitboxCollisionsTest.utroom"/>
   <scene-setting name="UnitTests" bg-mode="0" layer0-type="text" layer1-type="" layer2-type="" layer3-type=""/>
   <scene-setting name="Mode1_Bg2MT_NoImage" bg-mode="1bg3" layer0-type="" layer1-type="mt-tileset" layer2-type="text" layer3-type=""/>
   <scene-setting name="SettingSun" bg-mode="1bg3" layer0-type="mt-tileset" layer1-type="bg-image" layer2-type="text" layer3-type=""/>
