@@ -7,6 +7,7 @@
 //  * MetaTiles.LoadTileset
 //  * MetaTiles.MoveEntityAndProcessTileCollisions
 //  * MetaSprite Tile Collision Hitbox
+//  * MetaTile Tile Priority
 
 namespace Entities {
 namespace Players {
