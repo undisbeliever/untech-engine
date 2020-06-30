@@ -231,18 +231,10 @@ au()
 i16()
 code()
 function Divide.u16y_u16x {
-    // Inspiration: http://codebase64.org/doku.php?id=base:16bit_division_16-bit_result
-
-    // if divisor < 256
-    //  calculate using SNES registers
-    // else
-    //  remainder = 0
-    //  repeat 16 times
-    //      remainder << 1 | MSB(dividend)
-    //      dividend << 1
-    //      if (remainder >= divisor)
-    //          remainder -= divisor
-    //          result++
+    //  if divisor < 256
+    //      calculate using the SNES registers
+    //  else
+    //      calculate using the 16 bit division algorithm
 
 constant divisor = tmp1
 
@@ -279,40 +271,68 @@ i16()
 
 
 LargeX:
-    // X > 256
+    // divisor (X) > 256
+
+    // using DP to access divisor saves 2 cycles
+    // and allows this scope to be called with DB anywhere
+    assertShadowRam(divisor)
+    assert((divisor & 0xff00) == ((divisor + 1) & 0xff00))
+
+    // ::KUDOS codebase64 wiki for the original algorithm::
+    // ::: http://codebase64.org/doku.php?id=base:16bit_division_16-bit_result ::
+
+    // ::KUDOS Ben Eater for the improved division algorithm::
+    // ::: Binary to decimal can’t be that hard, right? https://www.youtube.com/watch?v=v3-a-zqKfgA ::
+    // (The improved algorithm uses less ROM space and is faster if 5 or more bits in the result are set)
+
+    //  remainder = 0
+    //  c = 0
+    //
+    //  repeat 16 times
+    //      remainder << 1 | MSB(dividend)
+    //      dividend << 1 | c
+    //      c = bool (remainder >= divisor)
+    //      if c set:
+    //          remainder -= divisor
+    //  dividend << 1 | c
+    //
+    //  result = dividend
+
     rep #$30
 i16()
 a16()
-    // using DP to access divisor saves 2 cycles
-    // and allows this scope to be called with DB anywhere
-
-    assert((divisor & 0xff00) == ((divisor + 1) & 0xff00))
 
     lda.w   #divisor & 0xff00
     tcd
 
     stx.b   divisor
-    ldx.w   #0          // Remainder
+    ldx.w   #0
+    // X = remainder
+    clc
 
     evaluate n = 0
     while {n} < 16 {
-        tya         // Dividend / result
-        asl
+        // Y = dividend
+        tya
+        rol
         tay
-        txa         // Remainder
+
+        // X = remainder
+        txa
         rol
         tax
 
         sec
         sbc.b   divisor
         bcc     +
-            // C set if positive
             tax
-            iny     // Result
         +
 
         evaluate n = {n} + 1
     }
+    tya
+    rol
+    tay
 
     plp
     pld
@@ -341,7 +361,8 @@ function Divide.s32_s32 {
     rep     #$30
 a16()
 i16()
-    // code requires these variables to exist in the same page
+    // code requires these variables to exist in the same page and in bank 0
+    assertShadowRam(dividend32)
     assert((dividend32 >> 8) == ((remainder32 + 3) >> 8))
 
     phd
@@ -442,21 +463,33 @@ iu()
 code()
 function Divide.u32_u32 {
 
-    // Inspiration: http://codebase64.org/doku.php?id=base:16bit_division_16-bit_result
+    // ::KUDOS codebase64 wiki for the original algorithm::
+    // ::: http://codebase64.org/doku.php?id=base:16bit_division_16-bit_result ::
 
-    // remainder = 0
-    // Repeat 32 times:
-    //  remainder << 1 | MSB(dividend)
-    //  dividend << 1
-    //  if (remainder >= divisor)
-    //      remainder -= divisor
-    //      result++
+    // ::KUDOS Ben Eater for the improved division algorithm::
+    // ::: Binary to decimal can’t be that hard, right? https://www.youtube.com/watch?v=v3-a-zqKfgA ::
+    // (The improved division algorithm is faster if 3 or more bits in the result are set)
+
+    //  remainder = 0
+    //  c = 0
+    //
+    //  repeat 32 times
+    //      remainder << 1 | MSB(dividend)
+    //      dividend << 1 | c
+    //      c = bool (remainder >= divisor)
+    //      if c set:
+    //          remainder -= divisor
+    //  dividend << 1 | c
+    //
+    //  result = dividend
+
 
     php
     rep #$30
 a16()
 i16()
-    // code requires these variables to exist in the same page
+    // the code requires these variables to exist in the same page and in bank 0
+    assertShadowRam(dividend32)
     assert((dividend32 >> 8) == ((remainder32 + 3) >> 8))
 
     phd
@@ -467,16 +500,17 @@ AfterRegisters:
 
     stz.b   remainder32
     stz.b   remainder32 + 2
+    clc
 
     ldx.w   #32
     -
-        asl.b   dividend32
+        rol.b   dividend32
         rol.b   dividend32 + 2
         rol.b   remainder32
         rol.b   remainder32 + 2
 
-        lda.b   remainder32
         sec
+        lda.b   remainder32
         sbc.b   divisor32
         tay
         lda.b   remainder32 + 2
@@ -485,11 +519,13 @@ AfterRegisters:
         bcc     +
             sty.b   remainder32
             sta.b   remainder32 + 2
-            inc.b   result32        // result32 = dividend32, no overflow possible
         +
 
         dex
         bne     -
+
+    rol.b   dividend32
+    rol.b   dividend32 + 2
 
     pld
     plp
