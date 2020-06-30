@@ -61,7 +61,7 @@ function Divide.u16y_u8a {
 //
 // OUTPUT:
 //  Y: sint16 result
-//  X: uint16 remainder (Always positive, Euclidian division)
+//  X: uint16 remainder (Always positive, Euclidean division)
 au()
 i16()
 code()
@@ -101,7 +101,7 @@ a16()
 //
 // OUTPUT:
 //  Y: sint16 result
-//  X: uint16 remainder (Always positive, Euclidian division)
+//  X: uint16 remainder (Always positive, Euclidean division)
 au()
 i16()
 code()
@@ -182,7 +182,7 @@ a16()
 //
 // OUTPUT:
 //  Y: sint16 result
-//  X: uint16 remainder (Always positive, Euclidian division)
+//  X: uint16 remainder (Always positive, Euclidean division)
 
 // This one is here because it is the most common of the signed divisions
 au()
@@ -329,7 +329,7 @@ a16()
 //
 // OUTPUT:
 //  result32: sint32 result
-//  remainder32: uint32 remainder (Always positive, Euclidian division)
+//  remainder32: uint32 remainder (Always positive, Euclidean division)
 //
 // NOTES:
 //  `result32` and `dividend32` share the same memory location
@@ -351,8 +351,8 @@ i16()
     ldy.b   dividend32 + 2
     bpl     DividendPositive
 
-        // negate dividend
-        // y is high work of dividend
+        // dividend is negative, negate it
+        // y is high word of dividend
         lda.b   dividend32
         eor.w   #0xffff
         clc
@@ -367,7 +367,7 @@ i16()
         ldy.b   divisor32 + 2
         bpl     +
             // divisor is negative, negate it
-            // y is high work of divisor
+            // y is high word of divisor
             lda.b   divisor32
             eor.w   #0xffff
             clc
@@ -400,9 +400,8 @@ DividendPositive:
     ldy.b   divisor32 + 2
     bpl     Divide.u32_u32.AfterRegisters
 
-    // divisor is negative
-    // y is high work of divisor
-
+    // divisor is negative, negate it
+    // y is high word of divisor
     lda.b   divisor32
     eor.w   #0xffff
     clc
