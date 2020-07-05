@@ -7,7 +7,7 @@
 //       Please see `src/metatiles/collisions.inc` for a movement routine with tile-collisions.
 //
 // This file is part of the UnTech Game Engine.
-// Copyright (c) 2016 - 2019, Marcus Rowe <undisbeliever@gmail.com>.
+// Copyright (c) 2016 - 2020, Marcus Rowe <undisbeliever@gmail.com>.
 // Distributed under The MIT License: https://opensource.org/licenses/MIT
 
 
