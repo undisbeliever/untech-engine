@@ -19,13 +19,41 @@ namespace MetaTiles {
 code()
 namespace MoveEntityAndProcessTileCollisions {
 
-// Populate _tileIndexTmp with a given Y-position
+// Populate _tileIndexTmp with a given X-position
+// REQUIRES: 16 bit A, 16 bit Index, DB = 0x7e
+// INPUT: A = X position
+// OUTPUT: _tileIndexTmp = the X part of the tile index
+macro _xPosA_To_tileIndexTmp() {
+    assert16a()
+    assert16i()
+
+    // _tileIndexTmp = (xPos & X_POSITION_MASK) / 16 * MAP_HEIGHT
+    and.w   #X_POSITION_MASK
+    if MAP_HEIGHT / METATILE_SIZE_PX == 4 {
+        assert(MAP_HEIGHT / 16 == 1 << 2)
+        asl
+        asl
+    } else if MAP_HEIGHT / METATILE_SIZE_PX == 8 {
+        assert(MAP_HEIGHT / 16 == 1 << 3)
+        asl
+        asl
+        asl
+    } else {
+        error "Invalid MAP_HEIGHT"
+    }
+    sta.w   _tileIndexTmp
+}
+
+
+// Calculate a tile index from a given Y-position and _tileIndexTmp.
+//
 // REQUIRES: 16 bit A, 16 bit Index, DB = 0x7e
 // INPUT: A = Y position
-// OUTPUT: _tileIndexTmp = Y part of the tile index
-// KEEP: X / Y
-macro _yPosA_To_tileIndexTmp() {
+// INPUT: tileIndexTmp = tile index at the given X coordinate
+// OUTPUT: Y = tile index
+macro _yPosA_tileIndexTmp_To_tileIndexY() {
     assert16a()
+    assert16i()
 
     // _tileIndexTmp = (yPos & Y_POSITION_MASK) / 16
     and.w   #Y_POSITION_MASK
@@ -33,44 +61,10 @@ macro _yPosA_To_tileIndexTmp() {
     lsr
     lsr
     lsr
-    sta.w   _tileIndexTmp
-}
-
-// Calculate a tile index from a given X-position and _tileIndexTmp
-// REQUIRES: 16 bit A, 16 bit Index, DB = 0x7e
-// INPUT: A = X position
-//        _tileIndexTmp = Y part of the tile Index
-// OUTPUT: Y = tile index at xPos and last `_yPosA_To_tileIndexTmp` call
-macro _xPosA_tileIndexTmp_To_tileIndexY() {
-    assert16a()
-    assert16i()
-
-    // Y = (xPos & X_POSITION_MASK) / 16 * MAP_HEIGHT + _tileIndexTmp
-    and.w   #X_POSITION_MASK
-    if MAP_HEIGHT / METATILE_SIZE_PX == 4 {
-        asl
-        asl
-    } else if MAP_HEIGHT / METATILE_SIZE_PX == 8 {
-        asl
-        asl
-        asl
-    } else {
-        error "Invalid MAP_HEIGHT"
-    }
-    // carry clear
+    assert((Y_POSITION_MASK >> 3) & 1 == 0)
+    // c clear
     adc.w   _tileIndexTmp
     tay
-}
-
-// Calculate a tile index from the entity's X-position and a given Y-position.
-// REQUIRES: 16 bit A, 16 bit Index, DB = 0x7e
-// INPUT: A = Y position
-//        dp = entity
-// OUTPUT: Y = tile Index at (entity->xPos.px, A)
-macro _entityXpos_yPosA_To_tileIndexY() {
-    _yPosA_To_tileIndexTmp()
-    lda.b   BaseEntity.xPos.px
-    _xPosA_tileIndexTmp_To_tileIndexY()
 }
 
 
@@ -271,7 +265,7 @@ constant _yOffsetHeightPair = MetaSprite.EntityHitbox._yPosHeightPair
 allocateTmpWord(_top)
 allocateTmpWord(_oldTileCollisionState)
 
-// Holds the Y-component of a tile index.
+// Holds the X-component of a tile index.
 allocateTmpWord(_tileIndexTmp)
 
 allocateTmpWord(_counter)
@@ -307,18 +301,8 @@ i16()
     bmi     NoHitbox
     sta.w   _yOffsetHeightPair
 
-    // _top = MS.TileHitbox[x].yOffset + entity.yPos.px
-    ora.w   #0xff00                 // yOffset is always a negative value
-    clc
-    adc.b   BaseEntity.yPos.px
-    sta.w   _top
-
-    // A = top
-    _yPosA_To_tileIndexTmp()
-
     lda.l   MetaSprite.Format.Frame.TileHitbox.left,x
     sta.w   _leftRightPair
-
 
     assert(Entity.MovementState.MOVING_RIGHT_FLAG == 0x40)
     bit.b   BaseEntity.movementState - 1
@@ -338,8 +322,18 @@ MovingRight:
         adc.w   _leftRightPair + 1          // Third byte of _leftRightPair is 0
         sta.w   _xTmp
 
-        _xPosA_tileIndexTmp_To_tileIndexY()
+        _xPosA_To_tileIndexTmp()
+
+        // _top = MS.TileHitbox[x].yOffset + entity.yPos.px
+        lda.w   _yOffsetHeightPair
+        ora.w   #0xff00                 // yOffset is always a negative value
+        clc
+        adc.b   BaseEntity.yPos.px
+        sta.w   _top
+
+        _yPosA_tileIndexTmp_To_tileIndexY()
         // Y = tile index for top-right of hitbox
+
 
         // set Ah to 0 for `tax` below
         lda.w   #0
@@ -442,9 +436,18 @@ MovingLeft:
         adc.b   BaseEntity.xPos.px
         sta.w   _xTmp
 
-        _xPosA_tileIndexTmp_To_tileIndexY()
+        _xPosA_To_tileIndexTmp()
 
+        // _top = MS.TileHitbox[x].yOffset + entity.yPos.px
+        lda.w   _yOffsetHeightPair
+        ora.w   #0xff00                 // yOffset is always a negative value
+        clc
+        adc.b   BaseEntity.yPos.px
+        sta.w   _top
+
+        _yPosA_tileIndexTmp_To_tileIndexY()
         // Y = tile index for top-left of hitbox
+
 
         // set Ah to 0 for `tax` below
         lda.w   #0
@@ -540,6 +543,11 @@ EndXaxis_A16:
 // `BaseEntity.movementState`.
 //
 // NOMENCLATURE: center tile means the tile above or below the entity's xPos.
+
+
+    lda.b   BaseEntity.xPos.px
+    _xPosA_To_tileIndexTmp()
+
 
     lda.b   BaseEntity.movementState
     and.w   #Entity.Movement.Y_AXIS_MOVEMENT_STATE_FUNCTION_TABLE_MASK
@@ -644,9 +652,9 @@ MovingDown:
         adc.b   BaseEntity.yPos.px
         sta.w   _bottom
 
-        _entityXpos_yPosA_To_tileIndexY()
-
+        _yPosA_tileIndexTmp_To_tileIndexY()
         // Y = entity bottom-center map tile
+
 
         // set Ah to 0 for the `tax`s below
         lda.w   #0
@@ -972,9 +980,9 @@ MovingDown:
         adc.b   BaseEntity.yPos.px
         sta.w   _top                    // required for `MovingUp.Collision`
 
-        _entityXpos_yPosA_To_tileIndexY()
-
+        _yPosA_tileIndexTmp_To_tileIndexY()
         // Y = entity top-center map tile
+
 
         // set Ah to 0 for the `tax`s below
         lda.w   #0
@@ -1145,9 +1153,9 @@ MovingDown_Standing:
         adc.b   BaseEntity.yPos.px
         sta.w   _bottom
 
-        _entityXpos_yPosA_To_tileIndexY()
-
+        _yPosA_tileIndexTmp_To_tileIndexY()
         // Y = entity bottom-center map tile
+
 
         // set Ah to 0 for the `tax`s below
         lda.w   #0
@@ -1364,17 +1372,11 @@ MovingUp:
 
 
         // Calculate tile index for top-center of tile hitbox
-
-        // _top = _yPosHeightPair.yPos + entity.yPos.px
-        lda.w   _yOffsetHeightPair
-        ora.w   #0xff00                 // yOffset is always negative value
-        clc
-        adc.b   BaseEntity.yPos.px
-        sta.w   _top
-
-        _entityXpos_yPosA_To_tileIndexY()
-
+        // _top is already set in X-axis test
+        lda.w   _top
+        _yPosA_tileIndexTmp_To_tileIndexY()
         // Y = entity top-center map tile
+
 
         // set Ah to 0 for the `tax`s below
         lda.w   #0
@@ -1586,9 +1588,9 @@ MovingUp:
         adc.b   BaseEntity.yPos.px
         sta.w   _bottom                 // Required for `MovingDown.Collision`
 
-        _entityXpos_yPosA_To_tileIndexY()
-
+        _yPosA_tileIndexTmp_To_tileIndexY()
         // Y = entity bottom-center map tile
+
 
         // set Ah to 0 for the `tax`s below
         lda.w   #0
@@ -1712,13 +1714,18 @@ MovingUp_Standing:
         // `MoveEntityAndProcessTileCollisions` call.
 
 
-        // Calculate tile index for bottom-center of tile hitbox
-        // _top and _tileIndexTmp are already set in X-axis test
+        // Calculate tile index for top-center of tile hitbox
 
-        lda.b   BaseEntity.xPos.px
-        _xPosA_tileIndexTmp_To_tileIndexY()
+        // _top = _yPosHeightPair.yPos + entity.yPos.px
+        lda.w   _yOffsetHeightPair
+        ora.w   #0xff00                 // yOffset is always negative value
+        clc
+        adc.b   BaseEntity.yPos.px
+        sta.w   _top
 
+        _yPosA_tileIndexTmp_To_tileIndexY()
         // Y = entity top-center map tile
+
 
         // set Ah to 0 for the `tax`s below
         lda.w   #0
