@@ -19,6 +19,45 @@ namespace MetaTiles {
 code()
 namespace MoveEntityAndProcessTileCollisions {
 
+assert(METATILE_SIZE_PX == 16)
+
+// Confirm entity momentum is a 24 bit value
+assert(BaseEntity.yMomentum.sx - BaseEntity.xMomentum.sx == 3)
+
+assert(MetaSprite.Format.Frame.TileHitbox.left + 1 == MetaSprite.Format.Frame.TileHitbox.right)
+assert(MetaSprite.Format.Frame.TileHitbox.yOffset + 1 == MetaSprite.Format.Frame.TileHitbox.height)
+
+// Third byte of _leftRightPair and _yOffsetHeightPair is 0
+constant _leftRightPair = MetaSprite.EntityHitbox._xPosWidthPair
+constant _yOffsetHeightPair = MetaSprite.EntityHitbox._yPosHeightPair
+
+allocateTmpWord(_top)
+allocateTmpWord(_oldTileCollisionState)
+
+// Holds the X-component of a tile index.
+allocateTmpWord(_tileIndexTmp)
+
+allocateTmpWord(_counter)
+allocateTmpWord(_xTmp)
+
+allocateTmpWord(_bottom)
+allocateTmpWord(_yDelta)
+allocateTmpWord(_bottomOffset)
+allocateTmpWord(_edgeOnPlatform)
+
+constant _TileCollisionType_FIRST_UP_SLOPE   = TileCollisionType.UP_RIGHT_SLOPE
+constant _TileCollisionType_LAST_UP_SLOPE    = TileCollisionType.UP_LEFT_SHORT_SLOPE
+constant _TileCollisionType_FIRST_DOWN_SLOPE = TileCollisionType.DOWN_RIGHT_SLOPE
+constant _TileCollisionType_LAST_DOWN_SLOPE  = TileCollisionType.DOWN_LEFT_SHORT_SLOPE
+
+constant SmallMapHeight.MAP_HEIGHT      = MAP_HEIGHT_SMALL
+constant SmallMapHeight.Y_POSITION_MASK = Y_POSITION_MASK_SMALL
+
+constant LargeMapHeight.MAP_HEIGHT      = MAP_HEIGHT_LARGE
+constant LargeMapHeight.Y_POSITION_MASK = Y_POSITION_MASK_LARGE
+
+
+
 // Populate _tileIndexTmp with a given X-position
 // REQUIRES: 16 bit A, 16 bit Index, DB = 0x7e
 // INPUT: A = X position
@@ -242,47 +281,14 @@ inline _AdjustTileIndexAndGoto_FallThrough(CollisionLabel) {
 
 
 // REQUIRES: 16 bit A, 16 bit Index, DB = 0x7e
-// PARAM: mapHeight - map height (SMALL or LARGE)
+// PARAM: MAP_HEIGHT - map height in tiles
+//        Y_POSITION_MASK - mask of y position
 // INPUT: dp = entity
 // OUTPUT: carry set if collision occurred in Y-Axis
 //         Y = The tile index of the tile that collided in the Y-Axis (if carry set).
-inline __MoveEntityAndProcessTileCollisions(mapHeight) {
+inline __MoveEntityAndProcessTileCollisions() {
 assert16a()
 assert16i()
-
-assert(METATILE_SIZE_PX == 16)
-
-// Confirm entity momentum is a 24 bit value
-assert(BaseEntity.yMomentum.sx - BaseEntity.xMomentum.sx == 3)
-
-assert(MetaSprite.Format.Frame.TileHitbox.left + 1 == MetaSprite.Format.Frame.TileHitbox.right)
-assert(MetaSprite.Format.Frame.TileHitbox.yOffset + 1 == MetaSprite.Format.Frame.TileHitbox.height)
-
-// Third byte of _leftRightPair and _yOffsetHeightPair is 0
-constant _leftRightPair = MetaSprite.EntityHitbox._xPosWidthPair
-constant _yOffsetHeightPair = MetaSprite.EntityHitbox._yPosHeightPair
-
-allocateTmpWord(_top)
-allocateTmpWord(_oldTileCollisionState)
-
-// Holds the X-component of a tile index.
-allocateTmpWord(_tileIndexTmp)
-
-allocateTmpWord(_counter)
-allocateTmpWord(_xTmp)
-
-allocateTmpWord(_bottom)
-allocateTmpWord(_yDelta)
-allocateTmpWord(_bottomOffset)
-allocateTmpWord(_edgeOnPlatform)
-
-constant _TileCollisionType_FIRST_UP_SLOPE   = TileCollisionType.UP_RIGHT_SLOPE
-constant _TileCollisionType_LAST_UP_SLOPE    = TileCollisionType.UP_LEFT_SHORT_SLOPE
-constant _TileCollisionType_FIRST_DOWN_SLOPE = TileCollisionType.DOWN_RIGHT_SLOPE
-constant _TileCollisionType_LAST_DOWN_SLOPE  = TileCollisionType.DOWN_LEFT_SHORT_SLOPE
-
-constant MAP_HEIGHT = MAP_HEIGHT_{mapHeight}
-constant Y_POSITION_MASK = Y_POSITION_MASK_{mapHeight}
 
 
 
@@ -1928,7 +1934,7 @@ function MoveEntityAndProcessTileCollisions {
 
     LargeMapHeight:
     namespace LargeMapHeight {
-        __MoveEntityAndProcessTileCollisions(LARGE)
+        __MoveEntityAndProcessTileCollisions()
     }
 
     namespace SmallMapHeight {
@@ -1943,7 +1949,7 @@ function MoveEntityAndProcessTileCollisions {
 
     SmallMapHeight:
     namespace SmallMapHeight {
-        __MoveEntityAndProcessTileCollisions(SMALL)
+        __MoveEntityAndProcessTileCollisions()
     }
 }
 
