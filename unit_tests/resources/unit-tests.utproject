@@ -3,6 +3,12 @@
 <project>
   <memory-map mode="hirom" first-bank="c1" n-banks="1"/>
   <room-settings room-data-size="16384"/>
+  <interactive-tiles>
+    <tile-function-table name="SetUpGravity"/>
+    <tile-function-table name="SetDownGravity"/>
+    <tile-function-table name="Token"/>
+    <tile-function-table name="DisappearingBlock"/>
+  </interactive-tiles>
   <entity-rom-data>
     <listid name="Particles"/>
     <listid name="PlayerProjectiles"/>
@@ -35,6 +41,8 @@
     <function-table name="MapCursor" type="player" export-order="OneFrame" parameter-type="unused"/>
     <function-table name="EhCollisionTest_Player" type="player" export-order="EhCollisionTest_Player" parameter-type="unused"/>
     <function-table name="ActionPointSpawner" type="player" export-order="SingleAnimation" parameter-type="unused"/>
+    <function-table name="InteractiveTilesTest_Player" type="player" export-order="OneFrame" parameter-type="unused"/>
+    <function-table name="InteractiveTilesTest_Entity" type="entity" export-order="OneFrame" parameter-type="unused"/>
     <entities>
       <entry name="Blank_0" function-table="Blank" listid="EntityList_0" frameset="FST_OneTileFixed1" frame="frame" palette="0"/>
       <entry name="Blank_1" function-table="Blank" listid="EntityList_1" frameset="FST_OneTileFixed1" frame="frame" palette="0"/>
@@ -93,6 +101,7 @@
       <entry name="EhCollisionTest_Enemy" function-table="EhCollisionTest_Enemy" listid="Enemies" frameset="EhCollisionTest_Enemy" frame="row1" palette="0"/>
       <entry name="EhCollisionTest_BlankEnemy" function-table="Blank" listid="Enemies" frameset="FST_OneTileFixed1" frame="frame" palette="0"/>
       <entry name="EhCollisionTest_CollisionCentre" function-table="EhCollisionTest_CollisionCentre" listid="Particles" frameset="EhCollisionTest_Centre" frame="frame" palette="0"/>
+      <entry name="InteractiveTiles_Entity" function-table="InteractiveTilesTest_Entity" listid="Enemies" frameset="InteractiveTilesTestEntity" frame="frame" palette="0"/>
     </entities>
     <projectiles>
       <entry name="EightDirectionGreenProjectile" function-table="EightDirectionProjectile" listid="PlayerProjectiles" frameset="Projectile" frame="frame" palette="1"/>
@@ -104,6 +113,7 @@
       <entry name="EhCollisionTest_Player" function-table="EhCollisionTest_Player" frameset="EhCollisionTest_Player" frame="frame1" palette="0"/>
       <entry name="MapCursor" function-table="MapCursor" frameset="Cursor" frame="frame" palette="0"/>
       <entry name="ActionPointSpawner" function-table="ActionPointSpawner" projectileid="EightDirectionRedProjectile" frameset="ActionPointSpawner" frame="playerProjectile0" palette="0"/>
+      <entry name="InteractiveTilesTest_Player" function-table="InteractiveTilesTest_Player" frameset="InteractiveTilesTestEntity" frame="frame" palette="1"/>
     </players>
   </entity-rom-data>
   <action-point-function name="PlayerProjectile"/>
@@ -147,8 +157,9 @@
   <frameset src="metasprite/utms/EhCollisionTest_Centre.utms" type="metasprite"/>
   <frameset src="metasprite/utms/DeleteIfAnimationEnds.utms" type="metasprite"/>
   <frameset src="metasprite/utms/TileCollisionTestPlayer.utms" type="metasprite"/>
+  <frameset src="metasprite/utms/InteractiveTilesTestEntity.utms" type="metasprite"/>
   <palette name="MetaTileRenderTest" image="palettes/metatile-render-test.palette.png" rows-per-frame="3" animation-delay="300"/>
-  <palette name="TileCollisionTest" image="palettes/tile-collision-test.png" rows-per-frame="2" animation-delay="255"/>
+  <palette name="TileCollisionTest" image="palettes/tile-collision-test.png" rows-per-frame="3" animation-delay="255"/>
   <background-image name="Sun" bit-depth="4" image="background-images/sun.png" palette="TileCollisionTest" first-palette="0" npalettes="2" default-order="0"/>
   <metatile-tileset src="metatile-tilesets/metatile-render-test.utmt"/>
   <metatile-tileset src="metatile-tilesets/tile-collision-test.utmt"/>
@@ -158,6 +169,8 @@
   <room-file src="rooms/MetaTileRenderTestLarge.utroom"/>
   <room-file src="rooms/EmptyRoom.utroom"/>
   <room-file src="rooms/EntityHitboxCollisionsTest.utroom"/>
+  <room-file src="rooms/InteractiveTilesTestSmall.utroom"/>
+  <room-file src="rooms/InteractiveTilesTestLarge.utroom"/>
   <scene-setting name="UnitTests" bg-mode="0" layer0-type="text" layer1-type="" layer2-type="" layer3-type=""/>
   <scene-setting name="Mode1_Bg2MT_NoImage" bg-mode="1bg3" layer0-type="" layer1-type="mt-tileset" layer2-type="text" layer3-type=""/>
   <scene-setting name="SettingSun" bg-mode="1bg3" layer0-type="mt-tileset" layer1-type="bg-image" layer2-type="text" layer3-type=""/>

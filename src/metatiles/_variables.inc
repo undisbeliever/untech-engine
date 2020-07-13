@@ -60,6 +60,20 @@ namespace MetaTiles {
         // The right-most x coordinate of the map
         // (uint16)
         allocate(right, wram7e, 2)
+
+
+        // X component of an index within `map.data`
+        // (uint16)
+        allocate(dataIndexXmask, wram7e, 2)
+
+        // Y component of an index within `map.data`
+        // (uint16)
+        allocate(dataIndexYmask, wram7e, 2)
+
+        // Y position mask used for converting a position to a tile index/address
+        // Equal to either Y_POSITION_MASK_SMALL or Y_POSITION_MASK_LARGE
+        // (uint16)
+        allocate(yPositionMask, wram7e, 2)
     }
 
     // A bit-mask used when converting a position to a tile index/address
@@ -71,6 +85,7 @@ namespace MetaTiles {
     assert(X_POSITION_MASK < map.LEFT)
     assert(Y_POSITION_MASK_SMALL < map.TOP)
     assert(Y_POSITION_MASK_LARGE < map.TOP)
+
 
     // Horizontal SNES Tilemap Buffer
     // A single tile map 64 * 2 tiles in size

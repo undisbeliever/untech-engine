@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF_8"?>
+<!DOCTYPE untech>
+<metasprite id="InteractiveTilesTestEntity" tilesettype="ONE_TILE_FIXED" exportorder="OneFrame">
+  <largetileset>
+    /wD/AP8A/wD/AP8A/wD/AAAAAAAAAAAAAAAAAAAAAAD/AP8A/wD/AP8A/wD/AP8A
+    AAAAAAAAAAAAAAAAAAAAAP8A/wD/AP8A/wD/AP8A/wAAAAAAAAAAAAAAAAAAAAAA
+    /wD/AP8A/wD/AP8A/wD/AAAAAAAAAAAAAAAAAAAAAAA=
+  </largetileset>
+  <palette>
+    AAAAfAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=
+  </palette>
+  <palette>
+    AAAYAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=
+  </palette>
+  <frame id="frame" order="2">
+    <tilehitbox x="-12" y="-12" width="24" height="24"/>
+    <object size="large" x="-12" y="-12" tile="0"/>
+    <object size="large" x="-12" y="-4" tile="0"/>
+    <object size="large" x="-4" y="-12" tile="0"/>
+    <object size="large" x="-4" y="-4" tile="0"/>
+  </frame>
+</metasprite>

@@ -18,6 +18,12 @@
   <tile t="30" collision="ults"/>
   <tile t="31" collision="ulss"/>
   <tile t="32" collision="es"/>
+  <tile t="64" ft="SetUpGravity"/>
+  <tile t="65" ft="SetUpGravity"/>
+  <tile t="66" ft="SetDownGravity"/>
+  <tile t="67" ft="SetDownGravity"/>
+  <tile t="68" ft="Token"/>
+  <tile t="69" collision="solid" ft="DisappearingBlock"/>
   <tile-priorities>
     AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAADwkAAA+QAAAAAAAAAAAAAAAAAAAAAAAA
     AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA

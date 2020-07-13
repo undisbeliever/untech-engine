@@ -25,17 +25,32 @@ macro _LoadMap() {
     assert16a()
     assert16i()
 
-    // map.bytesPerColumn = room height <= MAP_HEIGHT_SMALL ? MAP_HEIGHT_SMALL : MAP_HEIGHT_LARGE
+    // Set map bytesPerColumn, dataIndexXmask, dataIndexYmask and yPositionMask
+    // (the value of these variables depend on the height of the map)
     lda.w   Room.Format.Header.height
     and.w   #0xff
     cmp.w   #MetaTiles.MAP_HEIGHT_SMALL + 1
     bcc     +
         lda.w   #MetaTiles.MAP_HEIGHT_LARGE
+        sta.w   MetaTiles.map.bytesPerColumn
+
+        assertPowerOfTwo(MetaTiles.MAP_HEIGHT_LARGE)
+        ldx.w   #0xff * MetaTiles.MAP_HEIGHT_LARGE
+        ldy.w   #MetaTiles.MAP_HEIGHT_LARGE - 1
+        lda.w   #MetaTiles.Y_POSITION_MASK_LARGE
         bra     ++
     +
         lda.w   #MetaTiles.MAP_HEIGHT_SMALL
+        sta.w   MetaTiles.map.bytesPerColumn
+
+        assertPowerOfTwo(MetaTiles.MAP_HEIGHT_SMALL)
+        ldx.w   #0xff * MetaTiles.MAP_HEIGHT_SMALL
+        ldy.w   #MetaTiles.MAP_HEIGHT_SMALL - 1
+        lda.w   #MetaTiles.Y_POSITION_MASK_SMALL
     +
-    sta.w   MetaTiles.map.bytesPerColumn
+    stx.w   MetaTiles.map.dataIndexXmask
+    sty.w   MetaTiles.map.dataIndexYmask
+    sta.w   MetaTiles.map.yPositionMask
 
 
     // RDMPY = map.width * map.bytesPerColumn

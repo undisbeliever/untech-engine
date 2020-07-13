@@ -301,8 +301,8 @@ i16()
     ldx.b   BaseEntity.MetaSprite.currentFrame
     // currentFrame is never null
     lda.l   MetaSprite.Format.Frame.TileHitbox.yOffset,x
-    bmi     NoHitbox
     sta.w   _yOffsetHeightPair
+    bmi     NoHitbox
 
     lda.l   MetaSprite.Format.Frame.TileHitbox.left,x
     sta.w   _leftRightPair
@@ -326,6 +326,9 @@ MovingRight:
         sta.w   _xTmp
 
         _xPosA_To_tileIndexTmp()
+
+
+        // NOTE: If I modify this code, also modify `MovePlayerWithTileCollisionsAndInteractiveTiles`
 
         // _top = MS.TileHitbox[x].yOffset + entity.yPos.px
         lda.w   _yOffsetHeightPair
@@ -355,6 +358,7 @@ MovingRight:
 
         // Test the remaining tiles (Goto Collision if right edge touches a SOLID tile)
 
+        // NOTE: If I edit this also edit MovePlayerWithTileCollisionsAndInteractiveTiles
         // _counter = (_top & 0xf + _yOffsetHeightPair.height - 1) / 16
         lda.w   _top
         and.b   #0xf
@@ -1847,14 +1851,18 @@ assert(pc() - MovementState_FunctionTable == Entity.Movement.N_Y_AXIS_MOVEMENT_S
 }
 
 
-namespace MoveEntityAndProcessTileCollisions.LargeMapHeight {
+namespace MoveEntityAndProcessTileCollisions {
+namespace LargeMapHeight {
     // DP = entity
     a16()
     i16()
     NoHitbox:
-        ldy.w   #0
+        lda.b   BaseEntity.xPos.px
+        _xPosA_To_tileIndexTmp()
+
         clc
         rts
+}
 }
 
 // Moves the entity (using the entity's movementState and momentum values) and
@@ -1889,6 +1897,12 @@ namespace MoveEntityAndProcessTileCollisions.LargeMapHeight {
 // INPUT: dp = entity
 // OUTPUT: carry set if collision occurred in Y-Axis
 //         Y = The tile index of the tile that collided in the Y-Axis (if carry set).
+//
+// OUTPUT used by interactive tiles (NOT TO BE USED elsewhere):
+//         _yOffsetHeightPair, _leftRightPair = entity tile hitbox
+//              (if _yOffsetHeightPair is negative then there is no tile hitbox)
+//              (_leftRightPair is only valid if _yOffsetHeightPair is positive)
+//         _tileIndexTmp = the x component of the tile index at entity's x-position
 //
 // This code assumes:
 //   * This routine is called once per frame.
@@ -1939,7 +1953,9 @@ function MoveEntityAndProcessTileCollisions {
     a16()
     i16()
     NoHitbox:
-        ldy.w   #0
+        lda.b   BaseEntity.xPos.px
+        _xPosA_To_tileIndexTmp()
+
         clc
         rts
     }

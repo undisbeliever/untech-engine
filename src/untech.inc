@@ -90,6 +90,7 @@ include "entity/validation.inc"
 
 include "metatiles/_mapheight.inc"
 include "metatiles/collisions.inc"
+include "metatiles/interactive-tiles.inc"
 include "metatiles/render.inc"
 include "metatiles/tileset.inc"
 include "metatiles/_common.inc"

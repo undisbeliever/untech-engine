@@ -9,8 +9,12 @@
 
 
 namespace MetaTiles {
-    if MetaTiles.TILESET_FORMAT_VERSION != 7 {
+    if MetaTiles.TILESET_FORMAT_VERSION != 8 {
         error "Invalid untech-compiler MetaTile Tileset Format"
+    }
+
+    if MetaTiles.INTERACTIVE_TILES_FORMAT_VERSION != 1 {
+        error "Invalid untech-compiler Interactive Tiles Format"
     }
 
     constant N_META_TILES = 256
@@ -35,6 +39,24 @@ namespace MetaTiles {
     //
     allocate(collisionMap, wram7e, N_META_TILES)
     constant collisionMap.size = N_META_TILES
+
+
+    // Interactive tiles function table index for each MetaTile
+    //
+    // Format:
+    //      00ttttt0
+    //          ttttt = interactive tile id
+    //
+    // See `InteractiveTilesFunctionTables` for details about the function tables.
+    allocate(interactiveTilesMap, wram7e, N_META_TILES)
+    namespace interactiveTilesMap {
+        constant size = N_META_TILES
+
+        // Number of functions inside the interactive tiles function table.
+        constant N_FUNCTIONS = 32
+
+        constant MASK = (N_FUNCTIONS - 1) << 1
+    }
 
 
     // Tile Collision type used by the collision map.
@@ -94,15 +116,109 @@ namespace MetaTiles {
         //          - see Resources.Format.AnimatedTilesetHeader for data format
         namespace Tileset {
             constant wramLocation = MetaTiles.tileMap
-            constant size = tileMap.size + collisionMap.size
+            constant size = tileMap.size + collisionMap.size + interactiveTilesMap.size
 
-            // Ensure `tileMap` and `collisionMap` are continuous
+            // Ensure `tileMap`, `collisionMap`, and `interactiveTilesMap` are continuous
             assert(tileMap + tileMap.size == collisionMap)
+            assert(collisionMap + collisionMap.size == interactiveTilesMap)
 
-            // Ensure `tileMap` and `collisionMap` is page aligned
+            // Ensure the variables are page aligned
             assert(tileMap & 0xff == 0)
             assert(collisionMap & 0xff == 0)
+            assert(interactiveTilesMap & 0xff == 0)
         }
+    }
+
+
+
+    namespace InteractiveTiles {
+        // Called when a tile-interacting entity has a Y-axis collision with
+        // the tile.
+        //
+        // This function is called on the first tile that collided the entity's
+        // tile hitbox.  For instance, if there was a y-axis collision on the
+        // tile at the bottom-center of the hitbox, then the entity will not
+        // interact with the tiles at the hitbox's bottom-left or bottom-right.
+        //
+        // NOTE: X-axis collisions DO NOT call this function.
+        //
+        // NOTE: This function is only called on entities that call
+        //       `MoveEntityWithTileCollisionsAndInteractiveTiles`.
+        //
+        // REQUIRES: 16 bit A, 16 bit Index, DB = 0x7e
+        // INPUT: dp = entity
+        // INPUT: Y = map data index of collided tile
+        constant EntityCollision_FunctionTable = Project.InteractiveTiles.EntityCollision_FunctionTable
+
+        // Called when a tile-interacting entity hovers over the tile.
+        //
+        // Only the map tile at the entity's position is checked, all other map
+        // tiles inside the entity's tile hitbox will be ignored.
+        //
+        // NOTE: This function is only called on entities that call
+        //       `MoveEntityWithTileCollisionsAndInteractiveTiles`.
+        //
+        // REQUIRES: 16 bit A, 16 bit Index, DB = 0x7e
+        // INPUT: dp = entity
+        // INPUT: Y = map data index of the tile at the entity's position
+        constant EntityAirCollision_FunctionTable = Project.InteractiveTiles.EntityAirCollision_FunctionTable
+
+        // Called when a tile-interacting player has a Y-axis collision and
+        // the map tile is in the same column as the player's X-position.
+        //
+        // This function will not be called if there is no collision in the map
+        // tile at the player's x-position.
+        //
+        // NOTE: X-axis collisions DO NOT call this function.
+        //
+        // NOTE: This function is only called on entities that call
+        //       `MovePlayerWithTileCollisionsAndInteractiveTiles`.
+        //
+        // REQUIRES: 16 bit A, 16 bit Index, DB = 0x7e
+        // INPUT: dp = entity address of player
+        // INPUT: Y = map data index of collided tile
+        constant PlayerOriginCollision_FunctionTable = Project.InteractiveTiles.PlayerOriginCollision_FunctionTable
+
+        // Called when a tile-interacting player has a Y-axis collision and
+        // the map tile is not in the same column as the player's X-position.
+        //
+        // This function will be called whenever the tile-interacting player
+        // has a Y-axis collision.  It can be called between 0 and 4 times per
+        // player depending on the size of the player's tile hitbox.
+        //
+        // NOTE: This function MUST BE blank if the tile is not SOLID.
+        //       ::TODO add this check to the editor::
+        //
+        // NOTE: X-axis collisions DO NOT call this function.
+        //
+        // NOTE: This function is only called on entities that call
+        //       `MovePlayerWithTileCollisionsAndInteractiveTiles`.
+        //
+        // REQUIRES: 16 bit A, 16 bit Index, DB = 0x7e
+        // INPUT: dp = entity address of player
+        // INPUT: Y = map data index
+        constant PlayerLeftRightCollision_FunctionTable = Project.InteractiveTiles.PlayerLeftRightCollision_FunctionTable
+
+        // Called when a tile-interacting player hovers over the tile.
+        //
+        // Only the map tiles that are in the same column as the player's
+        // X-position are invoked.  All tiles to the left or right of the
+        // player's x-position are ignored.
+        //
+        // NOTE: This function is only called on entities that call
+        //       `MovePlayerWithTileCollisionsAndInteractiveTiles`.
+        //
+        // REQUIRES: 16 bit A, 16 bit Index, DB = 0x7e
+        // INPUT: dp = entity
+        // INPUT: Y = map data index
+        constant PlayerAirCollision_FunctionTable = Project.InteractiveTiles.PlayerAirCollision_FunctionTable
+
+
+        assert(EntityAirCollision_FunctionTable - EntityCollision_FunctionTable == interactiveTilesMap.N_FUNCTIONS * 2)
+        assert(PlayerOriginCollision_FunctionTable - EntityAirCollision_FunctionTable == interactiveTilesMap.N_FUNCTIONS * 2)
+        assert(PlayerLeftRightCollision_FunctionTable - PlayerOriginCollision_FunctionTable == interactiveTilesMap.N_FUNCTIONS * 2)
+        assert(PlayerAirCollision_FunctionTable - PlayerLeftRightCollision_FunctionTable == interactiveTilesMap.N_FUNCTIONS * 2)
+        assert(Project.InteractiveTiles.EndFunctionTables - PlayerAirCollision_FunctionTable == interactiveTilesMap.N_FUNCTIONS * 2)
     }
 }
 
