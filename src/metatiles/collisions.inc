@@ -32,7 +32,6 @@ constant _leftRightPair = MetaSprite.EntityHitbox._xPosWidthPair
 constant _yOffsetHeightPair = MetaSprite.EntityHitbox._yPosHeightPair
 
 allocateTmpWord(_top)
-allocateTmpWord(_oldTileCollisionState)
 
 // Holds the X-component of a tile index.
 allocateTmpWord(_tileIndexTmp)
@@ -94,15 +93,13 @@ macro _yPosA_tileIndexTmp_To_tileIndexY() {
     assert16a()
     assert16i()
 
-    // _tileIndexTmp = (yPos & Y_POSITION_MASK) / 16
+    // Y = (yPos & Y_POSITION_MASK) / 16 | _tileIndexTmp
     and.w   #Y_POSITION_MASK
     lsr
     lsr
     lsr
     lsr
-    assert((Y_POSITION_MASK >> 3) & 1 == 0)
-    // c clear
-    adc.w   _tileIndexTmp
+    ora.w   _tileIndexTmp
     tay
 }
 
