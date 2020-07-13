@@ -125,11 +125,15 @@ a16()
 
 rodata(rom0)
 OrientationTable:
-    db  Entity.MovementState.FACING_RIGHT_FLAG | Entity.MovementState.MOVING_DOWN_FLAG // DOWN_RIGHT
-    db  Entity.MovementState.MOVING_DOWN_FLAG                                          // DOWN_LEFT
-    db  Entity.MovementState.FACING_RIGHT_FLAG | Entity.MovementState.UP_GRAVITY_FLAG  // UP_RIGHT
-    db  Entity.MovementState.FACING_RIGHT_FLAG | Entity.MovementState.UP_GRAVITY_FLAG  // UP_LEFT
+namespace OrientationTable {
+    constant LEFT = 0
+    constant RIGHT = Entity.MovementState.FACING_RIGHT_FLAG | Entity.MovementState.MOVING_RIGHT_FLAG
 
+    db  RIGHT | Entity.MovementState.MOVING_DOWN_FLAG // DOWN_RIGHT
+    db  LEFT  | Entity.MovementState.MOVING_DOWN_FLAG // DOWN_LEFT
+    db  RIGHT | Entity.MovementState.UP_GRAVITY_FLAG  // UP_RIGHT
+    db  LEFT  | Entity.MovementState.UP_GRAVITY_FLAG  // UP_LEFT
+}
 assert(pc() - OrientationTable == Format.RoomEntrance.ORIENTATION_MASK + 1)
 
 }
