@@ -1379,8 +1379,14 @@ MovingUp:
 
 
         // Calculate tile index for top-center of tile hitbox
-        // _top is already set in X-axis test
-        lda.w   _top
+
+        // _top = _yPosHeightPair.yPos + entity.yPos.px
+        lda.w   _yOffsetHeightPair
+        ora.w   #0xff00                 // yOffset is always a negative value
+        clc
+        adc.b   BaseEntity.yPos.px
+        sta.w   _top
+
         _yPosA_tileIndexTmp_To_tileIndexY()
         // Y = entity top-center map tile
 
@@ -1722,14 +1728,8 @@ MovingUp_Standing:
 
 
         // Calculate tile index for top-center of tile hitbox
-
-        // _top = _yPosHeightPair.yPos + entity.yPos.px
-        lda.w   _yOffsetHeightPair
-        ora.w   #0xff00                 // yOffset is always negative value
-        clc
-        adc.b   BaseEntity.yPos.px
-        sta.w   _top
-
+        // _top is already set in X-axis test
+        lda.w   _top
         _yPosA_tileIndexTmp_To_tileIndexY()
         // Y = entity top-center map tile
 
