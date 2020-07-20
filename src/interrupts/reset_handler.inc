@@ -96,11 +96,16 @@ a8()
     stx.w   A1T0
     stz.w   A1B0
 
+
+    // Disable HDMA (prevents a crash on model 1 consoles)
+    stz.w   HDMAEN
+
     lda.b   #MDMAEN.dma0
     sta.w   MDMAEN
 
     // DSA0 is 0, no need to set it again
     sta.w   MDMAEN
+
 
     jsr     ResetRegisters
 

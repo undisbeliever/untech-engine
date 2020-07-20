@@ -145,6 +145,9 @@ function DirtyWram {
 
     AssertForceBlank()
 
+    // Disable HDMA (prevents a crash on model 1 consoles)
+    stz.w   HDMAEN
+
     lda.b   #MDMAEN.dma0
     sta.w   MDMAEN
 
@@ -184,6 +187,9 @@ function ClearVram {
 
     AssertForceBlank()
 
+    // Disable HDMA (prevents a crash on model 1 consoles)
+    stz.w   HDMAEN
+
     lda.b   #MDMAEN.dma0
     sta.w   MDMAEN
 
@@ -216,6 +222,9 @@ function ClearVramH {
     stz.w   A1B0
 
     AssertForceBlank()
+
+    // Disable HDMA (prevents a crash on model 1 consoles)
+    stz.w   HDMAEN
 
     lda.b   #MDMAEN.dma0
     sta.w   MDMAEN
@@ -257,6 +266,9 @@ i8()
 
     AssertForceBlank()
 
+    // Disable HDMA (prevents a crash on model 1 consoles)
+    stz.w   HDMAEN
+
     ldx.b   #MDMAEN.dma0
     stx.w   MDMAEN
 
@@ -284,6 +296,9 @@ function TransferToCgram {
     stx.w   DMAP0       // also sets BBAD0
 
     AssertForceBlank()
+
+    // Disable HDMA (prevents a crash on model 1 consoles)
+    stz.w   HDMAEN
 
     lda.b   #MDMAEN.dma0
     sta.w   MDMAEN
@@ -315,6 +330,9 @@ function TransferToVram {
 
     AssertForceBlank()
 
+    // Disable HDMA (prevents a crash on model 1 consoles)
+    stz.w   HDMAEN
+
     lda.b   #MDMAEN.dma0
     sta.w   MDMAEN
 
@@ -345,6 +363,9 @@ function TransferToVramL {
 
     AssertForceBlank()
 
+    // Disable HDMA (prevents a crash on model 1 consoles)
+    stz.w   HDMAEN
+
     lda.b   #MDMAEN.dma0
     sta.w   MDMAEN
 
@@ -374,6 +395,9 @@ function TransferToVramH {
     stx.w   DMAP0       // also sets BBAD0
 
     AssertForceBlank()
+
+    // Disable HDMA (prevents a crash on model 1 consoles)
+    stz.w   HDMAEN
 
     lda.b   #MDMAEN.dma0
     sta.w   MDMAEN
@@ -422,6 +446,9 @@ a8()
     sty.w   DAS0
 
     AssertForceBlank()
+
+    // Disable HDMA (prevents a crash on model 1 consoles)
+    stz.w   HDMAEN
 
     lda.b   #MDMAEN.dma0
     sta.w   MDMAEN

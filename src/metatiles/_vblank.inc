@@ -21,6 +21,8 @@ macro DrawMapCell_VBlank_dp4300() {
     assert16a()
     assert8i()
 
+    // MUST NOT use DMA in this macro
+
     ldx.w   MetaTiles.drawMapCellBufferIndex
     beq     Return
         lda.w   #0x2100

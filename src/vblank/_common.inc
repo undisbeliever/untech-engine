@@ -288,6 +288,10 @@ SkipWaitForNMI:
     Dma.VBlank_dp4300()
     Hdma.VBlank_dp4300()
 
+
+    // MUST NOT USE DMA PAST THIS POINT
+    // --------------------------------
+
     MetaTiles.Render.DrawMapCell_VBlank_dp4300()
 
     lda.w   #0x2100
