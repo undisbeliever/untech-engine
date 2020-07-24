@@ -799,8 +799,11 @@ constant _mapPtrRend = utDpTmp2
 // INPUT: X = index of map cell to draw
 //        A = value of map cell (lower 8 bits only)
 //
-// BRANCH: to Return if cell outside visible range
-// BRANCH: to RetrunWithWarning if drawMapCellBuffer is full
+// OUTPUT: X = drawMapCellBufferIndex
+//
+// BRANCH: to DrawMapCell_Offscreen if the cell is outside the visible area
+//                                  (drawMapCellBuffer and `Dma.transfersLeft` will be unchanged)
+// BRANCH: to DrawMapCell_BufferFull if drawMapCellBuffer is full (MODIFIES Accumulator size)
 macro _DrawMapCell(mapHeight) {
     assert16a()
     assert16i()
@@ -836,9 +839,9 @@ constant MAP_HEIGHT = MAP_HEIGHT_{mapHeight}
     adc.w   #map.data
     sec
     sbc.w   Render.visibleMapPtr
-    bcc     Return
+    bcc     DrawMapCell_Offscreen
     cmp.w   #MAP_HEIGHT * METATILE_DISPLAY_WIDTH + METATILE_DISPLAY_HEIGHT + 1
-    bcs     Return
+    bcs     DrawMapCell_Offscreen
 
     sta.l   WRDIV
 
@@ -846,7 +849,7 @@ constant MAP_HEIGHT = MAP_HEIGHT_{mapHeight}
     assertPowerOfTwo(MAP_HEIGHT)
     and.w   #MAP_HEIGHT - 1
     cmp.w   #METATILE_DISPLAY_HEIGHT + 1
-    bcs     Return
+    bcs     DrawMapCell_Offscreen
 
     sep     #$20
 a8()
@@ -861,17 +864,19 @@ a8()
     bne     +
         lda.b   #-Dma.CalcDmaTime(Render.DRAW_MAP_CELL_VBLANK_INIT_CYCLES + Render.DRAW_MAP_CELL_VBLANK_LOOP_CYCLES)
     +
-    clc
+
+    // Goto DrawMapCellBufferFull if drawMapCellBuffer is full
+    cpx.w   #drawMapCellBufferIndex.END
+    bcs     DrawMapCell_BufferFull
+
+    // A = negated DMA time
+    // carry clear
     adc.w   Dma.transfersLeft
     bcs     +
         // Dma.transfersLeft underflowed
         lda.b   #0
     +
     sta.w   Dma.transfersLeft
-
-    // Exit with warning if drawMapCellBuffer is full
-    cpx.w   #drawMapCellBuffer.BUFFER_SIZE * 2
-    bcs     ReturnWithWarning
 
 
     // calculate Vram Word Address of map Cell

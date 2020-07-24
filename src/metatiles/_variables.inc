@@ -156,6 +156,9 @@ namespace MetaTiles {
     // Index to the current position on the drawMapCellBuffer
     // (word index)
     allocate(drawMapCellBufferIndex, shadow, 2)
+
+    // If `drawMapCellBufferIndex` is >= `END` value then the buffer is full
+    constant drawMapCellBufferIndex.END = drawMapCellBuffer.BUFFER_SIZE * 2
 }
 
 // vim: ft=bass-65816 ts=4 sw=4 et:

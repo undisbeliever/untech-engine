@@ -96,9 +96,11 @@ namespace SetMapCell {
 au()
 i16()
 code()
-ReturnWithWarning:
+IndexOutOfBounds:
+DrawMapCell_BufferFull:
     Warnings.Warn(SET_MAP_CELL_ERROR)
 
+DrawMapCell_Offscreen:
 Return:
     plp
     rts
@@ -133,7 +135,7 @@ function SetMapCell {
     rep     #$10
 i16()
     cpx.w   map.dataSize
-    bcs     ReturnWithWarning
+    bcs     IndexOutOfBounds
 
     sep     #$20
 a8()
@@ -166,10 +168,10 @@ a8()
     au()
     i16()
     code()
-    ReturnWithWarning:
+    DrawMapCell_BufferFull:
         Warnings.Warn(SET_MAP_CELL_ERROR)
 
-    Return:
+    DrawMapCell_Offscreen:
         plp
         rts
     }
