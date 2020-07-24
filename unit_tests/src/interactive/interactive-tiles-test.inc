@@ -7,6 +7,7 @@
 //  * MetaTiles.LoadTileset
 //  * MetaTiles.MoveEntityWithTileCollisionsAndInteractiveTiles
 //  * MetaTiles.MovePlayerWithTileCollisionsAndInteractiveTiles
+//  * MetaTiles.CrumblingTiles
 //  * MetaSprite Tile Collision Hitbox
 
 namespace Entities {
@@ -16,6 +17,8 @@ namespace InteractiveTilesTest_Player {
     buildFunctionTable(BasePlayerFunctionTable, InteractiveTilesTest_Player)
 
     constant DrawPlayer = MetaSprite.Render.RenderEntity
+
+    constant X_MOMENTUM_PX = 3
 
 
     // REQUIRES: 16 bit A, 16 bit Index, DB = 0x7e
@@ -31,7 +34,7 @@ namespace InteractiveTilesTest_Player {
         lda.w   Room.roomId
         cmp.b   #Project.RoomList.InteractiveTilesTestSmall
         bne     +
-            lda.b   #2
+            lda.b   #X_MOMENTUM_PX
             sta.b   BaseEntity.xMomentum.px
         +
 
@@ -73,7 +76,7 @@ namespace InteractiveTilesTest_Player {
             eor.b   #Entity.MovementState.FACING_RIGHT_FLAG | Entity.MovementState.MOVING_RIGHT_FLAG
             sta.b   BaseEntity.movementState
 
-            lda.b   #2
+            lda.b   #X_MOMENTUM_PX
             sta.b   BaseEntity.xMomentum.px
         +
 
@@ -200,30 +203,6 @@ function NullFunction {
 function PlayerAirCollision {
     inc.w   tokensCollected
 
-    lda.w   #0
-    tyx
-    jmp     MetaTiles.SetMapCell
-}
-}
-
-
-namespace DisappearingBlock {
-a16()
-i16()
-code()
-EntityAirCollision:
-PlayerAirCollision:
-function NullFunction {
-    rts
-}
-
-
-// The player is standing on a disappearing block
-// INPUT: dp = entity
-// INPUT:  Y = map data index
-PlayerLeftRightCollision:
-PlayerOriginCollision:
-function EntityCollision {
     lda.w   #0
     tyx
     jmp     MetaTiles.SetMapCell

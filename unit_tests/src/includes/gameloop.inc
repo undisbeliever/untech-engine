@@ -97,6 +97,10 @@ a16()
 i16()
 code()
 function ProcessFrame {
+
+    jsr     MetaTiles.CrumblingTiles.Process
+
+
     Entity.ProcessSpecialLists()
 
     MetaSprite.EntityHitbox.Begin()
@@ -138,6 +142,7 @@ function ProcessFrame {
     jsr     MetaSprite.Render.EndLoop
 
     jsr     Entity.ValidateEntityLists
+    jsr     MetaTiles.Validate
 
     rts
 }

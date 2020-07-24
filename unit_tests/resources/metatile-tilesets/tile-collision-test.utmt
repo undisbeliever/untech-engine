@@ -2,6 +2,8 @@
 <!DOCTYPE untech>
 <metatile-tileset name="TileCollisionTest">
   <palette name="TileCollisionTest"/>
+  <crumbling-tile chain="a" first-tile="71" first-delay="100" second-tile="0" no-third-tile="true"/>
+  <crumbling-tile chain="b" first-tile="71" first-delay="100" second-tile="72" second-delay="600" third-tile="70"/>
   <tile t="17" collision="solid"/>
   <tile t="18" collision="up"/>
   <tile t="19" collision="dp"/>
@@ -23,13 +25,15 @@
   <tile t="66" ft="SetDownGravity"/>
   <tile t="67" ft="SetDownGravity"/>
   <tile t="68" ft="Token"/>
-  <tile t="69" collision="solid" ft="DisappearingBlock"/>
+  <tile t="69" collision="es" ft="CrumblingTiles_A"/>
+  <tile t="70" collision="es" ft="CrumblingTiles_B"/>
+  <tile t="71" collision="es"/>
   <tile-priorities>
     AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAADwkAAA+QAAAAAAAAAAAAAAAAAAAAAAAA
     AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
     AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=
   </tile-priorities>
-  <animation-frames palette="TileCollisionTest" bit-depth="4" animation-delay="30">
+  <animation-frames palette="TileCollisionTest" bit-depth="4" animation-delay="40">
     <frame image="tile-collision-test.png"/>
   </animation-frames>
   <scratchpad width="16" height="16">

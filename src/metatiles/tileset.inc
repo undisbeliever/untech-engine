@@ -61,16 +61,19 @@ i16()
 
     // ensure tileMap is full
     cpy.w   #Format.Tileset.wramLocation + Format.Tileset.size
-    bne     Fail
+    beq     +
+    Fail:
+        break(INVALID_METATILE_TILEMAP)
+    +
 
+    CrumblingTiles._Init()
+
+assert16a()
+assert16i()
 
     // Load tiles
 
     jmp     Resources.AnimatedTileset.LoadAnimatedTileset_FromPtr
-
-
-Fail:
-    break(INVALID_METATILE_TILEMAP)
 }
 
 }

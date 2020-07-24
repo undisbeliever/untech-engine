@@ -18,6 +18,8 @@ namespace MetaTiles {
     constant MAP_HEIGHT_SMALL = 64
     constant MAP_HEIGHT_LARGE = 128
 
+
+
     namespace map {
         // Map width in metatiles
         // (uint8)
@@ -85,6 +87,7 @@ namespace MetaTiles {
     assert(X_POSITION_MASK < map.LEFT)
     assert(Y_POSITION_MASK_SMALL < map.TOP)
     assert(Y_POSITION_MASK_LARGE < map.TOP)
+
 
 
     // Horizontal SNES Tilemap Buffer
@@ -159,6 +162,128 @@ namespace MetaTiles {
 
     // If `drawMapCellBufferIndex` is >= `END` value then the buffer is full
     constant drawMapCellBufferIndex.END = drawMapCellBuffer.BUFFER_SIZE * 2
+
+
+
+    namespace CrumblingTiles {
+        constant N_ELEMENTS = 24
+
+        // Time used by the crumbling blocks
+        //
+        // This value is not in sync with `frameCounter`, it will be
+        // incremented on every `CrumblingTiles.Process` and may be
+        // decremented if overflowing.
+        //
+        // (uint16 - time in frames)
+        allocate(time, wram7e, 2)
+
+
+        inline __AllocateQueue(evaluate n) {
+            // Crumbling tiles queue.
+            //
+            // SoA linked list
+            namespace Queue {
+                // The next index in the linked list.
+                //
+                // If this value is negative then there are no more items in the list.
+                //
+                // (byte index, increments by 2, > 0x80 is NULL)
+                if {n} == 1 {
+                    allocate(next, wram7e, 2 * N_ELEMENTS)
+                } else {
+                    constant next = ChainA.Queue.next + 1
+                }
+
+
+                // The time the next transition occurs at.
+                //
+                // This value is compared with `CrumblingTiles.time`, not `frameCounter`.
+                //
+                // This value is not used by the first queue.
+                //
+                // (uint16)
+                allocate(time, wram7e, 2 * N_ELEMENTS)
+
+
+                // The index within `map.data` for the crumbling tile.
+                //
+                // (uint16 index into `map.data`)
+                allocate(mapDataIndex, wram7e, 2 * N_ELEMENTS)
+            }
+        }
+        namespace ChainA {
+            __AllocateQueue(1)
+        }
+        namespace ChainB {
+            __AllocateQueue(2)
+        }
+        assert(tilesetFooter.N_CRUMBLING_BLOCK_CHAINS == 2)
+
+
+        inline __AllocateVariables(ns) {
+            // The tile to turn into on the first, second and third transitions
+            // (3x byte)
+            constant firstTileId  = tilesetFooter.CrumblingTiles{ns}.firstTileId
+            constant secondTileId = tilesetFooter.CrumblingTiles{ns}.secondTileId
+            constant thirdTileId  = tilesetFooter.CrumblingTiles{ns}.thirdTileId
+
+            // Time to wait between the first and second tile transition in display frames.
+            // (uint16 - display frames)
+            allocate(firstWait, wram7e, 2)
+
+            // Time to wait between the second and third tile transition in display frames.
+            //
+            // If this value is 0xffff then there is no third tile transition
+            //
+            // (uint16 - display frames)
+            allocate(secondWait, wram7e, 2)
+
+
+            // Unallocated queue nodes
+            //
+            // (byte index, negative if empty)
+            allocate(free, wram7e, 1)
+
+
+            // The first linked list node in the first queue.
+            //
+            // Nodes in this queue will be processed on the next `MetaTiles.CrumblingTiles.Process` call.
+            //
+            // `Queue.time` is ignored by this queue.
+            //
+            // (byte index, negative if empty)
+            allocate(firstHead, wram7e, 1)
+
+            // The last linked list node in the first queue.
+            // (byte index, negative if empty)
+            allocate(firstTail, wram7e, 1)
+
+
+            // The first linked list node in the second queue.
+            // (byte index, negative if empty)
+            allocate(secondHead, wram7e, 1)
+
+            // The last linked list node in the second queue.
+            // (byte index, negative if empty)
+            allocate(secondTail, wram7e, 1)
+
+
+            // The first linked list node in the third queue.
+            // (byte index, negative if empty)
+            allocate(thirdHead, wram7e, 1)
+
+            // The last linked list node in the third queue.
+            // (byte index, negative if empty)
+            allocate(thirdTail, wram7e, 1)
+        }
+        namespace ChainA {
+            __AllocateVariables(ChainA)
+        }
+        namespace ChainB {
+            __AllocateVariables(ChainB)
+        }
+        assert(tilesetFooter.N_CRUMBLING_BLOCK_CHAINS == 2)
+    }
 }
 
 // vim: ft=bass-65816 ts=4 sw=4 et:

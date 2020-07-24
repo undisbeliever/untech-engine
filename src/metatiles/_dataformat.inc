@@ -9,7 +9,7 @@
 
 
 namespace MetaTiles {
-    if MetaTiles.TILESET_FORMAT_VERSION != 8 {
+    if MetaTiles.TILESET_FORMAT_VERSION != 9 {
         error "Invalid untech-compiler MetaTile Tileset Format"
     }
 
@@ -56,6 +56,65 @@ namespace MetaTiles {
         constant N_FUNCTIONS = 32
 
         constant MASK = (N_FUNCTIONS - 1) << 1
+    }
+
+    namespace tilesetFooter {
+        // This data is at the end because we want the tileset-map variables to be page aligned.
+
+        constant FOOTER_SIZE = 14
+        allocate(_data, wram7e, FOOTER_SIZE)
+
+        struct(_data)
+            // Crumbling tile settings for the MetaTile Tileset.
+            inline __CrumblingTilesChain() {
+                // The first tile in the chain
+                //
+                // The crumble tile will change to this tileId when the crumbling tile is activated.
+                //
+                // MUST NOT be the tileId of the crumble tile
+                //
+                // (byte)
+                field(firstTileId, 1)
+
+                // The second tile in the chain
+                //
+                // The crumble tile will change to this tileId after `firstDelay` ticks.
+                //
+                // (byte)
+                field(secondTileId, 1)
+
+                // The third tile in the chain
+                //
+                // The crumble tile will change to this tileId after `firstDelay` + `secondDelay` ticks.
+                //
+                // NOTE: This tileId will not be used if `secondDelay` is `0xffff`.
+                //
+                // (byte)
+                field(thirdTileId, 1)
+
+                // The delay between the first and second tile transition in animation ticks.
+                // (uint16 - ticks)
+                field(firstDelay, 2)
+
+                // The delay between the second and third tile transition in animation ticks.
+                //
+                // If this value is `0xffff`, then there is no third transition on this chain.
+                //
+                // (uint16 - ticks)
+                field(secondDelay, 2)
+            }
+            namespace CrumblingTilesChainA {
+                __CrumblingTilesChain()
+            }
+            namespace CrumblingTilesChainB {
+                __CrumblingTilesChain()
+            }
+
+            constant N_CRUMBLING_BLOCK_CHAINS = 2
+
+        endstruct()
+
+        assert(size == FOOTER_SIZE)
     }
 
 
@@ -116,13 +175,16 @@ namespace MetaTiles {
         //          - see Resources.Format.AnimatedTilesetHeader for data format
         namespace Tileset {
             constant wramLocation = MetaTiles.tileMap
-            constant size = tileMap.size + collisionMap.size + interactiveTilesMap.size
 
-            // Ensure `tileMap`, `collisionMap`, and `interactiveTilesMap` are continuous
+            constant size = tileMap.size + collisionMap.size + interactiveTilesMap.size + tilesetFooter.size
+
+            // Ensure `tileMap`, `collisionMap`, `interactiveTilesMap` and `tilesetFooter` are continuous
             assert(tileMap + tileMap.size == collisionMap)
             assert(collisionMap + collisionMap.size == interactiveTilesMap)
+            assert(interactiveTilesMap + interactiveTilesMap.size == tilesetFooter._data)
 
             // Ensure the variables are page aligned
+            assert(wramLocation & 0xff == 0)
             assert(tileMap & 0xff == 0)
             assert(collisionMap & 0xff == 0)
             assert(interactiveTilesMap & 0xff == 0)
