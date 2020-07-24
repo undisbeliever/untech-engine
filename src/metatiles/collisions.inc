@@ -598,9 +598,9 @@ MovingDown:
         // entity's xPos (refered to as the bottom-center tile).
         //
         // If the bottom-center tile is empty we then test the bottom
-        // left/right tiles for a SOLID or UP_PLATFORM collision.  Only two
-        // tiles to the left and two to the right are tested.  If the tile
-        // hitbox's left/right values are > 32 the remaining tiles will be
+        // left/right tiles for a SOLID, END_SLOPE, or UP_PLATFORM collision.
+        // Only two tiles to the left and two to the right are tested.  If the
+        // tile hitbox's left/right values are > 32 the remaining tiles will be
         // ignored.
         //
         // If the tile being tested is an UP_PLATFORM then collision only
@@ -619,9 +619,8 @@ MovingDown:
         // collisions, which is not an issue as the engine requires all down
         // slope tiles to have a SOLID or UP_PLATFORM tile underneath them.
         //
-        // The END_SLOPE tile is only solid in the bottom-center tile.
-        // There is no need to write code to test for END_SLOPE as
-        // `TopHeightTable[END_SLOPE | (xPos & 0xf)]` is always 0.
+        // There is no need to write code to test for END_SLOPE for the bottom-center
+        // tile, as `TopHeightTable[END_SLOPE | (xPos & 0xf)]` is always 0.
         //
         // The falling code will only reset the entity's yMomentum if the
         // entity has a collision in the Y-Axis and it did not change into a
@@ -805,8 +804,8 @@ MovingDown:
 
         // _edgeOnPlatform = 0
         // for each left/right tile:
-        //      a = collisionMap[map.data[y + offset]]
-        //      if a == PlatformIndex.SOLID:
+        //      a = collisionMap[map.data[y + offset]] & 0xf0
+        //      if a == TileCollisionType.SOLID:
         //          goto {SolidCollisionLabel}
         //      if a == {platform}:
         //          _edgeOnPlatform = LeftRightPlatformTileOffsetTable.{offset}_{MAP_HEIGHT}
@@ -830,6 +829,9 @@ MovingDown:
                 lda.w   map.data - 2 * MAP_HEIGHT,y
                 tax
                 lda.w   collisionMap,x
+                and.b   #0xf0
+                assert(TileCollisionType.__ENUM__.increment == 16)
+                assert(TileCollisionType.END_SLOPE & 0xf0 == 0)
                 assert(TileCollisionType.SOLID == 0)
                 beq     {SolidCollisionLabel}_TwoLeft
                 cmp.b   #TileCollisionType.{platform}
@@ -842,6 +844,9 @@ MovingDown:
             lda.w   map.data - 1 * MAP_HEIGHT,y
             tax
             lda.w   collisionMap,x
+            and.b   #0xf0
+            assert(TileCollisionType.__ENUM__.increment == 16)
+            assert(TileCollisionType.END_SLOPE & 0xf0 == 0)
             assert(TileCollisionType.SOLID == 0)
             beq     {SolidCollisionLabel}_OneLeft
             cmp.b   #TileCollisionType.{platform}
@@ -865,6 +870,9 @@ MovingDown:
                 lda.w   map.data + 2 * MAP_HEIGHT,y
                 tax
                 lda.w   collisionMap,x
+                and.b   #0xf0
+                assert(TileCollisionType.__ENUM__.increment == 16)
+                assert(TileCollisionType.END_SLOPE & 0xf0 == 0)
                 assert(TileCollisionType.SOLID == 0)
                 beq     {SolidCollisionLabel}_TwoRight
                 cmp.b   #TileCollisionType.{platform}
@@ -877,6 +885,9 @@ MovingDown:
             lda.w   map.data + 1 * MAP_HEIGHT,y
             tax
             lda.w   collisionMap,x
+            and.b   #0xf0
+            assert(TileCollisionType.__ENUM__.increment == 16)
+            assert(TileCollisionType.END_SLOPE & 0xf0 == 0)
             assert(TileCollisionType.SOLID == 0)
             beq     {SolidCollisionLabel}_OneRight
             cmp.b   #TileCollisionType.{platform}
@@ -1133,17 +1144,17 @@ MovingDown_Standing:
         //    2. It allows the entity to gracefully walk/run down slopes.
         //
         // The bottom left/right tile collision tests will only be test if the
-        // entity collides with a SOLID or UP_PLATFORM tile.  This is not an
-        // issue as there all down slope tiles have a SOLID, END_SLOPE or
-        // UP_PLATFORM tile underneath them.
+        // entity collides with a SOLID, END_SLOPE, or UP_PLATFORM tile.
+        // This is not an issue as there all down slope tiles have a SOLID,
+        // END_SLOPE or UP_PLATFORM tile underneath them.
         //
         // The bottom left/right corner tests will only check two tiles to the
         // left and two tiles to the right of the X position.  If the tile
         // hitbox's left/right values are > 32 the remaining tiles will be
         // ignored.
         //
-        // There is no need to write code to test for END_SLOPE, as
-        // `BottomHeightTable[END_SLOPE | (xPos & 0xf)]` is always 0.
+        // There is no need to write code to test for END_SLOPE for the bottom-center
+        // tile, as `BottomHeightTable[END_SLOPE | (xPos & 0xf)]` is always 0.
         //
         // The Standing code will reset the yMomentum to 0 when there is no collision
         // and the entity's Standing flag is cleared.
@@ -1226,8 +1237,8 @@ MovingDown_Standing:
         assert16i()
 
         // for each left/right tile:
-        //      a = collisionMap[map.data[y + offset]]
-        //      if a == SOLID or a == {platform}:
+        //      a = collisionMap[map.data[y + offset]] & 0xf0
+        //      if a == TileCollisionType.SOLID or a == {platform}:
         //          goto {SolidCollisionLabel}_{offset}
 
         lda.b   BaseEntity.xPos.px
@@ -1242,6 +1253,9 @@ MovingDown_Standing:
                 lda.w   map.data - 2 * MAP_HEIGHT,y
                 tax
                 lda.w   collisionMap,x
+                and.b   #0xf0
+                assert(TileCollisionType.__ENUM__.increment == 16)
+                assert(TileCollisionType.END_SLOPE & 0xf0 == 0)
                 assert(TileCollisionType.SOLID == 0)
                 beq     {SolidCollisionLabel}_TwoLeft
                 cmp.b   #TileCollisionType.{platform}
@@ -1251,6 +1265,9 @@ MovingDown_Standing:
             lda.w   map.data - 1 * MAP_HEIGHT,y
             tax
             lda.w   collisionMap,x
+            and.b   #0xf0
+            assert(TileCollisionType.__ENUM__.increment == 16)
+            assert(TileCollisionType.END_SLOPE & 0xf0 == 0)
             assert(TileCollisionType.SOLID == 0)
             beq     {SolidCollisionLabel}_OneLeft
             cmp.b   #TileCollisionType.{platform}
@@ -1272,6 +1289,9 @@ MovingDown_Standing:
                 lda.w   map.data + 2 * MAP_HEIGHT,y
                 tax
                 lda.w   collisionMap,x
+                and.b   #0xf0
+                assert(TileCollisionType.__ENUM__.increment == 16)
+                assert(TileCollisionType.END_SLOPE & 0xf0 == 0)
                 assert(TileCollisionType.SOLID == 0)
                 beq     {SolidCollisionLabel}_TwoRight
                 cmp.b   #TileCollisionType.{platform}
@@ -1281,6 +1301,9 @@ MovingDown_Standing:
             lda.w   map.data + 1 * MAP_HEIGHT,y
             tax
             lda.w   collisionMap,x
+            and.b   #0xf0
+            assert(TileCollisionType.__ENUM__.increment == 16)
+            assert(TileCollisionType.END_SLOPE & 0xf0 == 0)
             assert(TileCollisionType.SOLID == 0)
             beq     {SolidCollisionLabel}_OneRight
             cmp.b   #TileCollisionType.{platform}
