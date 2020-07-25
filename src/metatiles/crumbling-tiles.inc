@@ -33,53 +33,21 @@ constant animationSpeed = Resources.animationSpeed
     // Reset time
     stz.w   CrumblingTiles.time
 
+    lda.w   #CrumblingTiles.ChainA.Queue.LAST_INDEX | (CrumblingTiles.ChainA.Queue.LAST_INDEX << 8)
+    assert(CrumblingTiles.ChainA.Queue.writerPos + 1 == CrumblingTiles.ChainA.Queue.firstPos)
+    sta.w   CrumblingTiles.ChainA.Queue.writerPos
+    assert(CrumblingTiles.ChainA.Queue.secondPos + 1 == CrumblingTiles.ChainA.Queue.thirdPos)
+    sta.w   CrumblingTiles.ChainA.Queue.secondPos
 
-    sep     #$30
+    assert(CrumblingTiles.ChainA.Queue.LAST_INDEX == CrumblingTiles.ChainB.Queue.LAST_INDEX)
+    assert(CrumblingTiles.ChainB.Queue.writerPos + 1 == CrumblingTiles.ChainB.Queue.firstPos)
+    sta.w   CrumblingTiles.ChainB.Queue.writerPos
+    assert(CrumblingTiles.ChainB.Queue.secondPos + 1 == CrumblingTiles.ChainB.Queue.thirdPos)
+    sta.w   CrumblingTiles.ChainB.Queue.secondPos
+
+
+    sep     #$20
 a8()
-i8()
-    // Initialize the free list loop
-    ldx.b   #(CrumblingTiles.N_ELEMENTS - 1) * 2
-    stx.w   CrumblingTiles.ChainA.free
-    stx.w   CrumblingTiles.ChainB.free
-
-    Loop:
-        txa
-        dec
-        dec
-        sta.w   CrumblingTiles.ChainA.Queue.next,x
-        sta.w   CrumblingTiles.ChainB.Queue.next,x
-
-        tax
-        bne     Loop
-
-    ldx.b   #0xff
-    stx.w   CrumblingTiles.ChainA.Queue.next
-    stx.w   CrumblingTiles.ChainB.Queue.next
-
-
-    // Set head/tail to NULL
-    rep     #$10
-i16()
-    assert(CrumblingTiles.N_ELEMENTS * 2 < 0x80)
-
-    assert(CrumblingTiles.ChainA.firstHead  + 1 == CrumblingTiles.ChainA.firstTail)
-    assert(CrumblingTiles.ChainA.secondHead + 1 == CrumblingTiles.ChainA.secondTail)
-    assert(CrumblingTiles.ChainA.thirdHead  + 1 == CrumblingTiles.ChainA.thirdTail)
-
-    assert(CrumblingTiles.ChainB.firstHead  + 1 == CrumblingTiles.ChainB.firstTail)
-    assert(CrumblingTiles.ChainB.secondHead + 1 == CrumblingTiles.ChainB.secondTail)
-    assert(CrumblingTiles.ChainB.thirdHead  + 1 == CrumblingTiles.ChainB.thirdTail)
-
-    ldx.w   #0xffff
-    stx.w   CrumblingTiles.ChainA.firstHead
-    stx.w   CrumblingTiles.ChainA.secondHead
-    stx.w   CrumblingTiles.ChainA.thirdHead
-    stx.w   CrumblingTiles.ChainB.firstHead
-    stx.w   CrumblingTiles.ChainB.secondHead
-    stx.w   CrumblingTiles.ChainB.thirdHead
-
-
-
     // Convert first transition delay from ticks to frames
     ldy.w   tilesetFooter.CrumblingTilesChainA.firstDelay
     lda.w   animationSpeed
@@ -117,6 +85,52 @@ a16()
 
 
 
+// Advance the circular buffer index
+//
+// REQUIRES: 8 bit Index
+// DEFINE: {ns} = ChainA or ChainB
+// INPUT: X = queue index
+// OUTPUT: X = index of the next item in the queue
+// KEEP: carry
+inline __nextQueueIndex_X() {
+    assert8i()
+
+    // MUST NOT CHANGE CARRY
+
+    dex
+    dex
+    bpl     NoUnderflow_{#}
+        ldx.b   #{ns}.Queue.LAST_INDEX
+    NoUnderflow_{#}:
+}
+assert(ChainA.Queue.INDEX_INCREMENT == 2)
+assert(ChainA.Queue.LAST_INDEX < 0x80)
+assert(ChainB.Queue.LAST_INDEX < 0x80)
+
+// Advance the circular buffer index
+//
+// REQUIRES: 8 bit A
+// DEFINE: {ns} = ChainA or ChainB
+// INPUT: A = queue index
+// OUTPUT: A = index of the next item in the queue
+// KEEP: carry
+inline __nextQueueIndex_A() {
+    assert8a()
+
+    // MUST NOT CHANGE CARRY
+
+    dec
+    dec
+    bpl     NoUnderflow_{#}
+        lda.b   #{ns}.Queue.LAST_INDEX
+    NoUnderflow_{#}:
+}
+assert(ChainA.Queue.INDEX_INCREMENT == 2)
+assert(ChainA.Queue.LAST_INDEX < 0x80)
+assert(ChainB.Queue.LAST_INDEX < 0x80)
+
+
+
 // Activate a crumbling tile.
 //
 // NOTE: This function will be called by the interactive tiles system
@@ -134,65 +148,46 @@ inline __Activate(ns) {
     // DP unknown
 
 
+	// Map bounds check
     cpy.w   map.dataSize
     bcs     DoNotAddToQueue
 
-    sep     #$20
+	sep		#$20
 a8()
     // If the tile has already been changed then ignore it
     lda.w   {ns}.firstTileId
     cmp.w   map.data,y
     beq     DoNotAddToQueue
 
+
+	lda.w	{ns}.Queue.writerPos
+	tax
+
+	// Advance writerPos and check if the buffer is full
+	// (buffer is full if `__nextQueueIndex(writerPos)` == `thirdPos`)
+	__nextQueueIndex_A()
+	cmp.w	{ns}.Queue.thirdPos
+	beq		BufferFull
+	sta.w	{ns}.Queue.writerPos
+
+	// X = old (non-incremented) writerPos (NOTICE: high byte is invalid)
+	// Y = map data index
+
     // Change the map tile to prevent a crumbling tile from being activated twice
+    lda.w   {ns}.firstTileId
     sta.w   map.data,y
 
 
-    // Store mapDataIndex into first free node (if possible)
+	// Store map data index in queue
     rep     #$20
 a16()
     tya
 
+	// Must use an 8 bit index as the hi-byte of X is unknown.
+	// (`sep` must be done after the `tya`)
     sep     #$10
 i8()
-    ldy.w   {ns}.free
-    bmi     QueueFull
-
-    sta.w   {ns}.Queue.mapDataIndex,y
-
-
-    // Move node to the first list
-
-    //  y = free
-    //  free = y->next
-    //  y->next = null
-    //
-    //  if firstTail == null:
-    //      firstHead = y
-    //  else:
-    //      firstTail->next = y
-    //  firstTail = y
-
-    sep     #$30
-i8()
-a8()
-    // Y = {ns}.free
-    lda.w   {ns}.Queue.next,y
-    sta.w   {ns}.free
-
-    lda.b   #0xff
-    sta.w   {ns}.Queue.next,y
-
-    ldx.w   {ns}.firstTail
-    bpl     +
-        sty.w   {ns}.firstHead
-        bra     ++
-    +
-        tya
-        sta.w   {ns}.Queue.next,x
-    +
-    sty.w   {ns}.firstTail
-
+    sta.w   {ns}.Queue.mapDataIndex,x
 
 au()
 iu()
@@ -202,7 +197,9 @@ a16()
 i16()
     rts
 
-QueueFull:
+a8()
+i16()
+BufferFull:
     Warnings.Warn(CRUMBLING_LIST_FULL)
 
     rep     #$30
@@ -244,15 +241,12 @@ function ActivateChainB {
 
 // Process a crumbling tile chain.
 //
-// REQUIRES: 8 bit A, 8 bit Index, DB = 0x7e, DP = 0
+// REQUIRES: 8 bit Index, DB = 0x7e, DP = 0
 // PARAM: ns = ChainA or ChainB
 // PARAM: mapSize = SMALL or LARGE
+// MODIFIES: 16 bit A, 8 bit Index
 inline __Process(ns, mapSize) {
-    assert8a()
     assert8i()
-
-constant _queueIndex = utDpTmp0
-
 
     // Do not process crumbling tiles if the drawMapCellBuffer is full
     ldx.w   drawMapCellBufferIndex
@@ -260,29 +254,24 @@ constant _queueIndex = utDpTmp0
     bcs     Return
 
 
+
 // Process the first queue
 // -----------------------
-
-    ldx.w   {ns}.firstHead
-    bmi     SkipFirstQueue
-
-
-    rep     #$21
+    rep     #$20
 a16()
-    // carry clear
 
-    i8()
-    a16()
+    ldx.w   {ns}.Queue.firstPos
+    cpx.w   {ns}.Queue.writerPos
+    beq     ProcessSecondQueue
+
+a16()
+i8()
     FirstLoop:
-        // carry clear
-
         // X = queue index
-        stx.b   _queueIndex
-
 
         // Schedule second transition
         lda.w   time
-        // carry clear
+    	clc
         adc.w   {ns}.firstWait
         sta.w   {ns}.Queue.time,x
 
@@ -302,56 +291,22 @@ a16()
 
         sep     #$10
     i8()
-        ldy.b   _queueIndex
+        // Goto next item in queue
+        ldx.w   {ns}.Queue.firstPos
+        __nextQueueIndex_X()         // does not modify carry
+        stx.w   {ns}.Queue.firstPos
 
         // End loop if drawMapCellBuffer is full
         bcs     EndFirstLoop
 
-        // Continue loop if next node exists and time has expired
-        ldx.w   {ns}.Queue.next,y
-        bmi     EndFirstLoop
-
-        lda.w   {ns}.Queue.time,x
-        cmp.w   time
-        bcc     FirstLoop
+        // Loop if not at end of first queue
+        cpx.w   {ns}.Queue.writerPos
+        bne     FirstLoop
     EndFirstLoop:
 
-
-    // Y = last queue node that was updated
-    // Move queue nodes (firstHead to y) from first queue to end of second queue
     sep     #$30
 a8()
 i8()
-    //  if secondTail != NULL:
-    //      secondTail->next = firstHead
-    //  else:
-    //      secondHead = firstHead
-    //  firstHead = x->next
-    //  if firstHead == NULL:
-    //      firstTail = NULL
-    //  y->next = NULL
-    //  secondTail = y
-
-    lda.w   {ns}.firstHead
-    ldx.w   {ns}.secondTail
-    bmi     +
-        sta.w   {ns}.Queue.next,x
-        bra     ++
-    +
-        sta.w   {ns}.secondHead
-    +
-
-    lda.w   {ns}.Queue.next,y
-    sta.w   {ns}.firstHead
-    bpl     +
-        sta.w   {ns}.firstTail
-    +
-
-    lda.b   #0xff
-    sta.w   {ns}.Queue.next,y
-
-    sty.w   {ns}.secondTail
-
 
     // Return early
     // If I remove this I MUST CHECK if the SetMapCell buffer is full
@@ -361,32 +316,26 @@ Return:
 
 
 
-i8()
-a8()
-SkipFirstQueue:
-
-
 // Process the second queue
 // ------------------------
-
-    ldx.w   {ns}.secondHead
-    bmi     SkipSecondQueue
-
-    rep     #$20
 a16()
+i8()
+ProcessSecondQueue:
+
+    ldx.w   {ns}.Queue.secondPos
+    cpx.w   {ns}.Queue.firstPos
+    beq     ProcessThirdQueue
+
     lda.w   {ns}.Queue.time,x
     cmp.w   time
-    bcs     SkipSecondQueue
+    bcs     ProcessThirdQueue
     // Carry clear
 
-i8()
 a16()
+i8()
     SecondLoop:
         // carry clear
-
         // X = queue index
-        stx.b   _queueIndex
-
 
         // Schedule third transition
         lda.w   time
@@ -415,121 +364,61 @@ a16()
 
         sep     #$10
     i8()
-        ldy.b   _queueIndex
+        // Goto next item in queue
+        ldx.w   {ns}.Queue.secondPos
+        __nextQueueIndex_X()         // does not modify carry
+        stx.w   {ns}.Queue.secondPos
 
         // End loop if drawMapCellBuffer is full
         bcs     EndSecondLoop
 
-        // Continue loop if next node exists and time has expired
-        ldx.w   {ns}.Queue.next,y
-        bmi     EndSecondLoop
+        // Exit loop if at end of the second queue
+        cpx.w   {ns}.Queue.firstPos
+        beq     EndSecondLoop
 
+        // Continue loop if time has expired
         lda.w   {ns}.Queue.time,x
         cmp.w   time
         bcc     SecondLoop
     EndSecondLoop:
 
 
-    // Y = last queue node that was drawn
-    // Move queue nodes (secondHead to y) from second queue to end of third queue
-    sep     #$30
-a8()
+    // X = Queue.secondPos
+a16()
 i8()
-    //
-    //  if thirdTail != NULL:
-    //      thirdTail->next = secondHead
-    //  else:
-    //      thirdHead = secondHead
-    //  secondHead = x->next
-    //  if secondHead == NULL:
-    //      secondTail = NULL
-    //  y->next = NULL
-    //  thirdTail = y
-    lda.w   {ns}.secondHead
-    ldx.w   {ns}.thirdTail
-    bmi     +
-        sta.w   {ns}.Queue.next,x
-        bra     ++
-    +
-        sta.w   {ns}.thirdHead
-    +
-
-    lda.w   {ns}.Queue.next,y
-    sta.w   {ns}.secondHead
+    ldy.w   {ns}.secondWait + 1
     bpl     +
-        sta.w   {ns}.secondTail
+        // No third transition if secondWait is negative
+        stx.w   {ns}.Queue.thirdPos
     +
-
-    lda.b   #0xff
-    sta.w   {ns}.Queue.next,y
-
-    sty.w   {ns}.thirdTail
-
 
     // Return early
     // If I remove this I MUST CHECK if the SetMapCell buffer is full
     rts
 
-
-a8()
-i8()
-NoThirdTransition:
-    // Y = last queue node that was drawn
-    // Move queue nodes (secondHead to y) from second queue to the free list
-
-    //  x = secondHead
-    //
-    //  secondHead = y->next
-    //  if secondHead == NULL:
-    //      secondTail = NULL
-    //
-    //  y->next = free
-    //  free = x
-
-    ldx.w   {ns}.secondHead
-
-    lda.w   {ns}.Queue.next,y
-    sta.w   {ns}.secondHead
-    bpl     +
-        sta.w   {ns}.secondTail
-    +
-
-    lda.w   {ns}.free
-    sta.w   {ns}.Queue.next,y
-
-    stx.w   {ns}.free
-
-
-    // Return early
-    // If I remove this I MUST CHECK if the SetMapCell buffer is full
-    rts
-
-
-a8()
-i8()
-SkipSecondQueue:
 
 
 // Process the third queue
 // ------------------------
-
-    ldx.w   {ns}.thirdHead
-    bmi     SkipThirdQueue
-
-    rep     #$20
 a16()
+i8()
+ProcessThirdQueue:
+
+    ldx.w   {ns}.Queue.thirdPos
+    cpx.w   {ns}.Queue.secondPos
+    beq     SkipThirdQueue
+
     lda.w   {ns}.Queue.time,x
     cmp.w   time
     bcs     SkipThirdQueue
 
 
-i8()
 a16()
+i8()
     ThirdLoop:
         // X = queue index
-        stx.b   _queueIndex
 
-        // Last transition - no need to schedule another transition
+        // Last transition - no more transitions to schedule
 
         // Find map cell
         lda.w   {ns}.Queue.mapDataIndex,x
@@ -551,57 +440,31 @@ a16()
 
         sep     #$10
     i8()
-        ldy.b   _queueIndex
+        // Goto next item in queue
+        ldx.w   {ns}.Queue.thirdPos
+        __nextQueueIndex_X()         // does not modify carry
+        stx.w   {ns}.Queue.thirdPos
 
         // End loop if drawMapCellBuffer is full
         bcs     EndThirdLoop
 
-        // Continue loop if next node exists and time has expired
-        ldx.w   {ns}.Queue.next,y
-        bmi     EndThirdLoop
+        // Exit loop if at end of the third queue
+        cpx.w   {ns}.Queue.secondPos
+        beq     EndThirdLoop
 
+        // Continue loop if time has expired
         lda.w   {ns}.Queue.time,x
         cmp.w   time
         bcc     ThirdLoop
     EndThirdLoop:
 
-
-    sep     #$30
-a8()
-i8()
-    // Y = last queue node that was updated
-    // Move queue nodes (thirdHead to y) from third queue to the free list
-
-    //  x = thirdHead
-    //
-    //  thirdHead = y->next
-    //  if thirdHead == NULL:
-    //      thirdTail = NULL
-    //
-    //  y->next = free
-    //  free = x
-
-    ldx.w   {ns}.thirdHead
-
-    lda.w   {ns}.Queue.next,y
-    sta.w   {ns}.thirdHead
-    bpl     +
-        sta.w   {ns}.thirdTail
-    +
-
-    lda.w   {ns}.free
-    sta.w   {ns}.Queue.next,y
-
-    stx.w   {ns}.free
-
-
-a8()
+a16()
 i8()
 SkipThirdQueue:
     rts
 }
 
-a8()
+au()
 i8()
 code()
 function __Process_ChainA_Small {
@@ -649,8 +512,9 @@ i8()
         // Alternate between doing chainA and chainB first.
         // It should make it more fair to the system
         lsr
-        bcs +
+        bcs     +
             jsr     __Process_ChainA_Small
+        a16()
             jsr     __Process_ChainB_Small
 
             rep     #$30
@@ -659,7 +523,10 @@ i8()
             rts
 
         +
+        a8()
+        i8()
             jsr     __Process_ChainB_Small
+        a16()
             jsr     __Process_ChainA_Small
 
             rep     #$30
@@ -672,8 +539,9 @@ i8()
     LargeMapHeight:
         // A = time
         lsr
-        bcs +
+        bcs     +
             jsr     __Process_ChainA_Large
+        a16()
             jsr     __Process_ChainB_Large
 
             rep     #$30
@@ -682,7 +550,10 @@ i8()
             rts
 
         +
+        a8()
+        i8()
             jsr     __Process_ChainB_Large
+        a16()
             jsr     __Process_ChainA_Large
 
             rep     #$30

@@ -13,88 +13,14 @@ RegisterBreakId(BROKEN_CRUMBLING_TILES_QUEUE)
 namespace MetaTiles {
 
 
-// Validate a single Crumbling Tiles linked list
-//
-// REGISTERS: 8 bit A, 8 bit Index, DB = 0x7e, DP = 0
-//
-// INPUT: A = number of items in previous lists
-// INPUT: X = first node index (can be null)
-// OUTPUT: A = number of items in list + initial A value
-// OUTPUT: X = last node in the list
-inline __ValidateCrumblingTilesLinkedList(ns) {
-    assert8a()
-    assert8i()
-
-    txy
-    bmi     +
-        -
-            assert(CrumblingTiles.N_ELEMENTS * 2 < 0x80)
-            inc
-            bmi     Fail
-
-            tyx
-            ldy.w   CrumblingTiles.{ns}.Queue.next,x
-            bpl     -
-    +
-    rts
-
-Fail:
-    break(BROKEN_CRUMBLING_TILES_QUEUE)
-}
-a8()
-i8()
-code()
-function _ValidateCrumblingTilesLinkedList_ChainA {
-    __ValidateCrumblingTilesLinkedList(ChainA)
-}
-a8()
-i8()
-code()
-function _ValidateCrumblingTilesLinkedList_ChainB {
-    __ValidateCrumblingTilesLinkedList(ChainB)
-}
-
-
-
 // Validates the Crumbling Tiles subsystem
 //
-// REGISTERS: 8 bit A, 8 bit Index, DB = 0x7e, DP = 0
+// REGISTERS: 16 bit A, 8 bit Index, DB = 0x7e, DP = 0
 //
 // PARAM: ns = ChainA or ChainB
 macro _ValidateCrumblingTiles(ns) {
     assert8a()
     assert8i()
-
-    lda.b   #0
-
-    ldx.w   CrumblingTiles.{ns}.free
-    jsr     _ValidateCrumblingTilesLinkedList_{ns}
-
-    ldx.w   CrumblingTiles.{ns}.firstHead
-    jsr     _ValidateCrumblingTilesLinkedList_{ns}
-    cpx.w   CrumblingTiles.{ns}.firstTail
-    beq     +
-        break(BROKEN_CRUMBLING_TILES_QUEUE)
-    +
-
-    ldx.w   CrumblingTiles.{ns}.secondHead
-    jsr     _ValidateCrumblingTilesLinkedList_{ns}
-    cpx.w   CrumblingTiles.{ns}.secondTail
-    beq     +
-        break(BROKEN_CRUMBLING_TILES_QUEUE)
-    +
-
-    ldx.w   CrumblingTiles.{ns}.thirdHead
-    jsr     _ValidateCrumblingTilesLinkedList_{ns}
-    cpx.w   CrumblingTiles.{ns}.thirdTail
-    beq     +
-        break(BROKEN_CRUMBLING_TILES_QUEUE)
-    +
-
-    cmp.b   #CrumblingTiles.N_ELEMENTS
-    beq     +
-        break(BROKEN_CRUMBLING_TILES_QUEUE)
-    +
 }
 
 

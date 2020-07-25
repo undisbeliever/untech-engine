@@ -166,8 +166,6 @@ namespace MetaTiles {
 
 
     namespace CrumblingTiles {
-        constant N_ELEMENTS = 24
-
         // Time used by the crumbling blocks
         //
         // This value is not in sync with `frameCounter`, it will be
@@ -176,48 +174,6 @@ namespace MetaTiles {
         //
         // (uint16 - time in frames)
         allocate(time, wram7e, 2)
-
-
-        inline __AllocateQueue(evaluate n) {
-            // Crumbling tiles queue.
-            //
-            // SoA linked list
-            namespace Queue {
-                // The next index in the linked list.
-                //
-                // If this value is negative then there are no more items in the list.
-                //
-                // (byte index, increments by 2, > 0x80 is NULL)
-                if {n} == 1 {
-                    allocate(next, wram7e, 2 * N_ELEMENTS)
-                } else {
-                    constant next = ChainA.Queue.next + 1
-                }
-
-
-                // The time the next transition occurs at.
-                //
-                // This value is compared with `CrumblingTiles.time`, not `frameCounter`.
-                //
-                // This value is not used by the first queue.
-                //
-                // (uint16)
-                allocate(time, wram7e, 2 * N_ELEMENTS)
-
-
-                // The index within `map.data` for the crumbling tile.
-                //
-                // (uint16 index into `map.data`)
-                allocate(mapDataIndex, wram7e, 2 * N_ELEMENTS)
-            }
-        }
-        namespace ChainA {
-            __AllocateQueue(1)
-        }
-        namespace ChainB {
-            __AllocateQueue(2)
-        }
-        assert(tilesetFooter.N_CRUMBLING_BLOCK_CHAINS == 2)
 
 
         inline __AllocateVariables(ns) {
@@ -239,42 +195,84 @@ namespace MetaTiles {
             allocate(secondWait, wram7e, 2)
 
 
-            // Unallocated queue nodes
+            // Crumbling tiles queue.
             //
-            // (byte index, negative if empty)
-            allocate(free, wram7e, 1)
-
-
-            // The first linked list node in the first queue.
+            // SoA circular buffer.
             //
-            // Nodes in this queue will be processed on the next `MetaTiles.CrumblingTiles.Process` call.
-            //
-            // `Queue.time` is ignored by this queue.
-            //
-            // (byte index, negative if empty)
-            allocate(firstHead, wram7e, 1)
+            // The buffer positions start at the end and increment downwards.
+			//
+			// The buffer is considered full if the `index after writerPos` == `thirdPos`.
+			// This greatly simplifies the code but only allows only allows `N_ELEMENTS - 1`
+			// crumbling tiles to be active per queue (with a cost of 3 bytes of wasted memory
+			// per queue).
+            namespace Queue {
+                constant N_ELEMENTS = 32
 
-            // The last linked list node in the first queue.
-            // (byte index, negative if empty)
-            allocate(firstTail, wram7e, 1)
+				// ::TODO make these variables page aligned::
+
+                // The time the next transition occurs at.
+                //
+                // This value is compared with `CrumblingTiles.time`, not `frameCounter`.
+                //
+                // This value is not used by the first queue.
+                //
+                // (uint16)
+                allocate(time, wram7e, 2 * N_ELEMENTS)
 
 
-            // The first linked list node in the second queue.
-            // (byte index, negative if empty)
-            allocate(secondHead, wram7e, 1)
-
-            // The last linked list node in the second queue.
-            // (byte index, negative if empty)
-            allocate(secondTail, wram7e, 1)
+                // The index within `map.data` for the crumbling tile.
+                //
+                // (uint16 index into `map.data`)
+                allocate(mapDataIndex, wram7e, 2 * N_ELEMENTS)
 
 
-            // The first linked list node in the third queue.
-            // (byte index, negative if empty)
-            allocate(thirdHead, wram7e, 1)
+                constant INDEX_INCREMENT = 2
 
-            // The last linked list node in the third queue.
-            // (byte index, negative if empty)
-            allocate(thirdTail, wram7e, 1)
+                // The maximum allowed index value for a queue position index
+                constant LAST_INDEX = INDEX_INCREMENT * (N_ELEMENTS - 1)
+
+                // Negative indexes are used to test if the position index underflowed
+                assert(LAST_INDEX < 0x80)
+
+
+                // Position of next free element in the circular buffer.
+                //
+                // This variable is also used to mark the end of the first queue.
+				//
+				// If this variable is equal to equal to the item before `thirdPos`
+				// then the circular buffer is full.
+                //
+                // (byte index)
+                allocate(writerPos, wram7e, 1)
+
+                // Position of first queue in the circular buffer
+                //
+                // This variable is also used to mark the end of the second queue.
+                //
+                // Tiles in this queue will be processed on the next
+				// `MetaTiles.CrumblingTiles.Process` call.
+                //
+                // `Queue.time` is ignored by this queue.
+                //
+                // (byte index)
+                allocate(firstPos, wram7e, 1)
+
+                // Position of the second queue in the circular buffer
+                //
+                // This variable is also used to mark the end of the third queue.
+                //
+                // (byte index)
+                allocate(secondPos, wram7e, 1)
+
+                // Position of the third queue in the circular buffer
+                //
+                // This variable is also used to mark the end of the writable area in the circular buffer.
+                //
+                // This queue will always be empty if `secondWait` is negative.
+                //
+                // (byte index)
+                allocate(thirdPos, wram7e, 1)
+            }
         }
         namespace ChainA {
             __AllocateVariables(ChainA)
