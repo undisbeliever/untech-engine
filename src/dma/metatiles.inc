@@ -86,6 +86,7 @@ macro _VBlank_dp4300() {
     ldx.w   MetaTiles.bufferState
     beq     Return
         assert(MetaTiles.bufferState.VERTICAL == 0x80)
+        assert(MetaTiles.bufferState.VERTICAL | MetaTiles.bufferState.HORIZONTAL == 0xff)
         bpl     TransferHorizontalBuffer
             // Transfer Vertical Buffer to VRAM
 
@@ -126,10 +127,10 @@ macro _VBlank_dp4300() {
 
 
         // Skip horizontalBuffer if it not queued
-        assert(MetaTiles.bufferState.HORIZONTAL & 0x01)
-        lda.w   MetaTiles.bufferState
-        lsr
-        bcc     SkipHorizontalBuffer
+        assert16a()
+        assert(MetaTiles.bufferState.HORIZONTAL & 0x40)
+        bit.w   MetaTiles.bufferState - 1
+        bvc     SkipHorizontalBuffer
 
 
         TransferHorizontalBuffer:
