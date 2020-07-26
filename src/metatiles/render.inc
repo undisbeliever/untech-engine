@@ -518,10 +518,12 @@ macro __DrawVerticalBuffer() {
 
 // Updates the position of the map, drawing new tiles as necessary
 //
+// NOTE: This macro may change the camera position
+//
 // ASSUMES: DrawFullScreen_ForceBlank has been called to setup map state
 // ASSUMES: Camera position inside map
 //
-// REQUIRES: 16 bit A, 16 bit Index, DB = 0x7e
+// REQUIRES: 16 bit A, 16 bit Index, DB = 0x7e, DP = 0
 //
 // PARAM: mapHeight - height of map (SMALL or LARGE)
 inline __Update(mapHeight) {
@@ -529,6 +531,14 @@ inline __Update(mapHeight) {
     assert16i()
 
 constant MAP_HEIGHT = MAP_HEIGHT_{mapHeight}
+
+constant cameraXoffset      = MetaTiles.Render.cameraXoffset
+constant cameraYoffset      = MetaTiles.Render.cameraYoffset
+constant displayHoffset     = MetaTiles.Render.displayHoffset
+constant displayVoffset     = MetaTiles.Render.displayVoffset
+constant tilemapVramWaddr   = MetaTiles.Render.tilemapVramWaddr
+constant visibleMapPtr      = MetaTiles.Render.visibleMapPtr
+
 
     //  xOffset = Camera.xPos - verticalBuffer.cursorXpos
     //
@@ -624,7 +634,7 @@ XOffsetNegative:
 
     DrawVerticalBuffer:
         // A = map Index, Y = vramOffset
-        __DrawVerticalBuffer()
+        Render.__DrawVerticalBuffer()
 
 SkipDrawVerticalBuffer:
 
@@ -721,7 +731,7 @@ YOffsetNegative:
 
     DrawHorizontalBuffer:
         // A = map Index, Y = vramOffset
-        __DrawHorizontalBuffer()
+        Render.__DrawHorizontalBuffer()
 
 SkipDrawHorizontalBuffer:
 
@@ -738,46 +748,6 @@ SkipDrawHorizontalBuffer:
     sec
     sbc.w   cameraYoffset
     sta.w   displayVoffset
-
-    rts
-}
-
-
-
-// Updates the position of the map, drawing new tiles as necessary
-//
-// Will change the camera position to ensure only 1 MetaTile row and 1 MetaTile
-// column is processed per frame.
-//
-// This routine SHOULD BE called early in the game loop (ie, before
-// `Entities.ProcessGameLoop` and `Resources.ProcessAnimations`) to prevent a
-// VBlank overrun.
-//
-// ASSUMES: DrawFullScreen_ForceBlank has been called to setup map state
-// ASSUMES: Camera position inside map
-//
-// REQUIRES: 16 bit A, 16 bit Index, DB = 0x7e
-a16()
-i16()
-code()
-function Update {
-constant _mapPtr = utDpTmp0
-constant _mapPtrRend = utDpTmp2
-
-    BranchIfMapIsSmall_Long(SmallMapHeight)
-
-    LargeMapHeight:
-    namespace LargeMapHeight {
-        __Update(LARGE)
-        pld
-        rts
-    }
-    SmallMapHeight:
-    namespace SmallMapHeight {
-        __Update(SMALL)
-        pld
-        rts
-    }
 }
 
 

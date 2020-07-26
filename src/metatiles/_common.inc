@@ -90,6 +90,61 @@ macro _LoadMap() {
 
 
 
+// Process MetaTiles
+//
+// This function will:
+//    * Update the BG map offset
+//    * Draw newly visible tiles to the horizontal and vertical buffers
+//    * Process crumbling tiles
+//
+// It is recommended to call this function after updating the camera but before
+// processing entities.
+//
+// This routine SHOULD BE called early in the game loop (ie, before
+// `Entities.ProcessEntityList` and `Resources.ProcessAnimations`) to prevent a
+// VBlank overrun.
+//
+// The camera SHOULD NOT be changed after calling this function.
+//
+//
+// NOTE: This function may change the camera position to ensure ensure only
+// 1 MetaTile row and 1 MetaTile column is processed per frame.
+//
+//
+// ASSUMES: MetaTiles.Render.DrawFullScreen_ForceBlank has been called to setup map state
+// ASSUMES: Camera position inside map
+//
+// REQUIRES: 16 bit A, 16 bit Index, DB = 0x7e, DP = 0
+a16()
+i16()
+code()
+function Process {
+constant _mapPtr = utDpTmp0
+constant _mapPtrRend = utDpTmp2
+
+    BranchIfMapIsSmall_Long(SmallMapHeight)
+
+    namespace LargeMapHeight {
+        Render.__Update(LARGE)
+
+        CrumblingTiles._Process(Large)
+
+        rts
+    }
+
+SmallMapHeight:
+    namespace SmallMapHeight {
+        Render.__Update(SMALL)
+
+        CrumblingTiles._Process(Small)
+
+        rts
+    }
+}
+
+
+
+
 namespace SetMapCell {
 // DP unknown
 // P on stack

@@ -484,82 +484,49 @@ function __Process_ChainB_Large {
 
 // Process Crumbling Tiles
 //
-// This function should be called in the gameloop before the players, entities
-// or MetaTiles are processed.
-//
 // ASSUMES: There is enough DMA time in `dma.transfersLeft` to fill `drawMapCellBuffer`.
 //
 // REQUIRES: 16 bit A, 16 bit Index, DB = 0x7e, DP = 0
+// PARAM: mapHeight = Small or Large
 a16()
 i16()
-function Process {
-    lda.w   time
+inline _Process(mapHeight) {
+    assert16a()
+    assert16i()
+
+
+    lda.w   CrumblingTiles.time
     inc
     bpl     TimeValid
 
 TimeValid:
-    sta.w   time
+    sta.w   CrumblingTiles.time
 
     sep     #$30
 a8()
 i8()
-    assert(MAP_HEIGHT_LARGE == 0x80)
-    bit.w   map.bytesPerColumn
-    bmi     LargeMapHeight
-        // Map height is small
-        // A = time
+    // Alternate between doing chainA and chainB first.
+    // It should make it more fair to the system
+    lsr
+    bcs     OddFrame
+        jsr     CrumblingTiles.__Process_ChainA_{mapHeight}
+    a16()
+        jsr     CrumblingTiles.__Process_ChainB_{mapHeight}
 
-        // Alternate between doing chainA and chainB first.
-        // It should make it more fair to the system
-        lsr
-        bcs     +
-            jsr     __Process_ChainA_Small
-        a16()
-            jsr     __Process_ChainB_Small
-
-            rep     #$30
-        a16()
-        i16()
-            rts
-
-        +
-        a8()
-        i8()
-            jsr     __Process_ChainB_Small
-        a16()
-            jsr     __Process_ChainA_Small
-
-            rep     #$30
-        a16()
-        i16()
-            rts
+        bra     EndIf
 
     a8()
     i8()
-    LargeMapHeight:
-        // A = time
-        lsr
-        bcs     +
-            jsr     __Process_ChainA_Large
-        a16()
-            jsr     __Process_ChainB_Large
+    OddFrame:
+        jsr     CrumblingTiles.__Process_ChainB_{mapHeight}
+    a16()
+        jsr     CrumblingTiles.__Process_ChainA_{mapHeight}
 
-            rep     #$30
-        a16()
-        i16()
-            rts
+    EndIf:
 
-        +
-        a8()
-        i8()
-            jsr     __Process_ChainB_Large
-        a16()
-            jsr     __Process_ChainA_Large
-
-            rep     #$30
-        a16()
-        i16()
-            rts
+    rep     #$30
+a16()
+i16()
 }
 
 

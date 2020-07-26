@@ -98,9 +98,6 @@ i16()
 code()
 function ProcessFrame {
 
-    jsr     MetaTiles.CrumblingTiles.Process
-
-
     Entity.ProcessSpecialLists()
 
     MetaSprite.EntityHitbox.Begin()
@@ -118,8 +115,8 @@ function ProcessFrame {
 
     jsr     Camera.CenterOnPlayer
 
-    // Update MetaTiles (if room is loaded in memory)
-    jsr     MetaTiles.Render.Update
+    jsr     MetaTiles.Process
+
     jsr     Resources.ProcessAnimations
 
 
