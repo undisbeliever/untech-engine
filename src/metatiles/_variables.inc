@@ -111,6 +111,20 @@ namespace MetaTiles {
     }
 
 
+    namespace Render {
+        // Address of the top-left most visible cell
+        // (word index)
+        allocate(visibleMapPtr, wram7e, 2)
+
+
+        // Offset between the Camera position and the display offset
+        // Reset on every DrawFullScreen_ForceBlank
+        // (2x sint16)
+        allocate(cameraXoffset, wram7e, 2)
+        allocate(cameraYoffset, wram7e, 2)
+    }
+
+
     // Vertical SNES Tilemap Buffer
     // Two tile maps, each 1 * 32 tiles in size
     namespace verticalBuffer {

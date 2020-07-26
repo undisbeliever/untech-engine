@@ -15,32 +15,15 @@
 namespace MetaTiles {
 namespace Render {
 
-allocateTmpWord(tmp0)
-allocateTmpWord(tmp1)
-allocateTmpWord(tmp2)
-
-
-// Address of the top-left most visible cell
-// (word index)
-allocate(visibleMapPtr, wram7e, 2)
-
-
-// Offset between the Camera position and the display offset
-// Reset on every DrawFullScreen_ForceBlank
-// (2x sint16)
-allocate(cameraXoffset, wram7e, 2)
-allocate(cameraYoffset, wram7e, 2)
-
-
 // Display offset of the tilemap
 constant displayHoffset = Resources.AnimatedTileset.displayHoffset
 constant displayVoffset = Resources.AnimatedTileset.displayVoffset
 
 constant tilemapVramWaddr = Resources.AnimatedTileset.tilemapVramWaddr
 
-
 assertPowerOfTwo(horizontalBuffer.buffer.size)
 assertPowerOfTwo(verticalBuffer.buffer.size)
+
 
 
 // Calculates visibleMapPtr address and draws map tiles to VRAM
@@ -231,9 +214,9 @@ i16()
 code()
 function DrawFullScreen_ForceBlank {
 
-constant _vramWaddr = tmp0
-constant _vramWaddrEnd = tmp1
-constant _mapEndColumnPtr = tmp2
+allocateTmpWord(_vramWaddr)
+allocateTmpWord(_vramWaddrEnd)
+allocateTmpWord(_mapEndColumnPtr)
 
 
     Dma.ForceBlank.AssertForceBlank()
