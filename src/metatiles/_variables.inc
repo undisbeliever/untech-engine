@@ -146,7 +146,11 @@ namespace MetaTiles {
     }
 
 
-    // Buffer state
+    // Horizontal and vertical buffer states
+    //
+    // Used by `Dma.MetaTiles` to determine if horizontalBuffer or verticalBuffer is to be transferred to VRAM.
+    //
+    // (byte flags)
     allocate(bufferState, shadow, 1)
     namespace bufferState {
         constant VERTICAL = 0x80

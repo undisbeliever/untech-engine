@@ -49,7 +49,8 @@ function Init {
     sep     #$20
 a8()
 
-    MetaTiles._Init()
+    MetaTiles.ResetBufferState()
+
     ObjPalette._Init()
     Resources._Init()
 

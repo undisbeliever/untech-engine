@@ -13,10 +13,10 @@ namespace Dma {
 namespace MetaTiles {
 
 
-// Initialize the tables/variables
+// Disables any pending horizontalBuffer or verticalBuffer updates
 //
 // REQUIRES: 8 bit A, DB access shadow
-macro _Init() {
+macro ResetBufferState() {
     assert8a()
 
     stz.w   MetaTiles.bufferState

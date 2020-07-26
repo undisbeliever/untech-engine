@@ -121,6 +121,9 @@ a8()
     lda.b   #VMAIN.incrementMode.high | VMAIN.increment.by32
     sta.b   VMAIN
 
+    // Prevents a horizontalBuffer or verticalBuffer update from glitching the BG map
+    Dma.MetaTiles.ResetBufferState()
+
     assert(METATILE_DISPLAY_WIDTH * METATILE_SIZE == 32)
 
     rep     #$31
