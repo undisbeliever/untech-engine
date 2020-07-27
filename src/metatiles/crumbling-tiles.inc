@@ -243,9 +243,8 @@ function ActivateChainB {
 //
 // REQUIRES: 8 bit Index, DB = 0x7e, DP = 0
 // PARAM: ns = ChainA or ChainB
-// PARAM: mapSize = SMALL or LARGE
 // MODIFIES: 16 bit A, 8 bit Index
-inline __Process(ns, mapSize) {
+inline __Process(ns) {
     assert8i()
 
     // Do not process crumbling tiles if the drawMapCellBuffer is full
@@ -285,7 +284,7 @@ i8()
 
         // No need to set `map.data,x`, already set in `__Activate` macro
 
-        jsr     _DrawMapCell_{mapSize}
+        jsr     _DrawMapCell
         // Carry set if drawMapCellBuffer is full
 
 
@@ -358,7 +357,7 @@ i8()
 
         rep     #$30
     a16()
-        jsr     _DrawMapCell_{mapSize}
+        jsr     _DrawMapCell
         // Carry set if drawMapCellBuffer is full
 
 
@@ -434,7 +433,7 @@ i8()
 
         rep     #$30
     a16()
-        jsr     _DrawMapCell_{mapSize}
+        jsr     _DrawMapCell
         // Carry set if drawMapCellBuffer is full
 
 
@@ -467,17 +466,11 @@ SkipThirdQueue:
 au()
 i8()
 code()
-function __Process_ChainA_Small {
-    __Process(ChainA, Small)
+function __Process_ChainA {
+    __Process(ChainA)
 }
-function __Process_ChainB_Small {
-    __Process(ChainB, Small)
-}
-function __Process_ChainA_Large {
-    __Process(ChainA, Large)
-}
-function __Process_ChainB_Large {
-    __Process(ChainB, Large)
+function __Process_ChainB {
+    __Process(ChainB)
 }
 
 
@@ -487,10 +480,9 @@ function __Process_ChainB_Large {
 // ASSUMES: There is enough DMA time in `dma.transfersLeft` to fill `drawMapCellBuffer`.
 //
 // REQUIRES: 16 bit A, 16 bit Index, DB = 0x7e, DP = 0
-// PARAM: mapHeight = Small or Large
 a16()
 i16()
-inline _Process(mapHeight) {
+macro _Process() {
     assert16a()
     assert16i()
 
@@ -509,20 +501,21 @@ i8()
     // It should make it more fair to the system
     lsr
     bcs     OddFrame
-        jsr     CrumblingTiles.__Process_ChainA_{mapHeight}
+        jsr     CrumblingTiles.__Process_ChainA
     a16()
-        jsr     CrumblingTiles.__Process_ChainB_{mapHeight}
+        jsr     CrumblingTiles.__Process_ChainB
 
         bra     EndIf
 
     a8()
     i8()
     OddFrame:
-        jsr     CrumblingTiles.__Process_ChainB_{mapHeight}
+        jsr     CrumblingTiles.__Process_ChainB
     a16()
-        jsr     CrumblingTiles.__Process_ChainA_{mapHeight}
-
-    EndIf:
+        jsr     CrumblingTiles.__Process_ChainA
+a16()
+i8()
+EndIf:
 
     rep     #$30
 a16()
@@ -531,7 +524,8 @@ i16()
 
 
 
-namespace _DrawMapCell_Small {
+namespace _DrawMapCell {
+
 a16()
 i16()
 code()
@@ -539,9 +533,14 @@ DrawMapCell_Offscreen:
     // buffer is unchanged so it will never be full
     clc
     rts
+
+au()
+iu()
+DrawMapCell_BufferFull:
+    break(DRAW_MAP_CELL_BUFFER_OVERRUN)
 }
 
-// Add a map cell to the drawMapCellBuffer (large map height).
+// Add a map cell to the drawMapCellBuffer
 //
 // ASSUMES: The `drawMapCellBuffer` is not full.
 //
@@ -551,59 +550,11 @@ DrawMapCell_Offscreen:
 a16()
 i16()
 code()
-function _DrawMapCell_Small {
-    // ::TODO skip dataSize check::
-    // ::TODO skip drawMapCell check::
-    Render._DrawMapCell(SMALL)
+function _DrawMapCell {
+    Render._DrawMapCell()
     cpx.w   #drawMapCellBufferIndex.END
     // carry set if drawMapCellBuffer is full
     rts
-
-
-au()
-iu()
-DrawMapCell_BufferFull:
-    // This should not happen.
-    // `__Process` macro contains bufferIndex checks to prevent this from happening
-    break(DRAW_MAP_CELL_BUFFER_OVERRUN)
-}
-
-
-
-namespace _DrawMapCell_Large {
-a16()
-i16()
-code()
-DrawMapCell_Offscreen:
-    // buffer is unchanged so it will never be full
-    clc
-    rts
-}
-
-// Add a map cell to the drawMapCellBuffer (large map height).
-//
-// ASSUMES: The `drawMapCellBuffer` is not full.
-//
-// INPUT: A = tile
-// INPUT: X = map.data index
-// RETURN: carry set if buffer full
-a16()
-i16()
-code()
-function _DrawMapCell_Large {
-    // ::TODO skip dataSize check::
-    // ::TODO skip drawMapCell check::
-    Render._DrawMapCell(LARGE)
-    cpx.w   #drawMapCellBufferIndex.END
-    // carry set if drawMapCellBuffer is full
-    rts
-
-
-au()
-iu()
-DrawMapCell_BufferFull:
-    // `__Process` macro contains bufferIndex checks to prevent this from happening
-    break(DRAW_MAP_CELL_BUFFER_OVERRUN)
 }
 
 }

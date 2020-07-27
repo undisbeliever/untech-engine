@@ -750,8 +750,6 @@ SkipDrawHorizontalBuffer:
 //
 // REQUIRES: 16 bit A, 16 bit Index, DB = 0x7e
 //
-// PARAM: mapHeight - height of map (SMALL or LARGE)
-//
 // INPUT: X = index of map cell to draw
 //        A = value of map cell (lower 8 bits only)
 //
@@ -760,15 +758,13 @@ SkipDrawHorizontalBuffer:
 // BRANCH: to DrawMapCell_Offscreen if the cell is outside the visible area
 //                                  (drawMapCellBuffer and `Dma.transfersLeft` will be unchanged)
 // BRANCH: to DrawMapCell_BufferFull if drawMapCellBuffer is full (MODIFIES Accumulator size)
-macro _DrawMapCell(mapHeight) {
+macro _DrawMapCell() {
     assert16a()
     assert16i()
     // DP unknown
 
 allocateTmpWord(_tmp)
 assert(METATILE_SIZE_PX == 16)
-
-constant MAP_HEIGHT = MAP_HEIGHT_{mapHeight}
 
     // Get MetaTile tileMap index
     and.w   #0xff
@@ -783,9 +779,9 @@ constant MAP_HEIGHT = MAP_HEIGHT_{mapHeight}
     //  if offset < visibleMapPtr:
     //      return
     //  offset -= visibleMapPtr
-    //  if offset > MAP_HEIGHT * METATILE_DISPLAY_WIDTH + METATILE_DISPLAY_HEIGHT
+    //  if offset > map.dataIndexScreenOffset
     //      return
-    //  if offset & (MAP_HEIGHT - 1) > METATILE_DISPLAY_HEIGHT
+    //  if offset & map.dataIndexYmask > METATILE_DISPLAY_HEIGHT
     //      return
     //
     //  RDDIV,RDMPY = offset / MAP_HEIGHT
@@ -796,20 +792,20 @@ constant MAP_HEIGHT = MAP_HEIGHT_{mapHeight}
     sec
     sbc.w   Render.visibleMapPtr
     bcc     DrawMapCell_Offscreen
-    cmp.w   #MAP_HEIGHT * METATILE_DISPLAY_WIDTH + METATILE_DISPLAY_HEIGHT + 1
+    cmp.w   map.dataIndexScreenOffset
     bcs     DrawMapCell_Offscreen
 
     sta.l   WRDIV
 
     // Test if cell is outside the display on the vertical axis
-    assertPowerOfTwo(MAP_HEIGHT)
-    and.w   #MAP_HEIGHT - 1
+    and.w   map.dataIndexYmask
     cmp.w   #METATILE_DISPLAY_HEIGHT + 1
     bcs     DrawMapCell_Offscreen
 
     sep     #$20
 a8()
-    lda.b   #MAP_HEIGHT
+    assert(MAP_HEIGHT_LARGE < 0xff)
+    lda.w   map.bytesPerColumn
     sta.l   WRDIVB
 
 

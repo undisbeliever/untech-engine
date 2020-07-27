@@ -64,6 +64,13 @@ namespace MetaTiles {
         allocate(right, wram7e, 2)
 
 
+        // The map.data index offset between the top-left and the bottom-right of the screen.
+        //
+        // Equal to: `bytesPerColumn * METATILE_DISPLAY_WIDTH + METATILE_DISPLAY_HEIGHT`
+        //
+        // (uint16)
+        allocate(dataIndexScreenOffset, wram7e, 2)
+
         // X component of an index within `map.data`
         // (uint16)
         allocate(dataIndexXmask, wram7e, 2)

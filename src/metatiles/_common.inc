@@ -34,6 +34,9 @@ macro _LoadMap() {
         lda.w   #MetaTiles.MAP_HEIGHT_LARGE
         sta.w   MetaTiles.map.bytesPerColumn
 
+        lda.w   #MetaTiles.MAP_HEIGHT_LARGE * MetaTiles.METATILE_DISPLAY_WIDTH + MetaTiles.METATILE_DISPLAY_HEIGHT
+        sta.w   MetaTiles.map.dataIndexScreenOffset
+
         assertPowerOfTwo(MetaTiles.MAP_HEIGHT_LARGE)
         ldx.w   #0xff * MetaTiles.MAP_HEIGHT_LARGE
         ldy.w   #MetaTiles.MAP_HEIGHT_LARGE - 1
@@ -42,6 +45,9 @@ macro _LoadMap() {
     +
         lda.w   #MetaTiles.MAP_HEIGHT_SMALL
         sta.w   MetaTiles.map.bytesPerColumn
+
+        lda.w   #MetaTiles.MAP_HEIGHT_SMALL * MetaTiles.METATILE_DISPLAY_WIDTH + MetaTiles.METATILE_DISPLAY_HEIGHT
+        sta.w   MetaTiles.map.dataIndexScreenOffset
 
         assertPowerOfTwo(MetaTiles.MAP_HEIGHT_SMALL)
         ldx.w   #0xff * MetaTiles.MAP_HEIGHT_SMALL
@@ -127,19 +133,18 @@ constant _mapPtrRend = utDpTmp2
     namespace LargeMapHeight {
         Render.__Update(LARGE)
 
-        CrumblingTiles._Process(Large)
-
-        rts
+        jmp     EndIf
     }
 
 SmallMapHeight:
     namespace SmallMapHeight {
         Render.__Update(SMALL)
-
-        CrumblingTiles._Process(Small)
-
-        rts
     }
+EndIf:
+
+    CrumblingTiles._Process()
+
+    rts
 }
 
 
@@ -204,43 +209,14 @@ a8()
     bit.w   inidispBuffer
     bmi     Return
 
-    BranchIfMapIsSmall_Long(SmallMapHeight)
 
-    LargeMapHeight:
-    namespace LargeMapHeight {
-        rep     #$30
-    a16()
+    rep     #$30
+a16()
 
-        Render._DrawMapCell(LARGE)
+    Render._DrawMapCell()
 
-        plp
-        rts
-    }
-
-    namespace SmallMapHeight {
-    // DP unknown
-    // P on stack
-    au()
-    i16()
-    code()
-    DrawMapCell_BufferFull:
-        Warnings.Warn(SET_MAP_CELL_ERROR)
-
-    DrawMapCell_Offscreen:
-        plp
-        rts
-    }
-
-    SmallMapHeight:
-    namespace SmallMapHeight {
-        rep     #$30
-    a16()
-
-        Render._DrawMapCell(SMALL)
-
-        plp
-        rts
-    }
+    plp
+    rts
 }
 
 
