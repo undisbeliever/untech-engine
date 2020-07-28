@@ -145,7 +145,7 @@ namespace MapCursor {
             constant EntityStruct._cellsLeft    = EntityStruct.tmp3
 
             jsr     MetaTiles.EntityPositionToMapIndex
-            stx.b   EntityStruct._mapIndex
+            sty.b   EntityStruct._mapIndex
             lda.w   #1
             jsr     MetaTiles.SetMapCell
 
@@ -172,7 +172,7 @@ namespace MapCursor {
                 sbc.b   EntityStruct._displacement
                 cmp.w   #MetaTiles.map.LEFT
                 bcc     +
-                    // X = _mapIndex - _displacement / METATILE_SIZE_PX * 2
+                    // Y = _mapIndex - _displacement / METATILE_SIZE_PX * 2
                     lda.b   EntityStruct._displacement
                     assert(MetaTiles.METATILE_SIZE_PX == 16)
                     lsr
@@ -182,7 +182,7 @@ namespace MapCursor {
                     eor.w   #0xffff
                     sec
                     adc.b   EntityStruct._mapIndex
-                    tax
+                    tay
 
                     lda.w   #1
                     jsr     MetaTiles.SetMapCell
@@ -198,7 +198,7 @@ namespace MapCursor {
                 adc.b   EntityStruct._displacement
                 cmp.w   MetaTiles.map.right
                 bcs     +
-                    // X = _mapIndex + _displacement / METATILE_SIZE_PX * 2
+                    // Y = _mapIndex + _displacement / METATILE_SIZE_PX * 2
                     lda.b   EntityStruct._displacement
                     assert(MetaTiles.METATILE_SIZE_PX == 16)
                     lsr
@@ -207,7 +207,7 @@ namespace MapCursor {
                     lsr
                     clc
                     adc.b   EntityStruct._mapIndex
-                    tax
+                    tay
 
                     lda.w   #1
                     jsr     MetaTiles.SetMapCell

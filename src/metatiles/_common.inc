@@ -114,37 +114,37 @@ macro _LoadMap() {
 //
 // REQUIRES: 16 bit A, 16 bit Index, DB = 0x7e
 // INPUT: A = tile Id
-// INPUT: X = map index
+// INPUT: Y = map index
 a16()
 i16()
 // DP unknown
 code()
 function SetMapCell {
-    cpx.w   map.dataSize
+    cpy.w   map.dataSize
     bcs     IndexOutOfBounds
 
     sep     #$20
 a8()
-    cmp.w   map.data,x
+    cmp.w   map.data,y
     beq     DataUnchanged
 
-    sta.w   map.data,x
+    sta.w   map.data,y
 
     rep     #$30
 a16()
-    txa
+    tya
 
     sep     #$10
 i8()
-    ldx.w   SetMapCellQueue.currentIndex
-    cpx.b   #SetMapCellQueue.LAST_INDEX + 1
+    ldy.w   SetMapCellQueue.currentIndex
+    cpy.b   #SetMapCellQueue.LAST_INDEX + 1
     bcs     QueueFull
 
-    sta.w    SetMapCellQueue.mapDataIndex,x
+    sta.w    SetMapCellQueue.mapDataIndex,y
 
-    inx
-    inx
-    stx.w   SetMapCellQueue.currentIndex
+    iny
+    iny
+    sty.w   SetMapCellQueue.currentIndex
 
 IndexOutOfBounds:
 DataUnchanged:
@@ -327,7 +327,7 @@ i16()
 // ASSUMES: Entity inside map
 //
 // INPUT: DP = entity
-// OUTPUT: X = map index
+// OUTPUT: Y = map index
 a16()
 i16()
 code()
@@ -368,7 +368,7 @@ allocateTmpWord(_tileIndexTmp)
         }
         // carry clear
         adc.w   _tileIndexTmp
-        tax
+        tay
     }
 
     BranchIfMapIsSmall(SmallMapHeight)

@@ -204,7 +204,6 @@ function PlayerAirCollision {
     inc.w   tokensCollected
 
     lda.w   #0
-    tyx
     jmp     MetaTiles.SetMapCell
 }
 }
