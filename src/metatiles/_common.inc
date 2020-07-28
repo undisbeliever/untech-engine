@@ -94,9 +94,33 @@ macro _LoadMap() {
     sta.w   MetaTiles.map.dataSize
 
 
-    // Reset Queues
-    assert(MetaTiles.SetMapCellQueue.currentIndex + 1 == MetaTiles.SetMapCellQueue.mapDataIndex)
+    jsr     MetaTiles._ResetQueues
+}
+
+
+
+// Clear the MetaTile queues
+//
+// This routine is called when a room or tileset is loaded
+//
+// REQUIRES: 16 bit A, 16 bit Index, DB = 0x7e
+a16()
+i16()
+code()
+function _ResetQueues {
+    sep     #$20
+a8()
+    Dma.MetaTiles.ResetBufferState()
+
     stz.w   MetaTiles.SetMapCellQueue.currentIndex
+    stz.w   MetaTiles.drawMapCellBufferIndex
+
+    rep     #$30
+a16()
+
+    CrumblingTiles._ResetQueues()
+
+    rts
 }
 
 

@@ -17,20 +17,13 @@ namespace MetaTiles {
 namespace CrumblingTiles {
 
 
-// Initialize the crumbling tiles subsystem.
-//
-// ASSUMES: MetaTile Tileset is loaded into memory
+// Reset the crumbling tiles subsystem queues and time
 //
 // REGISTERS: 16 bit A, 16 bit Index, DB = 0x7e, DP = 0
-macro _Init() {
+macro _ResetQueues() {
     assert16a()
     assert16i()
 
-// ::TODO unify animationSpeed::
-constant animationSpeed = Resources.animationSpeed
-
-
-    // Reset time
     stz.w   CrumblingTiles.time
 
     lda.w   #CrumblingTiles.ChainA.Queue.LAST_INDEX | (CrumblingTiles.ChainA.Queue.LAST_INDEX << 8)
@@ -44,10 +37,23 @@ constant animationSpeed = Resources.animationSpeed
     sta.w   CrumblingTiles.ChainB.Queue.writerPos
     assert(CrumblingTiles.ChainB.Queue.secondPos + 1 == CrumblingTiles.ChainB.Queue.thirdPos)
     sta.w   CrumblingTiles.ChainB.Queue.secondPos
+}
 
 
-    sep     #$20
-a8()
+
+// Calculate the transition delays for the crumbling tiles chains
+//
+// ASSUMES: MetaTile Tileset is loaded into memory
+//
+// REGISTERS: 8 bit A, 16 bit Index, DB = 0x7e, DP = 0
+macro _CalculateTransitionDelays() {
+    assert8a()
+    assert16i()
+
+// ::TODO unify animationSpeed::
+constant animationSpeed = Resources.animationSpeed
+
+
     // Convert first transition delay from ticks to frames
     ldy.w   tilesetFooter.CrumblingTilesChainA.firstDelay
     lda.w   animationSpeed
@@ -77,10 +83,6 @@ a8()
         jsr     Math.Divide.u16y_u8a
     +
     sty.w   CrumblingTiles.ChainB.secondWait
-
-
-    rep     #$30
-a16()
 }
 
 

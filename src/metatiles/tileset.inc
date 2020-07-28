@@ -66,7 +66,14 @@ i16()
         break(INVALID_METATILE_TILEMAP)
     +
 
-    CrumblingTiles._Init()
+    jsr     MetaTiles._ResetQueues
+
+    sep     #$20
+a8()
+    CrumblingTiles._CalculateTransitionDelays()
+
+    rep     #$30
+a16()
 
 assert16a()
 assert16i()
