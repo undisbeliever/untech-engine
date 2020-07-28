@@ -11,7 +11,7 @@
 // Distributed under The MIT License: https://opensource.org/licenses/MIT
 
 
-Warnings.Register(SET_MAP_CELL_ERROR, 24, 0, 12)
+Warnings.Register(SET_MAP_CELL_QUEUE_FULL, 24, 0, 12)
 
 
 namespace MetaTiles {
@@ -92,6 +92,119 @@ macro _LoadMap() {
 
     lda.l   RDMPY
     sta.w   MetaTiles.map.dataSize
+
+
+    // Reset Queues
+    assert(MetaTiles.SetMapCellQueue.currentIndex + 1 == MetaTiles.SetMapCellQueue.mapDataIndex)
+    stz.w   MetaTiles.SetMapCellQueue.currentIndex
+}
+
+
+
+// Sets a map cell to a given value.
+//
+// This routine will set the tile within `map.data` but it will not draw
+// the tile to the screen.  Instead it will add the tile to a queue and
+// the tile will be drawn at a later time by `MetaTiles.Process`.
+//
+// If the queue is full then the map cell will still be changed, no draw
+// call will be made and a warning will be emitted.
+//
+// This routine will silently fail if the index is out of bounds.
+//
+// REQUIRES: 16 bit A, 16 bit Index, DB = 0x7e
+// INPUT: A = tile Id
+// INPUT: X = map index
+a16()
+i16()
+// DP unknown
+code()
+function SetMapCell {
+    cpx.w   map.dataSize
+    bcs     IndexOutOfBounds
+
+    sep     #$20
+a8()
+    cmp.w   map.data,x
+    beq     DataUnchanged
+
+    sta.w   map.data,x
+
+    rep     #$30
+a16()
+    txa
+
+    sep     #$10
+i8()
+    ldx.w   SetMapCellQueue.currentIndex
+    cpx.b   #SetMapCellQueue.LAST_INDEX + 1
+    bcs     QueueFull
+
+    sta.w    SetMapCellQueue.mapDataIndex,x
+
+    inx
+    inx
+    stx.w   SetMapCellQueue.currentIndex
+
+IndexOutOfBounds:
+DataUnchanged:
+    rep     #$30
+a16()
+i16()
+    rts
+
+
+a16()
+i8()
+QueueFull:
+    Warnings.Warn(SET_MAP_CELL_QUEUE_FULL)
+
+    rep     #$30
+a16()
+i16()
+    rts
+
+}
+
+
+
+// Draws pending SetMapCellQueue tiles to the drawMapCellBuffer
+//
+// You MUST NOT call this function if the drawMapCellBuffer is full.
+//
+// ASSUMES: There is enough DMA time in `dma.transfersLeft` to fill `drawMapCellBuffer`.
+//
+// REQUIRES: 16 bit A, 8 bit Index, DB = 0x7e, DP = 0
+// REQUIRES: drawMapCellBuffer not full
+// BRANCH: DrawMapCellBufferFull if the drawMapCellBuffer buffer is full
+macro _ProcessSetMapCellQueue() {
+    assert16a()
+    assert8i()
+
+    ldy.w   SetMapCellQueue.currentIndex
+    beq     QueueEmpty
+
+    i8()
+    Loop:
+        dey
+        dey
+        sty.w   SetMapCellQueue.currentIndex
+
+        rep     #$30
+    i16()
+        ldx.w   SetMapCellQueue.mapDataIndex,y
+        lda.w   map.data,x
+
+        jsr     Render._DrawMapCell
+        bcs     DrawMapCellBufferFull
+
+        sep     #$10
+    i8()
+        ldy.w   SetMapCellQueue.currentIndex
+        bne     Loop
+    EndLoop:
+
+QueueEmpty:
 }
 
 
@@ -101,6 +214,7 @@ macro _LoadMap() {
 // This function will:
 //    * Update the BG map offset
 //    * Draw newly visible tiles to the horizontal and vertical buffers
+//    * Draw any pending tiles in the SetMapCellQueue
 //    * Process crumbling tiles
 //
 // It is recommended to call this function after updating the camera but before
@@ -117,6 +231,7 @@ macro _LoadMap() {
 // 1 MetaTile row and 1 MetaTile column is processed per frame.
 //
 //
+// ASSUMES: The screen is active
 // ASSUMES: MetaTiles.Render.DrawFullScreen_ForceBlank has been called to setup map state
 // ASSUMES: Camera position inside map
 //
@@ -136,88 +251,38 @@ constant _mapPtrRend = utDpTmp2
         jmp     EndIf
     }
 
+a16()
+i16()
 SmallMapHeight:
     namespace SmallMapHeight {
         Render.__Update(SMALL)
     }
 EndIf:
 
+    sep     #$10
+i8()
+
+    // Do not process queues if drawMapCellBuffer is full
+    ldx.w   drawMapCellBufferIndex
+    cpx.b   #drawMapCellBufferIndex.END
+    bcs     DrawMapCellBufferFull
+
+
+    _ProcessSetMapCellQueue()
     CrumblingTiles._Process()
 
-    rts
-}
+assert16a()
+assert8i()
 
-
-
-
-namespace SetMapCell {
-// DP unknown
-// P on stack
-au()
-i16()
-code()
-IndexOutOfBounds:
-DrawMapCell_BufferFull:
-    Warnings.Warn(SET_MAP_CELL_ERROR)
-
-DrawMapCell_Offscreen:
-Return:
-    plp
-    rts
-}
-
-
-
-// Sets a map cell to a given value.
-//
-// If the screen is enabled, then the cell will then be drawn to VRAM during
-// VBlank.
-//
-// This routine will silently fail and emit a warning if the tile/index is out
-// of bounds.
-//
-// If the VBlank buffer is full then the map cell will be set but not drawn and
-// a warning will be emitted.
-//
-// ASSUMES: Map is on screen if the screen is enabled.
-// ASSUMES: DrawFullScreen_ForceBlank has been called if screen is enabled
-// REQUIRES: DB = 0x7e
-//
-// INPUT: A = tile Id
-// INPUT: X = map index
 au()
 iu()
-// DP unknown
-code()
-function SetMapCell {
-    php
-
-    rep     #$10
-i16()
-    cpx.w   map.dataSize
-    bcs     IndexOutOfBounds
-
-    sep     #$20
-a8()
-    cmp.w   map.data,x
-    beq     Return
-
-    sta.w   map.data,x
-
-    // skip draw if in force-blank
-    assert(INIDISP.force == 0x80)
-    bit.w   inidispBuffer
-    bmi     Return
-
-
+DrawMapCellBufferFull:
     rep     #$30
 a16()
-
-    Render._DrawMapCell()
-
-    plp
+i16()
     rts
 }
+
 
 
 // Converts an entity's position into a map index

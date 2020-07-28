@@ -190,6 +190,27 @@ namespace MetaTiles {
 
 
 
+    namespace SetMapCellQueue {
+        constant N_ELEMENTS = 32
+
+        // Current position within the queue.
+        //
+        // Incremented by `SetMapCell`, decremented after drawing map cell.
+        //
+        // (byte index into `mapDataIndex)
+        allocate(currentIndex, wram7e, 1)
+        constant INDEX_INCREMENT = 2
+        constant LAST_INDEX = (N_ELEMENTS - 1) * INDEX_INCREMENT
+
+
+        // Pending `SetMapCell` cells that have yet to be drawn to screen.
+        //
+        // (array of word indexes within `map.data`)
+        allocate(mapDataIndex, wram7e, 2 * N_ELEMENTS)
+    }
+
+
+
     namespace CrumblingTiles {
         // Time used by the crumbling blocks
         //

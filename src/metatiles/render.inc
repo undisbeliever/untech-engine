@@ -738,31 +738,45 @@ SkipDrawHorizontalBuffer:
 
 
 
+namespace _DrawMapCell {
+au()
+iu()
+code()
+DrawMapCell_BufferFull:
+    break(DRAW_MAP_CELL_BUFFER_OVERRUN)
+
+a16()
+i16()
+code()
+DrawMapCell_Offscreen:
+    // buffer is unchanged so it will never be full
+    clc
+    rts
+}
+
 // Draws a map cell to the VBlank buffer (if necessary).
+//
+// You MUST NOT call this function if the drawMapCellBuffer is full.
 //
 // ASSUMES: DrawFullScreen_ForceBlank has been called to setup map state
 // ASSUMES: Camera position inside map
 // ASSUMES: X is inside the map
+// ASSUMES: `drawMapCellBuffer` is not full.
 //
 // NOTE: This macro will always add the MetaTile to the buffer, even if
 // `Dma.transfersLeft` does not contain enough time to upload the
 // MetaTile.
 //
-// REQUIRES: 16 bit A, 16 bit Index, DB = 0x7e
+// REQUIRES: 16 bit A, 16 bit Index, DB = 0x7e, DP = 0
 //
 // INPUT: X = index of map cell to draw
 //        A = value of map cell (lower 8 bits only)
 //
-// OUTPUT: X = drawMapCellBufferIndex
-//
-// BRANCH: to DrawMapCell_Offscreen if the cell is outside the visible area
-//                                  (drawMapCellBuffer and `Dma.transfersLeft` will be unchanged)
-// BRANCH: to DrawMapCell_BufferFull if drawMapCellBuffer is full (MODIFIES Accumulator size)
-macro _DrawMapCell() {
-    assert16a()
-    assert16i()
-    // DP unknown
-
+// OUTPUT: Carry set if the drawMapCellBuffer is full
+a16()
+i16()
+code()
+function _DrawMapCell {
 allocateTmpWord(_tmp)
 assert(METATILE_SIZE_PX == 16)
 
@@ -897,6 +911,9 @@ a16()
     inx
     inx
     stx.w   drawMapCellBufferIndex
+    cpx.w   #drawMapCellBufferIndex.END
+    // carry set if drawMapCellBuffer is full
+    rts
 }
 
 }

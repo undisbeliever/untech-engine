@@ -284,7 +284,7 @@ i8()
 
         // No need to set `map.data,x`, already set in `__Activate` macro
 
-        jsr     _DrawMapCell
+        jsr     Render._DrawMapCell
         // Carry set if drawMapCellBuffer is full
 
 
@@ -308,7 +308,7 @@ a8()
 i8()
 
     // Return early
-    // If I remove this I MUST CHECK if the SetMapCell buffer is full
+    // If I remove this I MUST CHECK if the drawMapCellBuffer is full
     // And I must place a `rts` directly after the `Return` label
 Return:
     rts
@@ -357,7 +357,7 @@ i8()
 
         rep     #$30
     a16()
-        jsr     _DrawMapCell
+        jsr     Render._DrawMapCell
         // Carry set if drawMapCellBuffer is full
 
 
@@ -392,7 +392,7 @@ i8()
     +
 
     // Return early
-    // If I remove this I MUST CHECK if the SetMapCell buffer is full
+    // If I remove this I MUST CHECK if the drawMapCellBuffer is full
     rts
 
 
@@ -433,7 +433,7 @@ i8()
 
         rep     #$30
     a16()
-        jsr     _DrawMapCell
+        jsr     Render._DrawMapCell
         // Carry set if drawMapCellBuffer is full
 
 
@@ -479,12 +479,13 @@ function __Process_ChainB {
 //
 // ASSUMES: There is enough DMA time in `dma.transfersLeft` to fill `drawMapCellBuffer`.
 //
-// REQUIRES: 16 bit A, 16 bit Index, DB = 0x7e, DP = 0
+// REQUIRES: 16 bit A, 8 bit Index, DB = 0x7e, DP = 0
+// MODIFIES: Accumulator and Index size
 a16()
 i16()
 macro _Process() {
     assert16a()
-    assert16i()
+    assert8i()
 
 
     lda.w   CrumblingTiles.time
@@ -516,45 +517,6 @@ i8()
 a16()
 i8()
 EndIf:
-
-    rep     #$30
-a16()
-i16()
-}
-
-
-
-namespace _DrawMapCell {
-
-a16()
-i16()
-code()
-DrawMapCell_Offscreen:
-    // buffer is unchanged so it will never be full
-    clc
-    rts
-
-au()
-iu()
-DrawMapCell_BufferFull:
-    break(DRAW_MAP_CELL_BUFFER_OVERRUN)
-}
-
-// Add a map cell to the drawMapCellBuffer
-//
-// ASSUMES: The `drawMapCellBuffer` is not full.
-//
-// INPUT: A = tileId
-// INPUT: X = map.data index
-// RETURN: carry set if buffer full
-a16()
-i16()
-code()
-function _DrawMapCell {
-    Render._DrawMapCell()
-    cpx.w   #drawMapCellBufferIndex.END
-    // carry set if drawMapCellBuffer is full
-    rts
 }
 
 }
