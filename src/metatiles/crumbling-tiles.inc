@@ -89,18 +89,18 @@ a16()
 //
 // REQUIRES: 8 bit Index
 // DEFINE: {ns} = ChainA or ChainB
-// INPUT: X = queue index
-// OUTPUT: X = index of the next item in the queue
+// INPUT: Y = queue index
+// OUTPUT: Y = index of the next item in the queue
 // KEEP: carry
-inline __nextQueueIndex_X() {
+inline __nextQueueIndex_Y() {
     assert8i()
 
     // MUST NOT CHANGE CARRY
 
-    dex
-    dex
+    dey
+    dey
     bpl     NoUnderflow_{#}
-        ldx.b   #{ns}.Queue.LAST_INDEX
+        ldy.b   #{ns}.Queue.LAST_INDEX
     NoUnderflow_{#}:
 }
 assert(ChainA.Queue.INDEX_INCREMENT == 2)
@@ -273,28 +273,27 @@ inline __Process(ns) {
 
 // Process the first queue
 // -----------------------
-    ldx.w   {ns}.Queue.firstPos
-    cpx.w   {ns}.Queue.writerPos
+    ldy.w   {ns}.Queue.firstPos
+    cpy.w   {ns}.Queue.writerPos
     beq     ProcessSecondQueue
 
 
 a16()
 i8()
     FirstLoop:
-        // X = queue index
+        // Y = queue index
 
         // Schedule second transition
         lda.w   time
     	clc
         adc.w   {ns}.firstWait
-        sta.w   {ns}.Queue.time,x
+        sta.w   {ns}.Queue.time,y
 
 
         // Find and draw map cell
-        lda.w   {ns}.Queue.mapDataIndex,x
         rep     #$30
     i16()
-        tax
+        ldx.w   {ns}.Queue.mapDataIndex,y
         lda.w   {ns}.firstTileId
 
         // No need to set `map.data,x`, already set in `__Activate` macro
@@ -306,15 +305,15 @@ i8()
         sep     #$10
     i8()
         // Goto next item in queue
-        ldx.w   {ns}.Queue.firstPos
-        __nextQueueIndex_X()         // does not modify carry
-        stx.w   {ns}.Queue.firstPos
+        ldy.w   {ns}.Queue.firstPos
+        __nextQueueIndex_Y()         // does not modify carry
+        sty.w   {ns}.Queue.firstPos
 
         // End loop if drawMapCellBuffer is full
         bcs     EndFirstLoop
 
         // Loop if not at end of first queue
-        cpx.w   {ns}.Queue.writerPos
+        cpy.w   {ns}.Queue.writerPos
         bne     FirstLoop
     EndFirstLoop:
 
@@ -332,11 +331,11 @@ a16()
 i8()
 ProcessSecondQueue:
 
-    ldx.w   {ns}.Queue.secondPos
-    cpx.w   {ns}.Queue.firstPos
+    ldy.w   {ns}.Queue.secondPos
+    cpy.w   {ns}.Queue.firstPos
     beq     ProcessThirdQueue
 
-    lda.w   {ns}.Queue.time,x
+    lda.w   {ns}.Queue.time,y
     cmp.w   time
     bcs     ProcessThirdQueue
     // Carry clear
@@ -345,24 +344,21 @@ a16()
 i8()
     SecondLoop:
         // carry clear
-        // X = queue index
+        // Y = queue index
 
         // Schedule third transition
         lda.w   time
         // carry clear
         adc.w   {ns}.secondWait
-        sta.w   {ns}.Queue.time,x
+        sta.w   {ns}.Queue.time,y
 
-
-        // Find map cell
-        lda.w   {ns}.Queue.mapDataIndex,x
-        rep     #$30
-    i16()
-        tax
 
         // Set map cell
+        rep     #$30
         sep     #$20
+    i16()
     a8()
+        ldx.w   {ns}.Queue.mapDataIndex,y
         lda.w   {ns}.secondTileId
         sta.w   map.data,x
 
@@ -375,31 +371,31 @@ i8()
         sep     #$10
     i8()
         // Goto next item in queue
-        ldx.w   {ns}.Queue.secondPos
-        __nextQueueIndex_X()         // does not modify carry
-        stx.w   {ns}.Queue.secondPos
+        ldy.w   {ns}.Queue.secondPos
+        __nextQueueIndex_Y()         // does not modify carry
+        sty.w   {ns}.Queue.secondPos
 
         // End loop if drawMapCellBuffer is full
         bcs     EndSecondLoop
 
         // Exit loop if at end of the second queue
-        cpx.w   {ns}.Queue.firstPos
+        cpy.w   {ns}.Queue.firstPos
         beq     EndSecondLoop
 
         // Continue loop if time has expired
-        lda.w   {ns}.Queue.time,x
+        lda.w   {ns}.Queue.time,y
         cmp.w   time
         bcc     SecondLoop
     EndSecondLoop:
 
 
-    // X = Queue.secondPos
+    // Y = Queue.secondPos
 a16()
 i8()
-    ldy.w   {ns}.secondWait + 1
+    ldx.w   {ns}.secondWait + 1
     bpl     +
         // No third transition if secondWait is negative
-        stx.w   {ns}.Queue.thirdPos
+        sty.w   {ns}.Queue.thirdPos
     +
 
     // Return early
@@ -414,11 +410,11 @@ a16()
 i8()
 ProcessThirdQueue:
 
-    ldx.w   {ns}.Queue.thirdPos
-    cpx.w   {ns}.Queue.secondPos
+    ldy.w   {ns}.Queue.thirdPos
+    cpy.w   {ns}.Queue.secondPos
     beq     SkipThirdQueue
 
-    lda.w   {ns}.Queue.time,x
+    lda.w   {ns}.Queue.time,y
     cmp.w   time
     bcs     SkipThirdQueue
 
@@ -426,19 +422,16 @@ ProcessThirdQueue:
 a16()
 i8()
     ThirdLoop:
-        // X = queue index
+        // Y = queue index
 
         // Last transition - no more transitions to schedule
 
-        // Find map cell
-        lda.w   {ns}.Queue.mapDataIndex,x
-        rep     #$10
-    i16()
-        tax
-
         // Set map cell
+        rep     #$10
         sep     #$20
     a8()
+    i16()
+        ldx.w   {ns}.Queue.mapDataIndex,y
         lda.w   {ns}.thirdTileId
         sta.w   map.data,x
 
@@ -451,19 +444,19 @@ i8()
         sep     #$10
     i8()
         // Goto next item in queue
-        ldx.w   {ns}.Queue.thirdPos
-        __nextQueueIndex_X()         // does not modify carry
-        stx.w   {ns}.Queue.thirdPos
+        ldy.w   {ns}.Queue.thirdPos
+        __nextQueueIndex_Y()         // does not modify carry
+        sty.w   {ns}.Queue.thirdPos
 
         // End loop if drawMapCellBuffer is full
         bcs     EndThirdLoop
 
         // Exit loop if at end of the third queue
-        cpx.w   {ns}.Queue.secondPos
+        cpy.w   {ns}.Queue.secondPos
         beq     EndThirdLoop
 
         // Continue loop if time has expired
-        lda.w   {ns}.Queue.time,x
+        lda.w   {ns}.Queue.time,y
         cmp.w   time
         bcc     ThirdLoop
     EndThirdLoop:
