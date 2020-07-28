@@ -34,18 +34,6 @@ namespace MetaTiles {
         // Calculated values
         // =================
 
-        // Number of bytes per column (AKA map height in metaTiles)
-        //
-        // Used to determine if the map has a small (64) or large (128)
-        // height, see `BranchIfMapIsSmall` macro for more details.
-        //
-        // Used to move tileIndex left or right.
-        //
-        // MUST be equal to MAP_HEIGHT_SMALL (64) or MAP_HEIGHT_LARGE (128)
-        //
-        // (uint16, MUST be equal to 64 or 128)
-        allocate(bytesPerColumn, wram7e, 2)
-
         // The number of bytes in the data
         // (Equal to map.width * map.bytesPerColumn)
         // (uint16)
@@ -63,6 +51,18 @@ namespace MetaTiles {
         // (uint16)
         allocate(right, wram7e, 2)
 
+
+        // Number of bytes per column (AKA map height in metaTiles)
+        //
+        // Used to determine if the map has a small (64) or large (128)
+        // height, see `BranchIfMapIsSmall` macro for more details.
+        //
+        // Used to move tileIndex left or right.
+        //
+        // MUST be equal to MAP_HEIGHT_SMALL (64) or MAP_HEIGHT_LARGE (128)
+        //
+        // (uint16, MUST be equal to 64 or 128)
+        allocate(bytesPerColumn, wram7e, 2)
 
         // The map.data index offset between the top-left and the bottom-right of the screen.
         //

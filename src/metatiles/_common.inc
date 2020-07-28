@@ -25,38 +25,19 @@ macro _LoadMap() {
     assert16a()
     assert16i()
 
-    // Set map bytesPerColumn, dataIndexXmask, dataIndexYmask and yPositionMask
-    // (the value of these variables depend on the height of the map)
+    // Use a lookup table to set the map variables whose value depends on the height of the room
     lda.w   Room.Format.Header.height
     and.w   #0xff
     cmp.w   #MetaTiles.MAP_HEIGHT_SMALL + 1
     bcc     +
-        lda.w   #MetaTiles.MAP_HEIGHT_LARGE
-        sta.w   MetaTiles.map.bytesPerColumn
-
-        lda.w   #MetaTiles.MAP_HEIGHT_LARGE * MetaTiles.METATILE_DISPLAY_WIDTH + MetaTiles.METATILE_DISPLAY_HEIGHT
-        sta.w   MetaTiles.map.dataIndexScreenOffset
-
-        assertPowerOfTwo(MetaTiles.MAP_HEIGHT_LARGE)
-        ldx.w   #0xff * MetaTiles.MAP_HEIGHT_LARGE
-        ldy.w   #MetaTiles.MAP_HEIGHT_LARGE - 1
-        lda.w   #MetaTiles.Y_POSITION_MASK_LARGE
+        ldx.w   #MetaTiles.MapVariablesTable.Large
         bra     ++
     +
-        lda.w   #MetaTiles.MAP_HEIGHT_SMALL
-        sta.w   MetaTiles.map.bytesPerColumn
-
-        lda.w   #MetaTiles.MAP_HEIGHT_SMALL * MetaTiles.METATILE_DISPLAY_WIDTH + MetaTiles.METATILE_DISPLAY_HEIGHT
-        sta.w   MetaTiles.map.dataIndexScreenOffset
-
-        assertPowerOfTwo(MetaTiles.MAP_HEIGHT_SMALL)
-        ldx.w   #0xff * MetaTiles.MAP_HEIGHT_SMALL
-        ldy.w   #MetaTiles.MAP_HEIGHT_SMALL - 1
-        lda.w   #MetaTiles.Y_POSITION_MASK_SMALL
+        ldx.w   #MetaTiles.MapVariablesTable.Small
     +
-    stx.w   MetaTiles.map.dataIndexXmask
-    sty.w   MetaTiles.map.dataIndexYmask
-    sta.w   MetaTiles.map.yPositionMask
+    ldy.w   #MetaTiles.MapVariablesTable.firstVariable
+    lda.w   #MetaTiles.MapVariablesTable.size - 1
+    mvn     0x7e=(MetaTiles.MapVariablesTable.Small >> 16)
 
 
     // RDMPY = map.width * map.bytesPerColumn
@@ -95,6 +76,41 @@ macro _LoadMap() {
 
 
     jsr     MetaTiles._ResetQueues
+}
+
+
+// Table of map variables whose value depends on the height of the room
+namespace MapVariablesTable {
+constant firstVariable = map.bytesPerColumn
+
+evaluate n = 0
+inline word(name, evaluate v) {
+    assert(map.{name} - firstVariable == {n})
+    dw  {v}
+    evaluate n = {n} + 2
+}
+
+rodata(rom0)
+Small:
+    word(bytesPerColumn,          MAP_HEIGHT_SMALL)
+    word(dataIndexScreenOffset,   MAP_HEIGHT_SMALL * METATILE_DISPLAY_WIDTH + METATILE_DISPLAY_HEIGHT)
+    word(dataIndexXmask,          0xff * MAP_HEIGHT_SMALL)
+    word(dataIndexYmask,          MAP_HEIGHT_SMALL - 1)
+    word(yPositionMask,           Y_POSITION_MASK_SMALL)
+assertPowerOfTwo(MAP_HEIGHT_SMALL)
+
+rodata(rom0)
+Large:
+evaluate n = 0
+    word(bytesPerColumn,          MAP_HEIGHT_LARGE)
+    word(dataIndexScreenOffset,   MAP_HEIGHT_LARGE * METATILE_DISPLAY_WIDTH + METATILE_DISPLAY_HEIGHT)
+    word(dataIndexXmask,          0xff * MAP_HEIGHT_LARGE)
+    word(dataIndexYmask,          MAP_HEIGHT_LARGE - 1)
+    word(yPositionMask,           Y_POSITION_MASK_LARGE)
+assertPowerOfTwo(MAP_HEIGHT_LARGE)
+
+constant size  = Large - Small
+assert(pc() - Large == size)
 }
 
 
