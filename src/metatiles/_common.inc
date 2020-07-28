@@ -261,6 +261,7 @@ EndIf:
 
     sep     #$10
 i8()
+    CrumblingTiles._IncrementTime()
 
     // Do not process queues if drawMapCellBuffer is full
     ldx.w   drawMapCellBufferIndex
@@ -268,11 +269,46 @@ i8()
     bcs     DrawMapCellBufferFull
 
 
+    // NOTE: branches to DrawMapCellBufferFull if drawMapCellBuffer is full
     _ProcessSetMapCellQueue()
-    CrumblingTiles._Process()
-
 assert16a()
 assert8i()
+
+
+    // drawMapCellBuffer is not full
+
+    // Alternate between doing chainA and chainB first.
+    // It should make it more fair to the system
+    lda.w   CrumblingTiles.time
+    lsr
+    bcs     OddFrame
+        assert(tilesetFooter.N_CRUMBLING_BLOCK_CHAINS == 2)
+        jsr     CrumblingTiles._Process_ChainA
+
+        // Do not process crumbling tiles if the drawMapCellBuffer is full
+        ldx.w   drawMapCellBufferIndex
+        cpx.b   #drawMapCellBufferIndex.END
+        bcs     DrawMapCellBufferFull
+
+        jsr     CrumblingTiles._Process_ChainB
+
+        rep     #$30
+    a16()
+    i16()
+        rts
+
+
+    a16()
+    i8()
+    OddFrame:
+        jsr     CrumblingTiles._Process_ChainB
+
+        // Do not process crumbling tiles if the drawMapCellBuffer is full
+        ldx.w   drawMapCellBufferIndex
+        cpx.b   #drawMapCellBufferIndex.END
+        bcs     DrawMapCellBufferFull
+
+        jsr     CrumblingTiles._Process_ChainA
 
 au()
 iu()

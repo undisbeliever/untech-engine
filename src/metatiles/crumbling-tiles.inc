@@ -239,29 +239,44 @@ function ActivateChainB {
 
 
 
-// Process a crumbling tile chain.
+// Increment the crumbling tiles time
 //
-// REQUIRES: 8 bit Index, DB = 0x7e, DP = 0
-// PARAM: ns = ChainA or ChainB
-// MODIFIES: 16 bit A, 8 bit Index
-inline __Process(ns) {
+// REQUIRES: 16 bit A, 8 bit Index, DB = 0x7e, DP = 0
+// OUTPUT: A = new time value
+macro _IncrementTime() {
+    assert16a()
     assert8i()
 
-    // Do not process crumbling tiles if the drawMapCellBuffer is full
-    ldx.w   drawMapCellBufferIndex
-    cpx.b   #drawMapCellBufferIndex.END
-    bcs     Return
 
+    lda.w   CrumblingTiles.time
+    inc
+    bpl     TimeValid
+        // ::TODO handle time overflow::
+
+TimeValid:
+    sta.w   CrumblingTiles.time
+}
+
+
+
+// Process a crumbling tile chain.
+//
+// You MUST NOT call this function if the drawMapCellBuffer is full.
+//
+// REQUIRES: 16 bit A, 8 bit Index, DB = 0x7e, DP = 0
+// REQUIRES: drawMapCellBuffer not full
+// PARAM: ns = ChainA or ChainB
+inline __Process(ns) {
+    assert16a()
+    assert8i()
 
 
 // Process the first queue
 // -----------------------
-    rep     #$20
-a16()
-
     ldx.w   {ns}.Queue.firstPos
     cpx.w   {ns}.Queue.writerPos
     beq     ProcessSecondQueue
+
 
 a16()
 i8()
@@ -303,14 +318,10 @@ i8()
         bne     FirstLoop
     EndFirstLoop:
 
-    sep     #$30
-a8()
+a16()
 i8()
-
     // Return early
     // If I remove this I MUST CHECK if the drawMapCellBuffer is full
-    // And I must place a `rts` directly after the `Return` label
-Return:
     rts
 
 
@@ -462,61 +473,17 @@ i8()
 SkipThirdQueue:
     rts
 }
-
-au()
+a16()
 i8()
 code()
-function __Process_ChainA {
+function _Process_ChainA {
     __Process(ChainA)
 }
-function __Process_ChainB {
+a16()
+i8()
+code()
+function _Process_ChainB {
     __Process(ChainB)
-}
-
-
-
-// Process Crumbling Tiles
-//
-// ASSUMES: There is enough DMA time in `dma.transfersLeft` to fill `drawMapCellBuffer`.
-//
-// REQUIRES: 16 bit A, 8 bit Index, DB = 0x7e, DP = 0
-// MODIFIES: Accumulator and Index size
-a16()
-i16()
-macro _Process() {
-    assert16a()
-    assert8i()
-
-
-    lda.w   CrumblingTiles.time
-    inc
-    bpl     TimeValid
-
-TimeValid:
-    sta.w   CrumblingTiles.time
-
-    sep     #$30
-a8()
-i8()
-    // Alternate between doing chainA and chainB first.
-    // It should make it more fair to the system
-    lsr
-    bcs     OddFrame
-        jsr     CrumblingTiles.__Process_ChainA
-    a16()
-        jsr     CrumblingTiles.__Process_ChainB
-
-        bra     EndIf
-
-    a8()
-    i8()
-    OddFrame:
-        jsr     CrumblingTiles.__Process_ChainB
-    a16()
-        jsr     CrumblingTiles.__Process_ChainA
-a16()
-i8()
-EndIf:
 }
 
 }
