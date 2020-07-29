@@ -168,7 +168,7 @@ namespace MetaTiles {
     // DrawMapCell VBlank buffer
     // (Structure of arrays)
     namespace drawMapCellBuffer {
-        constant BUFFER_SIZE = 3
+        constant BUFFER_SIZE = 4
 
         // Vram word address to transfer the MetaTile to
         // (word address - shadow)
