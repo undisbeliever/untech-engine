@@ -2,6 +2,8 @@
 // Copyright (c) 2016 - 2020, Marcus Rowe <undisbeliever@gmail.com>.
 // Distributed under The MIT License: https://opensource.org/licenses/MIT
 
+// This test is completely automatic.
+//
 // Tests:
 //  * MetaTiles.Render
 //  * MetaTiles.LoadTileset
@@ -10,11 +12,19 @@
 //  * MetaTiles.CrumblingTiles
 //  * MetaSprite Tile Collision Hitbox
 
+
 namespace Entities {
 namespace Players {
 
 namespace InteractiveTilesTest_Player {
     buildFunctionTable(BasePlayerFunctionTable, InteractiveTilesTest_Player)
+
+    namespace EntityStruct {
+        basestruct(BaseEntity)
+            field(changeInY, 2)
+            field(oldYposPx, 2)
+        endstruct()
+    }
 
     constant DrawPlayer = MetaSprite.Render.RenderEntity
 
@@ -29,6 +39,11 @@ namespace InteractiveTilesTest_Player {
     function Init {
         SetFrame(frame)
 
+        stz.b   EntityStruct.changeInY
+        lda.b   EntityStruct.yPos.px
+        sta.b   EntityStruct.oldYposPx
+
+
         sep     #$20
     a8()
         lda.w   Room.roomId
@@ -40,8 +55,10 @@ namespace InteractiveTilesTest_Player {
 
         rep     #$30
     a16()
-        SetFrame_A()
 
+        // Always activate entity
+        // (This function is reused by blue "enemy" entity)
+        sec
         rts
     }
 
@@ -67,17 +84,39 @@ namespace InteractiveTilesTest_Player {
     function Process {
         MovePlayerWithTileCollisionsAndInteractiveTiles()
 
+        jmp     UpdateChangeInYAndMovementState
+    }
+
+
+    a16()
+    i16()
+    code()
+    function UpdateChangeInYAndMovementState {
+        lda.b   EntityStruct.yPos.px
+        tax
+        sec
+        sbc.b   EntityStruct.oldYposPx
+        bcs     +
+            eor.w   #0xffff
+            inc
+        +
+        clc
+        adc.b   EntityStruct.changeInY
+        sta.b   EntityStruct.changeInY
+        stx.b   EntityStruct.oldYposPx
+
+
         // Change movement direction on X axis collision
         sep     #$20
     a8()
         assert(Entity.MovementState.X_COLLISION_FLAG == 0x80)
-        lda.b   BaseEntity.movementState
+        lda.b   EntityStruct.movementState
         bpl     +
             eor.b   #Entity.MovementState.FACING_RIGHT_FLAG | Entity.MovementState.MOVING_RIGHT_FLAG
-            sta.b   BaseEntity.movementState
+            sta.b   EntityStruct.movementState
 
             lda.b   #X_MOMENTUM_PX
-            sta.b   BaseEntity.xMomentum.px
+            sta.b   EntityStruct.xMomentum.px
         +
 
         rep     #$30
@@ -91,22 +130,12 @@ namespace InteractiveTilesTest_Player {
 namespace InteractiveTilesTest_Entity {
     buildFunctionTable(BaseEntityFunctionTable, InteractiveTilesTest_Entity)
 
-    constant DrawPlayer = MetaSprite.Render.RenderEntity
-
-
-    // REQUIRES: 16 bit A, 16 bit Index, DB = 0x7e
-    // INPUT: DP = entity
-    // OUTPUT: carry set = always activate entity
-    a16()
-    i16()
-    code()
-    function Init {
-        SetFrame(frame)
-
-        // Always activate entity
-        sec
-        rts
+    namespace EntityStruct {
+        childstruct(Players.InteractiveTilesTest_Player.EntityStruct)
+        endstruct()
     }
+
+    constant Init = Players.InteractiveTilesTest_Player.Init
 
 
     // REQUIRES: 16 bit A, 16 bit Index, DB = 0x7e
@@ -130,6 +159,8 @@ namespace InteractiveTilesTest_Entity {
     code()
     function Process {
         MoveEntityWithTileCollisionsAndInteractiveTiles()
+
+        jsr     Players.InteractiveTilesTest_Player.UpdateChangeInYAndMovementState
 
         jmp     Entity.DrawAndGotoNextEntity
     }
@@ -214,7 +245,8 @@ function PlayerAirCollision {
 namespace InteractiveTests {
 namespace InteractiveTilesTest {
 
-constant GRAVITY = 0x1c80
+// Strong gravity makes the tests faster
+constant GRAVITY = 0xFFFF
 
 
 a16()
@@ -244,12 +276,22 @@ i16()
 code()
 function Test {
 
+// Number of frames remaining in this test
+// (sint16)
+constant _framesRemaining = Test.dpTmp
+
+
     // A = room Id
     ldx.w   #Project.PlayerIds.InteractiveTilesTest_Player
     ldy.w   #0
     jsr     GameLoop.Init_LoadRoom
 
     jsr     GameLoop.SpawnAllEntitiesInRoom
+
+
+    // Execute test for 5 seconds (on NTSC)
+    lda.w   #60 * 5
+    sta.b   _framesRemaining
 
 
     lda.w   #GRAVITY
@@ -272,11 +314,13 @@ a8()
 
 
     Text.Console.SetCursor(0, 3)
-    Text.Console.PrintConstString("Tokens: ")
-
+    Text.Console.PrintConstString("Tokens:\n")
+    Text.Console.PrintConstString("Red Y:\n")
+    Text.Console.PrintConstString("Blue Y:\n")
 
     rep     #$30
 a16()
+
 
     Loop:
         jsr     WaitFrame_PrintFreeCycles
@@ -284,24 +328,74 @@ a16()
         jsr     GameLoop.ProcessFrame
 
 
-        sep     #$20
-    a8()
         Text.Console.SetCursor(8, 3)
-
         ldy.w   InteractiveTiles.Token.tokensCollected
         jsr     Text.Console.PrintU16Y
 
-        rep     #$20
+        Text.Console.SetCursor(8, 4)
+        ldy.w   Entity.playerEntity + Entities.Players.InteractiveTilesTest_Player.EntityStruct.changeInY
+        jsr     Text.Console.PrintU16Y
+
+        Text.Console.SetCursor(8, 5)
+        jsr     GetChangeInYForBlueEntity
+        jsr     Text.Console.PrintU16Y
+
+
+        dec.b   _framesRemaining
+        bpl     Loop
+
+
+    sep     #$20
+a8()
+    lda.w   Room.roomId
+    cmp.b   #Project.RoomList.InteractiveTilesTestSmall
+    bne     RoomIsLarge
+        // Room is Small
+        // Test passes if
+        //   * more than three rows of tokens are collected
+        //   * Two tiles in the crumbling tiles bridge have been restored
+
+        define mapTile(x, y, mapHeight) = MetaTiles.map.data + {y} + {x} * MetaTiles.MAP_HEIGHT_{mapHeight}
+
+        ldy.w   InteractiveTiles.Token.tokensCollected
+        cpy.w   #32 * 3
+        bcc     Fail
+
+        lda.w   {mapTile(11, 7, SMALL)}
+        cmp.b   #70
+        bne     Fail
+
+        lda.w   {mapTile(20, 7, SMALL)}
+        cmp.b   #70
+        bne     Fail
+
+        bra     EndRoomSizeIf
+
+
+    RoomIsLarge:
+        // Room is Large
+        // Test passes if both entities `changeInY` are large enough
+        //
+        // If this test fails then:
+        //  a) a crumbling tile did not crumble, or
+        //  b) a non-respawning crumble tile respawned, or
+        //  c) the enemy did not interact with the crumbling blocks
+
+        rep     #$30
     a16()
+        ldy.w   Entity.playerEntity + Entities.Players.InteractiveTilesTest_Player.EntityStruct.changeInY
+        cpy.w   #450
+        bcc     Fail
+
+        jsr     GetChangeInYForBlueEntity
+        cpy.w   #112
+        bcc     Fail
 
 
-        lda.w   Controller.Joy1.pressed
-        and.w   #JOY.buttons
-        bne     Pass
-
-        jmp     Loop
-
-Pass:
+EndRoomSizeIf:
+    // Test passes
+    rep     #$30
+a16()
     Resources.AnimatedTileset.DisableAnimation()
     Resources.Palette.DisableAnimation()
 
@@ -310,6 +404,25 @@ Pass:
 
 Fail:
     clc
+    rts
+}
+
+
+// Retrieves the `changeInY` for the InteractiveTilesTest_Entity
+//
+// REQUIRES: 8 bit A, 16 bit Index, DB = 0x7e, DP = 0
+// OUTPUT: Y = blue entity's `changeInY` value
+a16()
+i16()
+code()
+function GetChangeInYForBlueEntity {
+    lda.w   #2
+    Entity.GetEntityWithIdOrBranchIfEmpty_X(Fail)
+    ldy.b   Entities.InteractiveTilesTest_Entity.EntityStruct.changeInY,x
+    rts
+
+Fail:
+    ldy.w   #0
     rts
 }
 
