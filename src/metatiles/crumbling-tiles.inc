@@ -241,22 +241,42 @@ function ActivateChainB {
 
 
 
-// Increment the crumbling tiles time
+// Increment the crumbling tiles time, rolling back time if necessary.
 //
 // REQUIRES: 16 bit A, 8 bit Index, DB = 0x7e, DP = 0
-// OUTPUT: A = new time value
 macro _IncrementTime() {
     assert16a()
     assert8i()
 
+    constant DECREMENT_AMOUNT = 0x4000
+    assert(0xffff / 5 < DECREMENT_AMOUNT)
+    assert(0x8000 - DECREMENT_AMOUNT + 0xffff / 5 < 0x8000)
 
-    lda.w   CrumblingTiles.time
-    inc
+    inc.w   CrumblingTiles.time
     bpl     TimeValid
-        // ::TODO handle time overflow::
+        // Update time in both queues using a single loop
+        assert(tilesetFooter.N_CRUMBLING_BLOCK_CHAINS == 2)
+        assert(CrumblingTiles.ChainA.Queue.time + CrumblingTiles.ChainA.Queue.N_ELEMENTS * 2 == CrumblingTiles.ChainB.Queue.time)
+        assert(CrumblingTiles.N_ELEMENTS_IN_BOTH_QUEUES * 2 < 0xff)
+        ldy.b   #CrumblingTiles.N_ELEMENTS_IN_BOTH_QUEUES * 2
+        Loop:
+            lda.w   CrumblingTiles._timeBuffer - 2,y
+            sec
+            sbc.w   #DECREMENT_AMOUNT
+            bcs     +
+                lda.w   #0
+            +
+            sta.w   CrumblingTiles._timeBuffer - 2,y
+            dey
+            dey
+            bne     Loop
+
+        lda.w   CrumblingTiles.time
+        sec
+        sbc.w   #DECREMENT_AMOUNT
+        sta.w   CrumblingTiles.time
 
 TimeValid:
-    sta.w   CrumblingTiles.time
 }
 
 

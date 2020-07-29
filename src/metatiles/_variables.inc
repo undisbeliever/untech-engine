@@ -214,15 +214,24 @@ namespace MetaTiles {
     namespace CrumblingTiles {
         // Time used by the crumbling blocks
         //
-        // This value is not in sync with `frameCounter`, it will be
-        // incremented on every `CrumblingTiles.Process` and may be
-        // decremented if overflowing.
+        // This value is not in sync with `frameCounter`.
+        //
+        // `time` will be incremented on every `MetaTile.Process` call and will
+        // be rolled back when it is >= 0x8000.
         //
         // (uint16 - time in frames)
         allocate(time, wram7e, 2)
 
 
-        inline __AllocateVariables(ns) {
+        // Allocate a continuous buffer to store the queue arrays.
+        // This allows me to rollback time in both queues using a single loop
+        constant N_ELEMENTS_IN_BOTH_QUEUES = 32 * 2
+        allocate(_timeBuffer,         wram7e, N_ELEMENTS_IN_BOTH_QUEUES * 2)
+        allocate(_mapDataIndexBuffer, wram7e, N_ELEMENTS_IN_BOTH_QUEUES * 2)
+
+
+        variable __bufferOffset = 0
+        inline __AllocateVariables(ns, evaluate nElements) {
             // The tile to turn into on the first, second and third transitions
             // (3x byte)
             constant firstTileId  = tilesetFooter.CrumblingTiles{ns}.firstTileId
@@ -252,25 +261,7 @@ namespace MetaTiles {
 			// crumbling tiles to be active per queue (with a cost of 3 bytes of wasted memory
 			// per queue).
             namespace Queue {
-                constant N_ELEMENTS = 32
-
-				// ::TODO make these variables page aligned::
-
-                // The time the next transition occurs at.
-                //
-                // This value is compared with `CrumblingTiles.time`, not `frameCounter`.
-                //
-                // This value is not used by the first queue.
-                //
-                // (uint16)
-                allocate(time, wram7e, 2 * N_ELEMENTS)
-
-
-                // The index within `map.data` for the crumbling tile.
-                //
-                // (uint16 index into `map.data`)
-                allocate(mapDataIndex, wram7e, 2 * N_ELEMENTS)
-
+                constant N_ELEMENTS = {nElements}
 
                 constant INDEX_INCREMENT = 2
 
@@ -279,6 +270,26 @@ namespace MetaTiles {
 
                 // Negative indexes are used to test if the position index underflowed
                 assert(LAST_INDEX < 0x80)
+
+
+                // The time the next transition occurs at.
+                //
+                // This value is compared with `CrumblingTiles.time`, not `frameCounter`.
+                //
+                // This value is not used by the first queue.
+                //
+                // (uint16)
+                constant time = _timeBuffer + __bufferOffset * 2
+
+                // The index within `map.data` for the crumbling tile.
+                //
+                // (uint16 index into `map.data`)
+                constant mapDataIndex = _mapDataIndexBuffer + __bufferOffset * 2
+
+                __bufferOffset = __bufferOffset + N_ELEMENTS
+
+				// ::TODO assert buffer is page aligned::
+
 
 
                 // Position of next free element in the circular buffer.
@@ -321,12 +332,13 @@ namespace MetaTiles {
             }
         }
         namespace ChainA {
-            __AllocateVariables(ChainA)
+            __AllocateVariables(ChainA, 32)
         }
         namespace ChainB {
-            __AllocateVariables(ChainB)
+            __AllocateVariables(ChainB, 32)
         }
         assert(tilesetFooter.N_CRUMBLING_BLOCK_CHAINS == 2)
+        assert(__bufferOffset == N_ELEMENTS_IN_BOTH_QUEUES)
     }
 }
 

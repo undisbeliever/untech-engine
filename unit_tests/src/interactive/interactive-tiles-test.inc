@@ -280,6 +280,9 @@ function Test {
 // (sint16)
 constant _framesRemaining = Test.dpTmp
 
+constant _previousTime = Test.dpTmp + 2
+constant _nRollbacks   = Test.dpTmp + 4
+
 
     // A = room Id
     ldx.w   #Project.PlayerIds.InteractiveTilesTest_Player
@@ -287,6 +290,14 @@ constant _framesRemaining = Test.dpTmp
     jsr     GameLoop.Init_LoadRoom
 
     jsr     GameLoop.SpawnAllEntitiesInRoom
+
+
+    // Setup `MetaTiles.CrumblingTiles.time` overflow test
+    // -60 chosen to ensure that there are crumbling tiles in the Queue when time is rolled back
+    lda.w   #0x8000 - 60
+    sta.w   MetaTiles.CrumblingTiles.time
+    sta.b   _previousTime
+    stz.b   _nRollbacks
 
 
     // Execute test for 5 seconds (on NTSC)
@@ -314,6 +325,7 @@ a8()
 
 
     Text.Console.SetCursor(0, 3)
+    Text.Console.PrintConstString("Time:\n")
     Text.Console.PrintConstString("Tokens:\n")
     Text.Console.PrintConstString("Red Y:\n")
     Text.Console.PrintConstString("Blue Y:\n")
@@ -329,17 +341,41 @@ a16()
 
 
         Text.Console.SetCursor(8, 3)
-        ldy.w   InteractiveTiles.Token.tokensCollected
+        ldy.w   MetaTiles.CrumblingTiles.time
         jsr     Text.Console.PrintU16Y
 
         Text.Console.SetCursor(8, 4)
-        ldy.w   Entity.playerEntity + Entities.Players.InteractiveTilesTest_Player.EntityStruct.changeInY
+        ldy.w   InteractiveTiles.Token.tokensCollected
         jsr     Text.Console.PrintU16Y
 
         Text.Console.SetCursor(8, 5)
+        ldy.w   Entity.playerEntity + Entities.Players.InteractiveTilesTest_Player.EntityStruct.changeInY
+        jsr     Text.Console.PrintU16Y
+
+        Text.Console.SetCursor(8, 6)
         jsr     GetChangeInYForBlueEntity
         jsr     Text.Console.PrintU16Y
 
+
+        // Test `MetaTiles.CrumblingTiles.time` is never 0x8000 and is rolled back correctly
+        lda.w   MetaTiles.CrumblingTiles.time
+        bmi     Fail
+
+        cmp.b   _previousTime
+        sta.b   _previousTime
+        bcs     +
+            inc.b   _nRollbacks
+
+            sep     #$10
+        i8()
+            // Confirm that there is at least one tile in the ChainB (respawning tiles) queue
+            // when time was rolled back
+            ldx.w   MetaTiles.CrumblingTiles.ChainB.Queue.secondPos
+            cpx.w   MetaTiles.CrumblingTiles.ChainB.Queue.firstPos
+            beq     Fail
+        +
+        rep     #$30
+    i16()
 
         dec.b   _framesRemaining
         bpl     Loop
@@ -393,9 +429,16 @@ a8()
 
 
 EndRoomSizeIf:
-    // Test passes
     rep     #$30
 a16()
+
+    // Confirm there was only one rollback
+    lda.b   _nRollbacks
+    cmp.w   #1
+    bne     Fail
+
+
+    // Test passes
     Resources.AnimatedTileset.DisableAnimation()
     Resources.Palette.DisableAnimation()
 
