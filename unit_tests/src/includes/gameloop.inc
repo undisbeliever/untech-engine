@@ -139,7 +139,6 @@ function ProcessFrame {
     jsr     MetaSprite.Render.EndLoop
 
     jsr     Entity.ValidateEntityLists
-    jsr     MetaTiles.Validate
 
     rts
 }

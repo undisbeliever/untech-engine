@@ -94,7 +94,6 @@ include "metatiles/interactive-tiles.inc"
 include "metatiles/render.inc"
 include "metatiles/crumbling-tiles.inc"
 include "metatiles/tileset.inc"
-include "metatiles/validation.inc"
 include "metatiles/_common.inc"
 include "metatiles/_vblank.inc"
 
