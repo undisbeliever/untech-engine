@@ -798,7 +798,9 @@ assert(METATILE_SIZE_PX == 16)
     //  if offset & map.dataIndexYmask > METATILE_DISPLAY_HEIGHT
     //      return
     //
-    //  RDDIV,RDMPY = offset / MAP_HEIGHT
+    //  RDDIV,RDMPY = offset / map.bytesPerColumn
+
+    // NOTE: Using `WRDIV` is faster than bit shifting
 
     txa
     clc
