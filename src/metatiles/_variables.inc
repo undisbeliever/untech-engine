@@ -102,6 +102,21 @@ namespace MetaTiles {
 
 
 
+    namespace Render {
+        // Address of the top-left most visible cell
+        // (word index)
+        allocate(visibleMapPtr, wram7e, 2)
+
+
+        // Offset between the Camera position and the display offset
+        // Reset on every DrawFullScreen_ForceBlank
+        // (2x sint16)
+        allocate(cameraXoffset, wram7e, 2)
+        allocate(cameraYoffset, wram7e, 2)
+    }
+
+
+
     // Horizontal SNES Tilemap Buffer
     // A single tile map 64 * 2 tiles in size
     namespace horizontalBuffer {
@@ -120,20 +135,6 @@ namespace MetaTiles {
         // Used to determine when to update the buffer
         // (uint16)
         allocate(cursorYpos, wram7e, 2)
-    }
-
-
-    namespace Render {
-        // Address of the top-left most visible cell
-        // (word index)
-        allocate(visibleMapPtr, wram7e, 2)
-
-
-        // Offset between the Camera position and the display offset
-        // Reset on every DrawFullScreen_ForceBlank
-        // (2x sint16)
-        allocate(cameraXoffset, wram7e, 2)
-        allocate(cameraYoffset, wram7e, 2)
     }
 
 
