@@ -43,5 +43,17 @@ macro assertShadowRam(var) {
     }
 }
 
+// Asserts the variable is contained within one page
+// Breaks assembly if the variable crosses a page boundary
+macro assertOnePage(var, evaluate size) {
+    evaluate addr = {var}
+    if {addr} >> 8 != ({addr} + {size} - 1) >> 8 {
+        error "{var} crossed a page boundary"
+    }
+}
+inline assertOnePage(var) {
+    assertOnePage({var}, {var}.size)
+}
+
 // vim: ft=bass-65816 ts=4 sw=4 et:
 

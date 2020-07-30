@@ -46,6 +46,7 @@ namespace MetaTiles {
         //
         field(collisionMap, N_META_TILES)
         constant collisionMap.size = N_META_TILES
+        assertOnePage(collisionMap)
 
 
         // Interactive tiles function table index for each MetaTile
@@ -64,6 +65,7 @@ namespace MetaTiles {
 
             constant MASK = (N_FUNCTIONS - 1) << 1
         }
+        assertOnePage(interactiveTilesMap)
 
 
         // This data is at the end because we want the tileset-map variables to be page aligned.

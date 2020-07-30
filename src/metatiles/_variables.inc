@@ -19,6 +19,17 @@ namespace MetaTiles {
     constant MAP_HEIGHT_LARGE = 128
 
 
+
+    namespace CrumblingTiles {
+        // Allocate a continuous buffer to store the queue arrays.
+        // This allows me to rollback time in both queues using a single loop
+        constant N_ELEMENTS_IN_BOTH_QUEUES = 32 * 2
+        allocate(_timeBuffer,         wram7e, N_ELEMENTS_IN_BOTH_QUEUES * 2)
+        allocate(_mapDataIndexBuffer, wram7e, N_ELEMENTS_IN_BOTH_QUEUES * 2)
+
+        assert(_timeBuffer & 0xff == 0)
+    }
+
     // Location (in memory) to store the MetaTile Tileset
     constant TILESET_DATA_SIZE = 256 * 10 + 14
     allocate(_tilesetData, wram7e, TILESET_DATA_SIZE)
@@ -122,6 +133,7 @@ namespace MetaTiles {
     namespace horizontalBuffer {
         constant buffer.size = 64 * 2 * 2
         allocate(buffer, wram7e, buffer.size)
+        // No need to test if buffer is on a single page - we never read from it with index addressing
 
         // Vram word address to transfer the buffer to
         // (word address - shadow)
@@ -143,6 +155,7 @@ namespace MetaTiles {
     namespace verticalBuffer {
         constant buffer.size = 32 * 2 * 2
         allocate(buffer, wram7e, buffer.size)
+        // No need to test if buffer is on a single page - we never read from it with index addressing
 
         // Vram word address to transfer the buffer to
         // (word address - shadow)
@@ -186,6 +199,13 @@ namespace MetaTiles {
         allocate(topRight, shadow, BUFFER_SIZE * 2)
         allocate(bottomLeft, shadow, BUFFER_SIZE * 2)
         allocate(bottomRight, shadow, BUFFER_SIZE * 2)
+
+
+        assertOnePage(vramWaddr,    BUFFER_SIZE * 2)
+        assertOnePage(topLeft,      BUFFER_SIZE * 2)
+        assertOnePage(topRight,     BUFFER_SIZE * 2)
+        assertOnePage(bottomRight,  BUFFER_SIZE * 2)
+        assertOnePage(topLeft,      BUFFER_SIZE * 2)
     }
     // Index to the current position on the drawMapCellBuffer
     // (word index)
@@ -212,7 +232,8 @@ namespace MetaTiles {
         // Pending `SetMapCell` cells that have yet to be drawn to screen.
         //
         // (array of word indexes within `map.data`)
-        allocate(mapDataIndex, wram7e, 2 * N_ELEMENTS)
+        allocate(mapDataIndex, wram7e, N_ELEMENTS * 2)
+        assertOnePage(mapDataIndex, N_ELEMENTS * 2)
     }
 
 
@@ -227,13 +248,6 @@ namespace MetaTiles {
         //
         // (uint16 - time in frames)
         allocate(time, wram7e, 2)
-
-
-        // Allocate a continuous buffer to store the queue arrays.
-        // This allows me to rollback time in both queues using a single loop
-        constant N_ELEMENTS_IN_BOTH_QUEUES = 32 * 2
-        allocate(_timeBuffer,         wram7e, N_ELEMENTS_IN_BOTH_QUEUES * 2)
-        allocate(_mapDataIndexBuffer, wram7e, N_ELEMENTS_IN_BOTH_QUEUES * 2)
 
 
         variable __bufferOffset = 0
@@ -286,15 +300,15 @@ namespace MetaTiles {
                 //
                 // (uint16)
                 constant time = _timeBuffer + __bufferOffset * 2
+                assertOnePage(time, N_ELEMENTS * 2)
 
                 // The index within `map.data` for the crumbling tile.
                 //
                 // (uint16 index into `map.data`)
                 constant mapDataIndex = _mapDataIndexBuffer + __bufferOffset * 2
+                assertOnePage(mapDataIndex, N_ELEMENTS * 2)
 
                 __bufferOffset = __bufferOffset + N_ELEMENTS
-
-				// ::TODO assert buffer is page aligned::
 
 
 
