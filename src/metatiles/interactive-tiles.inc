@@ -10,7 +10,7 @@
 
 namespace MetaTiles {
 
-assertPowerOfTwo(interactiveTilesMap.N_FUNCTIONS)
+assertPowerOfTwo(Tileset.interactiveTilesMap.N_FUNCTIONS)
 
 
 // Calls the interactive tile function for a given tile index
@@ -26,8 +26,8 @@ inline __jsr_InteractiveTileFunction(type) {
     lda.w   map.data,y
     and.w   #0xff
     tax
-    lda.w   interactiveTilesMap,x
-    and.w   #interactiveTilesMap.MASK
+    lda.w   Tileset.interactiveTilesMap,x
+    and.w   #Tileset.interactiveTilesMap.MASK
     tax
 
     jsr     (InteractiveTiles.{type}_FunctionTable,x)
@@ -49,8 +49,8 @@ inline __jmp_InteractiveTileFunction(type) {
     lda.w   map.data,y
     and.w   #0xff
     tax
-    lda.w   interactiveTilesMap,x
-    and.w   #interactiveTilesMap.MASK
+    lda.w   Tileset.interactiveTilesMap,x
+    and.w   #Tileset.interactiveTilesMap.MASK
     tax
 
     jmp     (InteractiveTiles.{type}_FunctionTable,x)

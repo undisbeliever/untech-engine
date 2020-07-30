@@ -19,6 +19,11 @@ namespace MetaTiles {
     constant MAP_HEIGHT_LARGE = 128
 
 
+    // Location (in memory) to store the MetaTile Tileset
+    constant TILESET_DATA_SIZE = 256 * 10 + 14
+    allocate(_tilesetData, wram7e, TILESET_DATA_SIZE)
+
+
 
     namespace map {
         // Map width in metatiles
@@ -234,9 +239,9 @@ namespace MetaTiles {
         inline __AllocateVariables(ns, evaluate nElements) {
             // The tile to turn into on the first, second and third transitions
             // (3x byte)
-            constant firstTileId  = tilesetFooter.CrumblingTiles{ns}.firstTileId
-            constant secondTileId = tilesetFooter.CrumblingTiles{ns}.secondTileId
-            constant thirdTileId  = tilesetFooter.CrumblingTiles{ns}.thirdTileId
+            constant firstTileId  = Tileset.Footer.CrumblingTiles{ns}.firstTileId
+            constant secondTileId = Tileset.Footer.CrumblingTiles{ns}.secondTileId
+            constant thirdTileId  = Tileset.Footer.CrumblingTiles{ns}.thirdTileId
 
             // Time to wait between the first and second tile transition in display frames.
             // (uint16 - display frames)
@@ -337,8 +342,9 @@ namespace MetaTiles {
         namespace ChainB {
             __AllocateVariables(ChainB, 32)
         }
-        assert(tilesetFooter.N_CRUMBLING_BLOCK_CHAINS == 2)
         assert(__bufferOffset == N_ELEMENTS_IN_BOTH_QUEUES)
+
+        constant N_CRUMBLING_BLOCK_CHAINS = 2
     }
 }
 

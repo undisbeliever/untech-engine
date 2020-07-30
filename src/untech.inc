@@ -26,20 +26,19 @@ include "dma/_common.inc"
 
 include "math/_macros.inc"
 
-include "metatiles/_dataformat.inc"
+include "metatiles/_variables.inc"
 include "room/_variables.inc"
 
-include "resources/_dataformat.inc"
-include "metasprite/_dataformat.inc"
 include "entity/_dataformat.inc"
-
+include "metasprite/_dataformat.inc"
+include "metatiles/_dataformat.inc"
+include "resources/_dataformat.inc"
 include "room/_dataformat.inc"
 
 include "resources/_variables.inc"
 include "hdma/_variables.inc"
 include "math/_variables.inc"
 include "text/_variables.inc"
-include "metatiles/_variables.inc"
 include "metasprite/_variables.inc"
 include "entity/_variables.inc"
 include "camera/_variables.inc"

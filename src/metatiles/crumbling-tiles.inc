@@ -55,12 +55,12 @@ constant animationSpeed = Resources.animationSpeed
 
 
     // Convert first transition delay from ticks to frames
-    ldy.w   tilesetFooter.CrumblingTilesChainA.firstDelay
+    ldy.w   Tileset.Footer.CrumblingTilesChainA.firstDelay
     lda.w   animationSpeed
     jsr     Math.Divide.u16y_u8a
     sty.w   CrumblingTiles.ChainA.firstWait
 
-    ldy.w   tilesetFooter.CrumblingTilesChainB.firstDelay
+    ldy.w   Tileset.Footer.CrumblingTilesChainB.firstDelay
     lda.w   animationSpeed
     jsr     Math.Divide.u16y_u8a
     sty.w   CrumblingTiles.ChainB.firstWait
@@ -68,7 +68,7 @@ constant animationSpeed = Resources.animationSpeed
 
     // Convert second transition delay from ticks to frames
     // (unless the delay is 0xffff)
-    ldy.w   tilesetFooter.CrumblingTilesChainA.secondDelay
+    ldy.w   Tileset.Footer.CrumblingTilesChainA.secondDelay
     cpy.w   #0xffff
     beq     +
         lda.w   animationSpeed
@@ -76,7 +76,7 @@ constant animationSpeed = Resources.animationSpeed
     +
     sty.w   CrumblingTiles.ChainA.secondWait
 
-    ldy.w   tilesetFooter.CrumblingTilesChainB.secondDelay
+    ldy.w   Tileset.Footer.CrumblingTilesChainB.secondDelay
     cpy.w   #0xffff
     beq     +
         lda.w   animationSpeed
@@ -255,7 +255,7 @@ macro _IncrementTime() {
     inc.w   CrumblingTiles.time
     bpl     TimeValid
         // Update time in both queues using a single loop
-        assert(tilesetFooter.N_CRUMBLING_BLOCK_CHAINS == 2)
+        assert(CrumblingTiles.N_CRUMBLING_BLOCK_CHAINS == 2)
         assert(CrumblingTiles.ChainA.Queue.time + CrumblingTiles.ChainA.Queue.N_ELEMENTS * 2 == CrumblingTiles.ChainB.Queue.time)
         assert(CrumblingTiles.N_ELEMENTS_IN_BOTH_QUEUES * 2 < 0xff)
         ldy.b   #CrumblingTiles.N_ELEMENTS_IN_BOTH_QUEUES * 2

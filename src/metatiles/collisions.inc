@@ -351,7 +351,7 @@ MovingRight:
         // if collisionMap[map.data[y]] == TileCollisionType.SOLID goto Collision
         lda.w   map.data,y
         tax
-        lda.w   collisionMap,x
+        lda.w   Tileset.collisionMap,x
         assert(TileCollisionType.SOLID == 0)
         beq     Collision
 
@@ -378,7 +378,7 @@ MovingRight:
             lda.w   map.data,y
             // Ah = 0
             tax
-            lda.w   collisionMap,x
+            lda.w   Tileset.collisionMap,x
             assert(TileCollisionType.SOLID == 0)
             beq     Collision
 
@@ -466,7 +466,7 @@ MovingLeft:
         // if collisionMap[map.data[y]] == TileCollisionType.SOLID goto Collision
         lda.w   map.data,y
         tax
-        lda.w   collisionMap,x
+        lda.w   Tileset.collisionMap,x
         assert(TileCollisionType.SOLID == 0)
         beq     Collision
 
@@ -492,7 +492,7 @@ MovingLeft:
             lda.w   map.data,y
             // Ah = 0
             tax
-            lda.w   collisionMap,x
+            lda.w   Tileset.collisionMap,x
             assert(TileCollisionType.SOLID == 0)
             beq     Collision
 
@@ -671,7 +671,7 @@ MovingDown:
     a8()
         lda.w   map.data,y
         tax
-        lda.w   collisionMap,x
+        lda.w   Tileset.collisionMap,x
 
         // No collision if DOWN_PLATFORM, EMPTY or UP SLOPE
         assert(TileCollisionType.DOWN_PLATFORM > TileCollisionType.EMPTY)
@@ -699,7 +699,7 @@ MovingDown:
             //      goto NoBottomCollision
             lda.b   BaseEntity.xPos.px
             and.b   #0x0f
-            ora.w   collisionMap,x
+            ora.w   Tileset.collisionMap,x
             tax
 
             lda.w   _bottom
@@ -828,7 +828,7 @@ MovingDown:
                 // Two tiles on left
                 lda.w   map.data - 2 * MAP_HEIGHT,y
                 tax
-                lda.w   collisionMap,x
+                lda.w   Tileset.collisionMap,x
                 and.b   #0xf0
                 assert(TileCollisionType.__ENUM__.increment == 16)
                 assert(TileCollisionType.END_SLOPE & 0xf0 == 0)
@@ -843,7 +843,7 @@ MovingDown:
         OnlyOneTileOnLeft:
             lda.w   map.data - 1 * MAP_HEIGHT,y
             tax
-            lda.w   collisionMap,x
+            lda.w   Tileset.collisionMap,x
             and.b   #0xf0
             assert(TileCollisionType.__ENUM__.increment == 16)
             assert(TileCollisionType.END_SLOPE & 0xf0 == 0)
@@ -869,7 +869,7 @@ MovingDown:
                 // two tiles on right
                 lda.w   map.data + 2 * MAP_HEIGHT,y
                 tax
-                lda.w   collisionMap,x
+                lda.w   Tileset.collisionMap,x
                 and.b   #0xf0
                 assert(TileCollisionType.__ENUM__.increment == 16)
                 assert(TileCollisionType.END_SLOPE & 0xf0 == 0)
@@ -884,7 +884,7 @@ MovingDown:
         OnlyOneTileOnRight:
             lda.w   map.data + 1 * MAP_HEIGHT,y
             tax
-            lda.w   collisionMap,x
+            lda.w   Tileset.collisionMap,x
             and.b   #0xf0
             assert(TileCollisionType.__ENUM__.increment == 16)
             assert(TileCollisionType.END_SLOPE & 0xf0 == 0)
@@ -1011,7 +1011,7 @@ MovingDown:
     a8()
         lda.w   map.data,y
         tax
-        lda.w   collisionMap,x
+        lda.w   Tileset.collisionMap,x
 
         // Test if top-center is a SOLID or END_SLOPE tile
         assert(TileCollisionType.SOLID == 0)
@@ -1033,7 +1033,7 @@ MovingDown:
             //      goto MovingUp.Collision
             lda.b   BaseEntity.xPos.px
             and.b   #0x0f
-            ora.w   collisionMap,x
+            ora.w   Tileset.collisionMap,x
             tax
 
             lda.w   _top
@@ -1065,7 +1065,7 @@ MovingDown:
         // Y = tile index of bottom-center of hitbox
         lda.b   BaseEntity.xPos.px
         and.b   #0x0f
-        ora.w   collisionMap,x
+        ora.w   Tileset.collisionMap,x
         tax
         jmp     MovingDown.Collision
 
@@ -1085,7 +1085,7 @@ MovingDown:
 
         lda.b   BaseEntity.xPos.px
         and.b   #0xf
-        ora.w   collisionMap,x
+        ora.w   Tileset.collisionMap,x
         tax
         // X = TopHeightTable index
 
@@ -1189,7 +1189,7 @@ MovingDown_Standing:
 
         lda.w   map.data,y
         tax
-        lda.w   collisionMap,x
+        lda.w   Tileset.collisionMap,x
 
         // Collision if tile is SOLID, END_SLOPE, or DOWN SLOPE
         assert(TileCollisionType.SOLID < TileCollisionType.UP_PLATFORM)
@@ -1208,7 +1208,7 @@ MovingDown_Standing:
 
         lda.w   map.data,y
         tax
-        lda.w   collisionMap,x
+        lda.w   Tileset.collisionMap,x
 
         // Collision if tile is SOLID, END_SLOPE, UP_PLATFORM or DOWN SLOPE
         assert(TileCollisionType.SOLID < TileCollisionType.EMPTY)
@@ -1252,7 +1252,7 @@ MovingDown_Standing:
                 // two tiles on left
                 lda.w   map.data - 2 * MAP_HEIGHT,y
                 tax
-                lda.w   collisionMap,x
+                lda.w   Tileset.collisionMap,x
                 and.b   #0xf0
                 assert(TileCollisionType.__ENUM__.increment == 16)
                 assert(TileCollisionType.END_SLOPE & 0xf0 == 0)
@@ -1264,7 +1264,7 @@ MovingDown_Standing:
         OnlyOneTileOnLeft:
             lda.w   map.data - 1 * MAP_HEIGHT,y
             tax
-            lda.w   collisionMap,x
+            lda.w   Tileset.collisionMap,x
             and.b   #0xf0
             assert(TileCollisionType.__ENUM__.increment == 16)
             assert(TileCollisionType.END_SLOPE & 0xf0 == 0)
@@ -1288,7 +1288,7 @@ MovingDown_Standing:
                 // two tiles on right
                 lda.w   map.data + 2 * MAP_HEIGHT,y
                 tax
-                lda.w   collisionMap,x
+                lda.w   Tileset.collisionMap,x
                 and.b   #0xf0
                 assert(TileCollisionType.__ENUM__.increment == 16)
                 assert(TileCollisionType.END_SLOPE & 0xf0 == 0)
@@ -1300,7 +1300,7 @@ MovingDown_Standing:
         OnlyOneTileOnRight:
             lda.w   map.data + 1 * MAP_HEIGHT,y
             tax
-            lda.w   collisionMap,x
+            lda.w   Tileset.collisionMap,x
             and.b   #0xf0
             assert(TileCollisionType.__ENUM__.increment == 16)
             assert(TileCollisionType.END_SLOPE & 0xf0 == 0)
@@ -1425,7 +1425,7 @@ MovingUp:
 
         lda.w   map.data,y
         tax
-        lda.w   collisionMap,x
+        lda.w   Tileset.collisionMap,x
 
         // Test if center tile is an UP SLOPE
         assert(_TileCollisionType_LAST_UP_SLOPE == 0xf0)
@@ -1460,7 +1460,7 @@ MovingUp:
         //      goto NoTopCollision
         lda.b   BaseEntity.xPos.px
         and.b   #0x0f
-        ora.w   collisionMap,x
+        ora.w   Tileset.collisionMap,x
         tax
 
         lda.w   _top
@@ -1637,7 +1637,7 @@ MovingUp:
     a8()
         lda.w   map.data,y
         tax
-        lda.w   collisionMap,x
+        lda.w   Tileset.collisionMap,x
 
         // test if tile is SOLID, END_SLOPE or DOWN_PLATFORM
         assert(TileCollisionType.SOLID < TileCollisionType.EMPTY)
@@ -1656,7 +1656,7 @@ MovingUp:
             //      goto MovingDown.Collision
             lda.b   BaseEntity.xPos.px
             and.b   #0x0f
-            ora.w   collisionMap,x
+            ora.w   Tileset.collisionMap,x
             tax
 
             lda.w   _bottom
@@ -1686,7 +1686,7 @@ MovingUp:
         // Y = tile index of top-center of hitbox
         lda.b   BaseEntity.xPos.px
         and.b   #0x0f
-        ora.w   collisionMap,x
+        ora.w   Tileset.collisionMap,x
         tax
         jmp     MovingUp.Collision
 
@@ -1706,7 +1706,7 @@ MovingUp:
 
         lda.b   BaseEntity.xPos.px
         and.b   #0xf
-        ora.w   collisionMap,x
+        ora.w   Tileset.collisionMap,x
         tax
         // X = BottomHeightTable index
 
@@ -1767,7 +1767,7 @@ MovingUp_Standing:
 
         lda.w   map.data,y
         tax
-        lda.w   collisionMap,x
+        lda.w   Tileset.collisionMap,x
 
         // Collision if SOLID or END_SLOPE
         assert(TileCollisionType.END_SLOPE & 0xf0 == TileCollisionType.SOLID)
@@ -1790,7 +1790,7 @@ MovingUp_Standing:
 
         lda.w   map.data,y
         tax
-        lda.w   collisionMap,x
+        lda.w   Tileset.collisionMap,x
 
         // Collision if SOLID or END_SLOPE
         assert(TileCollisionType.END_SLOPE & 0xf0 == TileCollisionType.SOLID)

@@ -146,10 +146,10 @@ a16()
             asl
             tay
 
-            lda.w   tileMap.topLeft,y
+            lda.w   Tileset.tileMap.topLeft,y
             sta.b   VMDATA
 
-            lda.w   tileMap.bottomLeft,y
+            lda.w   Tileset.tileMap.bottomLeft,y
             sta.b   VMDATA
 
             inx
@@ -171,10 +171,10 @@ a16()
             asl
             tay
 
-            lda.w   tileMap.topRight,y
+            lda.w   Tileset.tileMap.topRight,y
             sta.b   VMDATA
 
-            lda.w   tileMap.bottomRight,y
+            lda.w   Tileset.tileMap.bottomRight,y
             sta.b   VMDATA
 
             inx
@@ -306,7 +306,7 @@ macro __DrawHorizontalBuffer() {
     assert(horizontalBuffer.buffer.size == 64 * 2 * 2)
 
     // prevent map ptr under-run
-    assert((map.data & 0xffff) > MAP_HEIGHT + 2)
+    assert((Room.Format.mapData & 0xffff) > MAP_HEIGHT_LARGE)
 
     assertZeroPage(_mapPtr)
     assertZeroPage(_mapPtrRend)
@@ -366,16 +366,16 @@ macro __DrawHorizontalBuffer() {
         asl
         tax
 
-        lda.w   tileMap.topLeft,x
+        lda.w   Tileset.tileMap.topLeft,x
         sta.w   horizontalBuffer.buffer,y
 
-        lda.w   tileMap.topRight,x
+        lda.w   Tileset.tileMap.topRight,x
         sta.w   horizontalBuffer.buffer + 2,y
 
-        lda.w   tileMap.bottomLeft,x
+        lda.w   Tileset.tileMap.bottomLeft,x
         sta.w   horizontalBuffer.buffer + 128,y
 
-        lda.w   tileMap.bottomRight,x
+        lda.w   Tileset.tileMap.bottomRight,x
         sta.w   horizontalBuffer.buffer + 128 + 2,y
 
         dey
@@ -411,7 +411,7 @@ macro __DrawVerticalBuffer() {
     assert(horizontalBuffer.buffer.size == 64 * 2 * 2)
 
     // prevent map ptr under-run
-    assert((map.data & 0xffff) > MAP_HEIGHT_LARGE)
+    assert((Room.Format.mapData & 0xffff) > MAP_HEIGHT_LARGE)
 
     assertZeroPage(_mapPtr)
     assertZeroPage(_mapPtrRend)
@@ -473,16 +473,16 @@ macro __DrawVerticalBuffer() {
         asl
         tax
 
-        lda.w   tileMap.topLeft,x
+        lda.w   Tileset.tileMap.topLeft,x
         sta.w   verticalBuffer.buffer,y
 
-        lda.w   tileMap.bottomLeft,x
+        lda.w   Tileset.tileMap.bottomLeft,x
         sta.w   verticalBuffer.buffer + 2,y
 
-        lda.w   tileMap.topRight,x
+        lda.w   Tileset.tileMap.topRight,x
         sta.w   verticalBuffer.buffer + 64,y
 
-        lda.w   tileMap.bottomRight,x
+        lda.w   Tileset.tileMap.bottomRight,x
         sta.w   verticalBuffer.buffer + 64 + 2,y
 
         dey
@@ -899,13 +899,13 @@ a16()
     // x = drawMapCellBufferIndex
     sta.w   drawMapCellBuffer.vramWaddr,x
 
-    lda.w   tileMap.topLeft,y
+    lda.w   Tileset.tileMap.topLeft,y
     sta.w   drawMapCellBuffer.topLeft,x
-    lda.w   tileMap.topRight,y
+    lda.w   Tileset.tileMap.topRight,y
     sta.w   drawMapCellBuffer.topRight,x
-    lda.w   tileMap.bottomLeft,y
+    lda.w   Tileset.tileMap.bottomLeft,y
     sta.w   drawMapCellBuffer.bottomLeft,x
-    lda.w   tileMap.bottomRight,y
+    lda.w   Tileset.tileMap.bottomRight,y
     sta.w   drawMapCellBuffer.bottomRight,x
 
     inx

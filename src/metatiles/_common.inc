@@ -322,7 +322,7 @@ assert8i()
     lda.w   CrumblingTiles.time
     lsr
     bcs     OddFrame
-        assert(tilesetFooter.N_CRUMBLING_BLOCK_CHAINS == 2)
+        assert(CrumblingTiles.N_CRUMBLING_BLOCK_CHAINS == 2)
         jsr     CrumblingTiles._Process_ChainA
 
         // Do not process crumbling tiles if the drawMapCellBuffer is full

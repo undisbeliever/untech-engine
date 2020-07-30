@@ -20,52 +20,55 @@ namespace MetaTiles {
     constant N_META_TILES = 256
 
 
-    // SNES Tile Map data for each MetaTile
-    //
-    // (structure of arrays -> Tilemap)
-    namespace tileMap {
-        allocate(topLeft,       wram7e, N_META_TILES * 2)
-        allocate(topRight,      wram7e, N_META_TILES * 2)
-        allocate(bottomLeft,    wram7e, N_META_TILES * 2)
-        allocate(bottomRight,   wram7e, N_META_TILES * 2)
-    }
-    constant tileMap = tileMap.topLeft
-    constant tileMap.size = N_META_TILES * 2 * 4
+    // MetaTile Tileset data format
+    namespace Tileset {
+        struct(_tilesetData)
+        struct_maxsize(TILESET_DATA_SIZE)
+
+        // SNES Tile Map data for each MetaTile
+        //
+        // (structure of arrays -> Tilemap)
+        namespace tileMap {
+            field(topLeft,      N_META_TILES * 2)
+            field(topRight,     N_META_TILES * 2)
+            field(bottomLeft,   N_META_TILES * 2)
+            field(bottomRight,  N_META_TILES * 2)
+
+            assert(topLeft & 0xff == 0)
+        }
+        constant tileMap = tileMap.topLeft
+        constant tileMap.size = N_META_TILES * 2 * 4
 
 
-    // Collision data for each MetaTile
-    //
-    // NOTE: Each entry MUST MATCH a TileCollisionType value
-    //
-    allocate(collisionMap, wram7e, N_META_TILES)
-    constant collisionMap.size = N_META_TILES
+        // Collision data for each MetaTile
+        //
+        // NOTE: Each entry MUST MATCH a TileCollisionType value
+        //
+        field(collisionMap, N_META_TILES)
+        constant collisionMap.size = N_META_TILES
 
 
-    // Interactive tiles function table index for each MetaTile
-    //
-    // Format:
-    //      00ttttt0
-    //          ttttt = interactive tile id
-    //
-    // See `InteractiveTilesFunctionTables` for details about the function tables.
-    allocate(interactiveTilesMap, wram7e, N_META_TILES)
-    namespace interactiveTilesMap {
-        constant size = N_META_TILES
+        // Interactive tiles function table index for each MetaTile
+        //
+        // Format:
+        //      00ttttt0
+        //          ttttt = interactive tile id
+        //
+        // See `InteractiveTilesFunctionTables` for details about the function tables.
+        field(interactiveTilesMap, N_META_TILES)
+        namespace interactiveTilesMap {
+            constant size = N_META_TILES
 
-        // Number of functions inside the interactive tiles function table.
-        constant N_FUNCTIONS = 32
+            // Number of functions inside the interactive tiles function table.
+            constant N_FUNCTIONS = 32
 
-        constant MASK = (N_FUNCTIONS - 1) << 1
-    }
+            constant MASK = (N_FUNCTIONS - 1) << 1
+        }
 
-    namespace tilesetFooter {
+
         // This data is at the end because we want the tileset-map variables to be page aligned.
-
-        constant FOOTER_SIZE = 14
-        allocate(_data, wram7e, FOOTER_SIZE)
-
-        struct(_data)
-            // Crumbling tile settings for the MetaTile Tileset.
+        // Crumbling tile settings for the MetaTile Tileset.
+        namespace Footer {
             inline __CrumblingTilesChain() {
                 // The first tile in the chain
                 //
@@ -109,12 +112,11 @@ namespace MetaTiles {
             namespace CrumblingTilesChainB {
                 __CrumblingTilesChain()
             }
-
-            constant N_CRUMBLING_BLOCK_CHAINS = 2
+            assert(MetaTiles.CrumblingTiles.N_CRUMBLING_BLOCK_CHAINS == 2)
+        }
 
         endstruct()
-
-        assert(size == FOOTER_SIZE)
+        assert(size == TILESET_DATA_SIZE)
     }
 
 
@@ -165,29 +167,19 @@ namespace MetaTiles {
 
 
     namespace Format {
-
         // MetaTile Tileset data format
         //  Two lz4 compressed data blocks, one after each other
-        //      * tile data block
+        //      * MetaTile tiles block
         //          - lz4 compressed block
-        //          - contains tileMap + collisionMap, copied straight to WRAM
+        //          - contains `MetaTiles.Tileset` struct, copied straight to WRAM
         //      * Animated Tileset block
         //          - see Resources.Format.AnimatedTilesetHeader for data format
         namespace Tileset {
-            constant wramLocation = MetaTiles.tileMap
-
-            constant size = tileMap.size + collisionMap.size + interactiveTilesMap.size + tilesetFooter.size
-
-            // Ensure `tileMap`, `collisionMap`, `interactiveTilesMap` and `tilesetFooter` are continuous
-            assert(tileMap + tileMap.size == collisionMap)
-            assert(collisionMap + collisionMap.size == interactiveTilesMap)
-            assert(interactiveTilesMap + interactiveTilesMap.size == tilesetFooter._data)
+            constant wramLocation = MetaTiles._tilesetData
+            constant size = MetaTiles.Tileset.size
 
             // Ensure the variables are page aligned
             assert(wramLocation & 0xff == 0)
-            assert(tileMap & 0xff == 0)
-            assert(collisionMap & 0xff == 0)
-            assert(interactiveTilesMap & 0xff == 0)
         }
     }
 
@@ -276,11 +268,11 @@ namespace MetaTiles {
         constant PlayerAirCollision_FunctionTable = Project.InteractiveTiles.PlayerAirCollision_FunctionTable
 
 
-        assert(EntityAirCollision_FunctionTable - EntityCollision_FunctionTable == interactiveTilesMap.N_FUNCTIONS * 2)
-        assert(PlayerOriginCollision_FunctionTable - EntityAirCollision_FunctionTable == interactiveTilesMap.N_FUNCTIONS * 2)
-        assert(PlayerLeftRightCollision_FunctionTable - PlayerOriginCollision_FunctionTable == interactiveTilesMap.N_FUNCTIONS * 2)
-        assert(PlayerAirCollision_FunctionTable - PlayerLeftRightCollision_FunctionTable == interactiveTilesMap.N_FUNCTIONS * 2)
-        assert(Project.InteractiveTiles.EndFunctionTables - PlayerAirCollision_FunctionTable == interactiveTilesMap.N_FUNCTIONS * 2)
+        assert(EntityAirCollision_FunctionTable - EntityCollision_FunctionTable == Tileset.interactiveTilesMap.N_FUNCTIONS * 2)
+        assert(PlayerOriginCollision_FunctionTable - EntityAirCollision_FunctionTable == Tileset.interactiveTilesMap.N_FUNCTIONS * 2)
+        assert(PlayerLeftRightCollision_FunctionTable - PlayerOriginCollision_FunctionTable == Tileset.interactiveTilesMap.N_FUNCTIONS * 2)
+        assert(PlayerAirCollision_FunctionTable - PlayerLeftRightCollision_FunctionTable == Tileset.interactiveTilesMap.N_FUNCTIONS * 2)
+        assert(Project.InteractiveTiles.EndFunctionTables - PlayerAirCollision_FunctionTable == Tileset.interactiveTilesMap.N_FUNCTIONS * 2)
     }
 }
 
