@@ -158,7 +158,7 @@ ifdef UTEDITOR_DIR
   .PHONY: untech-editor-gui
 
   untech-editor-gui:
-	$(MAKE) -C "$(UTEDITOR_DIR)" gui-qt
+	$(MAKE) -C "$(UTEDITOR_DIR)" gui
 
   $(untech-editor-gui): untech-editor-gui
 endif

@@ -4,13 +4,13 @@
   <memory-map mode="hirom" first-bank="c1" n-banks="1"/>
   <room-settings room-data-size="16384"/>
   <interactive-tiles>
-    <tile-function-table name="SetUpGravity" symbol="G⬆" color="ffa5a5"/>
-    <tile-function-table name="SetDownGravity" symbol="G⬇" color="a5e1ff"/>
-    <tile-function-table name="Token" symbol="💰" color="ffc800"/>
-    <tile-function-table name="CrumblingTiles_A" symbol="CA" color="ffc800"/>
-    <tile-function-table name="CrumblingTiles_B" symbol="CB" color="ffc800"/>
-    <tile-function-table name="CrumblingTiles_A_PlayerOnly" symbol="Ca" color="ffc800"/>
-    <tile-function-table name="CrumblingTiles_B_PlayerOnly" symbol="Cb" color="ffc800"/>
+    <tile-function-table name="SetUpGravity" tint="ffa5a5"/>
+    <tile-function-table name="SetDownGravity" tint="a5e1ff"/>
+    <tile-function-table name="Token" tint="ffc800"/>
+    <tile-function-table name="CrumblingTiles_A" tint="0077ff"/>
+    <tile-function-table name="CrumblingTiles_B" tint="00ff95"/>
+    <tile-function-table name="CrumblingTiles_A_PlayerOnly" tint="9b9bff"/>
+    <tile-function-table name="CrumblingTiles_B_PlayerOnly" tint="9bff9b"/>
   </interactive-tiles>
   <entity-rom-data>
     <listid name="Particles"/>
