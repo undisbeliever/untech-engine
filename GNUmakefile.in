@@ -115,39 +115,49 @@ $(PROJECT_BIN) $(PROJECT_INC): project-data
 ifdef BASS_DIR
   tools: bass
 
-  $(BINARY): bass
-
-  .INTERMEDIATE: bass
+  .PHONY: bass
   bass: $(call rwildcard_all $(BASS_DIR))
 	$(MAKE) -C "$(BASS_DIR)/bass"
 
   $(bass): bass
+
+  # Test if bass needs recompiling
+  __UNUESED__ := $(shell $(MAKE) --quiet --question -C "$(BASS_DIR)/bass")
+  ifneq ($(.SHELLSTATUS), 0)
+    $(BINARY): bass
+  endif
 endif
 
 
 ifdef UTEDITOR_DIR
-  tools: untech-editor untech-editor-gui
+  tools: untech-editor-cli untech-editor-gui
 
 
-  project-data: untech-editor
+  .PHONY: untech-editor-cli
 
-  .INTERMEDIATE: untech-editor
-
-  untech-editor: $(call rwildcard_all, $(UTEDITOR_DIR)/src/)
+  untech-editor-cli:
 	$(MAKE) -C "$(UTEDITOR_DIR)" cli
 
-  $(untech-lz4c): untech-editor
-  $(untech-compiler): untech-editor
-  $(untech-png2snes): untech-editor
-  $(untech-png2tileset): untech-editor
-  $(untech-utsi2utms): untech-editor
-  $(untech-write-sfc-checksum): untech-editor
+  $(untech-lz4c): untech-editor-cli
+  $(untech-compiler): untech-editor-cli
+  $(untech-png2snes): untech-editor-cli
+  $(untech-png2tileset): untech-editor-cli
+  $(untech-utsi2utms): untech-editor-cli
+  $(untech-write-sfc-checksum): untech-editor-cli
+
+  # Test if untech-editor-cli needs recompiling
+  __UNUSED__ := $(shell $(MAKE) --quiet --question -C "$(UTEDITOR_DIR)" cli)
+  ifneq ($(.SHELLSTATUS), 0)
+    project-data: untech-editor-cli
+  endif
+
+
 
   edit-project: untech-editor-gui
 
-  .INTERMEDIATE: untech-editor-gui
+  .PHONY: untech-editor-gui
 
-  untech-editor-gui: $(call rwildcard_all, $(UTEDITOR_DIR)/src/)
+  untech-editor-gui:
 	$(MAKE) -C "$(UTEDITOR_DIR)" gui-qt
 
   $(untech-editor-gui): untech-editor-gui
