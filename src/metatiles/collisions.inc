@@ -24,14 +24,23 @@ assert(METATILE_SIZE_PX == 16)
 // Confirm entity momentum is a 24 bit value
 assert(BaseEntity.yMomentum.sx - BaseEntity.xMomentum.sx == 3)
 
+
+// Used to extend tileHitbox right/height values from uint8 to uint16.
+//
+// See `MetaSprite.EntityHitbox._xPosWidthPair` for more details.
+//
+// I have decided to allocate new memory for these variables and not reuse the
+// `MetaSprite.EntityHitbox._xPosWidthPair` variables in order to minimize the
+// risk of me accidentally accessing them with direct-page addressing and
+// overriding entity data.
+//
+// Third byte of _leftRightPair and _yOffsetHeightPair is 0
+allocate(_leftRightPair, wram7e, 3)
+allocate(_yOffsetHeightPair, wram7e, 3)
+
 assert(MetaSprite.Format.Frame.TileHitbox.left + 1 == MetaSprite.Format.Frame.TileHitbox.right)
 assert(MetaSprite.Format.Frame.TileHitbox.yOffset + 1 == MetaSprite.Format.Frame.TileHitbox.height)
 
-// Third byte of _leftRightPair and _yOffsetHeightPair is 0
-constant _leftRightPair = MetaSprite.EntityHitbox._xPosWidthPair
-constant _yOffsetHeightPair = MetaSprite.EntityHitbox._yPosHeightPair
-
-allocateTmpWord(_top)
 
 // Holds the X-component of a tile index.
 allocateTmpWord(_tileIndexTmp)
@@ -39,6 +48,7 @@ allocateTmpWord(_tileIndexTmp)
 allocateTmpWord(_counter)
 allocateTmpWord(_xTmp)
 
+allocateTmpWord(_top)
 allocateTmpWord(_bottom)
 allocateTmpWord(_yDelta)
 allocateTmpWord(_bottomOffset)
