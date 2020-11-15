@@ -29,13 +29,13 @@ else ifneq ($(LOCAL_TOOLS), n)
 endif
 
 ifndef bass
-  BASS_DIR     := $(UNTECH_DIR)/tools/bass-untech
+  BASS_DIR     := $(UNTECH_DIR)/bass-untech
   bass         := $(BASS_DIR)/bass/out/bass-untech
 endif
 
 
 ifeq ($(LOCAL_TOOLS), n)
-  UTEDITOR_DIR := $(UNTECH_DIR)/tools/untech-editor
+  UTEDITOR_DIR := $(UNTECH_DIR)/untech-editor
 
   untech-editor-gui         := $(UTEDITOR_DIR)/bin/untech-editor-gui
   untech-compiler           := $(UTEDITOR_DIR)/bin/untech-compiler
