@@ -73,7 +73,7 @@ macro _SpawnPlayer() {
 
     sep     #$20
 a8()
-    lda.w   entranceId
+    lda.w   GameState.entranceId
     cmp.w   Format.Header.nEntrances
     bcc     +
     InvalidRoomEntrance:

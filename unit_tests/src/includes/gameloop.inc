@@ -17,10 +17,22 @@ a16()
 i16()
 code()
 function Init_LoadRoom {
+    // Always reset game state on each test
+    pha
+    phx
+    phy
+
+    jsr     GameState.LoadInitialGameState
+
+    ply
+    plx
+    pla
+
+
     sep     #$10
 i8()
-    stx.w   Room.playerDataId
-    sty.w   Room.entranceId
+    stx.w   GameState.playerDataId
+    sty.w   GameState.entranceId
 
     rep     #$30
 i16()

@@ -46,7 +46,7 @@ namespace InteractiveTilesTest_Player {
 
         sep     #$20
     a8()
-        lda.w   Room.roomId
+        lda.w   GameState.roomId
         cmp.b   #Project.RoomList.InteractiveTilesTestSmall
         bne     +
             lda.b   #X_MOMENTUM_PX
@@ -212,10 +212,6 @@ function Collision {
 
 
 namespace Token {
-// Number of token tiles collected by the player
-// (uint16)
-allocateTmpWord(tokensCollected)
-
 a16()
 i16()
 code()
@@ -232,7 +228,7 @@ function NullFunction {
 // INPUT: dp = entity
 // INPUT:  Y = map data index
 function PlayerAirCollision {
-    inc.w   tokensCollected
+    inc.w   Project.GameState.Words.tokensCollected
 
     lda.w   #0
     jmp     MetaTiles.SetMapCell
@@ -308,8 +304,6 @@ constant _nRollbacks   = Test.dpTmp + 4
     lda.w   #GRAVITY
     sta.w   Room.gravity_sx
 
-    stz.w   InteractiveTiles.Token.tokensCollected
-
 
     jsr     Test.PrintCurrentTestName
 
@@ -345,7 +339,7 @@ a16()
         jsr     Text.Console.PrintU16Y
 
         Text.Console.SetCursor(8, 4)
-        ldy.w   InteractiveTiles.Token.tokensCollected
+        ldy.w   Project.GameState.Words.tokensCollected
         jsr     Text.Console.PrintU16Y
 
         Text.Console.SetCursor(8, 5)
@@ -383,7 +377,7 @@ a16()
 
     sep     #$20
 a8()
-    lda.w   Room.roomId
+    lda.w   GameState.roomId
     cmp.b   #Project.RoomList.InteractiveTilesTestSmall
     bne     RoomIsLarge
         // Room is Small
@@ -393,7 +387,7 @@ a8()
 
         define mapTile(x, y, mapHeight) = MetaTiles.map.data + {y} + {x} * MetaTiles.MAP_HEIGHT_{mapHeight}
 
-        ldy.w   InteractiveTiles.Token.tokensCollected
+        ldy.w   Project.GameState.Words.tokensCollected
         cpy.w   #32 * 3
         bcc     Fail
 

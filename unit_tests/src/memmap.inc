@@ -23,6 +23,9 @@ createRamBlock(wram7e,      0x7e2000, 0x7effff)
 createRamBlock(wram7f,      0x7f0000, 0x7fffff)
 
 
+// Allocate 2 pages (512 bytes) to store the game state
+constant N_GAME_STATE_PAGES = 2
+
 
 // Entity Layout
 // =============

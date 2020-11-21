@@ -21,20 +21,6 @@ constant roomData.size = Project.ROOM_DATA_SIZE
 assert(roomData.size >= 1024)
 
 
-// Current room id
-// (byte)
-allocate(roomId, wram7e, 1)
-
-// The entrance to start the room in
-// (byte)
-allocate(entranceId, wram7e, 1)
-
-// The player's Data id.
-// Used to determine which player to spawn when loading the game.
-// (byte)
-allocate(playerDataId, wram7e, 1)
-
-
 namespace Entrances {
     // Word address of the room entrances data
     //

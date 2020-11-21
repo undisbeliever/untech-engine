@@ -3,6 +3,27 @@
 <project>
   <memory-map mode="hirom" first-bank="c1" n-banks="1"/>
   <room-settings room-data-size="16384"/>
+  <game-state starting-room="EmptyRoom" starting-entrance="Start" starting-player="Blank">
+    <flag index="0" name="zeroth"/>
+    <flag index="1" name="first"/>
+    <flag index="2" name="second"/>
+    <flag index="3" name="third"/>
+    <flag index="4" name="fourth"/>
+    <flag index="5" name="fifth"/>
+    <flag index="6" name="sixth"/>
+    <flag index="7" name="seventh"/>
+    <flag index="60" name="sixtyth"/>
+    <flag index="61" name="hidden" room="EmptyRoom"/>
+    <word index="1" name="first" value="1"/>
+    <word index="2" name="second" value="2"/>
+    <word index="3" name="third" value="3"/>
+    <word index="4" name="forth" value="4"/>
+    <word index="5" name="fifth" value="5"/>
+    <word index="10" name="tokensCollected" value="0"/>
+    <word index="60" name="sixtyth" value="60"/>
+    <word index="61" name="hidden1" room="EmptyRoom" value="0"/>
+    <word index="62" name="last" value="0"/>
+  </game-state>
   <interactive-tiles>
     <tile-function-table name="SetUpGravity" tint="ffa5a5"/>
     <tile-function-table name="SetDownGravity" tint="a5e1ff"/>
@@ -111,8 +132,8 @@
       <entry name="EightDirectionRedProjectile" function-table="EightDirectionProjectile" listid="PlayerProjectiles" frameset="Projectile" frame="frame" palette="2"/>
     </projectiles>
     <players>
-      <entry name="Blank" function-table="BlankPlayer" frameset="FST_OneTileFixed1" frame="frame" palette="0"/>
       <entry name="TileCollisionTestPlayer" function-table="TileCollisionTestPlayer" frameset="TileCollisionTestPlayer" frame="frame1" palette="0"/>
+      <entry name="Blank" function-table="BlankPlayer" frameset="FST_OneTileFixed1" frame="frame" palette="0"/>
       <entry name="EhCollisionTest_Player" function-table="EhCollisionTest_Player" frameset="EhCollisionTest_Player" frame="frame1" palette="0"/>
       <entry name="MapCursor" function-table="MapCursor" frameset="Cursor" frame="frame" palette="0"/>
       <entry name="ActionPointSpawner" function-table="ActionPointSpawner" projectileid="EightDirectionRedProjectile" frameset="ActionPointSpawner" frame="playerProjectile0" palette="0"/>

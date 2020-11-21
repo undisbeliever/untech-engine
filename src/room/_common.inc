@@ -50,10 +50,17 @@ a8()
     InvalidRoomId:
         break(INVALID_ROOM_ID)
     +
-    sta.w   roomId
+    sta.w   GameState.roomId
 
     rep     #$20
+    sep     #$10
 a16()
+i8()
+    GameState._ClearRoomState()
+
+    rep     #$30
+a16()
+i16()
 
     Maps._Init()
     EntityGroups._Init()
@@ -67,7 +74,7 @@ a16()
 
 
     // Decompress room data
-    lda.w   roomId
+    lda.w   GameState.roomId
     and.w   #0xff
     sta.b   _tmp
     asl

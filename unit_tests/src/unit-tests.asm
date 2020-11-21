@@ -79,6 +79,9 @@ include "tests/text/string.inc"
 
 include "tests/util/lz4.inc"
 
+include "tests/scripting/game-state.inc"
+
+
 include "interactive/interactive-tiles-test.inc"
 include "interactive/tile-collision-test.inc"
 include "interactive/entity-validation.inc"

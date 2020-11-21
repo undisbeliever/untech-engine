@@ -26,9 +26,11 @@ include "dma/_common.inc"
 
 include "math/_macros.inc"
 
+include "scripting/_variables-gamestate.inc"
 include "metatiles/_variables.inc"
 include "room/_variables.inc"
 
+include "scripting/_dataformat.inc"
 include "entity/_dataformat.inc"
 include "metasprite/_dataformat.inc"
 include "metatiles/_dataformat.inc"
@@ -104,6 +106,8 @@ include "resources/images.inc"
 include "resources/palette.inc"
 include "resources/_common.inc"
 include "resources/_vblank.inc"
+
+include "scripting/game-state.inc"
 
 include "room/maps.inc"
 include "room/entrances.inc"

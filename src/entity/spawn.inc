@@ -245,7 +245,7 @@ macro _SpawnPlayer() {
 a8()
     sta.w   Entity.playerEntity + BaseEntity.movementState
 
-    lda.w   Room.playerDataId
+    lda.w   GameState.playerDataId
     cmp.b   #Entity.Data.PlayerRomDataListCount
     bcc     +
         break(INVALID_ENTITY_ID)
