@@ -17,6 +17,10 @@ constant RoomList = Project.RoomList
 constant RoomList.count = Project.RoomList.count
 
 
+// Maximum number of scripts per room.
+constant N_ROOM_SCRIPTS = 16
+
+
 // The maximum number of entity groups in a room
 constant MAX_ENTITY_GROUPS = 8
 assert(EntityGroups.N_ENTITY_GROUPS == MAX_ENTITY_GROUPS)
@@ -24,7 +28,7 @@ assert(EntityGroups.N_ENTITY_GROUPS == MAX_ENTITY_GROUPS)
 
 
 namespace Format {
-    if Room.ROOM_FORMAT_VERSION != 2 {
+    if Room.ROOM_FORMAT_VERSION != 3 {
         error "Invalid untech-compiler Room Format"
     }
 
@@ -53,6 +57,13 @@ namespace Format {
 
             // Number of Room Entrances for this room
             field(nEntrances, 1)
+
+
+            // The initial program counter of each script in the map.
+            // Each entry contains a index (within `roomData`) to the start of script.
+            // If there is no script, the value is 0.
+            // (N_ROOM_SCRIPTS word indexes)
+            field(scripts, 2 * N_ROOM_SCRIPTS)
         endstruct()
     }
 
@@ -153,6 +164,20 @@ namespace Format {
         constant Entities.size = EntityGroup.size - HEADER_SIZE
     }
 
+
+    // Room Script data
+    //
+    // Immediately following this struct is the bytecode script data.
+    namespace RoomScripts {
+        // Byte used to identify the start of an room script data block
+        constant IDENTIFIER = 0x53 // "S"
+
+        struct()
+            // Size of the room script data in bytes
+            // (word)
+            field(blockSize, 2)
+        endstruct()
+    }
 
 
     // Room footer

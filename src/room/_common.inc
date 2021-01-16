@@ -39,9 +39,10 @@ a16()
 i16()
 code()
 function LoadRoom {
-constant _tmp   = utDpTmp0
-constant _tmpX  = utDpTmp1
-constant _count = utDpTmp2
+constant _tmp    = utDpTmp0
+constant _tmpEnd = utDpTmp1
+constant _tmpX   = utDpTmp2
+constant _count  = utDpTmp3
 
     sep     #$20
 a8()
@@ -57,6 +58,9 @@ a8()
 a16()
 i8()
     GameState._ClearRoomState()
+
+    Scripting._Init()
+
 
     rep     #$30
 a16()
@@ -108,6 +112,9 @@ i16()
 
     EntityGroups._Load()
     // X = address at end of entity groups
+
+    RoomScripts._Load()
+    // X = address at end of room scripts
 
 
     // Check footer (and confirm all data is read with the correct offsets/sizes)

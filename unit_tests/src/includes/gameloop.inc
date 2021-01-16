@@ -150,6 +150,8 @@ function ProcessFrame {
 
     jsr     MetaSprite.Render.EndLoop
 
+    jsr     Scripting.ProcessScripts
+
     jsr     Entity.ValidateEntityLists
 
     rts

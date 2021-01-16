@@ -40,6 +40,7 @@ function SuccessTest {
 }
 
 include "actionpoints.inc"
+include "bytecodes.inc"
 include "scenes.inc"
 
 include "tests/dma/obj-palette.inc"
@@ -80,6 +81,7 @@ include "tests/text/string.inc"
 include "tests/util/lz4.inc"
 
 include "tests/scripting/game-state.inc"
+include "tests/scripting/scripting.inc"
 
 
 include "interactive/interactive-tiles-test.inc"

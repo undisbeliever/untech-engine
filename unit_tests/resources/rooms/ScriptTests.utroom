@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF_8"?>
+<!DOCTYPE untech>
+<room name="ScriptTests" scene="MetaTileRenderTest">
+  <map width="16" height="14">
+    AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+    AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+    AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+    AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+    AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=
+  </map>
+  <entrance name="Start" x="128" y="112" orientation="down-right"/>
+  <script name="Increment_Counter">
+    <statement opcode="Increment_Word" arg1="counter"/>
+  </script>
+  <script name="Test_Set_Clear_Flag">
+    <statement opcode="Assert_Flag_Clear" arg1="first"/>
+    <statement opcode="Clear_Flag" arg1="first"/>
+    <statement opcode="Assert_Flag_Clear" arg1="first"/>
+    <statement opcode="Set_Flag" arg1="first"/>
+    <statement opcode="Assert_Flag_Set" arg1="first"/>
+    <statement opcode="Set_Flag" arg1="first"/>
+    <statement opcode="Assert_Flag_Set" arg1="first"/>
+    <statement opcode="Clear_Flag" arg1="first"/>
+    <statement opcode="Assert_Flag_Clear" arg1="first"/>
+    <statement opcode="Assert_Flag_Clear" arg1="three_hundredth"/>
+    <statement opcode="Clear_Flag" arg1="three_hundredth"/>
+    <statement opcode="Assert_Flag_Clear" arg1="three_hundredth"/>
+    <statement opcode="Set_Flag" arg1="three_hundredth"/>
+    <statement opcode="Assert_Flag_Set" arg1="three_hundredth"/>
+    <statement opcode="Set_Flag" arg1="three_hundredth"/>
+    <statement opcode="Assert_Flag_Set" arg1="three_hundredth"/>
+    <statement opcode="Clear_Flag" arg1="three_hundredth"/>
+    <statement opcode="Assert_Flag_Clear" arg1="three_hundredth"/>
+    <statement opcode="Set_Flag" arg1="first"/>
+    <statement opcode="Set_Flag" arg1="three_hundredth"/>
+  </script>
+  <script name="Test_GameState_Words">
+    <statement opcode="Assert_Word_Equals" arg1="seventh" arg2="7"/>
+    <statement opcode="Set_Word" arg1="seventh" arg2="2222"/>
+    <statement opcode="Assert_Word_Equals" arg1="seventh" arg2="2222"/>
+    <statement opcode="Add_To_Word" arg1="seventh" arg2="6666"/>
+    <statement opcode="Assert_Word_Equals" arg1="seventh" arg2="8888"/>
+    <statement opcode="Subtract_From_Word" arg1="seventh" arg2="1111"/>
+    <statement opcode="Assert_Word_Equals" arg1="seventh" arg2="7777"/>
+    <statement opcode="Decrement_Word" arg1="seventh"/>
+    <statement opcode="Assert_Word_Equals" arg1="seventh" arg2="7776"/>
+    <statement opcode="Increment_Word" arg1="seventh"/>
+    <statement opcode="Assert_Word_Equals" arg1="seventh" arg2="7777"/>
+    <statement opcode="Assert_Word_Equals" arg1="eighth" arg2="8"/>
+    <statement opcode="Add_To_Word" arg1="eighth" arg2="8000"/>
+    <statement opcode="Assert_Word_Equals" arg1="eighth" arg2="8008"/>
+    <statement opcode="Subtract_From_Word" arg1="eighth" arg2="9999"/>
+    <statement opcode="Assert_Word_Equals" arg1="eighth" arg2="0"/>
+    <statement opcode="Decrement_Word" arg1="eighth"/>
+    <statement opcode="Assert_Word_Equals" arg1="eighth" arg2="0"/>
+    <statement opcode="Add_To_Word" arg1="eighth" arg2="0xC000"/>
+    <statement opcode="Assert_Word_Equals" arg1="eighth" arg2="0xC000"/>
+    <statement opcode="Add_To_Word" arg1="eighth" arg2="0xC000"/>
+    <statement opcode="Assert_Word_Equals" arg1="eighth" arg2="0xFFFF"/>
+    <statement opcode="Increment_Word" arg1="eighth"/>
+    <statement opcode="Assert_Word_Equals" arg1="eighth" arg2="0xFFFF"/>
+    <statement opcode="Decrement_Word" arg1="eighth"/>
+    <statement opcode="Assert_Word_Equals" arg1="eighth" arg2="0xFFFE"/>
+    <statement opcode="Subtract_From_Word" arg1="eighth" arg2="56646"/>
+    <statement opcode="Assert_Word_Equals" arg1="eighth" arg2="8888"/>
+  </script>
+  <script name="Test_End_Script">
+    <statement opcode="End_Script"/>
+    <statement opcode="Fail"/>
+  </script>
+</room>

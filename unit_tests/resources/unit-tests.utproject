@@ -14,16 +14,26 @@
     <flag index="7" name="seventh"/>
     <flag index="60" name="sixtyth"/>
     <flag index="61" name="hidden" room="EmptyRoom"/>
+    <flag index="300" name="three_hundredth" room="ScriptTests"/>
     <word index="1" name="first" value="1"/>
     <word index="2" name="second" value="2"/>
     <word index="3" name="third" value="3"/>
     <word index="4" name="forth" value="4"/>
     <word index="5" name="fifth" value="5"/>
+    <word index="7" name="seventh" room="ScriptTests" value="7"/>
+    <word index="8" name="eighth" value="8"/>
     <word index="10" name="tokensCollected" value="0"/>
+    <word index="11" name="counter" value="0"/>
     <word index="60" name="sixtyth" value="60"/>
     <word index="61" name="hidden1" room="EmptyRoom" value="0"/>
     <word index="62" name="last" value="0"/>
   </game-state>
+  <bytecode>
+    <instruction name="Fail"/>
+    <instruction name="Assert_Flag_Set" arg1="flag"/>
+    <instruction name="Assert_Flag_Clear" arg1="flag"/>
+    <instruction name="Assert_Word_Equals" arg1="word" arg2="immediate-u16"/>
+  </bytecode>
   <interactive-tiles>
     <tile-function-table name="SetUpGravity" tint="ffa5a5"/>
     <tile-function-table name="SetDownGravity" tint="a5e1ff"/>
@@ -192,6 +202,7 @@
   <room-file src="rooms/MetaTileRenderTestSmall.utroom"/>
   <room-file src="rooms/MetaTileRenderTestLarge.utroom"/>
   <room-file src="rooms/EmptyRoom.utroom"/>
+  <room-file src="rooms/ScriptTests.utroom"/>
   <room-file src="rooms/EntityHitboxCollisionsTest.utroom"/>
   <room-file src="rooms/InteractiveTilesTestSmall.utroom"/>
   <room-file src="rooms/InteractiveTilesTestLarge.utroom"/>
