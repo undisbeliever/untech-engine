@@ -42,7 +42,7 @@ constant _tmp = utDpTmp0
 
     // Reset decompression Buffer
     assert(decompressionBuffer == 0x7f0000)
-    stz.w   decompressionBuffer
+    stz.w   decompressionBufferPos
 
     stz.w   VramTransferBuffer.currentIndex
 
