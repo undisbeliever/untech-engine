@@ -38,6 +38,21 @@ inline Flag_Instruction(name) {
         evaluate __FI_n = {__FI_n} + 1
     }
 }
+inline Flag_Instruction(name, suffix) {
+    evaluate __FI_n = 0
+
+    while {__FI_n} < N_FLAG_INSTRUCTIONS {
+        a8()
+        i16()
+        code()
+        function {name}___Flag{__FI_n}{suffix} {
+            constant flagData = GameState.flagData + (256 / 8) * {__FI_n}
+            {name}()
+        }
+
+        evaluate __FI_n = {__FI_n} + 1
+    }
+}
 
 
 
@@ -53,6 +68,8 @@ inline Flag_Instruction(name) {
 macro __TestGameStateFlag() {
     assert8a()
     assert16i()
+
+    // NOTE: If I modify this code, also modify the `__BranchIfFlag` macro
 
     // Argument: flag index
     lda.w   scriptData,y
@@ -386,6 +403,155 @@ a8()
 }
 
 
+
+// Conditional Opcodes
+// ===================
+
+
+// Conditional branch between a word variable and an immediate value.
+//
+// REQUIRES: 8 bit A, 16 bit Index, DP = 0, DB = 0x7e, Ah = 0
+// PARAM: flagData - the flag data block for this opcode
+// PARAM: branch - branch instruction to use (`beq`, `bne`, `bcc` or `bcs`)
+//
+// INPUT: Y - program counter
+// OUTPUT: Y - new program counter (either after this instruction or branch PC)
+// RETURN: Jump to GotoNextOpcode
+inline __BranchWordOpcode(name, branch) {
+    a8()
+    i16()
+    code()
+    function {name} {
+        // first argument: Word index
+        lda.w   scriptData,y
+        iny
+        asl
+        tax
+
+        rep     #$30
+    a16()
+        lda.w   GameState.wordData,x
+
+        // second argument: immediate u16 word
+        iny
+        iny
+        cmp.w   scriptData - 2,y
+
+        sep     #$20
+    a8()
+        {branch} Goto___PC
+
+        // skip third argument: Program Counter
+        iny
+        iny
+
+        jmp     GotoNextOpcode
+    }
+}
+__BranchWordOpcode(BranchIfWordEqual___Word_ImmU16_PC,              beq)
+__BranchWordOpcode(BranchIfWordNotEqual___Word_ImmU16_PC,           bne)
+__BranchWordOpcode(BranchIfWordLessThan___Word_ImmU16_PC,           bcc)
+__BranchWordOpcode(BranchIfWordGreaterThanEqual___Word_ImmU16_PC,   bcs)
+
+
+
+// Change Program Counter
+//
+// REQUIRES: 8 bit A, 16 bit Index, DP = 0, DB = 0x7e, Ah = 0
+// INPUT: Y - program counter
+// OUTPUT: Y - program counter in instruction argument
+// RETURN: Jump to GotoNextOpcode
+a8()
+i16()
+code()
+function Goto___PC {
+    // Argument: Program Counter
+    ldx.w   scriptData,y
+    txy
+
+    jmp     GotoNextOpcode
+}
+
+
+
+// Branch if a flag is set or cleared
+//
+// REQUIRES: 8 bit A, 16 bit Index, DP = 0, DB = 0x7e, Ah = 0
+// PARAM: flagData - the flag data block for this opcode
+// PARAM: branch - branch instruction to use (`beq` or `bne`)
+//
+// INPUT: Y - program counter
+// OUTPUT: Y - new program counter (either after this instruction or branch PC)
+// RETURN: Jump to GotoNextOpcode
+macro __BranchIfFlag(branch) {
+    assert8a()
+    assert16i()
+
+    // NOTE: If I modify this code, also modify the `__TestGameStateFlag` macro
+
+    // first argument: flag index
+    lda.w   scriptData,y
+    iny
+    sty.b   programCounter
+
+    tay
+    and.b   #0x7
+    tax
+
+    tya
+    lsr
+    lsr
+    lsr
+    tay
+    lda.w   flagData,y
+
+    ldy.b   programCounter
+
+    // A = flagData bits
+    and.l   SetFlagBits,x
+    {branch}    Goto___PC
+
+    // skip second argument: Program Counter
+    iny
+    iny
+
+    jmp     GotoNextOpcode
+}
+
+
+
+// Branch if a flag is set
+//
+// REQUIRES: 8 bit A, 16 bit Index, DP = 0, DB = 0x7e, Ah = 0
+// PARAM: flagData - the flag data block for this opcode
+//
+// INPUT: Y - program counter
+// OUTPUT: Y - new program counter (either after this instruction or branch PC)
+// RETURN: Jump to GotoNextOpcode
+macro BranchIfFlagSet() {
+    __BranchIfFlag(bne)
+}
+Flag_Instruction(BranchIfFlagSet, _PC)
+
+
+
+// Branch if a flag is clear
+//
+// REQUIRES: 8 bit A, 16 bit Index, DP = 0, DB = 0x7e, Ah = 0
+// PARAM: flagData - the flag data block for this opcode
+//
+// INPUT: Y - program counter
+// OUTPUT: Y - new program counter (either after this instruction or branch PC)
+// RETURN: Jump to GotoNextOpcode
+macro BranchIfFlagClear() {
+    __BranchIfFlag(beq)
+}
+Flag_Instruction(BranchIfFlagClear, _PC)
+
+
+
+// Flag Tables
+// ===========
 
 rodata(rom0)
 SetFlagBits:

@@ -10,6 +10,8 @@ constant ScriptId__Increment_Counter      = 0
 constant ScriptId__Test_Set_Clear_Flags   = 1
 constant ScriptId__Test_GameState_Words   = 2
 constant ScriptId__Test_End_Script        = 3
+constant ScriptId__Test_If_Statements     = 4
+
 
 
 a16()
@@ -208,6 +210,31 @@ function TestEndScriptBytecode {
     jsr     Scripting.ProcessScripts
 
     sec
+    rts
+}
+
+
+
+a16()
+i16()
+code()
+Test.add("Test If Statements")
+function TestIfStatements {
+    jsr     _LoadScriptTestsRoom
+
+    lda.w   #ScriptId__Test_If_Statements
+    jsr     Scripting.ActivateScript
+    jsr     Scripting.ProcessScripts
+
+    lda.w   Project.GameState.Words.counter
+    cmp.w   #15
+    bne     Fail
+
+    sec
+    rts
+
+Fail:
+    clc
     rts
 }
 

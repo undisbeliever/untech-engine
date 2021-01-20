@@ -68,4 +68,148 @@
     <statement opcode="End_Script"/>
     <statement opcode="Fail"/>
   </script>
+  <script name="Test_If_Statements">
+    <statement opcode="Assert_Word_Equals" arg1="eighth" arg2="8"/>
+    <statement opcode="Assert_Word_Equals" arg1="sixtyth" arg2="60"/>
+    <statement opcode="Set_Word" arg1="counter" arg2="0"/>
+    <if>
+      <condition type="word" var="sixtyth" comp="==" value="60"/>
+      <if>
+        <condition type="word" var="sixtyth" comp="!=" value="42"/>
+        <if>
+          <condition type="word" var="sixtyth" comp="&lt;" value="61"/>
+          <if>
+            <condition type="word" var="sixtyth" comp="&lt;" value="6000"/>
+            <if>
+              <condition type="word" var="sixtyth" comp="&gt;=" value="60"/>
+              <if>
+                <condition type="word" var="sixtyth" comp="&gt;=" value="10"/>
+                <statement opcode="Increment_Word" arg1="counter"/>
+              </if>
+            </if>
+          </if>
+        </if>
+      </if>
+    </if>
+    <statement opcode="Assert_Word_Equals" arg1="counter" arg2="1"/>
+    <if>
+      <condition type="word" var="eighth" comp="==" value="1"/>
+      <statement opcode="Fail"/>
+    </if>
+    <else>
+      <statement opcode="Increment_Word" arg1="counter"/>
+    </else>
+    <if>
+      <condition type="word" var="eighth" comp="!=" value="8"/>
+      <statement opcode="Fail"/>
+    </if>
+    <else>
+      <statement opcode="Increment_Word" arg1="counter"/>
+    </else>
+    <if>
+      <condition type="word" var="eighth" comp="&lt;" value="5"/>
+      <statement opcode="Fail"/>
+    </if>
+    <else>
+      <statement opcode="Increment_Word" arg1="counter"/>
+    </else>
+    <if>
+      <condition type="word" var="eighth" comp="&gt;=" value="100"/>
+      <statement opcode="Fail"/>
+    </if>
+    <else>
+      <statement opcode="Increment_Word" arg1="counter"/>
+    </else>
+    <statement opcode="Assert_Word_Equals" arg1="counter" arg2="5"/>
+    <statement opcode="Set_Flag" arg1="first"/>
+    <if>
+      <condition type="flag" var="first" comp="set"/>
+      <statement opcode="Increment_Word" arg1="counter"/>
+    </if>
+    <statement opcode="Set_Flag" arg1="three_hundredth"/>
+    <if>
+      <condition type="flag" var="three_hundredth" comp="clear"/>
+      <statement opcode="Fail"/>
+    </if>
+    <else>
+      <statement opcode="Increment_Word" arg1="counter"/>
+    </else>
+    <statement opcode="Clear_Flag" arg1="three_hundredth"/>
+    <if>
+      <condition type="flag" var="three_hundredth" comp="clear"/>
+      <statement opcode="Increment_Word" arg1="counter"/>
+    </if>
+    <statement opcode="Clear_Flag" arg1="first"/>
+    <if>
+      <condition type="flag" var="first" comp="set"/>
+      <statement opcode="Fail"/>
+    </if>
+    <else>
+      <statement opcode="Increment_Word" arg1="counter"/>
+    </else>
+    <statement opcode="Assert_Word_Equals" arg1="counter" arg2="9"/>
+    <if>
+      <condition type="word" var="sixtyth" comp="==" value="60"/>
+      <if>
+        <condition type="word" var="sixtyth" comp="!=" value="42"/>
+        <if>
+          <condition type="word" var="sixtyth" comp="&lt;" value="61"/>
+          <if>
+            <condition type="word" var="sixtyth" comp="&lt;" value="6000"/>
+            <if>
+              <condition type="word" var="sixtyth" comp="&gt;=" value="60"/>
+              <if>
+                <condition type="word" var="sixtyth" comp="&gt;=" value="10"/>
+                <statement opcode="Increment_Word" arg1="counter"/>
+              </if>
+              <else>
+                <statement opcode="Fail"/>
+              </else>
+            </if>
+            <else>
+              <statement opcode="Fail"/>
+            </else>
+          </if>
+          <else>
+            <statement opcode="Fail"/>
+          </else>
+        </if>
+        <else>
+          <statement opcode="Fail"/>
+        </else>
+      </if>
+      <else>
+        <statement opcode="Fail"/>
+      </else>
+    </if>
+    <else>
+      <statement opcode="Fail"/>
+    </else>
+    <statement opcode="Assert_Word_Equals" arg1="counter" arg2="10"/>
+    <statement opcode="Set_Flag" arg1="three_hundredth"/>
+    <if>
+      <condition type="word" var="sixtyth" comp="!=" value="100"/>
+      <if>
+        <condition type="flag" var="three_hundredth" comp="set"/>
+        <if>
+          <condition type="word" var="sixtyth" comp="!=" value="60"/>
+          <statement opcode="Fail"/>
+        </if>
+        <else>
+          <statement opcode="Increment_Word" arg1="counter"/>
+          <if>
+            <condition type="word" var="sixtyth" comp="&lt;" value="100"/>
+            <statement opcode="Increment_Word" arg1="counter"/>
+            <statement opcode="Increment_Word" arg1="counter"/>
+          </if>
+        </else>
+        <statement opcode="Increment_Word" arg1="counter"/>
+        <statement opcode="Increment_Word" arg1="counter"/>
+      </if>
+    </if>
+    <else>
+      <statement opcode="Fail"/>
+    </else>
+    <statement opcode="Assert_Word_Equals" arg1="counter" arg2="15"/>
+  </script>
 </room>
