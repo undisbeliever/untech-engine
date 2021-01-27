@@ -6,11 +6,21 @@ namespace ScriptingTests {
 
 
 // This file requires the scripts in the `ScriptTests` room exist in the following order:
-constant ScriptId__Increment_Counter      = 0
-constant ScriptId__Test_Set_Clear_Flags   = 1
-constant ScriptId__Test_GameState_Words   = 2
-constant ScriptId__Test_End_Script        = 3
-constant ScriptId__Test_If_Statements     = 4
+constant ScriptId__Increment_Counter            = 0
+constant ScriptId__Test_Set_Clear_Flags         = 1
+constant ScriptId__Test_GameState_Words         = 2
+constant ScriptId__Test_End_Script              = 3
+constant ScriptId__Test_If_Statements           = 4
+constant ScriptId__Test_Sleep_AnimationTicks    = 5
+constant ScriptId__Test_Yield_Helpers           = 6
+
+
+constant N_TEST_YIELD_INSTRUCTIONS = Scripting.Bytecode._SetTestYieldInstructionsBitfield__counter
+
+// Each bit in this variable represents a successful yield instruction test
+// See `Scripting.Bytecode._SetTestYieldInstructionsBitfield__counter` macro.
+// (byte bitfield)
+allocateTmpWord(testYieldInstructionsBitfield)
 
 
 
@@ -228,6 +238,129 @@ function TestIfStatements {
 
     lda.w   Project.GameState.Words.counter
     cmp.w   #15
+    bne     Fail
+
+    sec
+    rts
+
+Fail:
+    clc
+    rts
+}
+
+
+
+a16()
+i16()
+code()
+Test.add("Test Sleep_AnimationTicks")
+function TestSleepAnimationTicks {
+constant _loopCounter = Test.dpTmp
+
+    jsr     _LoadScriptTestsRoom
+
+    lda.w   #ScriptId__Test_Sleep_AnimationTicks
+    jsr     Scripting.ActivateScript
+
+
+    lda.l   STAT77
+    and.w   #STAT78.pal << 8
+    beq     +
+        // pal
+        lda.w   #50
+        bra     ++
+    +
+        // ntsc
+        lda.w   #60
+    +
+    sta.b   _loopCounter
+
+
+    jsr     Scripting.ProcessScripts
+
+    // Wait 1 second
+    Loop:
+        lda.w   Project.GameState.Words.counter
+        bne     Fail
+
+        jsr     Scripting.ProcessScripts
+
+        dec.b   _loopCounter
+        bne     Loop
+
+
+    lda.w   Project.GameState.Words.counter
+    cmp.w   #1
+    bne     Fail
+
+    jsr     Scripting.ProcessScripts
+
+    lda.w   Project.GameState.Words.counter
+    cmp.w   #2
+    bne     Fail
+
+    sec
+    rts
+
+Fail:
+    clc
+    rts
+}
+
+
+
+a16()
+i16()
+code()
+Test.add("Test Yielding Helpers")
+function TestYieldingHelpers {
+constant _oldCounter = Test.dpTmp
+
+
+    jsr     _LoadScriptTestsRoom
+
+    lda.w   #ScriptId__Test_Yield_Helpers
+    jsr     Scripting.ActivateScript
+
+    lda.w   Project.GameState.Words.counter
+    sta.b   _oldCounter
+
+
+    stz.w   Project.GameState.Words.last
+
+    stz.w   testYieldInstructionsBitfield
+
+
+    // Start first yielding instruction
+    jsr     Scripting.ProcessScripts
+
+    // Each helper function will test to ensure the arguments are correct
+    // and will wait for only 1 frame.
+
+    Loop:
+        jsr     Scripting.ProcessScripts
+
+        // Check counter has incremented
+        // (confirms each yield instruction waited one frame)
+        lda.b   _oldCounter
+        inc
+        cmp.w   Project.GameState.Words.counter
+        bne     Fail
+
+        sta.b   _oldCounter
+
+        // Loop until the last word has changed
+        lda.w   Project.GameState.Words.last
+        beq     Loop
+
+
+    lda.w   Project.GameState.Words.counter
+    cmp.w   #N_TEST_YIELD_INSTRUCTIONS
+    bne     Fail
+
+    // Test all yield instructions were tested successfully
+    lda.w   testYieldInstructionsBitfield
+    cmp.w   #(1 << N_TEST_YIELD_INSTRUCTIONS) - 1
     bne     Fail
 
     sec

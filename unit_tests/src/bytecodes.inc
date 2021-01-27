@@ -94,6 +94,249 @@ a8()
 }
 
 
+
+// Yielding instruction helper tests
+// ---------------------------------
+
+// Set the next available bit in `ScriptingTests.testYieldInstructionsBitfield`.
+// Also increments `_SetTestYieldInstructionsBitfield__counter`
+//
+// Used to confirm the resume function has called and the test passed.
+macro _SetTestYieldInstructionsBitfield() {
+    assert8a()
+
+    lda.b   #1 << _SetTestYieldInstructionsBitfield__counter
+    tsb.w   ScriptingTests.testYieldInstructionsBitfield
+
+    _SetTestYieldInstructionsBitfield__counter = _SetTestYieldInstructionsBitfield__counter + 1
+}
+variable _SetTestYieldInstructionsBitfield__counter = 0
+
+
+
+// Tests `YieldInstruction__NoArg`
+constant TestYield_NoArg = YieldInstruction__NoArg
+
+// REQUIRES: 8 bit A, 16 bit Index, DB = 0x7e, DP = 0
+// INPUT: Y - currentScriptIndex
+// RETURN: Jump to `ResumeInstruction_GotoNextOpcode_Y` or `Test.Fail`
+a8()
+i16()
+code()
+function TestYield_NoArg___Resume {
+    ldx.w   scripts.resumeArg1,y
+    bne     Wrong
+
+    ldx.w   scripts.resumeArg2,y
+    bne     Wrong
+
+    // Corrupt Y, test `ResumeInstruction_GotoNextOpcode`
+    dey
+    dey
+
+    _SetTestYieldInstructionsBitfield()
+
+    jmp     ResumeInstruction_GotoNextOpcode
+
+Wrong:
+    jmp     Test.Fail
+}
+
+
+
+// Tests `YieldInstruction__2ByteArg`
+// The test passes if the argument is `42`
+constant TestYield_2ByteArg_42___ImmU16 = YieldInstruction__2ByteArg
+
+// REQUIRES: 8 bit A, 16 bit Index, DB = 0x7e, DP = 0
+// INPUT: Y - currentScriptIndex
+// RETURN: Jump to `ResumeInstruction_GotoNextOpcode_Y` or `Test.Fail`
+a8()
+i16()
+code()
+function TestYield_2ByteArg_42___ImmU16___Resume {
+    ldx.w   scripts.resumeArg1,y
+    cpx.w   #42
+    bne     Wrong
+
+    ldx.w   scripts.resumeArg2,y
+    bne     Wrong
+
+    _SetTestYieldInstructionsBitfield()
+
+    jmp     ResumeInstruction_GotoNextOpcode_Y
+
+Wrong:
+    jmp     Test.Fail
+}
+
+
+
+// Tests `YieldInstruction__4ByteArg`
+// The test passes if the arguments are `1024` and `8192`.
+constant TestYield_4ByteArg_1024_8192___ImmU16_ImmU16 = YieldInstruction__4ByteArg
+
+// REQUIRES: 8 bit A, 16 bit Index, DB = 0x7e, DP = 0
+// INPUT: Y - currentScriptIndex
+// RETURN: Jump to `ResumeInstruction_GotoNextOpcode_Y` or `Test.Fail`
+a8()
+i16()
+code()
+function TestYield_4ByteArg_1024_8192___ImmU16_ImmU16___Resume {
+    ldx.w   scripts.resumeArg1,y
+    cpx.w   #1024
+    bne     Wrong
+
+    ldx.w   scripts.resumeArg2,y
+    cpx.w   #8192
+    bne     Wrong
+
+    _SetTestYieldInstructionsBitfield()
+
+    jmp     ResumeInstruction_GotoNextOpcode_Y
+
+Wrong:
+    jmp     Test.Fail
+}
+
+
+
+
+// Tests `Yield__Aopcode`
+//
+// REQUIRES: 8 bit A, 16 bit Index, DP = 0, DB = 0x7e, Ah = 0
+// INPUT: Y - program counter
+// OUTPUT: Y - program counter
+// RETURN: Jump to `Yield__Aopcode`
+a8()
+i16()
+code()
+function TestYield_Aopcode {
+    sty.b   programCounter
+
+    // corrupt Y PC
+    dey
+
+    lda.b   #Project.BytecodeOpcodes.Yielding.TestYield_Aopcode
+    jmp     Yield__Aopcode
+
+    // Also tests `Yield__Ypc_Aopcode`
+    assert(Yield__Ypc_Aopcode == Yield__Aopcode + 2)
+}
+
+// REQUIRES: 8 bit A, 16 bit Index, DB = 0x7e, DP = 0
+// INPUT: Y - currentScriptIndex
+// RETURN: Jump to `ResumeInstruction_GotoNextOpcode_Y` or `Test.Fail`
+a8()
+i16()
+code()
+function TestYield_Aopcode___Resume {
+    ldx.w   scripts.resumeArg1,y
+    bne     Wrong
+
+    ldx.w   scripts.resumeArg2,y
+    bne     Wrong
+
+    // Corrupt Y, test `ResumeInstruction_GotoNextOpcode`
+    dey
+    dey
+
+    _SetTestYieldInstructionsBitfield()
+
+    jmp     ResumeInstruction_GotoNextOpcode
+
+Wrong:
+    jmp     Test.Fail
+}
+
+
+
+// Tests `Yield__Xarg_Ypc_Aopcode`.
+//
+// REQUIRES: 8 bit A, 16 bit Index, DP = 0, DB = 0x7e, Ah = 0
+// INPUT: Y - program counter
+// OUTPUT: Y - program counter after arguments
+// RETURN: Jump to `Yield__Xarg_Ypc_Aopcode`
+a8()
+i16()
+code()
+function TestYield_Xarg_Ypc_Aopcode {
+    ldx.w   #0x4242
+    lda.b   #Project.BytecodeOpcodes.Yielding.TestYield_Xarg_Ypc_Aopcode
+
+    jmp     Yield__Xarg_Ypc_Aopcode
+
+    // Also tests Yield__Xarg_Aopcode
+    assert(Yield__Xarg_Aopcode == Yield__Xarg_Ypc_Aopcode + 2)
+}
+
+// REQUIRES: 8 bit A, 16 bit Index, DB = 0x7e, DP = 0
+// INPUT: Y - currentScriptIndex
+// RETURN: Jump to `ResumeInstruction_GotoNextOpcode_Y` or `Test.Fail`
+a8()
+i16()
+code()
+function TestYield_Xarg_Ypc_Aopcode___Resume {
+    ldx.w   scripts.resumeArg1,y
+    cpx.w   #0x4242
+    bne     Wrong
+
+    ldx.w   scripts.resumeArg2,y
+    bne     Wrong
+
+    _SetTestYieldInstructionsBitfield()
+
+    jmp     ResumeInstruction_GotoNextOpcode_Y
+
+Wrong:
+    jmp     Test.Fail
+}
+
+
+
+// Tests `TestYield_XYarg_Aopcode`
+//
+// REQUIRES: 8 bit A, 16 bit Index, DP = 0, DB = 0x7e, Ah = 0
+// INPUT: Y - program counter
+// OUTPUT: Y - program counter
+// RETURN: Jump to `Yield__XYargs_Aopcode`
+a8()
+i16()
+code()
+function TestYield_XYarg_Aopcode {
+    sty.b   programCounter
+
+    ldx.w   #0x1234
+    ldy.w   #0x5678
+    lda.b   #Project.BytecodeOpcodes.Yielding.TestYield_XYarg_Aopcode
+
+    jmp     Yield__XYarg_Aopcode
+}
+
+// REQUIRES: 8 bit A, 16 bit Index, DB = 0x7e, DP = 0
+// INPUT: Y - currentScriptIndex
+// RETURN: Jump to `ResumeInstruction_GotoNextOpcode_Y` or `Test.Fail`
+a8()
+i16()
+code()
+function TestYield_XYarg_Aopcode___Resume {
+    ldx.w   scripts.resumeArg1,y
+    cpx.w   #0x1234
+    bne     Wrong
+
+    ldx.w   scripts.resumeArg2,y
+    cpx.w   #0x5678
+    bne     Wrong
+
+    _SetTestYieldInstructionsBitfield()
+
+    jmp     ResumeInstruction_GotoNextOpcode_Y
+
+Wrong:
+    jmp     Test.Fail
+}
+
+
 }
 }
 

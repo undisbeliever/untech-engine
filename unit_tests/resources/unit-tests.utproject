@@ -33,6 +33,12 @@
     <instruction name="Assert_Flag_Set" arg1="flag"/>
     <instruction name="Assert_Flag_Clear" arg1="flag"/>
     <instruction name="Assert_Word_Equals" arg1="word" arg2="immediate-u16"/>
+    <instruction name="TestYield_NoArg" yields="true"/>
+    <instruction name="TestYield_2ByteArg_42" arg1="immediate-u16" yields="true"/>
+    <instruction name="TestYield_4ByteArg_1024_8192" arg1="immediate-u16" arg2="immediate-u16" yields="true"/>
+    <instruction name="TestYield_Aopcode" yields="true"/>
+    <instruction name="TestYield_Xarg_Ypc_Aopcode" yields="true"/>
+    <instruction name="TestYield_XYarg_Aopcode" yields="true"/>
   </bytecode>
   <interactive-tiles>
     <tile-function-table name="SetUpGravity" tint="ffa5a5"/>

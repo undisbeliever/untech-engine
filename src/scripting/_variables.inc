@@ -32,7 +32,7 @@ allocate(programCounter, dp, 2)
 
 
 
-// The index (within `scriptProgramCounters`) of the currently active script.
+// The index (within the `scripts` SoA) of the currently active script.
 //
 // NOTE: This value is only valid when a script is being processed.
 //
@@ -40,12 +40,38 @@ allocate(programCounter, dp, 2)
 allocate(currentScriptIndex, wram7e, 2)
 
 
-// The program counter for each script
-//
-// If the value is 0, then the script is not active.
-//
-// (Room.N_ROOM_SCRIPTS * word indexes)
-allocate(scriptProgramCounters, wram7e, 2 * N_SCRIPTS)
+// Structure of Arrays for active script data
+namespace scripts {
+    // The program counter for each script
+    //
+    // If the value is 0, then the script is not active.
+    //
+    // (word index * Room.N_ROOM_SCRIPTS)
+    allocate(programCounter, wram7e, 2 * N_SCRIPTS)
+
+
+    // The resume function to execute when the script is processed.
+    // Index into `BytecodeResumeFunctionTable`.
+    //
+    // If the script is not active, then `resumeOpcode` is zero.
+    //
+    // When a script is first activated `resumeOpcode` will be set to a special
+    // resume instruction that will start normal script execution.
+    //
+    // (2 * byte index * Room.N_ROOM_SCRIPTS)
+    allocate(resumeOpcode, wram7e, 2 * N_SCRIPTS)
+
+
+    // Data storage for the resume function.
+    // (word * Room.N_ROOM_SCRIPTS)
+    allocate(resumeArg1, wram7e, 2 * N_SCRIPTS)
+
+
+    // Data storage for the resume function.
+    // (word * Room.N_ROOM_SCRIPTS)
+    allocate(resumeArg2, wram7e, 2 * N_SCRIPTS)
+}
+constant scripts.size = __MEMORY__.ramBlocks.wram7e.pos - scripts.programCounter
 
 
 }

@@ -550,6 +550,49 @@ Flag_Instruction(BranchIfFlagClear, _PC)
 
 
 
+// Base Yielding Instructions
+// ==========================
+
+
+// The sleep instruction will pause script execution for a given number of animation ticks.
+constant Sleep_AnimationTicks___ImmU16 = YieldInstruction__2ByteArg
+
+
+
+// Decrement the sleep timer and continue sleeping if it is non-zero,
+// otherwise continue script execution.
+//
+// REQUIRES: 8 bit A, 16 bit Index, DB = 0x7e, DP = 0
+//
+// INPUT: Y - currentScriptIndex
+// RETURN: Jump to `ResumeInstruction_Sleep_Y` or `ResumeInstruction_GotoNextOpcode_Y`
+a8()
+i16()
+code()
+function Sleep_AnimationTicks___ImmU16___Resume {
+    rep     #$30
+a16()
+
+    // arg1 = timer
+    lda.w   scripts.resumeArg1,y
+    sec
+    sbc.w   Resources.animationSpeed
+
+    bcc     +
+    beq     +
+        sta.w   scripts.resumeArg1,y
+
+        // ResumeInstruction_Sleep_Y is register size independent
+        jmp     ResumeInstruction_Sleep_Y
+    +
+
+    sep     #$20
+a8()
+    jmp     ResumeInstruction_GotoNextOpcode_Y
+}
+
+
+
 // Flag Tables
 // ===========
 

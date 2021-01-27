@@ -212,4 +212,28 @@
     </else>
     <statement opcode="Assert_Word_Equals" arg1="counter" arg2="15"/>
   </script>
+  <script name="Test_Sleep_AnimationTicks">
+    <statement opcode="Set_Word" arg1="counter" arg2="0"/>
+    <statement opcode="Sleep_AnimationTicks" arg1="300"/>
+    <statement opcode="Increment_Word" arg1="counter"/>
+    <statement opcode="Sleep_AnimationTicks" arg1="0"/>
+    <statement opcode="Increment_Word" arg1="counter"/>
+  </script>
+  <script name="Test_Yield_Helpers">
+    <statement opcode="Set_Word" arg1="counter" arg2="0"/>
+    <statement opcode="Set_Word" arg1="last" arg2="0"/>
+    <statement opcode="TestYield_NoArg"/>
+    <statement opcode="Increment_Word" arg1="counter"/>
+    <statement opcode="TestYield_2ByteArg_42" arg1="42"/>
+    <statement opcode="Increment_Word" arg1="counter"/>
+    <statement opcode="TestYield_4ByteArg_1024_8192" arg1="1024" arg2="8192"/>
+    <statement opcode="Increment_Word" arg1="counter"/>
+    <statement opcode="TestYield_Aopcode"/>
+    <statement opcode="Increment_Word" arg1="counter"/>
+    <statement opcode="TestYield_Xarg_Ypc_Aopcode"/>
+    <statement opcode="Increment_Word" arg1="counter"/>
+    <statement opcode="TestYield_XYarg_Aopcode"/>
+    <statement opcode="Increment_Word" arg1="counter"/>
+    <statement opcode="Increment_Word" arg1="last"/>
+  </script>
 </room>
