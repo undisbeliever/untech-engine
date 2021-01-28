@@ -13,6 +13,7 @@ constant ScriptId__Test_End_Script              = 3
 constant ScriptId__Test_If_Statements           = 4
 constant ScriptId__Test_Sleep_AnimationTicks    = 5
 constant ScriptId__Test_Yield_Helpers           = 6
+constant ScriptId__Test_While_Statements        = 7
 
 
 constant N_TEST_YIELD_INSTRUCTIONS = Scripting.Bytecode._SetTestYieldInstructionsBitfield__counter
@@ -361,6 +362,42 @@ constant _oldCounter = Test.dpTmp
     // Test all yield instructions were tested successfully
     lda.w   testYieldInstructionsBitfield
     cmp.w   #(1 << N_TEST_YIELD_INSTRUCTIONS) - 1
+    bne     Fail
+
+    sec
+    rts
+
+Fail:
+    clc
+    rts
+}
+
+
+
+a16()
+i16()
+code()
+Test.add("Test While Statements")
+function TestWhileStatements {
+    jsr     _LoadScriptTestsRoom
+
+    lda.w   #ScriptId__Test_While_Statements
+    jsr     Scripting.ActivateScript
+
+
+    // The script compiler will generate a possible infinite loop warning
+    // if the while loop does not contain a yielding statement.
+    //
+    // Thus we run the test until it is completed.
+    Loop:
+        jsr     Scripting.ProcessScripts
+
+        lda.w   Project.GameState.Words.last
+        beq     Loop
+
+
+    lda.w   Project.GameState.Words.counter
+    cmp.w   #24
     bne     Fail
 
     sec

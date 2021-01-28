@@ -236,4 +236,74 @@
     <statement opcode="Increment_Word" arg1="counter"/>
     <statement opcode="Increment_Word" arg1="last"/>
   </script>
+  <script name="Test_While_Statements">
+    <comment c="These while statements include a `Sleep_AnimationTicks` statement to silence a possible infinite loop warning"/>
+    <comment c=""/>
+    <statement opcode="Set_Word" arg1="last" arg2="0"/>
+    <comment c="test this while flag clear loop does not execute"/>
+    <statement opcode="Set_Flag" arg1="first"/>
+    <while>
+      <condition type="flag" var="first" comp="clear"/>
+      <statement opcode="Sleep_AnimationTicks" arg1="0"/>
+      <statement opcode="Fail"/>
+    </while>
+    <comment c="test while flag set loop repeats 10 times"/>
+    <statement opcode="Set_Word" arg1="counter" arg2="0"/>
+    <while>
+      <condition type="flag" var="first" comp="set"/>
+      <statement opcode="Sleep_AnimationTicks" arg1="0"/>
+      <statement opcode="Increment_Word" arg1="counter"/>
+      <if>
+        <condition type="word" var="counter" comp="==" value="10"/>
+        <statement opcode="Clear_Flag" arg1="first"/>
+      </if>
+    </while>
+    <statement opcode="Assert_Word_Equals" arg1="counter" arg2="10"/>
+    <comment c="Test while word =="/>
+    <while>
+      <condition type="word" var="counter" comp="==" value="10"/>
+      <statement opcode="Sleep_AnimationTicks" arg1="0"/>
+      <statement opcode="Increment_Word" arg1="counter"/>
+    </while>
+    <statement opcode="Assert_Word_Equals" arg1="counter" arg2="11"/>
+    <comment c="Test while word !="/>
+    <while>
+      <condition type="word" var="counter" comp="!=" value="15"/>
+      <statement opcode="Sleep_AnimationTicks" arg1="0"/>
+      <statement opcode="Increment_Word" arg1="counter"/>
+    </while>
+    <statement opcode="Assert_Word_Equals" arg1="counter" arg2="15"/>
+    <comment c="Test while word &lt;"/>
+    <while>
+      <condition type="word" var="counter" comp="&lt;" value="20"/>
+      <statement opcode="Sleep_AnimationTicks" arg1="0"/>
+      <statement opcode="Increment_Word" arg1="counter"/>
+    </while>
+    <statement opcode="Assert_Word_Equals" arg1="counter" arg2="20"/>
+    <comment c="Test while word &gt;="/>
+    <while>
+      <condition type="word" var="counter" comp="&gt;=" value="13"/>
+      <statement opcode="Sleep_AnimationTicks" arg1="0"/>
+      <statement opcode="Decrement_Word" arg1="counter"/>
+    </while>
+    <statement opcode="Assert_Word_Equals" arg1="counter" arg2="12"/>
+    <comment c="While statements should not be nested, but I will test for it anyway"/>
+    <comment c="Test nested while statements"/>
+    <statement opcode="Set_Word" arg1="first" arg2="0"/>
+    <while>
+      <condition type="word" var="first" comp="&lt;" value="3"/>
+      <statement opcode="Sleep_AnimationTicks" arg1="0"/>
+      <statement opcode="Set_Word" arg1="second" arg2="0"/>
+      <while>
+        <condition type="word" var="second" comp="&lt;" value="4"/>
+        <statement opcode="Sleep_AnimationTicks" arg1="0"/>
+        <statement opcode="Increment_Word" arg1="second"/>
+        <statement opcode="Increment_Word" arg1="counter"/>
+      </while>
+      <statement opcode="Increment_Word" arg1="first"/>
+    </while>
+    <comment c="12 + 3 * 4 = 24"/>
+    <statement opcode="Assert_Word_Equals" arg1="counter" arg2="24"/>
+    <statement opcode="Increment_Word" arg1="last"/>
+  </script>
 </room>
