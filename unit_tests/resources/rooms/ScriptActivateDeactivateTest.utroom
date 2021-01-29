@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="UTF_8"?>
+<!DOCTYPE untech>
+<room name="ActivateDeactivateScriptTest" scene="MetaTileRenderTest">
+  <map width="16" height="14">
+    AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+    AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+    AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+    AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+    AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=
+  </map>
+  <entrance name="Start" x="128" y="112" orientation="down-right"/>
+  <script name="Sleep_5_A">
+    <comment c="Sleep for 5 frames"/>
+    <statement opcode="Sleep_AnimationTicks" arg1="25"/>
+    <statement opcode="Increment_Word" arg1="counter"/>
+  </script>
+  <script name="Sleep_4_A">
+    <comment c="Sleep for 4 frames"/>
+    <statement opcode="Sleep_AnimationTicks" arg1="19"/>
+    <statement opcode="Increment_Word" arg1="counter"/>
+  </script>
+  <script name="Sleep_2_A">
+    <comment c="Sleep for 2 frames"/>
+    <statement opcode="Sleep_AnimationTicks" arg1="8"/>
+    <statement opcode="Increment_Word" arg1="counter"/>
+  </script>
+  <script name="Sleep_0_A">
+    <comment c="No Sleep"/>
+    <statement opcode="Increment_Word" arg1="counter"/>
+  </script>
+  <script name="Sleep_1_A">
+    <comment c="Sleep for 1 frame"/>
+    <statement opcode="Sleep_AnimationTicks" arg1="0"/>
+    <statement opcode="Increment_Word" arg1="counter"/>
+  </script>
+  <script name="Sleep_2_B">
+    <comment c="Sleep for 2 frames"/>
+    <statement opcode="Sleep_AnimationTicks" arg1="8"/>
+    <statement opcode="Increment_Word" arg1="counter"/>
+  </script>
+  <script name="Sleep_3_A">
+    <comment c="Sleep for 3 frames"/>
+    <statement opcode="Sleep_AnimationTicks" arg1="16"/>
+    <statement opcode="Increment_Word" arg1="counter"/>
+  </script>
+  <script name="Sleep_5_B">
+    <comment c="Sleep for 5 frames"/>
+    <statement opcode="Sleep_AnimationTicks" arg1="25"/>
+    <statement opcode="Increment_Word" arg1="counter"/>
+  </script>
+  <script name="Sleep_1_B">
+    <comment c="Sleep for 1 frame"/>
+    <statement opcode="Sleep_AnimationTicks" arg1="0"/>
+    <statement opcode="Increment_Word" arg1="counter"/>
+  </script>
+  <script name="Sleep_3_B">
+    <comment c="Sleep for 3 frames"/>
+    <statement opcode="Sleep_AnimationTicks" arg1="16"/>
+    <statement opcode="Increment_Word" arg1="counter"/>
+  </script>
+  <script name="Sleep_1_C">
+    <comment c="Sleep for 1 frame"/>
+    <statement opcode="Sleep_AnimationTicks" arg1="0"/>
+    <statement opcode="Increment_Word" arg1="counter"/>
+  </script>
+  <script name="Sleep_5_C">
+    <comment c="Sleep for 5 frames"/>
+    <statement opcode="Sleep_AnimationTicks" arg1="25"/>
+    <statement opcode="Increment_Word" arg1="counter"/>
+  </script>
+  <script name="Sleep_4_B">
+    <comment c="Sleep for 4 frames"/>
+    <statement opcode="Sleep_AnimationTicks" arg1="19"/>
+    <statement opcode="Increment_Word" arg1="counter"/>
+  </script>
+  <script name="Sleep_2_C">
+    <comment c="Sleep for 2 frames"/>
+    <statement opcode="Sleep_AnimationTicks" arg1="8"/>
+    <statement opcode="Increment_Word" arg1="counter"/>
+  </script>
+  <script name="Sleep_3_C">
+    <comment c="Sleep for 3 frames"/>
+    <statement opcode="Sleep_AnimationTicks" arg1="16"/>
+    <statement opcode="Increment_Word" arg1="counter"/>
+  </script>
+  <script name="Sleep_4_C">
+    <comment c="Sleep for 4 frames"/>
+    <statement opcode="Sleep_AnimationTicks" arg1="19"/>
+    <statement opcode="Increment_Word" arg1="counter"/>
+  </script>
+</room>

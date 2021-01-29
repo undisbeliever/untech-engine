@@ -209,6 +209,7 @@
   <room-file src="rooms/MetaTileRenderTestLarge.utroom"/>
   <room-file src="rooms/EmptyRoom.utroom"/>
   <room-file src="rooms/ScriptTests.utroom"/>
+  <room-file src="rooms/ScriptActivateDeactivateTest.utroom"/>
   <room-file src="rooms/EntityHitboxCollisionsTest.utroom"/>
   <room-file src="rooms/InteractiveTilesTestSmall.utroom"/>
   <room-file src="rooms/InteractiveTilesTestLarge.utroom"/>

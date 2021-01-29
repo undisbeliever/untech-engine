@@ -456,6 +456,86 @@ Fail:
 }
 
 
+a16()
+i16()
+code()
+Test.add("Activate/Deactivate Scripts Test")
+function ActivateDeactivateScriptsTest {
+
+    // The `ActivateDeactivateScriptsTest` room contains `N_SCRIPTS` scripts that will 
+    // Sleep for a given number of frames and then increment the GameState counter.
+
+    lda.w   #Project.RoomList.ActivateDeactivateScriptTest
+    ldx.w   #Project.PlayerIds.Blank
+    ldy.w   #0
+    jsr     InteractiveTests.GameLoop.Init_LoadRoom
+
+
+    lda.w   #5
+    sta.w   Resources.animationSpeed
+
+    lda.w   Project.GameState.Words.counter
+    bne     Fail
+
+
+    // Activate the first 8 scripts
+    lda.w   #7
+    FirstLoop:
+        pha
+        jsr     Scripting.ActivateScript
+        pla
+        dec
+        bpl     FirstLoop
+
+    // Process 3 frames of scripts
+    // Four of the first eight scripts will increment the counter within 3 frames of execution.
+    jsr     Scripting.ProcessScripts
+    jsr     Scripting.ProcessScripts
+    jsr     Scripting.ProcessScripts
+
+    // Confirm 4 scripts completed
+    lda.w   Project.GameState.Words.counter
+    cmp.w   #4
+    bne     Fail
+
+
+    // Try to activate all scripts
+    // This will only activate `N_SCRIPTS - 4` scripts, Four scripts are still active.
+    // ActivateScript will not activate a script if it is already active.
+    lda.w   #Scripting.N_SCRIPTS
+    SecondLoop:
+        pha
+        jsr     Scripting.ActivateScript
+        pla
+        dec
+        bpl     SecondLoop
+
+    // Process 6 frames of scripts
+    // All scripts will be complete after 6 frames of execution.
+    lda.w   #6
+    ProcessLoop:
+        pha
+        jsr     Scripting.ProcessScripts
+        pla
+        dec
+        bne     ProcessLoop
+
+    // Confirm `N_SCRIPTS + 4` scripts completed
+    lda.w   Project.GameState.Words.counter
+    cmp.w   #Scripting.N_SCRIPTS + 4
+    bne     Fail
+
+
+    sec
+    rts
+
+
+Fail:
+    clc
+    rts
+}
+
+
 }
 
 // vim: ft=bass-65816 ts=4 sw=4 et:
