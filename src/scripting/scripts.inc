@@ -11,9 +11,6 @@
 namespace Scripting {
 
 
-// ::TODO use a linked list to iterate through the active scripts ::
-
-
 // Initialize and reset the scripting subsystem
 //
 // Called when a room is loaded
@@ -23,16 +20,17 @@ macro _Init() {
     assert16a()
     assert8i()
 
+    // Reset scripting variables to 0
 
-    // Reset currentScriptIndex and script variables to 0
+    constant VariablesSize = Scripting.__VariablesEnd - Scripting.__VariablesBegin
 
-    assert(Scripting.currentScriptIndex + 2 == Scripting.scripts.programCounter)
-    assert(Scripting.scripts.size + 2 < 0xff)
-    ldx.b   #Scripting.scripts.size + 2
+    assert(VariablesSize < 0xff)
+    assert(VariablesSize % 2 == 0)
+    ldx.b   #VariablesSize
     Loop:
+        dex
+        dex
         stz.w   Scripting.currentScriptIndex,x
-        dex
-        dex
         bne     Loop
 }
 
@@ -40,8 +38,8 @@ macro _Init() {
 
 // Activate a room script.
 //
-// This routine will do nothing if the *script Id* is invalid or the script is
-// already active.
+// This routine will do nothing if the *script Id* is invalid or the
+// script is already active.
 //
 // REQUIRES: DB = 0x7e
 //
@@ -57,24 +55,49 @@ function ActivateScript {
 a8()
 i8()
     // Check script id is valid
-    cmp.b   #N_SCRIPTS
+    cmp.b   #Room.N_ROOM_SCRIPTS
     bcs     Skip
-        asl
-        tax
 
-        // Check if script is not active active
-        assert(Project.BytecodeOpcodes.Yielding.End_Script == 0)
-        lda.w   scripts.resumeOpcode,x
+        // Check if the script is active
+        tay
+        ldx.w   activeScripts,y
         bne     Skip
 
-            lda.b   #Project.BytecodeOpcodes.Yielding.Process_Script
-            sta.w   scripts.resumeOpcode,x
+            // Sanity check
+            ldx.w   activeScriptsEnd
+            cpx.b   #MAX_ACTIVE_SCRIPTS * 2
+            bcs     Skip
 
-            rep     #$20
-        a16()
-            // Set Program Counter
-            lda.w   Room.Format.Header.scripts,x
-            sta.w   scripts.programCounter,x
+                // X = script index
+                // A = scriptId
+                // Y = scriptId
+
+                sta.w   scripts.scriptId,x
+
+                // Mark script active
+                assert(MAX_ACTIVE_SCRIPTS < 0x80)
+                inc
+                // A is non-zero
+                sta.w   activeScripts,y
+
+                asl
+                tay
+                // Y = index into room scripts list + 2
+
+                // Set script resume function
+                lda.b   #Project.BytecodeOpcodes.Yielding.Process_Script
+                sta.w   scripts.resumeOpcode,x
+
+                rep     #$20
+            a16()
+                // Set Program Counter
+                // (The minus two offsets `inc` above)
+                lda.w   Room.Format.Header.scripts - 2,y
+                sta.w   scripts.programCounter,x
+
+                inx
+                inx
+                stx.w   activeScriptsEnd
 
 au()
 Skip:
@@ -95,18 +118,52 @@ function ProcessScripts {
 a8()
 i8()
 
-    ldy.b   #(N_SCRIPTS - 1) * 2
+    ldy.w   activeScriptsEnd
+    beq     Return
 
     Loop:
-        assert(Project.BytecodeOpcodes.Yielding.End_Script == 0)
-        ldx.w   scripts.resumeOpcode,y
-        bne     ScriptActive
+        dey
+    Loop_AfterDEY:
+        dey
+        sty.w   currentScriptIndex
 
-        // Y = currentScriptIndex
-    ContinueLoop:
+        ldx.w   scripts.resumeOpcode,y
+
+        rep     #$10
+    i16()
+        jmp     (BytecodeResumeFunctionTable,x)
+
+        // Execution will eventually jump to NextScript_Y, NextScript_Yunknown or RemoveScript
+
+
+au()
+iu()
+NextScript_Y:
+    // Y = currentScriptIndex
+        sep     #$30
+    i8()
+    a8()
+        assert(MAX_ACTIVE_SCRIPTS * 2 < 0x80)
         dey
-        dey
-        bpl     Loop
+        // If currentScriptIndex is 0 this is negative
+        bpl     Loop_AfterDEY
+
+Return:
+    rep     #$30
+a16()
+i16()
+    rts
+
+
+au()
+iu()
+NextScript_Yunknown:
+    // Y = unknown
+        sep     #$30
+    i8()
+    a8()
+        ldy.w   currentScriptIndex
+        bne     Loop
 
 
     rep     #$30
@@ -115,55 +172,60 @@ i16()
     rts
 
 
-a8()
-i8()
-ScriptActive:
-// Y = script index
-// X = resumeOpcode
-
-    sty.w   currentScriptIndex
-
-    rep     #$10
-i16()
-    jmp     (BytecodeResumeFunctionTable,x)
-
-
 au()
 iu()
-YieldScript:
-    sep     #$30
-i8()
-a8()
-    ldy.w   currentScriptIndex
-
-    bra     ContinueLoop
-
-
-au()
-iu()
-YieldScript_YcurrentScriptIndex:
-    // Y = currentScriptIndex
-    sep     #$30
-i8()
-a8()
-    bra     ContinueLoop
-
-
-au()
-iu()
-EndActiveScript:
+RemoveScript:
     // The `End_Script` bytecode instruction jumps here
+        sep     #$30
+    i8()
+    a8()
+        ldy.w   currentScriptIndex
 
-    sep     #$30
-i8()
-a8()
-    ldy.w   currentScriptIndex
 
-    // Deactivate script
-    lda.b   #Project.BytecodeOpcodes.Yielding.End_Script
-    sta.w   scripts.resumeOpcode,y
+        // Mark script as deactivated
+        ldx.w   scripts.scriptId,y
+        stz.w   activeScripts,x
 
-    bra     ContinueLoop
+
+        // Remove script data from scripts SoA by moving the last script to currentScriptIndex
+        // (This is safe as we are iterating backwards)
+
+        // activeScriptsEnd is non-zero
+        ldx.w   activeScriptsEnd
+        dex
+        dex
+        stx.w   activeScriptsEnd
+
+        // X = source
+        // Y = target
+        rep     #$20
+    a16()
+        assert(scripts.resumeOpcode + 1 == scripts.scriptId)
+        lda.w   scripts.resumeOpcode,x
+        sta.w   scripts.resumeOpcode,y
+
+        lda.w   scripts.programCounter,x
+        sta.w   scripts.programCounter,x
+
+        lda.w   scripts.resumeArg1,x
+        sta.w   scripts.resumeArg1,y
+
+        lda.w   scripts.resumeArg2,x
+        sta.w   scripts.resumeArg2,y
+
+        sep     #$30
+    a8()
+
+        // Process the next script
+        assert(MAX_ACTIVE_SCRIPTS * 2 < 0x80)
+        dey
+        // If currentScriptIndex is 0 this is negative
+        bpl     Loop_AfterDEY
+
+
+    rep     #$30
+a16()
+    rts
 }
 
 
@@ -172,9 +234,17 @@ a8()
 // ============================
 
 
+// Stops the script
+//
+// REQUIRES: 8 bit A, 16 bit Index, DP = 0, DB = 0x7e, Ah = 0
+// INPUT: Y - program counter
+constant Bytecode.End_Script = Scripting.ProcessScripts.RemoveScript
+
+
+
 // Used to indicate a script is not active.
 // Execution should never enter reach this resume instruction.
-constant Bytecode.End_Script___Resume = ProcessScripts.ContinueLoop
+constant Bytecode.End_Script___Resume = ProcessScripts.RemoveScript
 
 
 
@@ -285,7 +355,7 @@ a16()
 a8()
 i8()
     txy
-    jmp     ProcessScripts.ContinueLoop
+    jmp     ProcessScripts.NextScript_Y
 }
 
 
@@ -336,7 +406,7 @@ a16()
 a8()
 i8()
     txy
-    jmp     ProcessScripts.ContinueLoop
+    jmp     ProcessScripts.NextScript_Y
 }
 
 
@@ -388,7 +458,7 @@ a16()
 a8()
 i8()
     txy
-    jmp     ProcessScripts.ContinueLoop
+    jmp     ProcessScripts.NextScript_Y
 }
 
 
@@ -451,7 +521,7 @@ a16()
     sep     #$30
 a8()
 i8()
-    jmp     ProcessScripts.ContinueLoop
+    jmp     ProcessScripts.NextScript_Y
 }
 
 
@@ -518,7 +588,7 @@ a16()
     sep     #$30
 a8()
 i8()
-    jmp     ProcessScripts.ContinueLoop
+    jmp     ProcessScripts.NextScript_Y
 }
 
 
@@ -561,7 +631,7 @@ a16()
     sep     #$30
 a8()
 i8()
-    jmp     ProcessScripts.ContinueLoop
+    jmp     ProcessScripts.NextScript_Y
 }
 
 
@@ -577,7 +647,7 @@ i8()
 // REQUIRES: DB = 0x7e, DP = 0
 //
 // INPUT: Y = currentScriptIndex
-constant ResumeInstruction_Sleep_Y = ProcessScripts.YieldScript_YcurrentScriptIndex
+constant ResumeInstruction_Sleep_Y = ProcessScripts.NextScript_Y
 
 
 
@@ -586,7 +656,7 @@ constant ResumeInstruction_Sleep_Y = ProcessScripts.YieldScript_YcurrentScriptIn
 // This code MUST ONLY be JMPed to inside a `BytecodeResumeFunctionTable` routine.
 //
 // REQUIRES: DB = 0x7e, DP = 0
-constant ResumeInstruction_Sleep = ProcessScripts.YieldScript
+constant ResumeInstruction_Sleep = ProcessScripts.NextScript_Yunknown
 
 
 

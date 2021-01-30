@@ -502,7 +502,7 @@ function ActivateDeactivateScriptsTest {
     // Try to activate all scripts
     // This will only activate `N_SCRIPTS - 4` scripts, Four scripts are still active.
     // ActivateScript will not activate a script if it is already active.
-    lda.w   #Scripting.N_SCRIPTS
+    lda.w   #Room.N_ROOM_SCRIPTS
     SecondLoop:
         pha
         jsr     Scripting.ActivateScript
@@ -522,7 +522,7 @@ function ActivateDeactivateScriptsTest {
 
     // Confirm `N_SCRIPTS + 4` scripts completed
     lda.w   Project.GameState.Words.counter
-    cmp.w   #Scripting.N_SCRIPTS + 4
+    cmp.w   #Room.N_ROOM_SCRIPTS + 4
     bne     Fail
 
 

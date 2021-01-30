@@ -139,16 +139,8 @@ i16()
 code()
 function InvalidOpcode {
     Warnings.Warn(INVALID_SCRIPTING_OPCODE)
-    jmp     Scripting.ProcessScripts.EndActiveScript
+    jmp     End_Script
 }
-
-
-
-// Stops the script
-//
-// REQUIRES: 8 bit A, 16 bit Index, DP = 0, DB = 0x7e, Ah = 0
-// INPUT: Y - program counter
-constant End_Script = Scripting.ProcessScripts.EndActiveScript
 
 
 
