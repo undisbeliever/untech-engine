@@ -85,7 +85,7 @@ i8()
                 // Y = index into room scripts list + 2
 
                 // Set script resume function
-                lda.b   #Project.BytecodeOpcodes.Yielding.Process_Script
+                lda.b   #SpecialResumeOpcodes.Process_Script
                 sta.w   scripts.resumeOpcode,x
 
                 rep     #$20
@@ -696,11 +696,22 @@ function ResumeInstruction_GotoNextOpcode_Y {
 
 
 
-// Misc
-// ====
+// Special Resume Functions
+// ========================
 
-// This resume instruction is executed when a script is activated.
-constant Bytecode._Process_Script___Resume = ResumeInstruction_GotoNextOpcode_Y
+namespace SpecialResumeOpcodes {
+    constant End_Script = 0
+    constant Process_Script = 2
+}
+
+assert(Project.BytecodeOpcodes.Yielding.N_SPECIAL_RESUME_OPCODES == 6)
+
+constant Bytecode._Special___Resume_0  = Bytecode.End_Script___Resume
+constant Bytecode._Special___Resume_2  = ResumeInstruction_GotoNextOpcode_Y // Process_Script
+constant Bytecode._Special___Resume_4  = Bytecode.End_Script___Resume
+constant Bytecode._Special___Resume_6  = Bytecode.End_Script___Resume
+constant Bytecode._Special___Resume_8  = Bytecode.End_Script___Resume
+constant Bytecode._Special___Resume_10 = Bytecode.End_Script___Resume
 
 }
 
