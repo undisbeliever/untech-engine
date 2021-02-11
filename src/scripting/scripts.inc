@@ -205,7 +205,7 @@ RemoveScript:
         sta.w   scripts.resumeOpcode,y
 
         lda.w   scripts.programCounter,x
-        sta.w   scripts.programCounter,x
+        sta.w   scripts.programCounter,y
 
         lda.w   scripts.resumeArg1,x
         sta.w   scripts.resumeArg1,y
