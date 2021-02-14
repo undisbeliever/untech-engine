@@ -462,7 +462,7 @@ code()
 Test.add("Activate/Deactivate Scripts Test")
 function ActivateDeactivateScriptsTest {
 
-    // The `ActivateDeactivateScriptsTest` room contains `N_SCRIPTS` scripts that will 
+    // The `ActivateDeactivateScriptsTest` room contains `N_SCRIPTS` scripts that will
     // Sleep for a given number of frames and then increment the GameState counter.
 
     lda.w   #Project.RoomList.ActivateDeactivateScriptTest
@@ -523,6 +523,73 @@ function ActivateDeactivateScriptsTest {
     // Confirm `N_SCRIPTS + 4` scripts completed
     lda.w   Project.GameState.Words.counter
     cmp.w   #Room.N_ROOM_SCRIPTS + 4
+    bne     Fail
+
+
+    sec
+    rts
+
+
+Fail:
+    clc
+    rts
+}
+
+
+
+a16()
+i16()
+code()
+Test.add("Script BG Tasks")
+function ScriptBgTasksTest {
+
+constant N_SCRIPTS = 5
+constant TASKS_PER_SCRIPT = 2
+
+constant EXPECTED_SETUP_COUNTER = N_SCRIPTS * TASKS_PER_SCRIPT
+constant EXPECTED_TASK_COUNTER  = Scripting.Bytecode.TestBgTask.TASK_DELAY * EXPECTED_SETUP_COUNTER
+
+
+    // The `ScriptBgTasksTest` room contains `N_SCRIPTS` scripts that will
+    // sleep and execute a `TestBgTask` scripting instruction `TASKS_PER_SCRIPT` times.
+
+
+    lda.w   #Project.RoomList.ScriptBgTasksTest
+    ldx.w   #Project.PlayerIds.Blank
+    ldy.w   #0
+    jsr     InteractiveTests.GameLoop.Init_LoadRoom
+
+
+    stz.w   Scripting.Bytecode.TestBgTask.setupCounter
+    stz.w   Scripting.Bytecode.TestBgTask.taskCounter
+
+
+    // Activate the scripts
+    lda.w   #N_SCRIPTS - 1
+    ActivateLoop:
+        pha
+        jsr     Scripting.ActivateScript
+        pla
+        dec
+        bpl     ActivateLoop
+
+
+    // Run the scripts until they have all ended
+    Loop:
+        jsr     Scripting.ProcessScripts
+
+        lda.w   Scripting.activeScriptsEnd
+        bne     Loop
+
+
+    // Confirm setupCounter is correct
+    lda.w   Scripting.Bytecode.TestBgTask.setupCounter
+    cmp.w   #EXPECTED_SETUP_COUNTER
+    bne     Fail
+
+    // Confirm taskCounter is correct
+    lda.w   Scripting.Bytecode.TestBgTask.taskCounter
+    cmp.w   #EXPECTED_TASK_COUNTER
     bne     Fail
 
 

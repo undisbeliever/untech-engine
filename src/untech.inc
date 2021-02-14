@@ -37,8 +37,8 @@ include "metatiles/_dataformat.inc"
 include "resources/_dataformat.inc"
 include "room/_dataformat.inc"
 
-include "resources/_variables.inc"
 include "scripting/_variables.inc"
+include "resources/_variables.inc"
 include "hdma/_variables.inc"
 include "math/_variables.inc"
 include "text/_variables.inc"
@@ -109,6 +109,7 @@ include "resources/_common.inc"
 include "resources/_vblank.inc"
 
 include "scripting/game-state.inc"
+include "scripting/background-tasks.inc"
 include "scripting/scripts.inc"
 include "scripting/bytecodes.inc"
 

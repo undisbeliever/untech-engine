@@ -25,95 +25,38 @@ macro _Init() {
     constant VariablesSize = Scripting.__VariablesEnd - Scripting.__VariablesBegin
 
     assert(VariablesSize < 0xff)
-    assert(VariablesSize % 2 == 0)
-    ldx.b   #VariablesSize
+
+    ldx.b   #VariablesSize & 0xfe
     Loop:
         dex
         dex
-        stz.w   Scripting.currentScriptIndex,x
+        stz.w   Scripting.__VariablesBegin,x
         bne     Loop
+
+
+    if VariablesSize % 2 != 0 {
+        assert16a()
+        stz.w   Scripting.__VariablesEnd - 2
+    }
+
+    print hex:Scripting.__VariablesBegin, "\n"
+    print hex:Scripting.__VariablesEnd, "\n"
 }
 
 
 
-// Activate a room script.
-//
-// This routine will do nothing if the *script Id* is invalid or the
-// script is already active.
-//
-// REQUIRES: DB = 0x7e
-//
-// INPUT: A - script id
-au()
-iu()
-code()
-function ActivateScript {
-    // NOTE: DP is unknown
-
-    php
-    sep     #$30
-a8()
-i8()
-    // Check script id is valid
-    cmp.b   #Room.N_ROOM_SCRIPTS
-    bcs     Skip
-
-        // Check if the script is active
-        tay
-        ldx.w   activeScripts,y
-        bne     Skip
-
-            // Sanity check
-            ldx.w   activeScriptsEnd
-            cpx.b   #MAX_ACTIVE_SCRIPTS * 2
-            bcs     Skip
-
-                // X = script index
-                // A = scriptId
-                // Y = scriptId
-
-                sta.w   scripts.scriptId,x
-
-                // Mark script active
-                assert(MAX_ACTIVE_SCRIPTS < 0x80)
-                inc
-                // A is non-zero
-                sta.w   activeScripts,y
-
-                asl
-                tay
-                // Y = index into room scripts list + 2
-
-                // Set script resume function
-                lda.b   #SpecialResumeOpcodes.Process_Script
-                sta.w   scripts.resumeOpcode,x
-
-                rep     #$20
-            a16()
-                // Set Program Counter
-                // (The minus two offsets `inc` above)
-                lda.w   Room.Format.Header.scripts - 2,y
-                sta.w   scripts.programCounter,x
-
-                inx
-                inx
-                stx.w   activeScriptsEnd
-
-au()
-Skip:
-    plp
-    rts
-}
-
-
-
-// Execute all active scripts.
+// Execute all active scripts and the background task.
 //
 // REQUIRES: 8 bit A, 16 bit Index, DP = 0, DB = 0x7e
 a8()
 i16()
 code()
 function ProcessScripts {
+    sep     #$20
+a8()
+    BackgroundTasks._ProcessBackgroundTask()
+
+
     sep     #$30
 a8()
 i8()
@@ -225,6 +168,77 @@ RemoveScript:
 
     rep     #$30
 a16()
+    rts
+}
+
+
+
+// Activate a room script.
+//
+// This routine will do nothing if the *script Id* is invalid or the
+// script is already active.
+//
+// REQUIRES: DB = 0x7e
+//
+// INPUT: A - script id
+au()
+iu()
+code()
+function ActivateScript {
+    // NOTE: DP is unknown
+
+    php
+    sep     #$30
+a8()
+i8()
+    // Check script id is valid
+    cmp.b   #Room.N_ROOM_SCRIPTS
+    bcs     Skip
+
+        // Check if the script is active
+        tay
+        ldx.w   activeScripts,y
+        bne     Skip
+
+            // Sanity check
+            ldx.w   activeScriptsEnd
+            cpx.b   #MAX_ACTIVE_SCRIPTS * 2
+            bcs     Skip
+
+                // X = script index
+                // A = scriptId
+                // Y = scriptId
+
+                sta.w   scripts.scriptId,x
+
+                // Mark script active
+                assert(MAX_ACTIVE_SCRIPTS < 0x80)
+                inc
+                // A is non-zero
+                sta.w   activeScripts,y
+
+                asl
+                tay
+                // Y = index into room scripts list + 2
+
+                // Set script resume function
+                lda.b   #SpecialResumeOpcodes.Process_Script
+                sta.w   scripts.resumeOpcode,x
+
+                rep     #$20
+            a16()
+                // Set Program Counter
+                // (The minus two offsets `inc` above)
+                lda.w   Room.Format.Header.scripts - 2,y
+                sta.w   scripts.programCounter,x
+
+                inx
+                inx
+                stx.w   activeScriptsEnd
+
+au()
+Skip:
+    plp
     rts
 }
 
@@ -702,14 +716,17 @@ function ResumeInstruction_GotoNextOpcode_Y {
 namespace SpecialResumeOpcodes {
     constant End_Script = 0
     constant Process_Script = 2
+
+    constant StartBgTask = 4
+    constant WaitUntilBgTaskEnd = 6
 }
 
 assert(Project.BytecodeOpcodes.Yielding.N_SPECIAL_RESUME_OPCODES == 6)
 
 constant Bytecode._Special___Resume_0  = Bytecode.End_Script___Resume
 constant Bytecode._Special___Resume_2  = ResumeInstruction_GotoNextOpcode_Y // Process_Script
-constant Bytecode._Special___Resume_4  = Bytecode.End_Script___Resume
-constant Bytecode._Special___Resume_6  = Bytecode.End_Script___Resume
+constant Bytecode._Special___Resume_4  = BackgroundTasks.StartBgTask___Resume
+constant Bytecode._Special___Resume_6  = BackgroundTasks.WaitUntilBgTaskEnd___Resume
 constant Bytecode._Special___Resume_8  = Bytecode.End_Script___Resume
 constant Bytecode._Special___Resume_10 = Bytecode.End_Script___Resume
 

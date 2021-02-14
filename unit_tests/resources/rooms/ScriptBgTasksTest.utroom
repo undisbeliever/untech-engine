@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF_8"?>
+<!DOCTYPE untech>
+<room name="ScriptBgTasksTest" scene="MetaTileRenderTest">
+  <map width="16" height="14">
+    AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+    AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+    AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+    AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+    AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=
+  </map>
+  <entrance name="Start" x="128" y="112" orientation="down-right"/>
+  <script name="Test_0">
+    <statement opcode="Sleep_AnimationTicks" arg1="5"/>
+    <statement opcode="TestBgTask" arg1="42"/>
+    <statement opcode="Sleep_AnimationTicks" arg1="5"/>
+    <statement opcode="TestBgTask" arg1="42"/>
+  </script>
+  <script name="Test_1">
+    <statement opcode="Sleep_AnimationTicks" arg1="10"/>
+    <statement opcode="TestBgTask" arg1="42"/>
+    <statement opcode="Sleep_AnimationTicks" arg1="5"/>
+    <statement opcode="TestBgTask" arg1="42"/>
+  </script>
+  <script name="Test_NoSleep">
+    <statement opcode="TestBgTask" arg1="42"/>
+    <statement opcode="TestBgTask" arg1="42"/>
+  </script>
+  <script name="Test_2">
+    <statement opcode="Sleep_AnimationTicks" arg1="5"/>
+    <statement opcode="TestBgTask" arg1="42"/>
+    <statement opcode="Sleep_AnimationTicks" arg1="10"/>
+    <statement opcode="TestBgTask" arg1="42"/>
+  </script>
+  <script name="Test_3">
+    <statement opcode="Sleep_AnimationTicks" arg1="10"/>
+    <statement opcode="TestBgTask" arg1="42"/>
+    <statement opcode="Sleep_AnimationTicks" arg1="10"/>
+    <statement opcode="TestBgTask" arg1="42"/>
+  </script>
+</room>

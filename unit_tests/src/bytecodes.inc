@@ -337,6 +337,102 @@ Wrong:
 }
 
 
+
+// Background Task Instructions
+// ============================
+
+
+CreateBgTaskInstruction(TestBgTask, ImmU16)
+namespace TestBgTask {
+
+assert(BackgroundTasks.state.size >= 4)
+constant _var   = BackgroundTasks.state + 0
+constant _timer = BackgroundTasks.state + 2
+
+
+// Incremented every time `SetupBgTask___ImmU16` is called
+allocateTmpWord(setupCounter)
+
+// Incremented every time `ProcessBgTask` is called
+allocateTmpWord(taskCounter)
+
+// Number of frames to wait for each task
+// (ensures the BG tasks are constantly waiting in ScriptingTests)
+constant TASK_DELAY = 7
+
+
+// BG Task setup routine
+//
+// REQUIRES: 8 bit A, 16 bit Index, DP = 0, DB = 0x7e, Ah = 0
+// INPUT: Y - program counter
+// OUTPUT: Y - program counter
+a8()
+i16()
+code()
+function SetupBgTask___ImmU16 {
+    // Argument 1 = immediate u16
+
+    rep     #$30
+a16()
+
+    lda.w   scriptData,y
+    iny
+    iny
+
+    sta.w   _var
+    stz.w   _timer
+
+    inc.w   setupCounter
+
+    sep     #$20
+a8()
+    rts
+}
+
+
+
+// BG Task process routine
+//
+// REQUIRES: 8 bit A, 16 bit Index, DP = 0, DB = 0x7e
+// OUTPUT: carry set if the task has completed
+a8()
+i16()
+code()
+function ProcessBgTask {
+
+    // Confirm argument to `TestBgTask` is correct
+    ldx.w   _var
+    cpx.w   #42
+    bne     Wrong
+
+
+    // Increment taskCounter
+    ldx.w   taskCounter
+    inx
+    stx.w   taskCounter
+
+
+    // Increment timer, test if the task is complete
+    lda.w   _timer
+    inc
+    sta.w   _timer
+
+    cmp.b   #TASK_DELAY
+    // carry set (end task) if _timer >= TASK_DELAY
+
+    rts
+
+
+Wrong:
+    jmp     Test.Fail
+}
+
+}
+
+
+
+CreateBgTasksFunctionTables()
+
 }
 }
 

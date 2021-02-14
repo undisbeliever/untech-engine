@@ -92,6 +92,47 @@ constant BytecodeFunctionTable = Project.BytecodeFunctionTable
 //              (OUT: Y - currentScriptIndex (MUST BE UNCHANGED))
 constant BytecodeResumeFunctionTable = Project.BytecodeResumeFunctionTable
 
+
+
+// Background Task's setup routine.
+//
+// This routine is called when a Background Task scripting instruction is
+// executed and the system is ready to start a new Background Task.
+//
+// The setup routine should initialize any `Scripting.BackgroundTasks.state`
+// variables used by the BG task's `TaskFunctionTable` function.
+//
+// A background task MUST not modify the `scripts.*` variables.
+//
+// This function table is created by the `CreateBgTasksFunctionTables` macro.
+//
+// REGS: 8 bit A, 16 bit Index, DB = 0x7e, DP = 0, Ah = 0
+//
+// INPUT: Y - program counter after the bytecode opcode byte.
+// OUTPUT: Y - script program counter after bytecode instruction arguments
+constant BackgroundTasks.SetupFunctionTable = Bytecode._BgTasksSetupFunctionTable
+
+
+
+// Background Task's process routine.
+//
+// The task function will be called once per frame before any scripts are
+// processed.
+//
+// Any state used by the Background Task should be stored in the
+// `Scripting.BackgroundTasks.state` variable.
+//
+// A background task MUST not modify the `scripts.*` variables.
+//
+// This function table is created by the `CreateBgTasksFunctionTables` macro.
+//
+// REGS: 8 bit A, 16 bit Index, DB = 0x7e, DP = 0
+//
+// OUTPUT: carry set - The BG Task has ended.
+//         carry clear - The BG Task is incomplete.
+constant BackgroundTasks.TaskFunctionTable = Bytecode._BgTasksFunctionTable
+
+
 }
 
 // vim: ft=bass-65816 ts=4 sw=4 et:

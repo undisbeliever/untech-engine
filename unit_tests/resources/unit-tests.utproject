@@ -39,6 +39,7 @@
     <instruction name="TestYield_Aopcode" yields="true"/>
     <instruction name="TestYield_Xarg_Ypc_Aopcode" yields="true"/>
     <instruction name="TestYield_XYarg_Aopcode" yields="true"/>
+    <instruction name="TestBgTask" arg1="immediate-u16"/>
   </bytecode>
   <interactive-tiles>
     <tile-function-table name="SetUpGravity" tint="ffa5a5"/>
@@ -213,6 +214,7 @@
   <room-file src="rooms/EntityHitboxCollisionsTest.utroom"/>
   <room-file src="rooms/InteractiveTilesTestSmall.utroom"/>
   <room-file src="rooms/InteractiveTilesTestLarge.utroom"/>
+  <room-file src="rooms/ScriptBgTasksTest.utroom"/>
   <scene-setting name="UnitTests" bg-mode="0" layer0-type="text" layer1-type="" layer2-type="" layer3-type=""/>
   <scene-setting name="Mode1_Bg2MT_NoImage" bg-mode="1bg3" layer0-type="" layer1-type="mt-tileset" layer2-type="text" layer3-type=""/>
   <scene-setting name="SettingSun" bg-mode="1bg3" layer0-type="mt-tileset" layer1-type="bg-image" layer2-type="text" layer3-type=""/>

@@ -84,12 +84,52 @@ namespace scripts {
     // Data storage for the resume function.
     // (word * Room.N_ROOM_SCRIPTS)
     allocate(resumeArg2, wram7e, 2 * MAX_ACTIVE_SCRIPTS)
+
+
+    assertOnePage(resumeOpcode,   2 * MAX_ACTIVE_SCRIPTS)
+    assertOnePage(programCounter, 2 * MAX_ACTIVE_SCRIPTS)
+    assertOnePage(resumeArg1,     2 * MAX_ACTIVE_SCRIPTS)
+    assertOnePage(resumeArg2,     2 * MAX_ACTIVE_SCRIPTS)
 }
 
 
 // Script active flags
 // (byte flag * Room.N_ROOM_SCRIPTS)
 allocate(activeScripts, wram7e, Room.N_ROOM_SCRIPTS)
+assertOnePage(activeScripts, Room.N_ROOM_SCRIPTS)
+
+
+namespace BackgroundTasks {
+
+    // Status of the currently running (if any) background task.
+    //
+    //   cr000000
+    //      c = set if the task is completed
+    //      r = set if the task is running
+    //      0 = no task is running or waiting for acknowledgement
+    //
+    // (2 bit flags)
+    allocate(taskStatus, wram7e, 1)
+    constant taskStatus.TASK_COMPLETED_FLAG       = 0x80
+    constant taskStatus.TASK_RUNNING_FLAG         = 0x40
+    constant taskStatus.READY_TO_START_A_NEW_TASK = 0
+
+
+    // Function Table index for the current background task
+    //
+    // This variable is 0 if no background tasks are running.
+    //
+    // The high byte must always be 0.
+    //
+    // (byte index into BackgroundTasksFunctionTable)
+    allocate(backgroundTask, wram7e, 2)
+
+
+    // State variables used by the background task
+    // (state.size bytes of data)
+    constant state.size = 16
+    allocate(state, wram7e, state.size)
+}
 
 
 constant __VariablesEnd = __MEMORY__.ramBlocks.wram7e.pos
