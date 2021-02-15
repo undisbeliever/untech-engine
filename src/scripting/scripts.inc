@@ -38,9 +38,6 @@ macro _Init() {
         assert16a()
         stz.w   Scripting.__VariablesEnd - 2
     }
-
-    print hex:Scripting.__VariablesBegin, "\n"
-    print hex:Scripting.__VariablesEnd, "\n"
 }
 
 
@@ -227,14 +224,18 @@ i8()
 
                 rep     #$20
             a16()
-                // Set Program Counter
+                // Read the script's program counter
                 // (The minus two offsets `inc` above)
                 lda.w   Room.Format.Header.scripts - 2,y
-                sta.w   scripts.programCounter,x
+                beq     Skip
+                    // Script exists (programCounter is not null)
+                    // Save Program Counter
 
-                inx
-                inx
-                stx.w   activeScriptsEnd
+                    sta.w   scripts.programCounter,x
+
+                    inx
+                    inx
+                    stx.w   activeScriptsEnd
 
 au()
 Skip:

@@ -15,6 +15,8 @@ constant ScriptId__Test_Sleep_AnimationTicks    = 5
 constant ScriptId__Test_Yield_Helpers           = 6
 constant ScriptId__Test_While_Statements        = 7
 
+constant LastScriptId = 7
+
 
 constant N_TEST_YIELD_INSTRUCTIONS = Scripting.Bytecode._SetTestYieldInstructionsBitfield__counter
 
@@ -432,6 +434,16 @@ function TestMultipleScripts {
 
     lda.w   #ScriptId__Test_GameState_Words
     jsr     Scripting.ActivateScript
+
+    // Activate a script outside the N_ROOM_SCRIPTS range
+    lda.w   #0xff
+    jsr     Scripting.ActivateScript
+
+    // Test activating an unused script does nothing
+    assert(LastScriptId + 1 < Room.N_ROOM_SCRIPTS)
+    lda.w   #LastScriptId + 1
+    jsr     Scripting.ActivateScript
+
 
 
     jsr     Scripting.ProcessScripts
