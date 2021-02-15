@@ -9,6 +9,9 @@
 // Distributed under The MIT License: https://opensource.org/licenses/MIT
 
 
+if {defined DEBUG_BUILD} {
+    RegisterBreakId(INVALID_SCRIPTING_OPCODE)
+}
 Warnings.Register(INVALID_SCRIPTING_OPCODE, 16, 31, 16)
 
 
@@ -138,7 +141,13 @@ a8()
 i16()
 code()
 function InvalidOpcode {
-    Warnings.Warn(INVALID_SCRIPTING_OPCODE)
+    if {defined DEBUG_BUILD} {
+        break(INVALID_SCRIPTING_OPCODE)
+
+    } else {
+        Warnings.Warn(INVALID_SCRIPTING_OPCODE)
+    }
+
     jmp     End_Script
 }
 

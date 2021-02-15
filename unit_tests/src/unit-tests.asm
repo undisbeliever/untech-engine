@@ -13,6 +13,13 @@ define VERSION = 0
 // count number of free cycles in WaitFrame instead of sleeping
 define COUNT_FREE_CYCLES
 
+
+// Adds more break on error tests to the engine
+// ::TODO write more code that uses this variable::
+define DEBUG_BUILD
+
+
+
 include "../../src/common.inc"
 include "memmap.inc"
 
