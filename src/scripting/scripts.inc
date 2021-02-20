@@ -149,9 +149,9 @@ RemoveScript:
         // Y = target
         rep     #$20
     a16()
-        assert(scripts.resumeOpcode + 1 == scripts.scriptId)
-        lda.w   scripts.resumeOpcode,x
-        sta.w   scripts.resumeOpcode,y
+        assert(scripts.scriptId + 1 == scripts.resumeOpcode)
+        lda.w   scripts.scriptId,x
+        sta.w   scripts.scriptId,y
 
         lda.w   scripts.programCounter,x
         sta.w   scripts.programCounter,y
@@ -251,13 +251,12 @@ i8()
 
                 sta.w   Scripting.scripts.programCounter,x
 
-                // Set resumeOpcode & scriptId
-                assert(Scripting.scripts.resumeOpcode + 1 == Scripting.scripts.scriptId)
+                // Set scriptId & resumeOpcode
+                assert(Scripting.scripts.scriptId + 1 == Scripting.scripts.resumeOpcode)
                 tya
                 // Ah is 0
-                xba
-                ora.w   #Scripting.SpecialResumeOpcodes.Process_Script
-                sta.w   Scripting.scripts.resumeOpcode,x
+                ora.w   #Scripting.SpecialResumeOpcodes.Process_Script << 8
+                sta.w   Scripting.scripts.scriptId,x
 
                 assert(Scripting.scripts.INDEX_INCREMENT == 2)
                 inx

@@ -64,6 +64,11 @@ allocate(activeScriptsEnd, wram7e, 2)
 namespace scripts {
     constant INDEX_INCREMENT = 2
 
+    // The script Id of the active script
+    // (byte * Room.N_ROOM_SCRIPTS)
+    allocate(scriptId, wram7e, 2 * MAX_ACTIVE_SCRIPTS)
+
+
     // The resume function to execute when the script is processed.
     // Index into `BytecodeResumeFunctionTable`.
     //
@@ -73,11 +78,7 @@ namespace scripts {
     // resume instruction that will start normal script execution.
     //
     // (byte index * Room.N_ROOM_SCRIPTS)
-    allocate(resumeOpcode, wram7e, 2 * MAX_ACTIVE_SCRIPTS)
-
-    // The script Id of the active script
-    // (byte * Room.N_ROOM_SCRIPTS)
-    constant scriptId = resumeOpcode + 1
+    constant resumeOpcode = scriptId + 1
 
 
     // The program counter for the script
@@ -98,6 +99,7 @@ namespace scripts {
     allocate(resumeArg2, wram7e, 2 * MAX_ACTIVE_SCRIPTS)
 
 
+    assertOnePage(scriptId,       2 * MAX_ACTIVE_SCRIPTS)
     assertOnePage(resumeOpcode,   2 * MAX_ACTIVE_SCRIPTS)
     assertOnePage(programCounter, 2 * MAX_ACTIVE_SCRIPTS)
     assertOnePage(resumeArg1,     2 * MAX_ACTIVE_SCRIPTS)
