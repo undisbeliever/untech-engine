@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF_8"?>
+<!DOCTYPE untech>
+<room name="ScriptStartScriptTest" scene="TileCollisionTest">
+  <map width="16" height="14">
+    AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+    AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+    AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+    AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+    AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=
+  </map>
+  <entrance name="Start" x="128" y="112" orientation="down-right"/>
+  <script name="Starting_Script">
+    <statement opcode="Assert_Word_Equals" arg1="counter" arg2="0"/>
+    <statement opcode="Start_Script" arg1="Child_Script_1"/>
+    <statement opcode="Start_Script" arg1="Child_Script_2"/>
+    <statement opcode="Start_Script" arg1="Child_Script_3_sleep"/>
+    <statement opcode="Start_Script" arg1="Child_Script_4_sleep"/>
+    <comment c="Confirm starting a script after it has been activated will not activate it a second time"/>
+    <statement opcode="Start_Script" arg1="Child_Script_1"/>
+    <statement opcode="Start_Script" arg1="Child_Script_2"/>
+    <statement opcode="Start_Script" arg1="Child_Script_3_sleep"/>
+    <statement opcode="Start_Script" arg1="Child_Script_4_sleep"/>
+    <statement opcode="Sleep_AnimationTicks" arg1="8"/>
+    <statement opcode="Assert_Word_Equals" arg1="counter" arg2="4"/>
+    <statement opcode="Start_Script" arg1="Child_Script_1"/>
+    <statement opcode="Start_Script" arg1="Child_Script_3_sleep"/>
+    <statement opcode="Start_Script" arg1="Child_Script_4_sleep"/>
+    <statement opcode="Sleep_AnimationTicks" arg1="0"/>
+    <comment c="Child Scripts 3 &amp; 4 sleep for one frame. Only 1 script has incremented the counter"/>
+    <statement opcode="Assert_Word_Equals" arg1="counter" arg2="5"/>
+    <statement opcode="Start_Script" arg1="Child_Script_2"/>
+    <statement opcode="Sleep_AnimationTicks" arg1="0"/>
+    <statement opcode="Assert_Word_Equals" arg1="counter" arg2="8"/>
+    <statement opcode="Start_Script" arg1="Child_Script_1"/>
+    <statement opcode="Start_Script" arg1="Child_Script_2"/>
+    <statement opcode="Start_Script" arg1="Child_Script_3_sleep"/>
+    <statement opcode="Start_Script" arg1="Child_Script_4_sleep"/>
+    <statement opcode="Sleep_AnimationTicks" arg1="0"/>
+    <comment c="Child Scripts 3 &amp; 4 sleep for one frame. Only 2 scripts have incremented the counter"/>
+    <statement opcode="Assert_Word_Equals" arg1="counter" arg2="10"/>
+    <comment c="Child Scripts 3 &amp; 4 are already active, confirm calling Start_Script on them does nothing"/>
+    <statement opcode="Start_Script" arg1="Child_Script_3_sleep"/>
+    <statement opcode="Start_Script" arg1="Child_Script_4_sleep"/>
+    <statement opcode="Sleep_AnimationTicks" arg1="20"/>
+    <statement opcode="Assert_Word_Equals" arg1="counter" arg2="12"/>
+  </script>
+  <script name="Child_Script_1">
+    <statement opcode="Increment_Word" arg1="counter"/>
+  </script>
+  <script name="Child_Script_2">
+    <statement opcode="Increment_Word" arg1="counter"/>
+  </script>
+  <script name="Child_Script_3_sleep">
+    <statement opcode="Sleep_AnimationTicks" arg1="0"/>
+    <statement opcode="Increment_Word" arg1="counter"/>
+  </script>
+  <script name="Child_Script_4_sleep">
+    <statement opcode="Sleep_AnimationTicks" arg1="0"/>
+    <statement opcode="Increment_Word" arg1="counter"/>
+  </script>
+</room>

@@ -551,6 +551,33 @@ Flag_Instruction(BranchIfFlagClear, _PC)
 
 
 
+// Default Instructions
+// ====================
+
+
+// Start a room script.
+//
+// REQUIRES: 8 bit A, 16 bit Index, DP = 0, DB = 0x7e, Ah = 0
+//
+// INPUT: Y - program counter
+// OUTPUT: programCounter - program counter after arguments
+// RETURN: Jump to GotoNextOpcode_LoadPC
+a8()
+i16()
+code()
+function Start_Script___RoomScript {
+    // first argument: Room Script Id
+    lda.w   scriptData,y
+    iny
+    sty.b   programCounter
+
+    jsr     ActivateScript
+
+    jmp     GotoNextOpcode_LoadPC
+}
+
+
+
 // Base Yielding Instructions
 // ==========================
 

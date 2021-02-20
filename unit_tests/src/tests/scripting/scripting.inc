@@ -615,6 +615,54 @@ Fail:
 }
 
 
+
+a16()
+i16()
+code()
+Test.add("Start_Script instruction test")
+function ScriptScriptInstructionTest {
+
+constant N_CHILD_SCRIPTS = 4
+constant REPEAT = 3
+
+    // The `ScriptStartScriptTest` room will start `N_CHILD_SCRIPTS` scripts, `REPEAT` times.
+
+
+    lda.w   #Project.RoomList.ScriptStartScriptTest
+    ldx.w   #Project.PlayerIds.Blank
+    ldy.w   #0
+    jsr     InteractiveTests.GameLoop.Init_LoadRoom
+
+
+    // Activate the first script
+    lda.w   #0
+    jsr     Scripting.ActivateScript
+
+
+    // Run the scripts until they have all ended
+    Loop:
+        jsr     Scripting.ProcessScripts
+
+        lda.w   Scripting.activeScriptsEnd
+        bne     Loop
+
+
+    // Confirm counter is correct
+    lda.w   Project.GameState.Words.counter
+    cmp.w   #N_CHILD_SCRIPTS * REPEAT
+    bne     Fail
+
+
+    sec
+    rts
+
+
+Fail:
+    clc
+    rts
+}
+
+
 }
 
 // vim: ft=bass-65816 ts=4 sw=4 et:
