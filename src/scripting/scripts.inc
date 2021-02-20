@@ -305,6 +305,8 @@ i8()
     bcs     Skip
         tay
 
+        // MUST NOT MODIFY Y
+
         // Do not activate any scripts if the startup script is active
         ldx.w   startupScriptActive
         bne     StartupScriptIsActive
@@ -313,41 +315,38 @@ i8()
         ldx.w   activeScripts,y
         bne     Skip
 
-            // Sanity check
-            ldx.w   activeScriptsEnd
-            cpx.b   #MAX_ACTIVE_SCRIPTS * 2
-            bcs     Skip
+            // Calculate index into room script header
+            asl
+            tax
 
-                // X = script index
-                // A = scriptId
-                // Y = scriptId
+            // Mark script active
+            assert(MAX_ACTIVE_SCRIPTS < 0x80)
+            inc
+            // A is non-zero
+            sta.w   activeScripts,y
 
-                sta.w   scripts.scriptId,x
 
-                // Mark script active
-                assert(MAX_ACTIVE_SCRIPTS < 0x80)
-                inc
-                // A is non-zero
-                sta.w   activeScripts,y
+            rep     #$20
+        a16()
 
-                asl
-                tay
-                // Y = index into room scripts list + 2
+            // Read the script's program counter (and confirm the script exists)
+            lda.w   Room.Format.Header.scripts,x
+            beq     Skip
+                ldx.w   activeScriptsEnd
 
-                // Set script resume function
-                lda.b   #SpecialResumeOpcodes.Process_Script
-                sta.w   scripts.resumeOpcode,x
-
-                rep     #$20
-            a16()
-                // Read the script's program counter
-                // (The minus two offsets `inc` above)
-                lda.w   Room.Format.Header.scripts - 2,y
-                beq     Skip
-                    // Script exists (programCounter is not null)
-                    // Save Program Counter
-
+                // Sanity check
+                cpx.b   #MAX_ACTIVE_SCRIPTS * 2
+                bcs     Skip
                     sta.w   scripts.programCounter,x
+
+                    // Set scriptId & resumeOpcode
+                    assert(Scripting.scripts.scriptId + 1 == Scripting.scripts.resumeOpcode)
+                    // Y = scriptId
+                    tya
+                    // Ah is 0
+                    ora.w   #Scripting.SpecialResumeOpcodes.Process_Script << 8
+                    sta.w   Scripting.scripts.scriptId,x
+
 
                     assert(scripts.INDEX_INCREMENT == 2)
                     inx
