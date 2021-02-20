@@ -65,6 +65,44 @@ macro BranchIfFlagClear(evaluate n, define label) {
 a16()
 i16()
 code()
+Test.add("Room Startup Script")
+function RoomStartupScript {
+
+    // Test loading an empty room has StartupScriptTestFlag clear
+    lda.w   #Project.RoomList.EmptyRoom
+    ldx.w   #Project.PlayerIds.Blank
+    ldy.w   #0
+    jsr     InteractiveTests.GameLoop.Init_LoadRoom
+
+    lda.w   Project.GameState.Words.startupScriptTestFlag
+    bne     Fail
+
+
+    // Test the `ScriptTests` room sets `StartupScriptTestFlag` in its room startup script.
+    lda.w   #Project.RoomList.ScriptTests
+    ldx.w   #Project.PlayerIds.Blank
+    ldy.w   #0
+    jsr     InteractiveTests.GameLoop.Init_LoadRoom
+
+    lda.w   Project.GameState.Words.startupScriptTestFlag
+    cmp.w   #42
+    bne     Fail
+
+
+    sec
+    rts
+
+
+Fail:
+    clc
+    rts
+}
+
+
+
+a16()
+i16()
+code()
 Test.add("ActivateScript")
 function ActivateScript {
     jsr     _LoadScriptTestsRoom
@@ -616,6 +654,7 @@ Fail:
 
 
 
+// Also tests `Start_Script` inside the Room Startup Script
 a16()
 i16()
 code()
@@ -626,18 +665,18 @@ constant N_CHILD_SCRIPTS = 4
 constant REPEAT = 3
 
     // The `ScriptStartScriptTest` room will start `N_CHILD_SCRIPTS` scripts, `REPEAT` times.
-
+    // Each child script will increment the `counter` by one.
 
     lda.w   #Project.RoomList.ScriptStartScriptTest
     ldx.w   #Project.PlayerIds.Blank
     ldy.w   #0
     jsr     InteractiveTests.GameLoop.Init_LoadRoom
 
+    // The first script will be activated by the Startup script
 
-    // Activate the first script
-    lda.w   #0
-    jsr     Scripting.ActivateScript
-
+    // Confirm that none of the child scripts have been executed yet
+    lda.w   Project.GameState.Words.counter
+    bne     Fail
 
     // Run the scripts until they have all ended
     Loop:

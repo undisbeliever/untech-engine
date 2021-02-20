@@ -34,6 +34,12 @@ allocate(programCounter, dp, 2)
 constant __VariablesBegin = __MEMORY__.ramBlocks.wram7e.pos
 
 
+// Non-zero if the room startup script is active.
+//
+// (byte flag)
+allocate(startupScriptActive, wram7e, 1)
+
+
 // The index (within the `scripts` SoA) of the currently active script.
 //
 // NOTE: This value is only valid when a script is being processed.
@@ -50,8 +56,14 @@ allocate(currentScriptIndex, wram7e, 2)
 allocate(activeScriptsEnd, wram7e, 2)
 
 
+
 // Structure of Arrays for active script data
+//
+// NOTE: Scripts will not be activated if `startupScriptActive` is set.
+// Instead they will be activated after the room startup script ends.
 namespace scripts {
+    constant INDEX_INCREMENT = 2
+
     // The resume function to execute when the script is processed.
     // Index into `BytecodeResumeFunctionTable`.
     //
@@ -93,10 +105,16 @@ namespace scripts {
 }
 
 
-// Script active flags
+
+// Script active flags.
+//
+// If the room startup script is active, this array is used to mark which
+// scripts are to be activated after the startup script ends.
+//
 // (byte flag * Room.N_ROOM_SCRIPTS)
 allocate(activeScripts, wram7e, Room.N_ROOM_SCRIPTS)
 assertOnePage(activeScripts, Room.N_ROOM_SCRIPTS)
+
 
 
 namespace BackgroundTasks {

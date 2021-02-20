@@ -28,7 +28,7 @@ assert(EntityGroups.N_ENTITY_GROUPS == MAX_ENTITY_GROUPS)
 
 
 namespace Format {
-    if Room.ROOM_FORMAT_VERSION != 3 {
+    if Room.ROOM_FORMAT_VERSION != 4 {
         error "Invalid untech-compiler Room Format"
     }
 
@@ -58,10 +58,20 @@ namespace Format {
             // Number of Room Entrances for this room
             field(nEntrances, 1)
 
+            // The program counter of the room's startup script.
+            //
+            // This script will be started on room load and the gameloop will not start
+            // until this script has finished execution.
+            //
+            // This value MUST NOT be null (0).
+            //
+            // (word index into `roomData`)
+            field(startupScript, 2)
 
             // The initial program counter of each script in the map.
             // Each entry contains a index (within `roomData`) to the start of script.
             // If there is no script, the value is 0.
+            //
             // (N_ROOM_SCRIPTS word indexes)
             field(scripts, 2 * N_ROOM_SCRIPTS)
         endstruct()

@@ -9,17 +9,23 @@
     AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=
   </map>
   <entrance name="Start" x="128" y="112" orientation="down-right"/>
-  <script name="Starting_Script">
+  <script name="Startup">
     <statement opcode="Assert_Word_Equals" arg1="counter" arg2="0"/>
-    <statement opcode="Start_Script" arg1="Child_Script_1"/>
-    <statement opcode="Start_Script" arg1="Child_Script_2"/>
+    <statement opcode="Start_Script" arg1="Starting_Script"/>
     <statement opcode="Start_Script" arg1="Child_Script_3_sleep"/>
     <statement opcode="Start_Script" arg1="Child_Script_4_sleep"/>
+    <comment c="Confirm the Start_Script scripts have not been activated"/>
+    <statement opcode="Sleep_AnimationTicks" arg1="50"/>
+    <statement opcode="Assert_Word_Equals" arg1="counter" arg2="0"/>
+  </script>
+  <script name="Starting_Script">
+    <statement opcode="Assert_Word_Equals" arg1="counter" arg2="0"/>
+    <comment c="Child Scripts 3 &amp; 4 are started by the Startup Script, do not start them here"/>
+    <statement opcode="Start_Script" arg1="Child_Script_1"/>
+    <statement opcode="Start_Script" arg1="Child_Script_2"/>
     <comment c="Confirm starting a script after it has been activated will not activate it a second time"/>
     <statement opcode="Start_Script" arg1="Child_Script_1"/>
     <statement opcode="Start_Script" arg1="Child_Script_2"/>
-    <statement opcode="Start_Script" arg1="Child_Script_3_sleep"/>
-    <statement opcode="Start_Script" arg1="Child_Script_4_sleep"/>
     <statement opcode="Sleep_AnimationTicks" arg1="8"/>
     <statement opcode="Assert_Word_Equals" arg1="counter" arg2="4"/>
     <statement opcode="Start_Script" arg1="Child_Script_1"/>

@@ -140,6 +140,9 @@ i16()
     jsr     Camera.CenterOnPlayer
 
 
+    Scripting._ProcessRoomStartupScript()
+
+
     lda.w   Format.Header.sceneId
     jmp     Resources.LoadScene
 }

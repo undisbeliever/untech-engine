@@ -9,6 +9,10 @@
     AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=
   </map>
   <entrance name="Start" x="128" y="112" orientation="down-right"/>
+  <script name="Startup">
+    <statement opcode="Assert_Word_Equals" arg1="counter" arg2="0"/>
+    <statement opcode="Set_Word" arg1="startupScriptTestFlag" arg2="42"/>
+  </script>
   <script name="Increment_Counter">
     <statement opcode="Increment_Word" arg1="counter"/>
   </script>

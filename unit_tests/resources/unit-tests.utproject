@@ -24,6 +24,7 @@
     <word index="8" name="eighth" value="8"/>
     <word index="10" name="tokensCollected" value="0"/>
     <word index="11" name="counter" value="0"/>
+    <word index="12" name="startupScriptTestFlag" value="0"/>
     <word index="60" name="sixtyth" value="60"/>
     <word index="61" name="hidden1" room="EmptyRoom" value="0"/>
     <word index="62" name="last" value="0"/>

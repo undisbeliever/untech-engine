@@ -10,6 +10,8 @@
 
 namespace Scripting {
 
+constant STARTUP_SCRIPT_ID = 0xff
+
 
 // Initialize and reset the scripting subsystem
 //
@@ -44,7 +46,7 @@ macro _Init() {
 
 // Execute all active scripts and the background task.
 //
-// REQUIRES: 8 bit A, 16 bit Index, DP = 0, DB = 0x7e
+// REQUIRES: 16 bit A, 16 bit Index, DP = 0, DB = 0x7e
 a8()
 i16()
 code()
@@ -62,6 +64,7 @@ i8()
     beq     Return
 
     Loop:
+        assert(scripts.INDEX_INCREMENT == 2)
         dey
     Loop_AfterDEY:
         dey
@@ -122,9 +125,14 @@ RemoveScript:
         ldy.w   currentScriptIndex
 
 
-        // Mark script as deactivated
+        // Mark script as deactivated.
+        // Bounds test is required as the startup script has no entry in the `activeScripts` array.
+        assert(STARTUP_SCRIPT_ID > Room.N_ROOM_SCRIPTS)
         ldx.w   scripts.scriptId,y
-        stz.w   activeScripts,x
+        cpx.b   #Room.N_ROOM_SCRIPTS
+        bcs     +
+            stz.w   activeScripts,x
+        +
 
 
         // Remove script data from scripts SoA by moving the last script to currentScriptIndex
@@ -132,6 +140,7 @@ RemoveScript:
 
         // activeScriptsEnd is non-zero
         ldx.w   activeScriptsEnd
+        assert(scripts.INDEX_INCREMENT == 2)
         dex
         dex
         stx.w   activeScriptsEnd
@@ -170,10 +179,114 @@ a16()
 
 
 
+// Process a room's startup script.
+//
+// After the startup script has ended, this macro will activate any scripts
+// that was started by the startup script.
+//
+// ASSUMES this macro is called in the `Room.LoadRoom` routine and it is the
+// first Scripting routine or macro called after `Scripting._Init`
+//
+// REQUIRES: 16 bit A, 16 bit Index, DP = 0, DB = 0x7e
+//
+// REQUIRES: Room loaded, player spawned, camera active
+macro _ProcessRoomStartupScript() {
+    assert16a()
+    assert16i()
+
+    sep     #$20
+a8()
+
+    // Notify system the Room Startup Script is active
+    assert(Scripting.STARTUP_SCRIPT_ID != 0)
+    lda.b   #Scripting.STARTUP_SCRIPT_ID
+    sta.w   Scripting.startupScriptActive
+
+
+    // Add startup script to active script list
+    sta.w   Scripting.scripts.scriptId
+
+    lda.b   #Scripting.SpecialResumeOpcodes.Process_Script
+    sta.w   Scripting.scripts.resumeOpcode
+
+    ldx.w   Room.Format.Header.startupScript
+    stx.w   Scripting.scripts.programCounter
+
+    lda.b   #Scripting.scripts.INDEX_INCREMENT
+    sta.w   Scripting.activeScriptsEnd
+
+
+    rep     #$30
+a16()
+
+    // Continue executing the Startup script until it has completed
+    Loop:
+        jsr     Scripting.ProcessScripts
+
+        ldx.w   Scripting.activeScriptsEnd
+        bne     Loop
+
+
+    // Activate all scripts that were marked by `ActivateScript`
+    sep     #$10
+a16()
+i8()
+
+    ldy.b   #0
+    sty.w   Scripting.startupScriptActive
+
+    // Y = 0
+    ActivateLoop:
+        ldx.w   Scripting.activeScripts,y
+        beq     NotActive
+            tya
+            asl
+            tax
+
+            // Determine if the script exists
+            lda.w   Room.Format.Header.scripts,x
+            beq     NotActive
+                // Activate script
+                ldx.w   Scripting.activeScriptsEnd
+
+                sta.w   Scripting.scripts.programCounter,x
+
+                // Set resumeOpcode & scriptId
+                assert(Scripting.scripts.resumeOpcode + 1 == Scripting.scripts.scriptId)
+                tya
+                // Ah is 0
+                xba
+                ora.w   #Scripting.SpecialResumeOpcodes.Process_Script
+                sta.w   Scripting.scripts.resumeOpcode,x
+
+                assert(Scripting.scripts.INDEX_INCREMENT == 2)
+                inx
+                inx
+                stx.w   Scripting.activeScriptsEnd
+
+                // No need to bounds check `activeScriptsEnd`
+                assert(Scripting.MAX_ACTIVE_SCRIPTS >= Room.N_ROOM_SCRIPTS)
+
+    NotActive:
+        iny
+        cpy.b   #Room.N_ROOM_SCRIPTS
+        bcc     ActivateLoop
+
+    rep     #$30
+a16()
+i16()
+}
+
+
+
 // Activate a room script.
 //
 // This routine will do nothing if the *script Id* is invalid or the
 // script is already active.
+//
+// Scripts will not be activated if `startupScriptActive` is set.
+// Instead the script will be marked for delayed activation and will be activated
+// after the room startup script ends.
 //
 // REQUIRES: DB = 0x7e
 //
@@ -191,9 +304,13 @@ i8()
     // Check script id is valid
     cmp.b   #Room.N_ROOM_SCRIPTS
     bcs     Skip
+        tay
+
+        // Do not activate any scripts if the startup script is active
+        ldx.w   startupScriptActive
+        bne     StartupScriptIsActive
 
         // Check if the script is active
-        tay
         ldx.w   activeScripts,y
         bne     Skip
 
@@ -233,12 +350,27 @@ i8()
 
                     sta.w   scripts.programCounter,x
 
+                    assert(scripts.INDEX_INCREMENT == 2)
                     inx
                     inx
                     stx.w   activeScriptsEnd
 
 au()
 Skip:
+    plp
+    rts
+
+
+a8()
+i8()
+StartupScriptIsActive:
+    // Mark script so it can be activated after the startup script ends
+    // (See `_ProcessRoomStartupScript`)
+
+    // Y = scriptId (in bounds)
+    lda.b   #0xff
+    sta.w   activeScripts,y
+
     plp
     rts
 }
