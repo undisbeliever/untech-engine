@@ -285,8 +285,6 @@ constant _nRollbacks   = Test.dpTmp + 4
     ldy.w   #0
     jsr     GameLoop.Init_LoadRoom
 
-    jsr     GameLoop.SpawnAllEntitiesInRoom
-
 
     // Setup `MetaTiles.CrumblingTiles.time` overflow test
     // -60 chosen to ensure that there are crumbling tiles in the Queue when time is rolled back

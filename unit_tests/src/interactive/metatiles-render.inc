@@ -282,8 +282,6 @@ function DoTest {
     ldy.w   #0
     jsr     GameLoop.Init_LoadRoom
 
-    jsr     GameLoop.SpawnAllEntitiesInRoom
-
 
     jsr     Test.PrintCurrentTestName
 

@@ -51,4 +51,8 @@
     <entity entity="EightDirectionProjectile" x="96" y="110" parameter=""/>
     <entity entity="EightDirectionProjectile" x="160" y="110" parameter=""/>
   </entity-group>
+  <script name="Startup">
+    <statement opcode="Spawn_Entity_Group" arg1="Blank"/>
+    <statement opcode="Spawn_Entity_Group" arg1="Enemies"/>
+  </script>
 </room>

@@ -369,14 +369,6 @@ function Test {
     jsr     GameLoop.Init_LoadRoom
 
 
-    // Only spawn entity groups 2 & 1.
-    // Do not spawn entity group 0, 1, 3, or 4.
-    lda.w   #0b001100
-    tsb.w   Room.EntityGroups.toActivateBitfield
-
-    jsr     Room.EntityGroups.SpawnEntityGroups
-
-
     jsr     Resources.TransferToPpu
     jsr     MetaTiles.Render.DrawFullScreen_ForceBlank
 

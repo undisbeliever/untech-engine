@@ -19,9 +19,8 @@ macro _Init() {
     assert16a()
     assert16i()
 
-    // Clear toActivateBitfield and spawnedGroupsBitfield
-    assert(EntityGroups.toActivateBitfield + 1 == EntityGroups.spawnedGroupsBitfield)
-    stz.w   EntityGroups.toActivateBitfield
+    assert(EntityGroups.spawnedGroupsBitfield + 1 == EntityGroups.groupAddrs)
+    stz.w   EntityGroups.spawnedGroupsBitfield
 }
 
 
@@ -130,130 +129,6 @@ macro _Load() {
 
 
 
-// Spawns all unspawned entity groups.
-//
-// REQUITES: 16 bit A, 16 bit Index, DB = 0x7e, DP = 0
-a16()
-i16()
-code()
-function SpawnEntityGroups {
-allocateTmpWord(_count)
-allocateTmpWord(_currentEntityInstanceId)
-constant _groupsToProcess = _currentEntityInstanceId + 1
-
-    // NOTE: _SpawnRoomEntity modifies DP, must not use DP here
-
-    // Confirm the `toActivateBitfield` and `unspawnedGroupsBitfield` are 8 bit
-    assert(MAX_ENTITY_GROUPS == 8)
-    assert(EntityGroups.toActivateBitfield + 1 == EntityGroups.spawnedGroupsBitfield)
-
-    sep     #$20
-a8()
-
-    // Find groups to spawn
-    lda.w   spawnedGroupsBitfield
-    eor.b   #0xff
-    and.w   toActivateBitfield
-    bne     +
-        jmp     Return
-    +
-
-    sta.w   _groupsToProcess
-
-    // Mark _groupsToProcess groups as spawned
-    ora.w   spawnedGroupsBitfield
-    sta.w   spawnedGroupsBitfield
-
-
-    lda.b   #Entity.FIRST_INSTANCE_ID
-    sta.w   _currentEntityInstanceId
-
-    ldx.w   #-2
-
-    // X = groupAddrs index
-    a8()
-    i16()
-    GroupLoop:
-        inx
-        inx
-
-        lsr.w   _groupsToProcess
-        bcs     SpawnGroup
-        beq     Return
-
-        a8()
-        SkipGroup:
-            ldy.w   groupAddrs,x
-            beq     GroupLoop
-
-            // Group exists
-            // advance _currentEntityInstanceId
-
-            assert(Entity.INSTANCE_ID_INCREMENT == 2)
-            lda.w   Format.EntityGroup.nEntities,y
-            asl
-            clc
-            adc.w   _currentEntityInstanceId
-            sta.w   _currentEntityInstanceId
-
-            bra     GroupLoop
-
-
-        EntityPoolEmpty:
-            Warnings.Warn(ENTITY_POOL_EMPTY)
-
-        au()
-        Return:
-            rep     #$30
-        a16()
-            lda.w   #0
-            tcd
-            rts
-
-
-        a8()
-        SpawnGroup:
-            // Spawn all entities in group
-
-            // Check group exists
-            ldy.w   groupAddrs,x
-            beq     GroupLoop
-
-            // Y = entity group address
-            rep     #$30
-        a16()
-
-            lda.w   Room.Format.EntityGroup.nEntities,y
-            and.w   #0xff
-            beq     GroupLoop
-            sta.w   _count
-
-            phx
-
-            InnerLoop:
-                phy
-                    Entity._SpawnRoomEntity()
-
-                    // NOTE: Entity._SpawnRoomEntity() will increment _currentEntityInstanceId
-
-                    // DP = entity spawned
-                pla
-                clc
-                adc.w   #Format.EntityGroup.Entities.size
-                tay
-
-                dec.w   _count
-                beq     +
-                    jmp     InnerLoop
-                +
-
-            sep     #$20
-        a8()
-            plx
-            jmp     GroupLoop
-}
-
-
 // Spawn_Entity_Group scripting background task
 namespace Spawn_Entity_Group__BgTask {
     // Number of entities to spawn
@@ -277,6 +152,9 @@ namespace Spawn_Entity_Group__BgTask {
     // REQUIRES: 8 bit A, 16 bit Index, DP = 0, DB = 0x7e, Ah = 0
     // INPUT: Y - script program counter before argument
     // OUTPUT: Y - script program counter after argument
+    a8()
+    i16()
+    code()
     function SetupBgTask___EntityGroup {
         constant _loopCounter = utDpTmp0
 
@@ -347,6 +225,7 @@ namespace Spawn_Entity_Group__BgTask {
     }
 
 
+    code()
     namespace ProcessBgTask {
         au()
         iu()

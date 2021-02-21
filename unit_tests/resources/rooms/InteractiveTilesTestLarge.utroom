@@ -50,4 +50,7 @@
   <entity-group name="Enemies">
     <entity entity="InteractiveTiles_Entity" x="184" y="1024" parameter=""/>
   </entity-group>
+  <script name="Startup">
+    <statement opcode="Spawn_Entity_Group" arg1="Enemies"/>
+  </script>
 </room>

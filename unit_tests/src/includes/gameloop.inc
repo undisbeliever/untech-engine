@@ -59,21 +59,6 @@ function Cleanup {
 }
 
 
-// Spawn all entities in the room
-//
-// REQUIRES: 16 bit A, 16 bit Index, DB = 0x7e, Init called
-a16()
-i16()
-code()
-function SpawnAllEntitiesInRoom {
-    lda.w   #0xff
-    tsb.w   Room.EntityGroups.toActivateBitfield
-
-    jsr     Room.EntityGroups.SpawnEntityGroups
-
-    rts
-}
-
 
 // Process the Game Loop until a joypad button has been pressed
 //

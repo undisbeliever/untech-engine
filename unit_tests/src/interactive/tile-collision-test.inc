@@ -243,8 +243,6 @@ function Test {
     ldy.w   #2              // Test loading a non-zero entranceId
     jsr     GameLoop.Init_LoadRoom
 
-    jsr     GameLoop.SpawnAllEntitiesInRoom
-
 
     lda.w   #GRAVITY
     sta.w   Room.gravity_sx

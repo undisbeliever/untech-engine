@@ -118,4 +118,5 @@
     AAAAAAAAAAAAAAAAAAAAAA==
   </map>
   <entrance name="Start" x="680" y="512" orientation="down-right"/>
+  <script name="Startup"/>
 </room>
