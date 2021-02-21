@@ -47,8 +47,8 @@ namespace InteractiveTilesTest_Player {
         sep     #$20
     a8()
         lda.w   GameState.roomId
-        cmp.b   #Project.RoomList.InteractiveTilesTestSmall
-        bne     +
+        cmp.b   #Project.RoomList.InteractiveTilesTestLarge
+        beq     +
             lda.b   #X_MOMENTUM_PX
             sta.b   BaseEntity.xMomentum.px
         +

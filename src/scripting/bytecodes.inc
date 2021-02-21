@@ -21,6 +21,11 @@ namespace Bytecode {
 constant N_FLAG_INSTRUCTIONS = GameState.flagData.size / (256 / 8)
 
 
+
+CreateBgTaskInstruction(Spawn_Entity_Group, Room.EntityGroups.Spawn_Entity_Group__BgTask, EntityGroup)
+
+
+
 // A simple macro to generate flag instruction opcode routines.
 //
 // Flag instructions have multiple opcodes, one for each block of 256 flags.

@@ -254,6 +254,163 @@ a8()
 }
 
 
+// Spawn_Entity_Group scripting background task
+namespace Spawn_Entity_Group__BgTask {
+    // Number of entities to spawn
+    // (byte counter)
+    constant _counter                   = Scripting.BackgroundTasks.state + 0
+
+    // The Instance Id of the next entity to spawn
+    // (byte)
+    constant _currentEntityInstanceId   = Scripting.BackgroundTasks.state + 1
+
+    // word address into Room.Format.EntityGroup.Entities
+    // (only set if _counter > 0)
+    constant _entityPos                 = Scripting.BackgroundTasks.state + 2
+
+    assert(Scripting.BackgroundTasks.state.size > 4)
+
+
+
+    // BG Task setup routine
+    //
+    // REQUIRES: 8 bit A, 16 bit Index, DP = 0, DB = 0x7e, Ah = 0
+    // INPUT: Y - script program counter before argument
+    // OUTPUT: Y - script program counter after argument
+    function SetupBgTask___EntityGroup {
+        constant _loopCounter = utDpTmp0
+
+        // First argument: entity group
+        lda.w   Scripting.scriptData,y
+        iny
+        sty.b   Scripting.programCounter
+
+        // If _counter is zero then no entities will be spawned
+        stz.w   _counter
+
+
+        cmp.b   #Room.MAX_ENTITY_GROUPS
+        bcs     Return
+
+        sta.b   _loopCounter
+
+
+        // Do not spawn entity group if it has already been spawned
+        // Also mark entity group as spawned
+        tax
+        lda.l   Scripting.Bytecode.SetFlagBits,x
+        tsb.w   Room.EntityGroups.spawnedGroupsBitfield
+        bne     Return
+
+
+        // The first entity MUST NOT have an instanceId of 0
+        lda.b   #Entity.INSTANCE_ID_INCREMENT
+        sta.w   _currentEntityInstanceId
+
+        ldx.w   #0
+
+        // Increment _currentEntityInstanceId
+        // ::TODO optimize later::
+        Loop:
+            dec.b   _loopCounter
+            bmi     FoundGroup
+
+            ldy.w   Room.EntityGroups.groupAddrs,x
+            beq     EmptyGroup
+
+                // Group exists, advance _currentEntityInstanceId
+                assert(Entity.INSTANCE_ID_INCREMENT == 2)
+                lda.w   Room.Format.EntityGroup.nEntities,y
+                asl
+                clc
+                adc.w   _currentEntityInstanceId
+                sta.w   _currentEntityInstanceId
+
+        EmptyGroup:
+            inx
+            inx
+            cpx.w   #Room.EntityGroups.N_ENTITY_GROUPS * 2
+            bcc     Loop
+
+
+    FoundGroup:
+        // X = index into groupAddrs for the selected entity group
+        ldy.w   Room.EntityGroups.groupAddrs,x
+        sty.w   _entityPos
+
+        lda.w   Room.Format.EntityGroup.nEntities,y
+        sta.w   _counter
+
+    Return:
+        ldy.b   Scripting.programCounter
+        rts
+    }
+
+
+    namespace ProcessBgTask {
+        au()
+        iu()
+        EntityPoolEmpty:
+            rep     #$30
+            sep     #$20
+        a16()
+        i16()
+            Warnings.Warn(ENTITY_POOL_EMPTY)
+
+        NoEntitiesToSpawn:
+            // End task
+            sec
+            rts
+    }
+
+
+    // BG Task process routine
+    //
+    // REQUIRES: 8 bit A, 16 bit Index, DP = 0, DB = 0x7e
+    // OUTPUT: carry set if the task has completed
+    a8()
+    i16()
+    code()
+    function ProcessBgTask {
+        lda.w   _counter
+        beq     NoEntitiesToSpawn
+
+
+        rep     #$30
+    a16()
+
+        ldy.w   _entityPos
+        Entity._SpawnRoomEntity()
+        // NOTE: Entity._SpawnRoomEntity() will increment _currentEntityInstanceId
+
+        // DP = entity spawned
+        // ::TODO move into _SpawnRoomEntity::
+        lda.w   #0
+        tcd
+
+
+        lda.w   _entityPos
+        clc
+        adc.w   #Room.Format.EntityGroup.Entities.size
+        sta.w   _entityPos
+
+        sep     #$30
+    a8()
+
+        dec.w   _counter
+        beq     TaskComplete
+
+        clc
+        rts
+
+
+    TaskComplete:
+        sec
+        rts
+    }
+}
+
+
 }
 }
 

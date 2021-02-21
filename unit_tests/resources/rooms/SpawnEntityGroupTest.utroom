@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF_8"?>
+<!DOCTYPE untech>
+<room name="SpawnEntityGroupTest" scene="TileCollisionTest">
+  <map width="16" height="14">
+    EREREREREREREREREREREREAAAAAAAAAAAAAAAAAABERAAAAAAAAAAAAAAAAAAAR
+    EQAAAAAAAAAAAAAAAAAAEREAAAARERERERERERERERERAAAAAAAAAAAAAAAAAAAR
+    EQAAAAAAAAAAAAAAAAAAEREREREREREREREREQAAABERAAAAAAAAAAAAAAAAAAAR
+    EQAAAAAAAAAAAAAAAAAAEREAAAARERERERERERERERERAAAAAAAAAAAAAAAAAAAR
+    EQAAAAAAAAAAAAAAAAAAERERERERERERERERERERERE=
+  </map>
+  <entrance name="Start" x="128" y="100" orientation="down-right"/>
+  <entity-group name="First_Group">
+    <entity entity="InteractiveTiles_Entity" x="80" y="28" parameter=""/>
+    <entity entity="InteractiveTiles_Entity" x="127" y="28" parameter=""/>
+    <entity entity="InteractiveTiles_Entity" x="176" y="28" parameter=""/>
+    <entity entity="InteractiveTiles_Entity" x="224" y="28" parameter=""/>
+  </entity-group>
+  <entity-group name="Startup_Group_1">
+    <entity entity="InteractiveTiles_Entity" x="80" y="144" parameter=""/>
+    <entity entity="InteractiveTiles_Entity" x="128" y="144" parameter=""/>
+  </entity-group>
+  <entity-group name="Second_Group">
+    <entity entity="InteractiveTiles_Entity" x="80" y="28" parameter=""/>
+    <entity entity="InteractiveTiles_Entity" x="127" y="28" parameter=""/>
+    <entity entity="InteractiveTiles_Entity" x="176" y="28" parameter=""/>
+    <entity entity="InteractiveTiles_Entity" x="224" y="28" parameter=""/>
+  </entity-group>
+  <entity-group name="Startup_Group_2">
+    <entity entity="InteractiveTiles_Entity" x="176" y="144" parameter=""/>
+    <entity entity="InteractiveTiles_Entity" x="224" y="144" parameter=""/>
+  </entity-group>
+  <entity-group name="Third_Group">
+    <entity entity="InteractiveTiles_Entity" x="80" y="28" parameter=""/>
+    <entity entity="InteractiveTiles_Entity" x="127" y="28" parameter=""/>
+    <entity entity="InteractiveTiles_Entity" x="176" y="28" parameter=""/>
+    <entity entity="InteractiveTiles_Entity" x="224" y="28" parameter=""/>
+  </entity-group>
+  <entity-group name="Forth_Group">
+    <entity entity="InteractiveTiles_Entity" x="80" y="28" parameter=""/>
+    <entity entity="InteractiveTiles_Entity" x="127" y="28" parameter=""/>
+    <entity entity="InteractiveTiles_Entity" x="176" y="28" parameter=""/>
+    <entity entity="InteractiveTiles_Entity" x="224" y="28" parameter=""/>
+  </entity-group>
+  <script name="Startup">
+    <statement opcode="Spawn_Entity_Group" arg1="Startup_Group_1"/>
+    <statement opcode="Spawn_Entity_Group" arg1="Startup_Group_2"/>
+    <statement opcode="Start_Script" arg1="Spawn_Groups_After_Delay"/>
+  </script>
+  <script name="Spawn_Groups_After_Delay">
+    <statement opcode="Sleep_AnimationTicks" arg1="300"/>
+    <statement opcode="Spawn_Entity_Group" arg1="First_Group"/>
+    <statement opcode="Sleep_AnimationTicks" arg1="300"/>
+    <statement opcode="Spawn_Entity_Group" arg1="Second_Group"/>
+    <statement opcode="Sleep_AnimationTicks" arg1="300"/>
+    <statement opcode="Spawn_Entity_Group" arg1="Third_Group"/>
+    <statement opcode="Sleep_AnimationTicks" arg1="300"/>
+    <comment c="Test trying to spawn an already spawned group does nothing"/>
+    <statement opcode="Spawn_Entity_Group" arg1="First_Group"/>
+    <statement opcode="Spawn_Entity_Group" arg1="Second_Group"/>
+    <statement opcode="Spawn_Entity_Group" arg1="Third_Group"/>
+    <comment c="Continue spawning entity groups"/>
+    <statement opcode="Spawn_Entity_Group" arg1="Forth_Group"/>
+    <statement opcode="Sleep_AnimationTicks" arg1="300"/>
+    <comment c="Test to ensure these instructions do nothing and don't lag the game"/>
+    <statement opcode="Spawn_Entity_Group" arg1="First_Group"/>
+    <statement opcode="Spawn_Entity_Group" arg1="Second_Group"/>
+    <statement opcode="Spawn_Entity_Group" arg1="Third_Group"/>
+    <statement opcode="Spawn_Entity_Group" arg1="Forth_Group"/>
+    <statement opcode="Sleep_AnimationTicks" arg1="300"/>
+    <comment c="The interactive test passes when this script ends"/>
+  </script>
+</room>
