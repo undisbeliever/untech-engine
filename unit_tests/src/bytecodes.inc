@@ -342,7 +342,7 @@ Wrong:
 // ============================
 
 
-CreateBgTaskInstruction(TestBgTask, ImmU16)
+CreateBgTaskInstruction(TestBgTask, TestBgTask, ImmU16)
 namespace TestBgTask {
 
 assert(BackgroundTasks.state.size >= 4)

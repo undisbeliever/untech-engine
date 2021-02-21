@@ -37,7 +37,8 @@ variable __BG_TASKS_COMPLETE__ = 0
 // This macro MUST BE called in the `Scripting.Bytecodes` namespace.
 //
 // PARAM: name - name of the Background Task instruction
-inline CreateBgTaskInstruction(name) {
+// PARAM: ns - the namespace of the background task code
+inline CreateBgTaskInstruction(name, ns) {
     if __BG_TASKS_COMPLETE__ == 1 {
         error "Cannot add a background task after `BackgroundTaskFunctions()` call"
     }
@@ -54,8 +55,8 @@ inline CreateBgTaskInstruction(name) {
     evaluate _n = __BG_TASKS_COUNTER__
     __BG_TASKS_COUNTER__ = __BG_TASKS_COUNTER__ + 1
 
-    constant _BgTasksSetupFunctionTable.__{_n} = {name}.SetupBgTask
-    constant _BgTasksFunctionTable.TaskFunctionTable.__{_n} = {name}.ProcessBgTask
+    constant _BgTasksSetupFunctionTable.__{_n} = {ns}.SetupBgTask
+    constant _BgTasksFunctionTable.TaskFunctionTable.__{_n} = {ns}.ProcessBgTask
 }
 
 
@@ -64,8 +65,9 @@ inline CreateBgTaskInstruction(name) {
 // This macro MUST BE called in the `Scripting.Bytecodes` namespace.
 //
 // PARAM: name - name of the Background Task instruction
+// PARAM: ns - the namespace of the background task code
 // PARAM: arguments - a "_" separated list of argument types used by the instruction
-inline CreateBgTaskInstruction(name, arguments) {
+inline CreateBgTaskInstruction(name, ns, arguments) {
     if __BG_TASKS_COMPLETE__ == 1 {
         error "Cannot add a background task after `BackgroundTaskFunctions()` call"
     }
@@ -81,8 +83,8 @@ inline CreateBgTaskInstruction(name, arguments) {
     evaluate _n = __BG_TASKS_COUNTER__
     __BG_TASKS_COUNTER__ = __BG_TASKS_COUNTER__ + 1
 
-    constant _BgTasksSetupFunctionTable.__{_n} = {name}.SetupBgTask___{arguments}
-    constant _BgTasksFunctionTable.__{_n} = {name}.ProcessBgTask
+    constant _BgTasksSetupFunctionTable.__{_n} = {ns}.SetupBgTask___{arguments}
+    constant _BgTasksFunctionTable.__{_n} = {ns}.ProcessBgTask
 }
 
 
