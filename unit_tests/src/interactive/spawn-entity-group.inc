@@ -109,6 +109,43 @@ a16()
     bne     Fail
 
 
+    // Test an invalid entity groups will set `_entityAddr` to 0.
+    sep     #$20
+a8()
+    ldx.w   #0xffff
+    stx.w   Room.EntityGroups.Spawn_Entity_Group__BgTask._entityAddr
+
+    // Test spawning an empty entity group
+    lda.b   #Room.N_ENTITY_GROUPS - 1
+    ldy.w   #0x100
+    sta.w   Scripting.scriptData,y
+    jsr     Room.EntityGroups.Spawn_Entity_Group__BgTask.SetupBgTask___EntityGroup
+
+    ldx.w   Room.EntityGroups.Spawn_Entity_Group__BgTask._entityAddr
+    bne     Fail
+
+
+    // Test out of bounds entity group id
+    ldx.w   #0xffff
+    stx.w   Room.EntityGroups.Spawn_Entity_Group__BgTask._entityAddr
+
+    constant OOB_GROUP_ID = 28
+    lda.b   #OOB_GROUP_ID
+    ldy.w   #0x100
+    sta.w   Scripting.scriptData,y
+
+    // Ensure entityGroup value for this out of bounds read is non-zero
+    sta.w   Room.Format.Header.entityGroups + OOB_GROUP_ID
+
+    jsr     Room.EntityGroups.Spawn_Entity_Group__BgTask.SetupBgTask___EntityGroup
+
+    ldx.w   Room.EntityGroups.Spawn_Entity_Group__BgTask._entityAddr
+    bne     Fail
+
+
+    rep     #$30
+a16()
+
     // Test passes
     Resources.AnimatedTileset.DisableAnimation()
     Resources.Palette.DisableAnimation()

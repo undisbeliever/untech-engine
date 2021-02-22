@@ -22,13 +22,12 @@ constant N_ROOM_SCRIPTS = 16
 
 
 // The maximum number of entity groups in a room
-constant MAX_ENTITY_GROUPS = 8
-assert(EntityGroups.N_ENTITY_GROUPS == MAX_ENTITY_GROUPS)
+constant N_ENTITY_GROUPS = 8
 
 
 
 namespace Format {
-    if Room.ROOM_FORMAT_VERSION != 4 {
+    if Room.ROOM_FORMAT_VERSION != 5 {
         error "Invalid untech-compiler Room Format"
     }
 
@@ -74,10 +73,24 @@ namespace Format {
             //
             // (N_ROOM_SCRIPTS word indexes)
             field(scripts, 2 * N_ROOM_SCRIPTS)
+
+            // The end-index within the `RoomEntity` struct for each entity group.
+            //
+            // Each value in this array is the one-past-the-end index within
+            // the `RoomEntity` struct for each entity group.
+            //
+            // If the entity group is empty then the value is 0.
+            //
+            // The last non-zero value in this array is used to determine the
+            // number of room-entities in the room.
+            //
+            // (byte array)
+            field(entityGroups, N_ENTITY_GROUPS)
         endstruct()
     }
 
     // Immediately following the header is the map data.
+
 
     // The map data
     //
@@ -126,52 +139,43 @@ namespace Format {
     }
 
 
-    // Entity Group data
+    // Room entity data.
     //
-    // Each Entity Group contains a list of entities.  When an entity group is
-    // activated, all entities within the group will be spawned.
-    namespace EntityGroup {
-        // Byte used to identify the start of an entity group block
+    // The entity-group that each room entity belongs to is determined
+    // by the `Header.entityGroups` array in the room header.
+    //
+    // The number of entities in this data block is equal to the last
+    // non-zero value in the `Header.entityGroups` array.
+    namespace RoomEntity {
+        // Byte used to identify the start of the room-entities block
         constant IDENTIFIER = 0x45 // "E"
 
         struct()
-            // Number of entities in the group
-            //
-            // If zero then there is no more entity groups in the room
-            //
+            // Entity Data Id
             // (byte)
-            field(nEntities, 1)
+            field(entityDataId, 1)
 
-            constant HEADER_SIZE = __STRUCT__.size
+            // The position of the entity
+            //
+            // xxxxxxxx xxxxyyyy yyyyyyyy
+            //
+            //      xxxxxxxxxxxx = Entity X position (offset by POSITION_X_OFFSET)
+            //      yyyyyyyyyyyy = Entity Y position (offset by POSITION_Y_OFFSET)
+            //
+            // (2x 12 bit position)
+            field(position, 3)
 
-            namespace Entities {
-                // Entity Data Id
-                // (byte)
-                field(entityDataId, 1)
+            constant POSITION_MASK  = 0x0fff
+            constant POSITION_SHIFT = 12
 
-                // The position of the entity
-                //
-                // xxxxxxxx xxxxyyyy yyyyyyyy
-                //
-                //      xxxxxxxxxxxx = Entity X position (offset by POSITION_X_OFFSET)
-                //      yyyyyyyyyyyy = Entity Y position (offset by POSITION_Y_OFFSET)
-                //
-                // (2x 12 bit position)
-                field(position, 3)
+            constant POSITION_X_OFFSET = MetaTiles.map.LEFT
+            constant POSITION_Y_OFFSET = MetaTiles.map.TOP  - 256
 
-                constant POSITION_MASK  = 0x0fff
-                constant POSITION_SHIFT = 12
+            // Entity spawn parameter
+            // (byte)
+            field(parameter, 1)
 
-                constant POSITION_X_OFFSET = MetaTiles.map.LEFT
-                constant POSITION_Y_OFFSET = MetaTiles.map.TOP  - 256
-
-                // Entity spawn parameter
-                // (byte)
-                field(parameter, 1)
-            }
         endstruct()
-
-        constant Entities.size = EntityGroup.size - HEADER_SIZE
     }
 
 

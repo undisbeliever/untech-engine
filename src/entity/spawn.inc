@@ -102,6 +102,7 @@ allocateTmpWord(yPos)
         // Remove Entity from free list
 
         tcd
+    // DP = entity
         lda.b   BaseEntity.next
         sta.w   specialLists.free
         bne     +
@@ -239,7 +240,7 @@ macro _SpawnPlayer() {
     assert16a()
     assert16i()
 
-    // Y = Room.Format.EntityGroup.Entities address
+    // Y = Room.Format.RoomEntity address
 
     sep     #$20
 a8()
@@ -328,7 +329,7 @@ a16()
 
 // Spawn a new room entity from an room entity group
 //
-// MUST ONLY BE INVOKED BY `Room.EntityGroups.SpawnEntityGroups`
+// MUST ONLY BE INVOKED BY `Room.EntityGroups.Spawn_Entity_Group__BgTask.ProcessBgTask`
 //
 // The newly created entity will be given an instanceId of `_currentEntityInstanceId` (if it is free).
 //
@@ -340,25 +341,19 @@ a16()
 //   * `deactivated` special list if the Entity Init function returns
 //      carry clear and the entity is outside the active window.
 //
-// REQUIRES: 16 bit A, 16 bit Index, DB = $7E, DP unknown
+// REQUIRES: 16 bit A, 16 bit Index, DB = $7E, DP = 0
 //
-// INPUT: Y = Room.Format.EntityGroup.Entities address
-//
-// INPUT: _currentEntityInstanceId - instanceId of the new entity (byte)
-//                                   Will be incremented when the entity is spawned
-//
-// OUTPUT: dp = entity
-//         _currentEntityInstanceId incremented to next value
+// INPUT: Y = Room.Format.RoomEntity address
+// INPUT: _currentEntityInstanceId = instanceId of the new entity (byte)
 //
 // BRANCH: EntityPoolEmpty if no more entities can be spawned
-// MODIFIES: dp
 macro _SpawnRoomEntity() {
     assert16a()
     assert16i()
 
-    // Y = Room.Format.EntityGroup.Entities address
+    // Y = Room.Format.RoomEntity address
 
-    lda.w   Room.Format.EntityGroup.Entities.entityDataId,y
+    lda.w   Room.Format.RoomEntity.entityDataId,y
     and.w   #0xff
     cmp.w   #Entity.Data.EntityRomDataListCount
     bcc     +
@@ -375,6 +370,7 @@ macro _SpawnRoomEntity() {
     // Remove Entity from free list
 
     tcd
+// DP = entity
     lda.b   BaseEntity.next
     sta.w   Entity.specialLists.free
     bne     +
@@ -398,31 +394,31 @@ macro _SpawnRoomEntity() {
     // Set BaseEntity position
 
     // Confirm position is 3 bytes in size
-    assert(Room.Format.EntityGroup.Entities.position + 3 == Room.Format.EntityGroup.Entities.parameter)
+    assert(Room.Format.RoomEntity.position + 3 == Room.Format.RoomEntity.parameter)
 
-    lda.w   Room.Format.EntityGroup.Entities.position,y
-    and.w   #Room.Format.EntityGroup.Entities.POSITION_MASK
+    lda.w   Room.Format.RoomEntity.position,y
+    and.w   #Room.Format.RoomEntity.POSITION_MASK
     clc
-    adc.w   #Room.Format.EntityGroup.Entities.POSITION_X_OFFSET
+    adc.w   #Room.Format.RoomEntity.POSITION_X_OFFSET
     sta.b   BaseEntity.xPos.px
     stz.b   BaseEntity.xPos.sx
 
-    assert(Room.Format.EntityGroup.Entities.POSITION_SHIFT == 8 + 4)
-    lda.w   Room.Format.EntityGroup.Entities.position + 1,y
+    assert(Room.Format.RoomEntity.POSITION_SHIFT == 8 + 4)
+    lda.w   Room.Format.RoomEntity.position + 1,y
     lsr
     lsr
     lsr
     lsr
-    and.w   #Room.Format.EntityGroup.Entities.POSITION_MASK
+    and.w   #Room.Format.RoomEntity.POSITION_MASK
     clc
-    adc.w   #Room.Format.EntityGroup.Entities.POSITION_Y_OFFSET
+    adc.w   #Room.Format.RoomEntity.POSITION_Y_OFFSET
     sta.b   BaseEntity.yPos.px
     stz.b   BaseEntity.yPos.sx
 
 
     // Confirm parameter is byte
-    assert(Room.Format.EntityGroup.size - Room.Format.EntityGroup.Entities.parameter == 1)
-    lda.w   Room.Format.EntityGroup.Entities.parameter,y
+    assert(Room.Format.RoomEntity.size - Room.Format.RoomEntity.parameter == 1)
+    lda.w   Room.Format.RoomEntity.parameter,y
     and.w   #0xff
     // Store parameter for later
     pha
@@ -460,10 +456,6 @@ macro _SpawnRoomEntity() {
     sep     #$10
 i8()
     ldx.w   _currentEntityInstanceId
-    txy
-    iny
-    iny
-    sty.w   _currentEntityInstanceId
 
     // X = new entity instanceId
     Entity._InstanceIdTable._SetInstanceId()
@@ -513,6 +505,11 @@ i16()
             sta.w   Entity.specialLists.deactivated
 
         EndIf:
+
+    // Restore DP back to 0
+    lda.w   #0
+    tcd
+// DP = 0
 }
 
 

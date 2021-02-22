@@ -30,21 +30,16 @@ namespace Entrances {
 
 
 namespace EntityGroups {
-    constant N_ENTITY_GROUPS = 8
-
-
     // Bitfield of entity groups that have been spawned
     //
     // (byte bitfield)
     allocate(spawnedGroupsBitfield, wram7e, 1)
 
 
-    // Word address of each entity group
+    // Word address of the room entity list
     //
-    // If the value is zero then there is no entity group
-    //
-    // (word pointer array)
-    allocate(groupAddrs, wram7e, 2 * N_ENTITY_GROUPS)
+    // (word addr)
+    allocate(roomEntitiesAddr, wram7e, 2)
 }
 
 }

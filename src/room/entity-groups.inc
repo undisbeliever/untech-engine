@@ -19,13 +19,13 @@ macro _Init() {
     assert16a()
     assert16i()
 
-    assert(EntityGroups.spawnedGroupsBitfield + 1 == EntityGroups.groupAddrs)
+    assert(EntityGroups.spawnedGroupsBitfield + 1 == EntityGroups.roomEntitiesAddr)
     stz.w   EntityGroups.spawnedGroupsBitfield
 }
 
 
 
-// Load and verify the EntityGroup data
+// Load and verify the Entity Group data
 //
 // REQUITES: 16 bit A, 16 bit Index, DB = 0x7e, DP = 0
 //
@@ -35,113 +35,113 @@ macro _Load() {
     assert16a()
     assert16i()
 
-    // Confirm this is an Entity Group data block
+    sep     #$20
+a8()
+
+    // Confirm this is an Room Entity data block
     lda.w   0,x
-    and.w   #0xff
-    cmp.w   #Format.EntityGroup.IDENTIFIER
+    cmp.b   #Format.RoomEntity.IDENTIFIER
     beq     +
     MissingEntityGroupIdentifier:
         break(INVALID_ROOM_DATA)
     +
     inx
 
+    stx.w   EntityGroups.roomEntitiesAddr
 
-    stz.b   _count
 
-    // Y holds nGroups
-    ldy.w   #0
+    sep     #$30
+a8()
+i8()
+
+    // Check entityGroups array is valid and find the last entity group
+
+    // X holds index into entityGroups
+    // Y = previous entityGroups value
+    ldy.b   #0
+    ldx.b   #0
 
     Loop:
-        // Read nEntities
-        // MUST NOT SET CARRY
-        assert(Format.EntityGroup.nEntities == 0)
-        lda.w   Format.EntityGroup.nEntities,x
-        and.w   #0xff
-        beq     EndLoop
+        lda.w   Format.Header.entityGroups,x
+        beq     EmptyEntityGroup
 
-
-        // Advance entity count
-        // carry clear
-        adc.b   _count
-        sta.b   _count
-
-
-        // Store entity Group address
-        txa
-        sta.w   EntityGroups.groupAddrs,y
-        iny
-        iny
-        cpy.w   #MAX_ENTITY_GROUPS * 2 - 1
+        // ::SHOULDO add MAX_N_ROOM_ENTITIES constant::
+        cmp.b   #Entity.N_ENTITIES
         bcc     +
-        TooManyEntityGroups:
+        InvalidEntityGroup:
             break(INVALID_ROOM_DATA)
         +
 
+        tay
 
-        // Advance pointer
-        // X += nEntities * Format.EntityGroup.Entities.size + Format.EntityGroup.HEADER_SIZE
-        stx.b   _tmpX
-
-        assert(Format.EntityGroup.HEADER_SIZE == 1)
-        assert((1 << 2) + 1 == Format.EntityGroup.Entities.size)
-        lda.w   Format.EntityGroup.nEntities,x
-        and.w   #0xff
-        sta.b   _tmp
-        asl
-        asl
-        // carry clear
-        adc.b   _tmp
-        sec         // + 1
-        adc.b   _tmpX
-        tax
+        inx
+        cpx.b   #N_ENTITY_GROUPS
+        bcc     Loop
 
 
-        bra     Loop
-    EndLoop:
-
-    assert(Format.EntityGroup.HEADER_SIZE)
-    inx
+    // All entity groups exist, do not check for empty groups
+    bra     SkipEmptyCheck
 
 
-    // Set address of unused groups to 0
-    lda.w   #0
-    FillLoop:
-        cpy.w   #MAX_ENTITY_GROUPS * 2
-        bcs     EndFillLoop
+    EmptyEntityGroup:
+        // There is at least one empty entity group
+        // Confirm the rest of the entity groups are empty
+        CheckEmptyLoop:
+            lda.w   Format.Header.entityGroups,x
+            beq     +
+            ExpectedEmptyEntityGroup:
+                break(INVALID_ROOM_DATA)
+            +
 
-        sta.w   EntityGroups.groupAddrs,y
-        iny
-        iny
-        bra     FillLoop
-    EndFillLoop:
+            inx
+            cpx.b   #N_ENTITY_GROUPS
+            bcc     CheckEmptyLoop
 
 
-    // Set minimum entity InstanceId for non room spawned entities
-    assert(Entity.N_ENTITIES > 0)
-    lda.b   _count
-    cmp.w   #Entity.N_ENTITIES + 1
-    bcc     +
-    InvalidEntityCount:
-        break(INVALID_ROOM_DATA)
-    +
+SkipEmptyCheck:
+    // Y = number of entities in the entity list
+
+    rep     #$30
+a16()
+i16()
+    tya
+    // Ah = 0
+    sta.b   _tmp
+
     Entity._InstanceIdTable._SetNumberOfRoomEntities()
+
+
+    // Calculate the end address of the room entities list
+    // X = numberRoomEntities + sizeof(Entities) + roomEntitiesAddr
+    assert(Room.Format.RoomEntity.size == 5)
+    lda.b   _tmp
+    asl             // * 2
+    asl             // * 4
+    clc
+    adc.b   _tmp    // + 1
+    clc
+    adc.w   Room.EntityGroups.roomEntitiesAddr
+    tax
 }
 
 
 
 // Spawn_Entity_Group scripting background task
 namespace Spawn_Entity_Group__BgTask {
-    // Number of entities to spawn
-    // (byte counter)
-    constant _counter                   = Scripting.BackgroundTasks.state + 0
+    // Word address into the Room.Format.RoomEntity struct
+    // (Set to 0 if entity group already spawned or entity group invalid)
+    // (word addr)
+    constant _entityAddr                 = Scripting.BackgroundTasks.state + 0
 
-    // The Instance Id of the next entity to spawn
+    // Entity instance Id of the next entity to spawn.
+    // MUST NOT BE 0, the first instanceId is `Entity.FIRST_INSTANCE_ID`.
     // (byte)
-    constant _currentEntityInstanceId   = Scripting.BackgroundTasks.state + 1
+    constant _currentEntityInstanceId   = Scripting.BackgroundTasks.state + 2
 
-    // word address into Room.Format.EntityGroup.Entities
-    // (only set if _counter > 0)
-    constant _entityPos                 = Scripting.BackgroundTasks.state + 2
+    // The one-past-the-end entity instance id for the entity group.
+    // Used to determine when to stop spawning entities.
+    // (byte)
+    constant _entityInstanceIdEnd       = Scripting.BackgroundTasks.state + 3
 
     assert(Scripting.BackgroundTasks.state.size > 4)
 
@@ -156,84 +156,99 @@ namespace Spawn_Entity_Group__BgTask {
     i16()
     code()
     function SetupBgTask___EntityGroup {
-        constant _loopCounter = utDpTmp0
+    constant _tmp = utDpTmp0
 
         // First argument: entity group
         lda.w   Scripting.scriptData,y
         iny
         sty.b   Scripting.programCounter
 
-        // If _counter is zero then no entities will be spawned
-        stz.w   _counter
-
-
-        cmp.b   #Room.MAX_ENTITY_GROUPS
-        bcs     Return
-
-        sta.b   _loopCounter
+        cmp.b   #Room.N_ENTITY_GROUPS
+        bcs     DoNotSpawn
 
 
         // Do not spawn entity group if it has already been spawned
         // Also mark entity group as spawned
+        assert(Room.N_ENTITY_GROUPS == 8)
+        assert(Room.EntityGroups.spawnedGroupsBitfield + 1 == Room.EntityGroups.roomEntitiesAddr)
+        // Ah = 0
         tax
         lda.l   Scripting.Bytecode.SetFlagBits,x
         tsb.w   Room.EntityGroups.spawnedGroupsBitfield
-        bne     Return
+        bne     DoNotSpawn
 
 
-        // The first entity MUST NOT have an instanceId of 0
-        lda.b   #Entity.INSTANCE_ID_INCREMENT
-        sta.w   _currentEntityInstanceId
+        // Check entityGroup exists
+        lda.w   Room.Format.Header.entityGroups,x
+        beq     DoNotSpawn
 
+            // _entityInstanceIdEnd = (end_index + 1) * INSTANCE_ID_INCREMENT
+            assert(Entity.INSTANCE_ID_INCREMENT == 2)
+            assert(Entity.FIRST_INSTANCE_ID == Entity.INSTANCE_ID_INCREMENT)
+            inc
+            asl
+            sta.w   _entityInstanceIdEnd
+
+
+            // Get the end-entity index of the previous entity group
+            // (set A to 0 if entity group == 0)
+            txa
+            beq     +
+                lda.w   Room.Format.Header.entityGroups - 1,x
+            +
+            sta.b   _tmp
+
+
+            // _currentEntityInstanceId = (start_index + 1) * INSTANCE_ID_INCREMENT
+            assert(Entity.INSTANCE_ID_INCREMENT == 2)
+            assert(Entity.FIRST_INSTANCE_ID == Entity.INSTANCE_ID_INCREMENT)
+            inc
+            asl
+            sta.w   _currentEntityInstanceId
+
+
+            // _entityAddr = start_index * sizeof(Entities) + roomEntitiesAddr
+            assert(Room.Format.RoomEntity.size == 5)
+            lda.b   _tmp
+            asl             // * 2
+            asl             // * 4
+            clc
+            adc.b   _tmp    // + 1
+
+            rep     #$31
+        a16()
+            // carry clear
+            adc.w   Room.EntityGroups.roomEntitiesAddr
+            sta.w   _entityAddr
+
+
+            sep     #$20
+        a8()
+
+            ldy.b   Scripting.programCounter
+
+            rts
+
+
+    a8()
+    DoNotSpawn:
         ldx.w   #0
+        stx.w   _entityAddr
 
-        // Increment _currentEntityInstanceId
-        // ::TODO optimize later::
-        Loop:
-            dec.b   _loopCounter
-            bmi     FoundGroup
-
-            ldy.w   Room.EntityGroups.groupAddrs,x
-            beq     EmptyGroup
-
-                // Group exists, advance _currentEntityInstanceId
-                assert(Entity.INSTANCE_ID_INCREMENT == 2)
-                lda.w   Room.Format.EntityGroup.nEntities,y
-                asl
-                clc
-                adc.w   _currentEntityInstanceId
-                sta.w   _currentEntityInstanceId
-
-        EmptyGroup:
-            inx
-            inx
-            cpx.w   #Room.EntityGroups.N_ENTITY_GROUPS * 2
-            bcc     Loop
-
-
-    FoundGroup:
-        // X = index into groupAddrs for the selected entity group
-        ldy.w   Room.EntityGroups.groupAddrs,x
-        sty.w   _entityPos
-
-        lda.w   Room.Format.EntityGroup.nEntities,y
-        sta.w   _counter
-
-    Return:
         ldy.b   Scripting.programCounter
+
         rts
     }
 
 
+
     code()
     namespace ProcessBgTask {
-        au()
-        iu()
-        EntityPoolEmpty:
-            rep     #$30
-            sep     #$20
         a16()
         i16()
+        EntityPoolEmpty:
+            sep     #$20
+        a8()
             Warnings.Warn(ENTITY_POOL_EMPTY)
 
         NoEntitiesToSpawn:
@@ -251,40 +266,30 @@ namespace Spawn_Entity_Group__BgTask {
     i16()
     code()
     function ProcessBgTask {
-        lda.w   _counter
+        ldy.w   _entityAddr
         beq     NoEntitiesToSpawn
-
 
         rep     #$30
     a16()
 
-        ldy.w   _entityPos
         Entity._SpawnRoomEntity()
-        // NOTE: Entity._SpawnRoomEntity() will increment _currentEntityInstanceId
 
-        // DP = entity spawned
-        // ::TODO move into _SpawnRoomEntity::
-        lda.w   #0
-        tcd
-
-
-        lda.w   _entityPos
+        lda.w   _entityAddr
         clc
-        adc.w   #Room.Format.EntityGroup.Entities.size
-        sta.w   _entityPos
+        adc.w   #Room.Format.RoomEntity.size
+        sta.w   _entityAddr
 
-        sep     #$30
+
+        sep     #$21
     a8()
-
-        dec.w   _counter
-        beq     TaskComplete
-
-        clc
-        rts
+        lda.w   _currentEntityInstanceId
+        // carry set
+        adc.b   #Entity.INSTANCE_ID_INCREMENT - 1
+        sta.w   _currentEntityInstanceId
 
 
-    TaskComplete:
-        sec
+        // BG Task is completed if _currentEntityInstanceId >= _entityInstanceIdEnd
+        cmp.w   _entityInstanceIdEnd
         rts
     }
 }
