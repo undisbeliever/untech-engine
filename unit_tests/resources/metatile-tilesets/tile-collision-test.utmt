@@ -28,6 +28,8 @@
   <tile t="69" collision="es" ft="CrumblingTiles_A"/>
   <tile t="70" collision="es" ft="CrumblingTiles_B"/>
   <tile t="71" collision="es"/>
+  <tile t="73" collision="solid" ft="PlayerScriptTrigger"/>
+  <tile t="74" ft="PlayerScriptTrigger"/>
   <tile-priorities>
     AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAADwkAAA+QAAAAAAAAAAAAAAAAAAAAAAAA
     AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA

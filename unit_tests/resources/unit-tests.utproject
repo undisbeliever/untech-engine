@@ -50,6 +50,7 @@
     <tile-function-table name="CrumblingTiles_B" tint="00ff95"/>
     <tile-function-table name="CrumblingTiles_A_PlayerOnly" tint="9b9bff"/>
     <tile-function-table name="CrumblingTiles_B_PlayerOnly" tint="9bff9b"/>
+    <tile-function-table name="PlayerScriptTrigger" tint="4a4aff"/>
   </interactive-tiles>
   <entity-rom-data>
     <listid name="Particles"/>
@@ -218,6 +219,7 @@
   <room-file src="rooms/ScriptBgTasksTest.utroom"/>
   <room-file src="rooms/ScriptStartScriptTest.utroom"/>
   <room-file src="rooms/SpawnEntityGroupTest.utroom"/>
+  <room-file src="rooms/ScriptTriggerTest.utroom"/>
   <scene-setting name="UnitTests" bg-mode="0" layer0-type="text" layer1-type="" layer2-type="" layer3-type=""/>
   <scene-setting name="Mode1_Bg2MT_NoImage" bg-mode="1bg3" layer0-type="" layer1-type="mt-tileset" layer2-type="text" layer3-type=""/>
   <scene-setting name="SettingSun" bg-mode="1bg3" layer0-type="mt-tileset" layer1-type="bg-image" layer2-type="text" layer3-type=""/>

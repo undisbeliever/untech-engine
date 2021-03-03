@@ -42,6 +42,53 @@ namespace EntityGroups {
     allocate(roomEntitiesAddr, wram7e, 2)
 }
 
+namespace ScriptTriggers {
+    constant N_SCRIPT_TRIGGERS = 16
+
+    // The index of the last item in the Script Triggers SoA.
+    //
+    // This value is negative if there are no triggers in the room
+    //
+    // (byte index)
+    allocate(lastTriggerIndex, wram7e, 1)
+
+
+    // The tile index (within `room.mapData`) of the script-trigger tile
+    // the player touched.
+    //
+    // If this value is negative then the player has not touched a room
+    // script-trigger tile.
+    //
+    // This value should not be set if it is positive.
+    //
+    // This value is reset to a negative value on every `Room.Process()` call.
+    //
+    // (word index into `room.mapData`)
+    allocate(playerTileIndex, wram7e, 2)
+
+
+    // Calculated values within the Script Triggers SoA
+    namespace Triggers {
+        // The top y-tile position of the script trigger.
+        //
+        // This array is calculated at room load.
+        //
+        // (byte SoA element)
+        allocate(top, wram7e, 2 * N_SCRIPT_TRIGGERS)
+
+        // The bottom y-tile position of the script trigger.
+        //
+        // Equal to script trigger `aabb.y + aabb.height`.
+        //
+        // This array is calculated at room load.
+        //
+        // (byte SoA element)
+        constant bottom = top + 1
+
+        assertOnePage(top, 2 * N_SCRIPT_TRIGGERS)
+    }
+}
+
 }
 
 // vim: ft=bass-65816 ts=4 sw=4 et:

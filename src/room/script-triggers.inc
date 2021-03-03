@@ -1,0 +1,217 @@
+// room/script-triggers.inc
+// ====================----
+//
+// Room Script Triggers.
+//
+// This file is part of the UnTech Game Engine.
+// Copyright (c) 2016 - 2020, Marcus Rowe <undisbeliever@gmail.com>.
+// Distributed under The MIT License: https://opensource.org/licenses/MIT
+
+
+namespace Room {
+namespace ScriptTriggers {
+
+
+assert(Room.ScriptTriggers.N_SCRIPT_TRIGGERS == Room.N_SCRIPT_TRIGGERS)
+
+
+// Load and verify the room script trigger header data.
+//
+// REQUITES: 16 bit A, 16 bit Index, DB = 0x7e, DP = 0
+macro _Load() {
+    assert16a()
+    assert16i()
+
+    sep     #$10
+i8()
+    // Mark playerTileIndex as unused
+    assert(MetaTiles.MAP_HEIGHT_LARGE * MetaTiles.MAP_MAX_WIDTH < 0x8000)
+    ldx.b   #0xff
+    stx.w   ScriptTriggers.playerTileIndex + 1
+
+
+    // Clear ScriptTriggers variables
+    ldx.b   #Format.Header.ScriptTriggers.LAST_INDEX
+    ClearLoop:
+        assert(ScriptTriggers.Triggers.top + 1 == ScriptTriggers.Triggers.bottom)
+        stz.w   ScriptTriggers.Triggers.top,x
+        dex
+        dex
+        bpl     ClearLoop
+
+
+    sep     #$30
+a8()
+i8()
+
+    // Find the last valid entry
+    ldx.b   #0
+    SizeLoop:
+        assert(MetaTiles.MAP_HEIGHT_LARGE * MetaTiles.MAP_MAX_WIDTH < 0x8000)
+        lda.w   Format.Header.ScriptTriggers.bottomRight + 1,x
+        bmi     EndSizeLoop
+
+        assert(Format.Header.ScriptTriggers.INDEX_INCREMENT == 2)
+        inx
+        inx
+
+        cpx.b   #Format.Header.ScriptTriggers.LAST_INDEX + 2
+        bcc     SizeLoop
+EndSizeLoop:
+
+    // X = index after the last script trigger
+    dex
+    dex
+    stx.w   ScriptTriggers.lastTriggerIndex
+
+    assert(Format.Header.ScriptTriggers.LAST_INDEX < 0x80)
+    bmi     SkipCalcLoop
+
+
+    // Calculate `Triggers.top` and `Triggers.bottom` values
+    CalcLoop:
+        lda.w   Format.Header.ScriptTriggers.topLeft,x
+        and.w   MetaTiles.map.dataIndexYmask
+        sta.w   ScriptTriggers.Triggers.top,x
+
+        lda.w   Format.Header.ScriptTriggers.bottomRight,x
+        dec
+        and.w   MetaTiles.map.dataIndexYmask
+        inc
+        sta.w   ScriptTriggers.Triggers.bottom,x
+
+        assert(Format.Header.ScriptTriggers.INDEX_INCREMENT == 2)
+        dex
+        dex
+        bpl     CalcLoop
+SkipCalcLoop:
+
+
+    rep     #$30
+a16()
+i16()
+}
+
+
+
+// Process the script triggers.
+//
+// REQUIRES: 16 bit A, 16 bit Index, DB = 0x7e, DP = 0
+macro _Process() {
+    assert16a()
+    assert16i()
+
+
+    sep     #$10
+i8()
+
+    // Only test script triggers if the player touched a script-trigger tile.
+    assert(MetaTiles.MAP_HEIGHT_LARGE * MetaTiles.MAP_MAX_WIDTH < 0x8000)
+    lda.w   Room.ScriptTriggers.playerTileIndex
+    bmi     NoScriptTriggers
+
+
+    ldx.w   Room.ScriptTriggers.lastTriggerIndex
+    bmi     NoScriptTriggers
+
+    Loop:
+        cmp.w   Room.Format.Header.ScriptTriggers.topLeft,x
+        bcc     NextTrigger
+
+        cmp.w   Room.Format.Header.ScriptTriggers.bottomRight,x
+        bcs     NextTrigger
+
+            sep     #$20
+        a8()
+            tay
+
+            and.w   MetaTiles.map.dataIndexYmask
+
+            cmp.w   Room.ScriptTriggers.Triggers.top,x
+            bcc     NextTrigger_a8
+
+            cmp.w   Room.ScriptTriggers.Triggers.bottom,x
+            bcs     NextTrigger_a8
+                // Trigger found
+                lda.w   Room.Format.Header.ScriptTriggers.script,x
+                jsr     Scripting.ActivateScript
+
+                jmp     EndLoop
+
+        a8()
+        NextTrigger_a8:
+            tya
+            // A = lastTriggerIndex
+
+            rep     #$20
+        a16()
+
+    NextTrigger:
+        dex
+        dex
+        bpl     Loop
+
+au()
+i8()
+EndLoop:
+    // Mark playerTileIndex as unused
+    assert(MetaTiles.MAP_HEIGHT_LARGE * MetaTiles.MAP_MAX_WIDTH < 0x8000)
+    ldx.b   #0xff
+    stx.w   ScriptTriggers.playerTileIndex + 1
+
+NoScriptTriggers:
+    rep     #$30
+a16()
+i16()
+}
+
+
+
+// Set playerTileIndex when the player has touched a script-trigger metaTile.
+//
+// This routine should be called by an InteractiveTiles function.
+//
+// REQUIRES: 16 bit A, 16 bit Index, DB = 0x7e
+// INPUT: dp = entity
+// INPUT: Y = map data index
+a16()
+i16()
+code()
+function _SetPlayerTileIndex {
+    // Only save playerTileIndex on the first trigger on every frame
+    assert(MetaTiles.MAP_HEIGHT_LARGE * MetaTiles.MAP_MAX_WIDTH < 0x8000)
+    ldx.w   Room.ScriptTriggers.playerTileIndex
+    bpl     +
+       sty.w    Room.ScriptTriggers.playerTileIndex
+    +
+
+    rts
+}
+
+}
+}
+
+
+// An interactive tile function that enables a script trigger when a player
+// enters it.
+//
+// NOTE: As the engine will only preform one trigger check per frame, this code
+//       assumes the interactive triggers are executed in this order:
+//  * PlayerOriginCollision
+//  * PlayerAirCollision
+namespace InteractiveTiles {
+namespace PlayerScriptTrigger {
+
+constant EntityCollision = InteractiveTiles.NoTileInteraction.NullFunction
+constant EntityAirCollision = InteractiveTiles.NoTileInteraction.NullFunction
+
+constant PlayerLeftRightCollision = InteractiveTiles.NoTileInteraction.NullFunction
+
+constant PlayerOriginCollision = Room.ScriptTriggers._SetPlayerTileIndex
+constant PlayerAirCollision = Room.ScriptTriggers._SetPlayerTileIndex
+
+}
+}
+
+// vim: ft=bass-65816 ts=4 sw=4 et:
+

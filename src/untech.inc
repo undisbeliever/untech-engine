@@ -117,6 +117,7 @@ include "room/maps.inc"
 include "room/entrances.inc"
 include "room/entity-groups.inc"
 include "room/room-scripts.inc"
+include "room/script-triggers.inc"
 include "room/_common.inc"
 
 include "vblank/controller.inc"

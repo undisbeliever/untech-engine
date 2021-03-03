@@ -20,14 +20,16 @@ constant RoomList.count = Project.RoomList.count
 // Maximum number of scripts per room.
 constant N_ROOM_SCRIPTS = 16
 
-
 // The maximum number of entity groups in a room
 constant N_ENTITY_GROUPS = 8
+
+// The maximum number of script triggers in a room
+constant N_SCRIPT_TRIGGERS = 16
 
 
 
 namespace Format {
-    if Room.ROOM_FORMAT_VERSION != 5 {
+    if Room.ROOM_FORMAT_VERSION != 6 {
         error "Invalid untech-compiler Room Format"
     }
 
@@ -86,6 +88,42 @@ namespace Format {
             //
             // (byte array)
             field(entityGroups, N_ENTITY_GROUPS)
+
+
+            // Room Script Triggers
+            //
+            // Structure of Arrays
+            namespace ScriptTriggers {
+                constant ARRAY_SIZE = 2 * N_SCRIPT_TRIGGERS
+
+                constant LAST_INDEX = (N_SCRIPT_TRIGGERS - 1) * 2
+                constant INDEX_INCREMENT = 2
+
+                // Top-Left `mapData` tile index for the script trigger
+                // (word index)
+                field(topLeft, ARRAY_SIZE)
+
+                // The byte after the tile index of the bottom-most right-most tile in the script trigger.
+                //
+                // If the script trigger exists, this value is equal to
+                // `tilePos(x + width - 1, y + height - 1) + 1`.
+                //
+                // If this value is negative then the scriptTrigger does not exist.
+                //
+                // (word index)
+                field(bottomRight, ARRAY_SIZE)
+
+                // The script to activate when the trigger is triggered
+                // ::TODO put some data in the second byte::
+                // (byte with 1 byte padding)
+                field(script, ARRAY_SIZE)
+
+                // ::TODO add a single flag::
+
+                assertOnePage(topLeft,     ARRAY_SIZE)
+                assertOnePage(bottomRight, ARRAY_SIZE)
+                assertOnePage(script,      ARRAY_SIZE)
+            }
         endstruct()
     }
 

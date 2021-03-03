@@ -130,6 +130,10 @@ i16()
     +
 
 
+    // Script Triggers does not need to hold X
+    ScriptTriggers._Load()
+
+
     jsr     Camera.Init
 
 
@@ -147,6 +151,23 @@ i16()
     jmp     Resources.LoadScene
 }
 
+
+// Process Room subsystem.
+//
+// This function will:
+//   * Check and activate script triggers
+//
+// This function should be called at the end of the game loop.
+//
+// REQUITES: 16 bit A, 16 bit Index, DB = 0x7e, DP = 0
+a16()
+i16()
+code()
+function Process {
+    Room.ScriptTriggers._Process()
+
+    rts
+}
 
 }
 

@@ -18,6 +18,8 @@ namespace MetaTiles {
     constant MAP_HEIGHT_SMALL = 64
     constant MAP_HEIGHT_LARGE = 128
 
+    constant MAP_MAX_WIDTH = 0xff
+
 
 
     namespace CrumblingTiles {

@@ -91,6 +91,7 @@ include "tests/scripting/game-state.inc"
 include "tests/scripting/scripting.inc"
 
 
+include "interactive/script-trigger-test.inc"
 include "interactive/spawn-entity-group.inc"
 include "interactive/interactive-tiles-test.inc"
 include "interactive/tile-collision-test.inc"
