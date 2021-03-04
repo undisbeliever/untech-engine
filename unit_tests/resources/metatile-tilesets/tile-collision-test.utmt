@@ -30,6 +30,7 @@
   <tile t="71" collision="es"/>
   <tile t="73" collision="solid" ft="PlayerScriptTrigger"/>
   <tile t="74" ft="PlayerScriptTrigger"/>
+  <tile t="75" collision="solid" ft="PlayerScriptTrigger"/>
   <tile-priorities>
     AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAADwkAAA+QAAAAAAAAAAAAAAAAAAAAAAAA
     AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA

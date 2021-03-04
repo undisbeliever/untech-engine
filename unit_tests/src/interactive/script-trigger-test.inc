@@ -9,9 +9,18 @@
 namespace InteractiveTests {
 namespace ScriptTriggerTest {
 
+
+// NOTE: The room used by this test contains `PlayerScriptTrigger` tiles
+//       that do not have a script trigger attached to them.
+
+
 constant GRAVITY = 10000
 
-constant TEST_TIME = 4 * 60
+constant TEST_TIME       = 4 * 60
+
+constant EXPECTED_FIRST  = 2
+constant EXPECTED_SECOND = 4
+constant EXPECTED_THIRD  = 4
 
 
 a16()
@@ -43,6 +52,11 @@ constant _timer  = Test.dpTmp + 0
     sep     #$20
 a8()
 
+    Text.Console.SetCursor(0, 3)
+    Text.Console.PrintConstString("First:\n")
+    Text.Console.PrintConstString("Second:\n")
+    Text.Console.PrintConstString("Third:\n")
+
     // Ensure test room uses all available script triggers
     lda.w   Room.ScriptTriggers.lastTriggerIndex
     cmp.b   #Room.Format.Header.ScriptTriggers.LAST_INDEX
@@ -50,11 +64,6 @@ a8()
 
 
     jsr     EnableDisplay_Full
-
-    Text.Console.SetCursor(0, 3)
-    Text.Console.PrintConstString("First:\n")
-    Text.Console.PrintConstString("Second:\n")
-    Text.Console.PrintConstString("Third:\n")
 
     rep     #$30
 a16()
@@ -84,7 +93,19 @@ a16()
         bne     Loop
 
 
-    // ::TODO add count tests::
+    // Confirm counters are correct at the end of the test
+    lda.w   Project.GameState.Words.first
+    cmp.w   #EXPECTED_FIRST
+    bne     Fail
+
+    lda.w   Project.GameState.Words.second
+    cmp.w   #EXPECTED_SECOND
+    bne     Fail
+
+    lda.w   Project.GameState.Words.second
+    cmp.w   #EXPECTED_THIRD
+    bne     Fail
+
 
     jsr     Entity.ValidateEntityLists
 

@@ -24,10 +24,11 @@ macro _Load() {
 
     sep     #$10
 i8()
-    // Mark playerTileIndex as unused
+    // Mark playerTileIndex and prevTriggerIndex unused
     assert(MetaTiles.MAP_HEIGHT_LARGE * MetaTiles.MAP_MAX_WIDTH < 0x8000)
     ldx.b   #0xff
     stx.w   ScriptTriggers.playerTileIndex + 1
+    stx.w   ScriptTriggers.prevTriggerIndex
 
 
     // Clear ScriptTriggers variables
@@ -108,7 +109,44 @@ i8()
     // Only test script triggers if the player touched a script-trigger tile.
     assert(MetaTiles.MAP_HEIGHT_LARGE * MetaTiles.MAP_MAX_WIDTH < 0x8000)
     lda.w   Room.ScriptTriggers.playerTileIndex
-    bmi     NoScriptTriggers
+    bpl     PlayerTouchTrigger
+        // Invalidate `prevTriggerIndex` if the player did not touch a script-trigger tile in this frame.
+        ldx.b   #0xff
+        stx.w   Room.ScriptTriggers.prevTriggerIndex
+        bra     NoScriptTriggers
+PlayerTouchTrigger:
+
+
+    // Goto EndLoop if `prevTriggerIndex` valid and `playerTileIndex` inside the previous trigger.
+    ldx.w   Room.ScriptTriggers.prevTriggerIndex
+    bmi     NoPreviousTrigger
+        cmp.w   Room.Format.Header.ScriptTriggers.topLeft,x
+        bcc     DepartedPreviousTrigger
+
+        cmp.w   Room.Format.Header.ScriptTriggers.bottomRight,x
+        bcs     DepartedPreviousTrigger
+
+            sep     #$20
+        a8()
+            tay
+
+            and.w   MetaTiles.map.dataIndexYmask
+
+            cmp.w   Room.ScriptTriggers.Triggers.top,x
+            bcc     DepartedPreviousTrigger_a8
+
+            cmp.w   Room.ScriptTriggers.Triggers.bottom,x
+            bcc     EndLoop
+
+        a8()
+        DepartedPreviousTrigger_a8:
+            tya
+            // A = lastTriggerIndex
+
+            rep     #$20
+        a16()
+        DepartedPreviousTrigger:
+NoPreviousTrigger:
 
 
     ldx.w   Room.ScriptTriggers.lastTriggerIndex
@@ -133,6 +171,8 @@ i8()
             cmp.w   Room.ScriptTriggers.Triggers.bottom,x
             bcs     NextTrigger_a8
                 // Trigger found
+                stx.w   Room.ScriptTriggers.prevTriggerIndex
+
                 lda.w   Room.Format.Header.ScriptTriggers.script,x
                 jsr     Scripting.ActivateScript
 
@@ -150,6 +190,12 @@ i8()
         dex
         dex
         bpl     Loop
+
+
+    // No triggers found, invalidate `prevTriggerIndex`
+    ldx.b   #0xff
+    stx.w   Room.ScriptTriggers.prevTriggerIndex
+
 
 au()
 i8()

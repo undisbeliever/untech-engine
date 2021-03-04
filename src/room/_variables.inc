@@ -53,6 +53,14 @@ namespace ScriptTriggers {
     allocate(lastTriggerIndex, wram7e, 1)
 
 
+    // The index of the script trigger encountered in the previous frame.
+    //
+    // This value is negative if there is no previous script trigger.
+    //
+    // (byte index into Script Triggers SOA)
+    allocate(prevTriggerIndex, wram7e, 1)
+
+
     // The tile index (within `room.mapData`) of the script-trigger tile
     // the player touched.
     //
