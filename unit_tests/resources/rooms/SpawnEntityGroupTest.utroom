@@ -35,7 +35,7 @@
     <entity entity="InteractiveTiles_Entity" x="176" y="28" parameter=""/>
     <entity entity="InteractiveTiles_Entity" x="224" y="28" parameter=""/>
   </entity-group>
-  <entity-group name="Forth_Group">
+  <entity-group name="Fourth_Group">
     <entity entity="InteractiveTiles_Entity" x="80" y="28" parameter=""/>
     <entity entity="InteractiveTiles_Entity" x="127" y="28" parameter=""/>
     <entity entity="InteractiveTiles_Entity" x="176" y="28" parameter=""/>
@@ -59,13 +59,13 @@
     <statement opcode="Spawn_Entity_Group" arg1="Second_Group"/>
     <statement opcode="Spawn_Entity_Group" arg1="Third_Group"/>
     <comment c="Continue spawning entity groups"/>
-    <statement opcode="Spawn_Entity_Group" arg1="Forth_Group"/>
+    <statement opcode="Spawn_Entity_Group" arg1="Fourth_Group"/>
     <statement opcode="Sleep_AnimationTicks" arg1="300"/>
     <comment c="Test to ensure these instructions do nothing and don't lag the game"/>
     <statement opcode="Spawn_Entity_Group" arg1="First_Group"/>
     <statement opcode="Spawn_Entity_Group" arg1="Second_Group"/>
     <statement opcode="Spawn_Entity_Group" arg1="Third_Group"/>
-    <statement opcode="Spawn_Entity_Group" arg1="Forth_Group"/>
+    <statement opcode="Spawn_Entity_Group" arg1="Fourth_Group"/>
     <statement opcode="Sleep_AnimationTicks" arg1="300"/>
     <comment c="The interactive test passes when this script ends"/>
   </script>

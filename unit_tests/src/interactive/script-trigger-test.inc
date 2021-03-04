@@ -21,7 +21,7 @@ constant TEST_TIME       = 4 * 60
 constant EXPECTED_FIRST  = 2
 constant EXPECTED_SECOND = 4
 constant EXPECTED_THIRD  = 1
-constant EXPECTED_FORTH  = 4
+constant EXPECTED_FOURTH = 4
 
 
 a16()
@@ -57,7 +57,7 @@ a8()
     Text.Console.PrintConstString("First:\n")
     Text.Console.PrintConstString("Second:\n")
     Text.Console.PrintConstString("Third:\n")
-    Text.Console.PrintConstString("Forth:\n")
+    Text.Console.PrintConstString("Fourth:\n")
 
     jsr     EnableDisplay_Full
 
@@ -89,7 +89,7 @@ a16()
         jsr     Text.Console.PrintU16Y
 
         Text.Console.SetCursor(8, 6)
-        ldy.w   Project.GameState.Words.forth
+        ldy.w   Project.GameState.Words.fourth
         jsr     Text.Console.PrintU16Y
 
 
@@ -112,8 +112,8 @@ a16()
     cmp.w   #EXPECTED_THIRD
     bne     Fail
 
-    lda.w   Project.GameState.Words.forth
-    cmp.w   #EXPECTED_FORTH
+    lda.w   Project.GameState.Words.fourth
+    cmp.w   #EXPECTED_FOURTH
     bne     Fail
 
 

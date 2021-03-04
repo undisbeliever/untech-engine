@@ -18,7 +18,7 @@
     <word index="1" name="first" value="1"/>
     <word index="2" name="second" value="2"/>
     <word index="3" name="third" value="3"/>
-    <word index="4" name="forth" value="4"/>
+    <word index="4" name="fourth" value="4"/>
     <word index="5" name="fifth" value="5"/>
     <word index="7" name="seventh" room="ScriptTests" value="7"/>
     <word index="8" name="eighth" value="8"/>
