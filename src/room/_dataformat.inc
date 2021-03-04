@@ -113,12 +113,23 @@ namespace Format {
                 // (word index)
                 field(bottomRight, ARRAY_SIZE)
 
-                // The script to activate when the trigger is triggered
-                // ::TODO put some data in the second byte::
+                // The script to activate when the trigger is triggered.
+                //
+                //   osssssss
+                //      o = activate script once flag
+                //      s = script id
+                //
+                // This value will be set to an invalid script id after a "once" trigger has been activated.
+                //
                 // (byte with 1 byte padding)
                 field(script, ARRAY_SIZE)
 
-                // ::TODO add a single flag::
+                constant script.ONCE_FLAG        = 0b10000000
+                constant script.SCRIPT_ID_MASK   = 0b01111111
+
+
+                // ::TODO put some data in the second byte::
+
 
                 assertOnePage(topLeft,     ARRAY_SIZE)
                 assertOnePage(bottomRight, ARRAY_SIZE)

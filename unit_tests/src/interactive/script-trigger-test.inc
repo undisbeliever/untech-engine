@@ -20,7 +20,8 @@ constant TEST_TIME       = 4 * 60
 
 constant EXPECTED_FIRST  = 2
 constant EXPECTED_SECOND = 4
-constant EXPECTED_THIRD  = 4
+constant EXPECTED_THIRD  = 1
+constant EXPECTED_FORTH  = 4
 
 
 a16()
@@ -56,14 +57,15 @@ a8()
     Text.Console.PrintConstString("First:\n")
     Text.Console.PrintConstString("Second:\n")
     Text.Console.PrintConstString("Third:\n")
+    Text.Console.PrintConstString("Forth:\n")
+
+    jsr     EnableDisplay_Full
+
 
     // Ensure test room uses all available script triggers
     lda.w   Room.ScriptTriggers.lastTriggerIndex
     cmp.b   #Room.Format.Header.ScriptTriggers.LAST_INDEX
     bne     Fail
-
-
-    jsr     EnableDisplay_Full
 
     rep     #$30
 a16()
@@ -86,6 +88,10 @@ a16()
         ldy.w   Project.GameState.Words.third
         jsr     Text.Console.PrintU16Y
 
+        Text.Console.SetCursor(8, 6)
+        ldy.w   Project.GameState.Words.forth
+        jsr     Text.Console.PrintU16Y
+
 
         jsr     GameLoop.ProcessFrame
 
@@ -102,8 +108,12 @@ a16()
     cmp.w   #EXPECTED_SECOND
     bne     Fail
 
-    lda.w   Project.GameState.Words.second
+    lda.w   Project.GameState.Words.third
     cmp.w   #EXPECTED_THIRD
+    bne     Fail
+
+    lda.w   Project.GameState.Words.forth
+    cmp.w   #EXPECTED_FORTH
     bne     Fail
 
 

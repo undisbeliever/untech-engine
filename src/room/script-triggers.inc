@@ -173,10 +173,31 @@ NoPreviousTrigger:
                 // Trigger found
                 stx.w   Room.ScriptTriggers.prevTriggerIndex
 
+                assert(Room.Format.Header.ScriptTriggers.script.ONCE_FLAG == 0x80)
                 lda.w   Room.Format.Header.ScriptTriggers.script,x
-                jsr     Scripting.ActivateScript
+                bmi     RunOnce
+                    jsr     Scripting.ActivateScript
 
-                jmp     EndLoop
+                    jmp     EndLoop
+
+
+                RunOnce:
+                    // Set the trigger's script value to an invalid scriptId so it can never be activated again.
+                    // ::ANNOY no `sty addr,x` instruction::
+                    tay
+                    constant InvalidScriptId = Room.Format.Header.ScriptTriggers.script.SCRIPT_ID_MASK
+                    assert(InvalidScriptId > Room.N_ROOM_SCRIPTS + 1)
+                    assert(InvalidScriptId < 0x80)
+                    lda.b   #InvalidScriptId
+                    sta.w   Room.Format.Header.ScriptTriggers.script,x
+                    tya
+
+
+                    // A = ScriptTriggers.script
+                    and.b   #~Room.Format.Header.ScriptTriggers.script.ONCE_FLAG
+                    jsr     Scripting.ActivateScript
+
+                    jmp     EndLoop
 
         a8()
         NextTrigger_a8:
