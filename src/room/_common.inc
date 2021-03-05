@@ -31,10 +31,9 @@ namespace Room {
 //
 // REQUIRES: 16 bit A, 16 bit Index, DB = 0x7e, DP = 0
 //
-// INPUT: A = room Id
-//
-// INPUT: entranceId = entrance to load
-// INPUT: playerDataId = player entity data id
+// INPUT: GameState.roomId = room Id
+// INPUT: GameState.entranceId = entrance to load
+// INPUT: GameState.playerDataId = player entity data id
 a16()
 i16()
 code()
@@ -44,19 +43,16 @@ constant _tmpEnd = utDpTmp1
 constant _tmpX   = utDpTmp2
 constant _count  = utDpTmp3
 
-    sep     #$20
-a8()
-    cmp.b   #RoomList.count
+    sep     #$10
+i8()
+    ldx.w   GameState.roomId
+    cpx.b   #RoomList.count
     bcc     +
     InvalidRoomId:
         break(INVALID_ROOM_ID)
     +
-    sta.w   GameState.roomId
 
-    rep     #$20
-    sep     #$10
-a16()
-i8()
+
     GameState._ClearRoomState()
 
     Scripting._Init()

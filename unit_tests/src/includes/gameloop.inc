@@ -29,12 +29,15 @@ function Init_LoadRoom {
     pla
 
 
-    sep     #$10
+    sep     #$30
+a8()
 i8()
+    sta.w   GameState.roomId
     stx.w   GameState.playerDataId
     sty.w   GameState.entranceId
 
     rep     #$30
+a16()
 i16()
 
     // LoadRoom also resets Entity and Camera modules
