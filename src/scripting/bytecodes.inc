@@ -583,6 +583,33 @@ function Start_Script___RoomScript {
 
 
 
+// Load a new room.
+//
+// REQUIRES: 8 bit A, 16 bit Index, DP = 0, DB = 0x7e, Ah = 0
+//
+// INPUT: Y - program counter
+// OUTPUT: Y - program counter after arguments
+// RETURN: Jump to GotoNextOpcode
+a8()
+i16()
+code()
+function Load_Room___Room_RoomEntrance {
+    // first argument: Room id
+    // second argument: Room Entrance
+    assert(GameState.roomId + 1 == GameState.entranceId)
+    ldx.w   scriptData,y
+    iny
+    iny
+    stx.w   GameState.roomId
+
+    lda.b   #0xff
+    sta.w   Room.roomChangeRequested
+
+    jmp     GotoNextOpcode
+}
+
+
+
 // Base Yielding Instructions
 // ==========================
 

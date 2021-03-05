@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF_8"?>
+<!DOCTYPE untech>
+<room name="LoadRoomScriptTest_3" scene="TileCollisionTest">
+  <map width="16" height="14">
+    EREREREREREREREREREREREAAAAAAAAAAAAAAAAAABERAAAAAAAAAAAAAAAAAAAR
+    EQAAAAAAAAARABEAEQAAEREAAAAAAAAAEQARABEAABERAAAAAAAAABEAEQARAAAR
+    EQAAAAAAAAAAAAAAAAAAEREAAAAAAAAAAAAAAAAAABERERERERERERERERERERER
+    EQAAAAAAAAAAAAAAAAAAEREAAAAAAAAAAAAAAAAAABERAAAAAAAAAAAAAAAAAAAR
+    ERERERERERERERERERERERERERERERERERERERERERE=
+  </map>
+  <entrance name="Bad_1" x="96" y="114" orientation="down-right"/>
+  <entrance name="Bad_2" x="64" y="114" orientation="down-right"/>
+  <entrance name="Start" x="128" y="179" orientation="down-right"/>
+  <entrance name="Bad_3" x="33" y="114" orientation="down-right"/>
+  <script name="Startup">
+    <comment c="counter set to 2 by LoadRoomScriptTest_3"/>
+    <statement opcode="Assert_Word_Equals" arg1="counter" arg2="2"/>
+  </script>
+</room>

@@ -58,6 +58,10 @@ i8()
     Scripting._Init()
 
 
+    sep     #$20
+a8()
+    stz.w   roomChangeRequested
+
     rep     #$30
 a16()
 i16()

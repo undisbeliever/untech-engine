@@ -144,8 +144,27 @@ function ProcessFrame {
 
     jsr     Entity.ValidateEntityLists
 
+
+    // Load a new room if roomChangeRequested set.
+    // This is a hack, a proper GameLoop should exit the loop before loading the next room.
+    // ::TODO cleanup gameloop and rewrite this::
+    assert(Room.roomChangeRequested.LOAD_NEW_ROOM_FLAG == 0x80)
+    lda.w   Room.roomChangeRequested - 1
+    bpl     +
+        // This prevents screen tearing
+        jsr     WaitFrame
+
+        jsr     Room.LoadRoom
+
+        jsr     Resources.TransferToPpu
+        jsr     MetaTiles.Render.DrawFullScreen_ForceBlank
+
+        jsr     EnableDisplay_Full
+    +
+
     rts
 }
+
 
 }
 }

@@ -21,6 +21,18 @@ constant roomData.size = Project.ROOM_DATA_SIZE
 assert(roomData.size >= 1024)
 
 
+// Byte flag to request a room change
+//
+// MSB set if the script or engine requests the game loop changes the room.
+//
+// Project MUST check this flag regularly and call `Room.LoadRoom` when the MSB flag is set.
+//
+// (byte flag)
+allocate(roomChangeRequested, wram7e, 1)
+
+constant roomChangeRequested.LOAD_NEW_ROOM_FLAG = 0x80
+
+
 namespace Entrances {
     // Word address of the room entrances data
     //
