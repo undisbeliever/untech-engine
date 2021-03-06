@@ -760,6 +760,66 @@ Fail:
 }
 
 
+a16()
+i16()
+code()
+Test.add("Test Temp Script Variables")
+function TestTempScriptVariable {
+
+    sep     #$20
+a8()
+    lda.b   #Project.RoomList.TempScriptVariables
+    sta.w   GameState.roomId
+
+    stz.w   GameState.entranceId
+
+    lda.b   #Project.PlayerIds.Blank
+    sta.w   GameState.playerDataId
+
+
+    // Invalidate final words/flags in GameState
+    // Room startup script will confirm they are reset in `Room.LoadRoom`
+    lda.b   #0xff
+    sta.w   GameState.wordData + GameState.wordData.size - 1
+    sta.w   GameState.flagData + GameState.flagData.size - 1
+
+
+    rep     #$30
+a16()
+
+    // Activates the startup script that sets some temp words and temp flags
+    jsr     Room.LoadRoom
+
+
+    // Test the first temp word is 1
+    lda.w   GameState.wordData + GameState.wordData.size - 1 * 2
+    cmp.w   #1
+    bne     Fail
+
+    // Test the third temp word is 3
+    lda.w   GameState.wordData + GameState.wordData.size - 3 * 2
+    cmp.w   #3
+    bne     Fail
+
+
+    // Test the first and third temp words are set
+    assert(Project.GameState.N_FLAGS + 16 < Project.GameState.MAX_FLAGS)
+    lda.w   GameState.flagData + GameState.flagData.size - 2
+    cmp.w   #0b101 << (16 - 3)
+    bne     Fail
+
+
+    sec
+    rts
+
+
+Fail:
+    clc
+    rts
+}
+
+
+
 }
 
 // vim: ft=bass-65816 ts=4 sw=4 et:

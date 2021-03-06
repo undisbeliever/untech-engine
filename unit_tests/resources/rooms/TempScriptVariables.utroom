@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF_8"?>
+<!DOCTYPE untech>
+<room name="TempScriptVariables" scene="TileCollisionTest">
+  <map width="16" height="14">
+    AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+    AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+    AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+    AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+    AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=
+  </map>
+  <entrance name="Start" x="128" y="112" orientation="down-right"/>
+  <temp-script-variables>
+    <flag name="Tmp_Flag_1"/>
+    <flag name="Tmp_Flag_2"/>
+    <flag name="Tmp_Flag_3"/>
+    <word name="Tmp_Word_1"/>
+    <word name="Tmp_Word_2"/>
+    <word name="Tmp_Word_3"/>
+  </temp-script-variables>
+  <script name="Startup">
+    <statement opcode="Assert_Word_Equals" arg1="Tmp_Word_1" arg2="0"/>
+    <statement opcode="Assert_Word_Equals" arg1="Tmp_Word_2" arg2="0"/>
+    <statement opcode="Assert_Flag_Clear" arg1="Tmp_Flag_1"/>
+    <statement opcode="Assert_Flag_Clear" arg1="Tmp_Flag_2"/>
+    <statement opcode="Assert_Flag_Clear" arg1="Tmp_Flag_3"/>
+    <statement opcode="Set_Flag" arg1="Tmp_Flag_1"/>
+    <statement opcode="Set_Flag" arg1="Tmp_Flag_3"/>
+    <statement opcode="Assert_Flag_Set" arg1="Tmp_Flag_1"/>
+    <statement opcode="Assert_Flag_Set" arg1="Tmp_Flag_3"/>
+    <statement opcode="Add_To_Word" arg1="Tmp_Word_1" arg2="1"/>
+    <statement opcode="Assert_Word_Equals" arg1="Tmp_Word_1" arg2="1"/>
+    <statement opcode="Add_To_Word" arg1="Tmp_Word_2" arg2="2"/>
+    <statement opcode="Assert_Word_Equals" arg1="Tmp_Word_2" arg2="2"/>
+    <statement opcode="Add_To_Word" arg1="Tmp_Word_3" arg2="3"/>
+    <statement opcode="Assert_Word_Equals" arg1="Tmp_Word_3" arg2="3"/>
+  </script>
+</room>
