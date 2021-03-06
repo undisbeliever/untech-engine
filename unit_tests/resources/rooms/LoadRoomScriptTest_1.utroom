@@ -8,7 +8,7 @@
     EQAAAAAAAAAAAAAAAABKEREAAAAAAAAAAAAAAAAAShERAAAAAAAAAAAAAAAAAEoR
     ERERERERERERERERERERERERERERERERERERERERERE=
   </map>
-  <entrance name="Start" x="128" y="179" orientation="down-right"/>
+  <entrance name="Start" x="223" y="179" orientation="down-right"/>
   <script name="Startup">
     <statement opcode="Assert_Word_Equals" arg1="counter" arg2="0"/>
   </script>

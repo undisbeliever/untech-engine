@@ -151,15 +151,28 @@ function ProcessFrame {
     assert(Room.roomChangeRequested.LOAD_NEW_ROOM_FLAG == 0x80)
     lda.w   Room.roomChangeRequested - 1
     bpl     +
-        // This prevents screen tearing
-        jsr     WaitFrame
+        // Save inidispBuffer, so this routine can be used on tests with the screen disabled.
+        lda.w   inidispBuffer
+        pha
 
-        jsr     Room.LoadRoom
+            // This prevents screen tearing
+            jsr     WaitFrame
 
-        jsr     Resources.TransferToPpu
-        jsr     MetaTiles.Render.DrawFullScreen_ForceBlank
+            jsr     Room.LoadRoom
 
-        jsr     EnableDisplay_Full
+            jsr     Resources.TransferToPpu
+            jsr     MetaTiles.Render.DrawFullScreen_ForceBlank
+            jsr     EnableDisplay_Full
+
+        // Restore inidispBuffer
+        pla
+        sep     #$20
+    a8()
+        sta.w   inidispBuffer
+
+        rep     #$30
+    a16()
+
     +
 
     rts

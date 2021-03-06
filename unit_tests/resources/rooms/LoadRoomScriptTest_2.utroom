@@ -9,7 +9,7 @@
     ERERERERERERERERERERERERERERERERERERERERERE=
   </map>
   <entrance name="Bad_1" x="63" y="114" orientation="down-right"/>
-  <entrance name="Start" x="128" y="179" orientation="down-right"/>
+  <entrance name="Start" x="223" y="179" orientation="down-right"/>
   <entrance name="Bad_2" x="31" y="114" orientation="down-right"/>
   <entrance name="Bad_3" x="95" y="114" orientation="down-right"/>
   <script name="Startup">

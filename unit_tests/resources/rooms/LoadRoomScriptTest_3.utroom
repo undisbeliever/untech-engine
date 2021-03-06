@@ -10,7 +10,7 @@
   </map>
   <entrance name="Bad_1" x="96" y="114" orientation="down-right"/>
   <entrance name="Bad_2" x="64" y="114" orientation="down-right"/>
-  <entrance name="Start" x="128" y="179" orientation="down-right"/>
+  <entrance name="Start" x="223" y="179" orientation="down-right"/>
   <entrance name="Bad_3" x="33" y="114" orientation="down-right"/>
   <script name="Startup">
     <comment c="counter set to 2 by LoadRoomScriptTest_3"/>

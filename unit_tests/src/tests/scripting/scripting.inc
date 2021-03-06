@@ -702,6 +702,64 @@ Fail:
 }
 
 
+
+a16()
+i16()
+code()
+Test.add("Load_Room instruction Test")
+function LoadRoomTest {
+
+constant TEST_TIME = 3
+
+constant _timer  = Test.dpTmp + 0
+
+
+    lda.w   #Project.RoomList.LoadRoomScriptTest_1
+    ldx.w   #Project.PlayerIds.InteractiveTilesTest_Player
+    ldy.w   #0
+    jsr     InteractiveTests.GameLoop.Init_LoadRoom
+
+    jsr     MetaTiles.Render.DrawFullScreen_ForceBlank
+
+
+    lda.w   #TEST_TIME
+    sta.b   _timer
+
+    Loop:
+        // Force screen off - do not flash between full brightness and screen disabled
+        sep     #$20
+    a8()
+        lda.b   #0xff
+        sta.w   inidispBuffer
+
+        rep     #$30
+    a16()
+
+
+        jsr     InteractiveTests.GameLoop.ProcessFrame
+
+        dec.b   _timer
+        bne     Loop
+
+
+    // Confirm we are in the third room in the Load_Room chain
+    lda.w   GameState.roomId
+    and.w   #0xff
+    cmp.w   #Project.RoomList.LoadRoomScriptTest_3
+    bne     Fail
+
+
+    jsr     Entity.ValidateEntityLists
+
+    jmp     Test.ResetPpuState
+
+
+Fail:
+    clc
+    rts
+}
+
+
 }
 
 // vim: ft=bass-65816 ts=4 sw=4 et:
