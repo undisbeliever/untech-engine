@@ -330,5 +330,15 @@ namespace Entity {
     }
 }
 
+if {defined SHOW_MEMORY_USAGE} {
+    namespace SHOW_MEMORY_USAGE {
+        evaluate baseEntitySize = BaseEntity.size
+        evaluate baseEntityMaxSize = BaseEntity.__STRUCT__.maxSize
+        evaluate baseEntityRemaining = BaseEntity.__STRUCT__.maxSize - BaseEntity.size
+
+        print "\nBaseEntity size: {baseEntityMaxSize} bytes ({baseEntitySize} bytes used, {baseEntityRemaining} remaining)\n"
+    }
+}
+
 // vim: ft=bass-65816 ts=4 sw=4 et:
 
