@@ -21,8 +21,8 @@ namespace Entity {
 code()
 InvalidEntityFunctionTable:
 namespace InvalidEntityFunctionTable {
-    // contains 12 as BaseEntityFunctionTable can be extended
-    evaluate n = 12
+    // contains 20 as BaseEntityFunctionTable can be extended
+    evaluate n = 20
     assert({n} > BaseEntityFunctionTable.size)
 
     while {n} > 0 {

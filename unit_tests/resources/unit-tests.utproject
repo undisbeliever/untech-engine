@@ -80,7 +80,7 @@
     <function-table name="EightDirectionEntity" type="entity" export-order="OneFrame" parameter-type="unused"/>
     <function-table name="EightDirectionProjectile" type="projectile" export-order="OneFrame" parameter-type="unused"/>
     <function-table name="BlankPlayer" type="player" export-order="OneFrame" parameter-type="unused"/>
-    <function-table name="TileCollisionTestPlayer" type="player" export-order="EhCollisionTest_Player" parameter-type="unused"/>
+    <function-table name="TileCollisionTestPlayer" type="player" export-order="TileCollisionTest_Player" parameter-type="unused"/>
     <function-table name="MapCursor" type="player" export-order="OneFrame" parameter-type="unused"/>
     <function-table name="EhCollisionTest_Player" type="player" export-order="EhCollisionTest_Player" parameter-type="unused"/>
     <function-table name="ActionPointSpawner" type="player" export-order="SingleAnimation" parameter-type="unused"/>
@@ -141,7 +141,7 @@
       <entry name="SpawnAndChangeList" function-table="SpawnAndChangeList" listid="EntityList_0" frameset="FST_OneTileFixed1" frame="frame" palette="0"/>
       <entry name="ShowAllFrames" function-table="ShowAllFrames" listid="EntityList_0" frameset="FST_OneTileFixed1" frame="frame" palette="0"/>
       <entry name="EightDirectionProjectile" function-table="EightDirectionEntity" listid="Particles" frameset="Projectile" frame="frame" palette="0"/>
-      <entry name="EhCollisionTest_Enemy" function-table="EhCollisionTest_Enemy" listid="Enemies" frameset="EhCollisionTest_Enemy" frame="row1" palette="0"/>
+      <entry name="EhCollisionTest_Enemy" function-table="EhCollisionTest_Enemy" listid="Enemies" frameset="EhCollisionTest_Enemy" frame="frame1" palette="0"/>
       <entry name="EhCollisionTest_BlankEnemy" function-table="Blank" listid="Enemies" frameset="FST_OneTileFixed1" frame="frame" palette="0"/>
       <entry name="EhCollisionTest_CollisionCentre" function-table="EhCollisionTest_CollisionCentre" listid="Particles" frameset="EhCollisionTest_Centre" frame="frame" palette="0"/>
       <entry name="InteractiveTiles_Entity" function-table="InteractiveTilesTest_Entity" listid="Enemies" frameset="InteractiveTilesTestEntity" frame="frame" palette="0"/>
@@ -172,6 +172,7 @@
   <exportorder src="metasprite/formats/EhCollisionTest_Player.utfseo"/>
   <exportorder src="metasprite/formats/EhCollisionTest_Enemy.utfseo"/>
   <exportorder src="metasprite/formats/SingleAnimation.utfseo"/>
+  <exportorder src="metasprite/formats/TileCollisionTest_Player.utfseo"/>
   <frameset src="metasprite/utsi/Cursor.utsi" type="spriteimporter"/>
   <frameset src="metasprite/utms/FST_10Palettes.utms" type="metasprite"/>
   <frameset src="metasprite/utms/FST_OneTileFixed1.utms" type="metasprite"/>

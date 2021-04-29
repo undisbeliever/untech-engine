@@ -2,50 +2,46 @@
 <!DOCTYPE untech>
 <metasprite id="EhCollisionTest_Player" tilesettype="TWO_TILES_FIXED" exportorder="EhCollisionTest_Player">
   <smalltileset>
-    AAB+fn5+fn5+fn5+fn4AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
-    AAB+AH4AfgB+AH4AfgAAAAAAfgB+AH4AfgB+AH4AAAAAAH4AfgB+AH4AfgB+AAAA
-    AAAAfgB+AH4AfgB+AH4AAAAAfgB+AH4AfgB+AH4AAAAAAH5+fn5+fn5+fn5+fgAA
-    AAB+AH4AfgB+AH4AfgAAAAAAAAAAAAAAAAAAAAAAAAAAAAB+AH4AfgB+AH4AfgAA
-    AAB+fn5+fn4AAAAAAAAAAAAAAAAAAAAAfgB+AH4AAAAAAHAOcA5wDnBwcHBwcAAA
-    AAB+AH4AfgBwDnAOcA4AAA==
+    AAB+fn5+fn5+fn5+fn4AAAAAAAAAAAAAAAAAAAAAAAA=
   </smalltileset>
+  <largetileset>
+    AAAAAAA/AD8APwA/AD8APwAAAAA/AD8APwA/AD8APwAAAAAAAPAA8ADwAPAA8ADw
+    AAAAAPAA8ADwAPAA8ADwAAA/AD8APwA/AAAAAAAAAAA/AD8APwA/AAAAAAAAAAAA
+    APAA8ADwAPAAAAAAAAAAAPAA8ADwAPAAAAAAAAAAAAA=
+  </largetileset>
   <palette>
-    4AMAAP9/GAAAfA9Q733WAlsBAAAAAAAAAAAAAAAAAAA=
+    4AMAAP9/fS0AfA9Q733WAlsBAAAAAAAAAAAAAAAAAAA=
   </palette>
   <frame id="frame1" order="3">
-    <object size="small" x="-4" y="-4" tile="0"/>
-    <entityhitbox type="ATTACK" x="-3" y="-3" width="6" height="6"/>
+    <hitbox x="2" y="-3" width="6" height="6"/>
+    <hurtbox x="-5" y="-5" width="10" height="10"/>
+    <object size="small" x="1" y="-4" tile="0"/>
+    <object size="large" x="-7" y="-7" tile="0"/>
   </frame>
   <frame id="frame2" order="3">
-    <object size="small" x="-4" y="-4" tile="1"/>
-    <entityhitbox type="BODY" x="-3" y="-3" width="6" height="6"/>
+    <hitbox x="-8" y="-3" width="6" height="6"/>
+    <hurtbox x="-5" y="-5" width="10" height="10"/>
+    <object size="small" x="-9" y="-4" tile="0"/>
+    <object size="large" x="-7" y="-7" tile="0"/>
   </frame>
   <frame id="frame3" order="3">
-    <object size="small" x="-4" y="-4" tile="2"/>
-    <entityhitbox type="BODY_ATTACK" x="-3" y="-3" width="6" height="6"/>
+    <hitbox x="-3" y="2" width="6" height="6"/>
+    <hurtbox x="-5" y="-5" width="10" height="10"/>
+    <object size="small" x="-4" y="1" tile="0"/>
+    <object size="large" x="-7" y="-7" tile="0"/>
   </frame>
   <frame id="frame4" order="3">
-    <object size="small" x="-4" y="-4" tile="3"/>
-    <entityhitbox type="BODY_WEAK" x="-3" y="-3" width="6" height="6"/>
+    <hitbox x="-3" y="-8" width="6" height="6"/>
+    <hurtbox x="-5" y="-5" width="10" height="10"/>
+    <object size="small" x="-4" y="-9" tile="0"/>
+    <object size="large" x="-7" y="-7" tile="0"/>
   </frame>
   <frame id="frame5" order="3">
-    <object size="small" x="-4" y="-4" tile="4"/>
-    <entityhitbox type="SHIELD" x="-3" y="-3" width="6" height="6"/>
+    <hurtbox x="-5" y="-5" width="10" height="10"/>
+    <object size="large" x="-7" y="-7" tile="0"/>
   </frame>
   <frame id="frame6" order="3">
-    <object size="small" x="-4" y="-4" tile="5"/>
-    <entityhitbox type="SHIELD_ATTACK" x="-3" y="-3" width="6" height="6"/>
-  </frame>
-  <frame id="frame7" order="3">
-    <object size="small" x="-4" y="-4" tile="6"/>
-    <entityhitbox type="ATTACK" x="-3" y="-3" width="6" height="3"/>
-    <entityhitbox type="BODY" x="-3" y="0" width="6" height="3"/>
-  </frame>
-  <frame id="frame8" order="3">
-    <object size="small" x="-4" y="-4" tile="7"/>
-    <entityhitbox type="BODY_ATTACK" x="-3" y="-3" width="3" height="3"/>
-    <entityhitbox type="SHIELD_ATTACK" x="0" y="0" width="3" height="3"/>
-    <entityhitbox type="SHIELD" x="-3" y="0" width="3" height="3"/>
-    <entityhitbox type="BODY_WEAK" x="0" y="-3" width="3" height="3"/>
+    <hitbox x="-3" y="-3" width="6" height="6"/>
+    <object size="small" x="-4" y="-4" tile="0"/>
   </frame>
 </metasprite>

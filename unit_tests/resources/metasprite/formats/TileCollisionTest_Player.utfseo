@@ -1,10 +1,12 @@
 <?xml version="1.0" encoding="UTF_8"?>
 <!DOCTYPE untech>
-<fsexportorder name="EhCollisionTest_Enemy">
+<fsexportorder name="TileCollisionTest_Player">
   <frame id="frame1"/>
   <frame id="frame2"/>
   <frame id="frame3"/>
   <frame id="frame4"/>
   <frame id="frame5"/>
   <frame id="frame6"/>
+  <frame id="frame7"/>
+  <frame id="frame8"/>
 </fsexportorder>

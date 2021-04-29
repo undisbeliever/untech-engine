@@ -15,7 +15,9 @@ namespace BlankPlayer {
     RoomAboutToChange:
     Process:
     DrawPlayer:
-    ProcessCollision:
+    HitboxCollision:
+    HurtboxCollision:
+    ShieldCollision:
     function Null {
         rts
     }

@@ -164,20 +164,42 @@ namespace BaseEntityFunctionTable {
         // RETURN: Entity.GotoNextEntity or a `@EndEntityProcess` tagged routine.
         field(Process, 2)
 
-
-        // Process a collision between this entity and an other entity.
+        // Process a collision between this entity's hitbox and the shield or hurtbox
+        // of another entity.
         //
         // REGS: 16 bit A, 16 bit Index, DB = 0x7e
         //
-        // INPUT: dp: entity
-        //         A: collision bits
-        //         Y: otherEntity address
-        //         Metasprite.Collision.bits: collision bits (MUST NOT BE MODIFIED)
-        //         Metasprite.Collision.otherEntity: the entity collided with (MUST NOT BE MODIFIED)
-        //         Metasprite.Collision.xPos: the x-coordinate of the collision centre
-        //         Metasprite.Collision.yPos: the y-coordinate of the collision centre
-        // Collision bits format: (this hitboxType << 4) | other hitboxType
-        field(ProcessCollision, 2)
+        // INPUT: dp: entity address
+        //        Y: other entity address
+        //        carry set if hitbox collides with shield
+        //        Metasprite.Collision.xPos: the x-coordinate of the collision centre
+        //        Metasprite.Collision.yPos: the y-coordinate of the collision centre
+        field(HitboxCollision, 2)
+
+        // Process a collision between this entity's hurtbox and the shield or hitbox
+        // of another entity.
+        //
+        // REGS: 16 bit A, 16 bit Index, DB = 0x7e
+        //
+        // INPUT: dp: entity address
+        //        Y: other entity address
+        //        carry set if collide with shield
+        //        Metasprite.Collision.xPos: the x-coordinate of the collision centre
+        //        Metasprite.Collision.yPos: the y-coordinate of the collision centre
+        field(HurtboxCollision, 2)
+
+        // Process a collision between this entity's shield and the hitbox or hurtbox
+        // of another entity
+        //
+        // REGS: 16 bit A, 16 bit Index, DB = 0x7e
+        //
+        // INPUT: dp: entity address
+        //        Y: other entity address
+        //        carry set if collision with hitbox
+        //        carry clear if collision with hurtbox
+        //        Metasprite.Collision.xPos: the x-coordinate of the collision centre
+        //        Metasprite.Collision.yPos: the y-coordinate of the collision centre
+        field(ShieldCollision, 2)
     endstruct()
 }
 
@@ -230,24 +252,47 @@ namespace BasePlayerFunctionTable {
         // INPUIT: dp = playerEntity
         field(DrawPlayer, 2)
 
-        // Process a collision between this entity and an other entity.
-        //
-        // This routine is the same as `BaseEntityFunctionTable.ProcessCollision`
+        // Process a collision between this entity's hitbox and the shield or hurtbox
+        // of another entity.
         //
         // REGS: 16 bit A, 16 bit Index, DB = 0x7e
         //
-        // INPUT: dp: entity
-        //         A: collision bits
-        //         Y: otherEntity address
-        //         Metasprite.Collision.bits: collision bits (MUST NOT BE MODIFIED)
-        //         Metasprite.Collision.otherEntity: the entity collided with (MUST NOT BE MODIFIED)
-        //         Metasprite.Collision.xPos: the x-coordinate of the collision centre
-        //         Metasprite.Collision.yPos: the y-coordinate of the collision centre
-        // Collision bits format: (this hitboxType << 4) | other hitboxType
-        field(ProcessCollision, 2)
+        // INPUT: dp: entity address
+        //        Y: other entity address
+        //        carry set if hitbox collides with shield
+        //        Metasprite.Collision.xPos: the x-coordinate of the collision centre
+        //        Metasprite.Collision.yPos: the y-coordinate of the collision centre
+        field(HitboxCollision, 2)
+
+        // Process a collision between this entity's hurtbox and the shield or hitbox
+        // of another entity.
+        //
+        // REGS: 16 bit A, 16 bit Index, DB = 0x7e
+        //
+        // INPUT: dp: entity address
+        //        Y: other entity address
+        //        carry set if collide with shield
+        //        Metasprite.Collision.xPos: the x-coordinate of the collision centre
+        //        Metasprite.Collision.yPos: the y-coordinate of the collision centre
+        field(HurtboxCollision, 2)
+
+        // Process a collision between this entity's shield and the hitbox or hurtbox
+        // of another entity
+        //
+        // REGS: 16 bit A, 16 bit Index, DB = 0x7e
+        //
+        // INPUT: dp: entity address
+        //        Y: other entity address
+        //        carry set if collision with hitbox
+        //        carry clear if collision with hurtbox
+        //        Metasprite.Collision.xPos: the x-coordinate of the collision centre
+        //        Metasprite.Collision.yPos: the y-coordinate of the collision centre
+        field(ShieldCollision, 2)
 
         assert(Init == BaseEntityFunctionTable.Init)
-        assert(ProcessCollision == BaseEntityFunctionTable.ProcessCollision)
+        assert(HitboxCollision == BaseEntityFunctionTable.HitboxCollision)
+        assert(HurtboxCollision == BaseEntityFunctionTable.HurtboxCollision)
+        assert(ShieldCollision == BaseEntityFunctionTable.ShieldCollision)
     endstruct()
 }
 

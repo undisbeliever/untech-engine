@@ -70,7 +70,7 @@ include "camera/_common.inc"
 include "camera/center-on-entity.inc"
 
 include "metasprite/animation.inc"
-include "metasprite/entityhitbox.inc"
+include "metasprite/collisionboxes.inc"
 include "metasprite/palette.inc"
 include "metasprite/vram.inc"
 include "metasprite/render.inc"

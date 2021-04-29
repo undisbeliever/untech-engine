@@ -1,63 +1,67 @@
 <?xml version="1.0" encoding="UTF_8"?>
 <!DOCTYPE untech>
 <metasprite id="EhCollisionTest_Enemy" tilesettype="ONE_ROW_FIXED" exportorder="EhCollisionTest_Enemy">
+  <smalltileset>
+    AAB+fn5+fn5+fn5+fn4AAAAAAAAAAAAAAAAAAAAAAAA=
+  </smalltileset>
   <largetileset>
-    AAAAAAAAfwB/P34/fT99PwAAAAAAAAAAAAAAAAAAAAAAAAAAAAD+AP78fvy+/L78
-    AAAAAAAAAAAAAAAAAAAAAHw/fT99P38/fwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
-    Pvy+/L78/vz+AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAB/AEAAQANAAkAD
-    AAAAAAAAAAA/ADwAPQA8AAAAAAAAAP4AAgACgAJAAoAAAAAAAAAAAPwAfAC8AHwA
-    QAJAAkADQAB/AAAAAAAAAD0APQA8AD8AAAAAAAAAAAACQAJAAoACAP4AAAAAAAAA
-    vAC8AHwA/AAAAAAAAAAAAAAAAAAAAH8AfwBjHG0SYxwAAAAAAAAAAD8AIwAtACMA
-    AAAAAAAA/gD+AM4wtki2SAAAAAAAAAAA/ADMALQAtABtEm0SYxx/AH8AAAAAAAAA
-    LQAtACMAPwAAAAAAAAAAAIZ4tki2SP4A/gAAAAAAAACEALQAtAD8AAAAAAAAAAAA
-    AAAAAAAAfwBAP0A/QD9APwAAAAAAAAAAPwAjAC0AIwAAAAAAAAD+AAL8AvwC/AL8
-    AAAAAAAAAAD8AHQAdAB0AEA/QD9AP0A/fwAAAAAAAAAtAC0AIwA/AAAAAAAAAAAA
-    AvwC/AL8Avz+AAAAAAAAAFQAVACsAPwAAAAAAAAAAAAAAAAAAAB/AH8/fj99P34/
-    AAAAAAAAAAA/AD4APQA+AAAAAAAAAP4A/vw+/P78fvwAAAAAAAAAAPwAPAD8AHwA
-    fz9/P3w/fz9/AAAAAAAAAD8APwA8AD8AAAAAAAAAAAC+/L78fvz+/P4AAAAAAAAA
-    vAC8AHwA/AAAAAAAAAAAAAAAAAAAAH8AQABADkAQQAwAAAAAAAAAAAA/ADEALwAz
-    AAAAAAAA/gACAAIwAkgCeAAAAAAAAAAAAPwAzAC0AIRAAkACQBxAAH8AAAAAAAAA
-    AD0APQAjAD8AAAAAAAAAAAJIAkgCSAIA/gAAAAAAAAAAtAC0ALQA/AAAAAAAAAAA
+    AAAAAAAAHx8fHx8fHx8fHwAAAAAAAAAAAAAAAAAAAAAAAAAAAAD4+Pj4+Pj4+Pj4
+    AAAAAAAAAAAAAAAAAAAAAB8fHx8fHx8fHx8AAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+    +Pj4+Pj4+Pj4+AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+    AAAAAH8AfwB/AH8AfwB/AAAAAAAAAAAAAAAAAAAAAAAAAAAA/gD+AP4A/gD+AP4A
+    AAAAAAAAAAAAAAAAAAAAAH8AfwB/AH8AfwB/AAAAAAAAAAAAAAAAAAAAAAAAAAAA
+    /gD+AP4A/gD+AP4AAAAAAAAAAAAHBwcHBwcHBwcHBwcAAAAABwAHAAcABwAHAAcA
+    AAAAAODg4ODg4ODg4ODg4AAAAADgAOAA4ADgAOAA4AAHBwcHBwcHBwcHBwcAAAAA
+    BwAHAAcABwAHAAcAAAAAAODg4ODg4ODg4ODg4AAAAADgAOAA4ADgAOAA4AAAAAAA
+    AAAAAAAAAAAAAH9/f39/fwAAAAAAAAAAAAB/AH8AfwAAAAAAAAAAAAAA/v7+/v7+
+    AAAAAAAAAAAAAP4A/gD+AH9/f39/f39/AAAAAAAAAAB/AH8AfwB/AAAAAAAAAAAA
+    /v7+/v7+/v4AAAAAAAAAAP4A/gD+AP4AAAAAAAAAAAA=
   </largetileset>
   <palette>
     4AMAAP9/GAAAfA9Q733WAlsBAAAAAAAAAAAAAAAAAAA=
   </palette>
-  <frame id="box" order="2">
-    <object size="large" x="-39" y="-13" tile="3"/>
-    <object size="large" x="-39" y="7" tile="0"/>
-    <object size="large" x="-15" y="-13" tile="5"/>
-    <object size="large" x="-15" y="7" tile="2"/>
-    <entityhitbox type="SHIELD_ATTACK" x="-14" y="-10" width="14" height="10"/>
-    <entityhitbox type="BODY_ATTACK" x="-14" y="10" width="14" height="10"/>
-    <entityhitbox type="ATTACK" x="-38" y="10" width="14" height="10"/>
-    <entityhitbox type="BODY_WEAK" x="-38" y="-10" width="14" height="10"/>
+  <frame id="frame1" order="2">
+    <shield x="5" y="0" width="6" height="12"/>
+    <hitbox x="-5" y="-4" width="10" height="20"/>
+    <hurtbox x="-7" y="-6" width="14" height="24"/>
+    <object size="large" x="-8" y="3" tile="0"/>
+    <object size="large" x="-8" y="-7" tile="0"/>
+    <object size="large" x="0" y="-2" tile="2"/>
+    <object size="large" x="-8" y="-8" tile="1"/>
+    <object size="large" x="-8" y="4" tile="1"/>
   </frame>
-  <frame id="row1" order="2">
-    <object size="large" x="-1" y="-13" tile="1"/>
-    <entityhitbox type="BODY" x="0" y="-10" width="14" height="10"/>
+  <frame id="frame2" order="2">
+    <hurtbox x="-7" y="-12" width="14" height="24"/>
+    <object size="large" x="-8" y="-14" tile="1"/>
+    <object size="large" x="-8" y="-2" tile="1"/>
   </frame>
-  <frame id="row2" order="2">
-    <object size="large" x="-1" y="-13" tile="4"/>
-    <object size="large" x="23" y="-13" tile="5"/>
-    <entityhitbox type="SHIELD_ATTACK" x="24" y="-10" width="14" height="10"/>
-    <entityhitbox type="SHIELD" x="0" y="-10" width="14" height="10"/>
+  <frame id="frame3" order="2">
+    <shield x="-7" y="-12" width="14" height="19"/>
+    <hurtbox x="-7" y="-12" width="14" height="19"/>
+    <object size="large" x="-8" y="-17" tile="3"/>
+    <object size="large" x="-8" y="-7" tile="1"/>
   </frame>
-  <frame id="row3" order="2">
-    <object size="large" x="-1" y="-13" tile="4"/>
-    <object size="large" x="47" y="-13" tile="0"/>
-    <object size="large" x="23" y="-13" tile="1"/>
-    <entityhitbox type="ATTACK" x="48" y="-10" width="14" height="10"/>
-    <entityhitbox type="BODY" x="24" y="-10" width="14" height="10"/>
-    <entityhitbox type="SHIELD" x="0" y="-10" width="14" height="10"/>
+  <frame id="frame4" order="2">
+    <shield x="-10" y="-7" width="6" height="12"/>
+    <hitbox x="-4" y="-6" width="10" height="10"/>
+    <hurtbox x="-6" y="-9" width="14" height="16"/>
+    <object size="large" x="-15" y="-9" tile="2"/>
+    <object size="large" x="-7" y="-9" tile="0"/>
+    <object size="large" x="-7" y="-11" tile="1"/>
+    <object size="large" x="-7" y="-7" tile="1"/>
   </frame>
-  <frame id="row4" order="2">
-    <object size="large" x="71" y="-13" tile="0"/>
-    <object size="large" x="23" y="-13" tile="2"/>
-    <object size="large" x="47" y="-13" tile="1"/>
-    <object size="large" x="-1" y="-13" tile="3"/>
-    <entityhitbox type="ATTACK" x="72" y="-10" width="14" height="10"/>
-    <entityhitbox type="BODY" x="48" y="-10" width="14" height="10"/>
-    <entityhitbox type="BODY_ATTACK" x="24" y="-10" width="14" height="10"/>
-    <entityhitbox type="BODY_WEAK" x="0" y="-10" width="14" height="10"/>
+  <frame id="frame5" order="2">
+    <shield x="5" y="-11" width="6" height="12"/>
+    <hitbox x="-2" y="-18" width="6" height="6"/>
+    <hurtbox x="-6" y="-13" width="14" height="18"/>
+    <object size="large" x="0" y="-13" tile="2"/>
+    <object size="small" x="-3" y="-19" tile="0"/>
+    <object size="large" x="-7" y="-15" tile="1"/>
+    <object size="large" x="-7" y="-9" tile="1"/>
+  </frame>
+  <frame id="frame6" order="2">
+    <hitbox x="-5" y="-8" width="10" height="16"/>
+    <object size="large" x="-8" y="-11" tile="0"/>
+    <object size="large" x="-8" y="-5" tile="0"/>
   </frame>
 </metasprite>

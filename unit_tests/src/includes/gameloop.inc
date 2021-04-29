@@ -100,10 +100,12 @@ function ProcessFrame {
 
     Entity.ProcessSpecialLists()
 
-    MetaSprite.EntityHitbox.Begin()
-        MetaSprite.EntityHitbox.TestForCollisionsWithPlayer(EnemyProjectiles, Enemies)
-        MetaSprite.EntityHitbox.TestCollisions(PlayerProjectiles,   Enemies)
-    MetaSprite.EntityHitbox.End()
+    MetaSprite.CollisionBoxes.Begin()
+        MetaSprite.CollisionBoxes.TestPlayerHitboxAgainstEntityList(EnemyProjectiles, Enemies)
+        MetaSprite.CollisionBoxes.TestPlayerHurtboxAgainstEntityList(EnemyProjectiles, Enemies)
+
+        MetaSprite.CollisionBoxes.TestEntityListHitboxAgainstEntityList(PlayerProjectiles, Enemies)
+    MetaSprite.CollisionBoxes.End()
 
 
     // ::KUDOS NovaSquirrel::

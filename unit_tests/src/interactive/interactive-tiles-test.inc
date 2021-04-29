@@ -69,7 +69,9 @@ namespace InteractiveTilesTest_Player {
     i16()
     code()
     RoomAboutToChange:
-    ProcessCollision:
+    HitboxCollision:
+    HurtboxCollision:
+    ShieldCollision:
     function Null {
         rts
     }
@@ -145,7 +147,9 @@ namespace InteractiveTilesTest_Entity {
     code()
     Destructor:
     Deactivated:
-    ProcessCollision:
+    HitboxCollision:
+    HurtboxCollision:
+    ShieldCollision:
     function Null {
         rts
     }

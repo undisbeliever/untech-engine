@@ -122,7 +122,9 @@ namespace EightDirectionProjectile {
     code()
     Destructor:
     Deactivated:
-    ProcessCollision:
+    HitboxCollision:
+    HurtboxCollision:
+    ShieldCollision:
     function Null {
         rts
     }
@@ -172,7 +174,9 @@ namespace ActionPointSpawner {
     i16()
     code()
     RoomAboutToChange:
-    ProcessCollision:
+    HitboxCollision:
+    HurtboxCollision:
+    ShieldCollision:
     function Null {
         rts
     }

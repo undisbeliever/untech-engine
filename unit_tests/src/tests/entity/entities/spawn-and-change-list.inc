@@ -102,7 +102,9 @@ namespace SpawnAndChangeList {
     code()
     Destructor:
     Deactivated:
-    ProcessCollision:
+    HitboxCollision:
+    HurtboxCollision:
+    ShieldCollision:
     function NULL {
         rts
     }

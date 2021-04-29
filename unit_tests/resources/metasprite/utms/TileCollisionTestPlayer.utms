@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF_8"?>
 <!DOCTYPE untech>
-<metasprite id="TileCollisionTestPlayer" tilesettype="TWO_TILES_FIXED" exportorder="EhCollisionTest_Player">
+<metasprite id="TileCollisionTestPlayer" tilesettype="TWO_TILES_FIXED" exportorder="TileCollisionTest_Player">
   <smalltileset>
     PAA8ADwAPAA8ADwAPAA8AAAAAAAAAAAAAAAAAAAAAAD/AP8A/wD/AP8A/wD/AP8A
     AAAAAAAAAAAAAAAAAAAAAAAAAAAAABgAGAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA

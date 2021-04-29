@@ -29,7 +29,9 @@ i16()
 code()
 Destructor:
 Deactivated:
-ProcessCollision:
+HitboxCollision:
+HurtboxCollision:
+ShieldCollision:
 function Null {
     rts
 }

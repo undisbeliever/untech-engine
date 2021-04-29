@@ -6,58 +6,58 @@
   <frame id="Fall_Left" order="2">
     <gridlocation x="7" y="0"/>
     <tilehitbox x="2" y="3" width="11" height="11"/>
+    <hitbox x="5" y="0" width="6" height="4"/>
+    <hurtbox x="2" y="4" width="11" height="10"/>
     <object size="large" x="0" y="0"/>
-    <entityhitbox type="---B" x="2" y="4" width="11" height="10"/>
-    <entityhitbox type="--A-" x="5" y="0" width="6" height="4"/>
   </frame>
   <frame id="Stand_Left" order="2">
     <gridlocation x="1" y="0"/>
     <tilehitbox x="2" y="3" width="11" height="12"/>
+    <hitbox x="5" y="1" width="6" height="4"/>
+    <hurtbox x="2" y="4" width="11" height="11"/>
     <object size="large" x="0" y="0"/>
-    <entityhitbox type="---B" x="2" y="4" width="11" height="11"/>
-    <entityhitbox type="--A-" x="5" y="1" width="6" height="4"/>
   </frame>
   <frame id="TouchPlayer_Left" order="2">
     <gridlocation x="8" y="0"/>
     <tilehitbox x="2" y="3" width="11" height="12"/>
+    <hitbox x="5" y="1" width="6" height="4"/>
+    <hurtbox x="2" y="5" width="11" height="10"/>
     <object size="large" x="0" y="0"/>
-    <entityhitbox type="---B" x="2" y="5" width="11" height="10"/>
-    <entityhitbox type="--A-" x="5" y="1" width="6" height="4"/>
   </frame>
   <frame id="Walk_Left_0" order="2">
     <gridlocation x="2" y="0"/>
     <tilehitbox x="2" y="3" width="11" height="12"/>
+    <hitbox x="5" y="0" width="6" height="4"/>
+    <hurtbox x="2" y="4" width="11" height="10"/>
     <object size="large" x="0" y="0"/>
-    <entityhitbox type="---B" x="2" y="4" width="11" height="10"/>
-    <entityhitbox type="--A-" x="4" y="1" width="7" height="3"/>
   </frame>
   <frame id="Walk_Left_1" order="2">
     <gridlocation x="3" y="0"/>
     <tilehitbox x="2" y="3" width="11" height="12"/>
+    <hitbox x="5" y="1" width="6" height="4"/>
+    <hurtbox x="2" y="5" width="11" height="10"/>
     <object size="large" x="0" y="0"/>
-    <entityhitbox type="---B" x="2" y="5" width="11" height="10"/>
-    <entityhitbox type="--A-" x="5" y="1" width="5" height="4"/>
   </frame>
   <frame id="Walk_Left_2" order="2">
     <gridlocation x="4" y="0"/>
     <tilehitbox x="2" y="3" width="11" height="12"/>
+    <hitbox x="5" y="1" width="6" height="4"/>
+    <hurtbox x="2" y="5" width="11" height="10"/>
     <object size="large" x="0" y="0"/>
-    <entityhitbox type="---B" x="2" y="5" width="11" height="10"/>
-    <entityhitbox type="--A-" x="5" y="1" width="5" height="4"/>
   </frame>
   <frame id="Walk_Left_3" order="2">
     <gridlocation x="5" y="0"/>
     <tilehitbox x="2" y="3" width="11" height="12"/>
+    <hitbox x="5" y="0" width="6" height="4"/>
+    <hurtbox x="2" y="4" width="11" height="11"/>
     <object size="large" x="0" y="0"/>
-    <entityhitbox type="---B" x="2" y="4" width="11" height="11"/>
-    <entityhitbox type="--A-" x="5" y="0" width="6" height="4"/>
   </frame>
   <frame id="Walk_Left_4" order="2">
     <gridlocation x="6" y="0"/>
     <tilehitbox x="2" y="3" width="11" height="12"/>
+    <hitbox x="5" y="1" width="6" height="4"/>
+    <hurtbox x="2" y="5" width="11" height="10"/>
     <object size="large" x="0" y="0"/>
-    <entityhitbox type="---B" x="2" y="5" width="11" height="10"/>
-    <entityhitbox type="--A-" x="5" y="0" width="6" height="5"/>
   </frame>
   <animation id="Walk_Left" durationformat="DISTANCE_HORIZONTAL">
     <aframe frame="Walk_Left_0" duration="30"/>

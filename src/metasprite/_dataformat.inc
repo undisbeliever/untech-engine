@@ -10,18 +10,20 @@
 
 
 // Data format may be subject to changes
-if MetaSprite.Data.METASPRITE_FORMAT_VERSION != 39 {
+if MetaSprite.Data.METASPRITE_FORMAT_VERSION != 40 {
     error "Invalid UnTech MetaSprite Format"
 }
 
 // In order to simplify processing of the MetaSprites, there are no
 // signed integers in the MetaSprite data structures.
 //
-// Instead a data type called `int_ms8` is used with the format:
+// Instead a biased data type called `int_ms8` is used with an offset of 128.
 //
-//      ROM DATA = (value + INT_MS8_OFFSET)
+// Integers can be converted to `int_ms8` with the following formula:
+//      int_ms8 value = (integerValue + INT_MS8_OFFSET)
 //
 constant INT_MS8_OFFSET = 128
+
 
 // `Index+1` is an word index data format with the following meaning
 //
@@ -48,8 +50,8 @@ namespace Data {
 
     constant FrameData = Project.MS_FrameData;
     constant FrameObjectsData = Project.MS_FrameObjectsData;
-    constant EntityHitboxData = Project.MS_EntityHitboxData;
     constant ActionPointsData = Project.MS_ActionPointsData;
+    constant CollisionBoxData = Project.MS_CollisionBoxData;
     constant AnimationData = Project.MS_AnimationData;
 
     // Palette Data
@@ -124,15 +126,14 @@ namespace Format {
             // (Index+1 format)
             field(frameObjects, 2)
 
-            // Index+1 of the EntityHitbox data in the `EntityHitboxData` block
-            // May be NULL
-            // (Index+1 format)
-            field(entityHitbox, 2)
-
             // Index+1 of the ActionPoints data in the `ActionPointsData` block
             // May be NULL
             // (Index+1 format)
             field(actionPoints, 2)
+
+            // Index into the frame's collision box data.
+            // (index into CollisionBoxes struct)
+            field(collisionBoxes, 2)
 
             // Index+1 of the tileset in the `DMA_Tile16Data` block
             //
@@ -150,6 +151,8 @@ namespace Format {
             //
             // Optional: If the frame has no tile hitbox then all 32
             //           bits of TileHitbox MUST be set.
+            //
+            // ::TODO move into CollisionBoxes::
             namespace TileHitbox {
                 // Distance from origin to the left side of the hitbox.
                 // Cannot be zero.
@@ -224,94 +227,6 @@ namespace Format {
     }
 
 
-    // The hitbox of the entity, used by the physics engine for entity
-    // collisions.
-    //
-    // The collision hitbox is represented by multiple Axis-Aligned
-    // Bounding Boxes, each of a different type.
-    //
-    // The type is dependant of the implementation code, but allows for
-    // flexibility in defining different collision areas on a frame.
-    //
-    // For example, an enemy frame could consist of:
-    //
-    //      * a sword AABB (the part the hurts the player)
-    //      * a shield AABB (the part where no damage would occur if hit)
-    //      * a weak-point AABB (where double damage would occur if hit)
-    //      * a body AABB (where normal damage would occur if hit)
-    //
-    //
-    // This data structure uses 16 bit values for the width and height,
-    // as it saves 20% cpu time in the check collision code (on average).
-    //
-    // In order to save processing an "outer" hitbox is used. This
-    // hitbox is tested first, then only if that hits, will the inner
-    // hitboxes be tested.
-    //
-    // Some hitboxes only involve one AABB. In this case count is 0 and
-    // the outer hitbox is checked.
-    namespace EntityHitbox {
-        assert(Data.EntityHitboxData & 0xffff != 0)
-        struct(Data.EntityHitboxData - 1)
-            // Determines the number of hitboxes used by the entity.
-            //
-            // Value is `number of hitboxes - 1`. The maximum allowed
-            // value is 3 (4 hitboxes).
-            //
-            // If zero then only the outer hitbox is checked, the inner
-            // hitboxes are not processed
-            field(count, 1)
-            constant COUNT_MASK = 3
-
-            // Outer hitbox, checked first
-            //
-            // NOTE: actual size of hitbox is width/height + 1
-            namespace Outer {
-                field(xOffset, 1) // int_ms8 format
-                field(width, 1)   // uint8 (offset by 1)
-                field(yOffset, 1) // int_ms8 format
-                field(height, 1)  // uint8 (offset by 1)
-            }
-
-            // The inner hitboxes, repeated `count + 1` times
-            //
-            // NOTE: actual size of hitbox is width/height + 1
-            //
-            // All inner hitboxes MUST be inside the outer hitbox.
-            namespace Inner {
-                // type of hitbox
-                // (EntityHitboxType 4 bit bitfield, upper nibble MUST BE 0)
-                field(type, 1)
-
-                field(xOffset, 1) // int_ms8 format
-                field(width, 1)   // uint8 (offset by 1)
-                field(yOffset, 1) // int_ms8 format
-                field(height, 1)  // uint8 (offset by 1)
-
-                constant size = 5
-            }
-
-            // The type of a single hitbox
-            //
-            // Only set if count == 0
-            // (EntityHitboxType 4 bit bitfield, upper nibble MUST BE 0)
-            constant singleHitboxType = Inner.type
-        endstruct()
-    }
-
-    // The entity hitbox type bitfield
-    //
-    // Upper bits MUST BE 0
-    namespace EntityHitboxType {
-        constant WEAK   = 0x08
-        constant SHIELD = 0x04
-        constant ATTACK = 0x02
-        constant BODY   = 0x01
-
-        constant _N_BITS = 4
-    }
-
-
     // Action points used by the metasprite animation engine.
     //
     // The data structure is NULL terminated.
@@ -342,6 +257,53 @@ namespace Format {
             //
             // (int_ms8 pair, xPos then yPos)
             field(positionPair, 2)
+        endstruct()
+    }
+
+
+    // The entity collision boxes.
+    //
+    // Each collision box is optional.  If a collision box does not exist then
+    // all 32 bits of the box must be set.
+    //
+    // The maximum width or height for any of these boxes is 127 pixels.
+    //
+    // NOTE: All MetaSprite frames contain a `CollisionBoxes` data structure.
+    //       Thus this struct IS NOT accessed with a `index+1` index.
+    //
+    namespace CollisionBoxes {
+        struct(Data.CollisionBoxData)
+
+            // Collides with an opponents Shield or Hurtbox.
+            //
+            // This collision box is tested first.  If there is a shield collision,
+            // then the Hitbox/Hurtbox collision test will not be preformed.
+            //
+            // This collision box is ignored for the player entity and the
+            // entity in the outer loop of `TestEntityListHitboxAgainstEntityList`.
+            //
+            namespace Shield {
+                field(xOffset, 1) // int_ms8 format
+                field(width, 1)   // uint8 (offset by 1)
+                field(yOffset, 1) // int_ms8 format
+                field(height, 1)  // uint8 (offset by 1)
+            }
+
+            // Collides with an opponents Shield or Hurtbox.
+            namespace Hurtbox {
+                field(xOffset, 1) // int_ms8 format
+                field(width, 1)   // uint8 (offset by 1)
+                field(yOffset, 1) // int_ms8 format
+                field(height, 1)  // uint8 (offset by 1)
+            }
+
+            // Collides with an opponents Shield or Hitbox.
+            namespace Hitbox {
+                field(xOffset, 1) // int_ms8 format
+                field(width, 1)   // uint8 (offset by 1)
+                field(yOffset, 1) // int_ms8 format
+                field(height, 1)  // uint8 (offset by 1)
+            }
         endstruct()
     }
 
@@ -401,21 +363,6 @@ namespace Format {
 }
 
 }
-
-// Global bitmasks for collisions
-constant THIS_WEAK   = MetaSprite.Format.EntityHitboxType.WEAK   << MetaSprite.Format.EntityHitboxType._N_BITS
-constant THIS_SHIELD = MetaSprite.Format.EntityHitboxType.SHIELD << MetaSprite.Format.EntityHitboxType._N_BITS
-constant THIS_ATTACK = MetaSprite.Format.EntityHitboxType.ATTACK << MetaSprite.Format.EntityHitboxType._N_BITS
-constant THIS_BODY   = MetaSprite.Format.EntityHitboxType.BODY   << MetaSprite.Format.EntityHitboxType._N_BITS
-
-constant OTHER_WEAK   = MetaSprite.Format.EntityHitboxType.WEAK
-constant OTHER_SHIELD = MetaSprite.Format.EntityHitboxType.SHIELD
-constant OTHER_ATTACK = MetaSprite.Format.EntityHitboxType.ATTACK
-constant OTHER_BODY   = MetaSprite.Format.EntityHitboxType.BODY
-
-// THIS_WEAK and THIS_SHIELD can be tested with the bit instruction
-assert(THIS_WEAK == 0x80)
-assert(THIS_SHIELD == 0x40)
 
 // vim: ft=bass-65816 ts=4 sw=4 et:
 

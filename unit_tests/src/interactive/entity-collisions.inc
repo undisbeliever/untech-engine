@@ -3,15 +3,14 @@
 // Distributed under The MIT License: https://opensource.org/licenses/MIT
 
 
-// EntityHitbox Interactive Collisions Test.
+// Interactive Entity Collisions Test.
 //
 // Displays a single player entity and multiple enemy entities on screen.
 // The player entity is moveable with the D-PAD, and entity type can be
 // changed with SELECT.
 //
-// When two entities collide the arguments sent to entity's ProcessCollision
-// routine are displayed on screen and a particle is spawned at the collision
-// centre.
+// When two entities collide the arguments sent to entity's collision routines
+// are displayed on screen and a particle is spawned at the collision centre.
 //
 // Tests:
 //  * The Entity Loop
@@ -27,7 +26,7 @@ namespace Players {
 namespace EhCollisionTest_Player {
     buildFunctionTable(BasePlayerFunctionTable, EhCollisionTest_Player)
 
-    constant N_FRAMES = 8
+    constant N_FRAMES = 6
 
     namespace EntityStruct {
         childstruct(BaseEntity)
@@ -68,16 +67,15 @@ namespace EhCollisionTest_Player {
     }
 
 
-    // Print the Move the entity's position with D-PAD, change the entity type on SELECT.
-    //
     // REQUIRES: 16 bit A, 16 bit Index, DB = 0x7e
     // INPUT: DP = entity
-    // INPUT:  A = MetaSprite.Collision.bits
-    // INPUT:  A = MetaSprite.Collision.bits
+    //        Y = other entity
+    //        Carry set if collision with shield
     a16()
     i16()
     code()
-    function ProcessCollision {
+    function HitboxCollision {
+        ldx.w   #InteractiveTests.EntityHitboxCollisionsTest.HitboxString
         jsr     InteractiveTests.EntityHitboxCollisionsTest.PrintProcessCollisionArgs
 
         // Spawn the CollisionCentre
@@ -85,6 +83,38 @@ namespace EhCollisionTest_Player {
 
         rts
     }
+
+
+    // REQUIRES: 16 bit A, 16 bit Index, DB = 0x7e
+    // INPUT: DP = entity
+    //        Y = other entity
+    //        Carry set if collision with shield
+    a16()
+    i16()
+    code()
+    function HurtboxCollision {
+        ldx.w   #InteractiveTests.EntityHitboxCollisionsTest.HurtboxString
+        jsr     InteractiveTests.EntityHitboxCollisionsTest.PrintProcessCollisionArgs
+
+        // Spawn the CollisionCentre
+        SpawnEntityAtMetaSpriteCollisionCentre(EhCollisionTest_CollisionCentre)
+
+        rts
+    }
+
+
+    // REQUIRES: 16 bit A, 16 bit Index, DB = 0x7e
+    // INPUT: DP = entity
+    //        Y = other entity
+    //        Carry set if collision with hitbox
+    a16()
+    i16()
+    code()
+    function ShieldCollision {
+        // Player shield collision is not implemented
+        jmp     Test.Fail
+    }
+
 
 
     // Move the entity's position with the D-PAD, change the entity type on SELECT.
@@ -135,8 +165,6 @@ namespace EhCollisionTest_Player {
 
 
 namespace EhCollisionTest_Enemy {
-    constant ProcessCollision = InteractiveTests.EntityHitboxCollisionsTest.PrintProcessCollisionArgs
-
     buildFunctionTable(BaseEntityFunctionTable, EhCollisionTest_Enemy)
 
 
@@ -184,8 +212,46 @@ namespace EhCollisionTest_Enemy {
     i16()
     code()
     function Process {
-
         jmp     Entity.DrawAndGotoNextEntity
+    }
+
+
+    // REQUIRES: 16 bit A, 16 bit Index, DB = 0x7e
+    // INPUT: DP = entity
+    //        Y = other entity
+    //        Carry set if collision with shield
+    a16()
+    i16()
+    code()
+    function HitboxCollision {
+        ldx.w   #InteractiveTests.EntityHitboxCollisionsTest.HitboxString
+        jmp     InteractiveTests.EntityHitboxCollisionsTest.PrintProcessCollisionArgs
+    }
+
+
+    // REQUIRES: 16 bit A, 16 bit Index, DB = 0x7e
+    // INPUT: DP = entity
+    //        Y = other entity
+    //        Carry set if collision with shield
+    a16()
+    i16()
+    code()
+    function HurtboxCollision {
+        ldx.w   #InteractiveTests.EntityHitboxCollisionsTest.HurtboxString
+        jmp     InteractiveTests.EntityHitboxCollisionsTest.PrintProcessCollisionArgs
+    }
+
+
+    // REQUIRES: 16 bit A, 16 bit Index, DB = 0x7e
+    // INPUT: DP = entity
+    //        Y = other entity
+    //        Carry set if collision with hitbox
+    a16()
+    i16()
+    code()
+    function ShieldCollision {
+        ldx.w   #InteractiveTests.EntityHitboxCollisionsTest.ShieldString
+        jmp     InteractiveTests.EntityHitboxCollisionsTest.PrintProcessCollisionArgs
     }
 }
 
@@ -228,7 +294,9 @@ namespace EhCollisionTest_CollisionCentre {
     code()
     Destructor:
     Deactivated:
-    ProcessCollision:
+    HitboxCollision:
+    HurtboxCollision:
+    ShieldCollision:
     function Null {
         rts
     }
@@ -256,8 +324,20 @@ namespace EhCollisionTest_CollisionCentre {
 namespace InteractiveTests {
 namespace EntityHitboxCollisionsTest {
 
-constant _collisionBits               = Test.tmp + 0
-constant _processCollisionArgumentsOk = Test.tmp + 2
+constant _carryFlag     = Test.tmp + 2
+constant _otherEntity   = Test.tmp + 4
+
+
+rodata(rom0)
+HitboxString:
+    db  "Hitbox  ", 0
+
+HurtboxString:
+    db  "Hurtbox ", 0
+
+ShieldString:
+    db  "Shield  ", 0
+
 
 // Prints the ProcessCollision arguments to screen.
 //
@@ -265,75 +345,40 @@ constant _processCollisionArgumentsOk = Test.tmp + 2
 // to zero if they do not match.
 //
 // REQUIRES: 16 bit A, 16 bit Index, DB = 0x7e
-// DP = entity
-// A = MetaSprite.Collision.bits
-// Y = MetaSprite.Collision.otherEntity
+// INPUT: DP = entity
+//        carry = state of carry flag at Collision callback
+//        Y = otherEntity
+//        X = String address (in rom0 bank)
 a16()
 i16()
 code()
 function PrintProcessCollisionArgs {
-constant tmpString = Text.tmpString
+    lda.w   #0
+    rol
+    sta.w   _carryFlag
 
-    sep     #$20
-a8()
-    cmp.w   MetaSprite.Collision.bits
-    bne     _ArgumentsFail
+    sty.w   _otherEntity
 
-    rep     #$30
-a16()
-i16()
-    cpy.w   MetaSprite.Collision.otherEntity
-    beq     +
-_ArgumentsFail:
-        rep     #$30
-        stz.w   _processCollisionArgumentsOk
-    +
+
+    lda.w   #HitboxString >> 16
+    jsr     Text.Console.PrintString
+
 
     tdc
     jsr     Text.Console.PrintHex16A
 
-
     Text.Console.PrintConstString(" ")
 
-    sep     #$20
-a8()
-    lda.w    MetaSprite.Collision.bits
-    sta.w   _collisionBits
-
-    jsr     Text.Console.PrintHex8A
-
-
-    // Convert _collisionBits to a human readable string
-    lda.b   #Text.Font.SPACE
-    sta.w   tmpString
-    sta.w   tmpString + 8 + 1
-    stz.w   tmpString + 8 + 2
-
-    ldx.w   #7
-    Loop:
-        lsr.w   _collisionBits
-        bcc     +
-            lda.l   BitsString,x
-            bra     ++
-        +
-            lda.b   #Text.Font.MINUS
-        +
-        sta.w   tmpString + 1,x
-        dex
-        bpl     Loop
-
-    lda.b   #tmpString >> 16
-    ldx.w   #tmpString
-    jsr     Text.Console.PrintString
-
-    ldy.w   MetaSprite.Collision.otherEntity
+    ldy.w   _otherEntity
     jsr     Text.Console.PrintHex16Y
+
+    lda.w   _carryFlag
+    beq     +
+        Text.Console.PrintConstString(" C")
+    +
 
     jsr     Text.Console.NewLine
 
-    rep     #$30
-a16()
-i16()
 
     // Corrupt all utDpTmp variables.
     //
@@ -341,11 +386,6 @@ i16()
     // are not used across a call boundary.
 
     jmp     _DirtyUtDpTmp
-
-
-rodata(rom0)
-BitsString:
-    db      "WSABwsab"
 }
 
 
@@ -359,9 +399,6 @@ code()
 Test.add("EntityHitbox Collisions Tst")
 function Test {
 
-    lda.w   #0xffff
-    sta.w   _processCollisionArgumentsOk
-
 
     lda.w   #Project.RoomList.EntityHitboxCollisionsTest
     ldx.w   #Project.PlayerIds.EhCollisionTest_Player
@@ -371,6 +408,9 @@ function Test {
 
     jsr     Resources.TransferToPpu
     jsr     MetaTiles.Render.DrawFullScreen_ForceBlank
+
+
+    // ::TODO add projectiles to this test::
 
 
     jsr     EnableDisplay_Full
@@ -395,10 +435,6 @@ function Test {
         jsr     GameLoop.ProcessFrame
 
         jsr     _DirtyUtDpTmp
-
-        // test ProcessCollision arguments still Ok
-        lda.w   _processCollisionArgumentsOk
-        beq     Fail
 
         jsr     WaitFrame
 

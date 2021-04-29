@@ -8,7 +8,7 @@
     AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
     AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=
   </map>
-  <entrance name="Player" x="128" y="160" orientation="down-right"/>
+  <entrance name="Player" x="128" y="144" orientation="down-right"/>
   <entity-group name="DoNotSpawn_1">
     <entity entity="EightDirectionProjectile" x="128" y="80" parameter=""/>
     <entity entity="EightDirectionProjectile" x="96" y="80" parameter=""/>
@@ -20,16 +20,16 @@
     <entity entity="EightDirectionProjectile" x="160" y="90" parameter=""/>
   </entity-group>
   <entity-group name="Enemies">
-    <entity entity="EhCollisionTest_Enemy" x="105" y="154" parameter="0"/>
-    <entity entity="EhCollisionTest_Enemy" x="138" y="134" parameter="1"/>
-    <entity entity="EhCollisionTest_Enemy" x="138" y="154" parameter="2"/>
-    <entity entity="EhCollisionTest_Enemy" x="138" y="174" parameter="3"/>
-    <entity entity="EhCollisionTest_Enemy" x="138" y="194" parameter="4"/>
-    <entity entity="EhCollisionTest_Enemy" x="114" y="161" parameter="0"/>
-    <entity entity="EhCollisionTest_Enemy" x="147" y="141" parameter="1"/>
-    <entity entity="EhCollisionTest_Enemy" x="147" y="161" parameter="2"/>
-    <entity entity="EhCollisionTest_Enemy" x="147" y="181" parameter="3"/>
-    <entity entity="EhCollisionTest_Enemy" x="147" y="201" parameter="4"/>
+    <entity entity="EhCollisionTest_Enemy" x="153" y="125" parameter="0"/>
+    <entity entity="EhCollisionTest_Enemy" x="193" y="159" parameter="1"/>
+    <entity entity="EhCollisionTest_Enemy" x="173" y="136" parameter="2"/>
+    <entity entity="EhCollisionTest_Enemy" x="173" y="164" parameter="3"/>
+    <entity entity="EhCollisionTest_Enemy" x="152" y="108" parameter="3"/>
+    <entity entity="EhCollisionTest_Enemy" x="193" y="105" parameter="0"/>
+    <entity entity="EhCollisionTest_Enemy" x="151" y="166" parameter="4"/>
+    <entity entity="EhCollisionTest_Enemy" x="173" y="186" parameter="2"/>
+    <entity entity="EhCollisionTest_Enemy" x="193" y="135" parameter="5"/>
+    <entity entity="EhCollisionTest_Enemy" x="173" y="117" parameter="4"/>
   </entity-group>
   <entity-group name="Blank">
     <entity entity="EhCollisionTest_BlankEnemy" x="128" y="130" parameter=""/>

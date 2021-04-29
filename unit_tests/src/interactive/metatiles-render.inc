@@ -47,7 +47,9 @@ namespace MapCursor {
     i16()
     code()
     RoomAboutToChange:
-    ProcessCollision:
+    HitboxCollision:
+    HurtboxCollision:
+    ShieldCollision:
     function Null {
         rts
     }
