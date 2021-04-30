@@ -101,8 +101,7 @@ function ProcessFrame {
     Entity.ProcessSpecialLists()
 
     MetaSprite.CollisionBoxes.Begin()
-        MetaSprite.CollisionBoxes.TestPlayerHitboxAgainstEntityList(EnemyProjectiles, Enemies)
-        MetaSprite.CollisionBoxes.TestPlayerHurtboxAgainstEntityList(EnemyProjectiles, Enemies)
+        MetaSprite.CollisionBoxes.TestPlayerHitboxAndHurtboxAgainstEntityList(EnemyProjectiles, Enemies)
 
         MetaSprite.CollisionBoxes.TestEntityListHitboxAgainstEntityList(PlayerProjectiles, Enemies)
     MetaSprite.CollisionBoxes.End()
