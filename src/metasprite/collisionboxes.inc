@@ -563,14 +563,10 @@ NoCollision_{#}:
 //
 // BRANCH: to `NoHitboxLabel` if the player does not have a hitbox
 inline _SetupPlayerHitbox(NoHitboxLabel) {
-    ldy.w   #Entity.playerEntity
-    sty.b   MetaSprite.CollisionBoxes.entityA.entityAddress
+    ldx.w   #Entity.playerEntity
+    stx.b   MetaSprite.CollisionBoxes.entityA.entityAddress
 
-    // ::TODO add collisionBox index to BaseEntity::
-    ldx.b   BaseEntity.MetaSprite.currentFrame,y
-    lda.l   MetaSprite.Format.Frame.collisionBoxes,x
-    tyx
-    tay
+    ldy.b   BaseEntity.MetaSprite.collisionBoxes,x
 
     MetaSprite.CollisionBoxes._SetupAabb(Hitbox, entityA.hitboxAabb, {NoHitboxLabel})
 }
@@ -585,14 +581,10 @@ inline _SetupPlayerHitbox(NoHitboxLabel) {
 //
 // BRANCH: to `NoHurtboxLabel` if the player does not have a hurtbox
 inline _SetupPlayerHurtbox(NoHurtboxLabel) {
-    ldy.w   #Entity.playerEntity
-    sty.b   MetaSprite.CollisionBoxes.entityA.entityAddress
+    ldx.w   #Entity.playerEntity
+    stx.b   MetaSprite.CollisionBoxes.entityA.entityAddress
 
-    // ::TODO add collisionBox index to BaseEntity::
-    ldx.b   BaseEntity.MetaSprite.currentFrame,y
-    lda.l   MetaSprite.Format.Frame.collisionBoxes,x
-    tyx
-    tay
+    ldy.b   BaseEntity.MetaSprite.collisionBoxes,x
 
     MetaSprite.CollisionBoxes._SetupAabb(Hurtbox, entityA.hurtboxAabb, {NoHurtboxLabel})
 }
@@ -612,7 +604,7 @@ inline _ProcessList_Hitbox_vs_ShieldAndHurtbox(entityList) {
 
     lda.l   {Entity.listAddress({entityList})}
     beq     EndIf{#}
-        tay
+        tax
         jsr     MetaSprite.CollisionBoxes.__ProcessList_Hitbox_vs_ShieldAndHurtbox
     EndIf{#}:
 }
@@ -632,7 +624,7 @@ inline _ProcessList_Hurtbox_vs_ShieldAndHitbox(entityList) {
 
     lda.l   {Entity.listAddress({entityList})}
     beq     EndIf{#}
-        tay
+        tax
         jsr     MetaSprite.CollisionBoxes.__ProcessList_Hurtbox_vs_ShieldAndHitbox
     EndIf{#}:
 }
@@ -652,7 +644,7 @@ inline _ProcessList_PlayerHitboxAndHurtbox_vs_EntityList(entityList) {
 
     lda.l   {Entity.listAddress({entityList})}
     beq     EndIf{#}
-        tay
+        tax
         jsr     MetaSprite.CollisionBoxes.__ProcessList_PlayerHitboxAndHurtbox_vs_EntityList
     EndIf{#}:
 }
@@ -672,17 +664,13 @@ inline _ListHitboxVsListHurtbox_Start(entityList, labelSuffix) {
     lda.l   {Entity.listAddress({entityList})}
     beq     ListEmpty_{labelSuffix}
 
-    tay
+    tax
 
     Loop_{labelSuffix}:
-        // Y = entity address (not null)
-        sty.b   MetaSprite.CollisionBoxes.entityA.entityAddress
+        // X = entity address (not null)
+        stx.b   MetaSprite.CollisionBoxes.entityA.entityAddress
 
-        // ::TODO add collisionBox index to BaseEntity::
-        ldx.b   BaseEntity.MetaSprite.currentFrame,y
-        lda.l   MetaSprite.Format.Frame.collisionBoxes,x
-        tyx
-        tay
+        ldy.b   BaseEntity.MetaSprite.collisionBoxes,x
 
         MetaSprite.CollisionBoxes._SetupAabb(Hitbox, entityA.hitboxAabb, NoHurtboxLabel_{labelSuffix})
 }
@@ -703,7 +691,7 @@ inline _ListHitboxVsListHurtbox_TestList(entityList) {
 
         lda.l   {Entity.listAddress({entityList})}
         beq     EndIf{#}
-            tay
+            tax
             jsr     MetaSprite.CollisionBoxes.__ProcessList_Hitbox_vs_ShieldAndHurtbox
         EndIf{#}:
 }
@@ -719,8 +707,8 @@ inline _ListHitboxVsListHurtbox_End(labelSuffix) {
     assert16i()
 
     NoHurtboxLabel_{labelSuffix}:
-        ldx.w   MetaSprite.CollisionBoxes.entityA.entityAddress
-        ldy.b   BaseEntity.next,x
+        ldy.w   MetaSprite.CollisionBoxes.entityA.entityAddress
+        ldx.b   BaseEntity.next,y
         bne     Loop_{labelSuffix}
 
     ListEmpty_{labelSuffix}:
@@ -956,8 +944,8 @@ ShieldCollision:
 
 
 ContinueLoopAfterCollision:
-    ldx.b   entityB.entityAddress
-    ldy.b   BaseEntity.next,x
+    ldy.b   entityB.entityAddress
+    ldx.b   BaseEntity.next,y
     beq     Return
 
 Fallthrough:
@@ -972,7 +960,7 @@ Fallthrough:
 //
 // REQUIRES: 16 bit A, 16 bit Index, DP = 0, DB = CollisionBoxBank
 //
-// INPUT: Y = first item in listB (NOT NULL)
+// INPUT: X = first item in listB (NOT NULL)
 // INPUT: entityA.hitboxAabb = the aabb of the hitbox to compare against
 // INPUT: entityA.entityAddress = the address of the entity to compare against
 a16()
@@ -982,28 +970,16 @@ function __ProcessList_Hitbox_vs_ShieldAndHurtbox {
     assert(pc() == Fallthrough)
 
     Loop:
-        // Y = entity address
-
-        // ::TODO add collisionBoxes index to BaseEntity::
-        ldx.b   BaseEntity.MetaSprite.currentFrame,y
-
-        if Data.FrameList >> 16 == CollisionBoxBank {
-            lda.w   Format.Frame.collisionBoxes,x
-        } else {
-            lda.l   Format.Frame.collisionBoxes,x
-        }
-        tyx
-        tay
-
         // X = entity address
-        // Y = hitbox address
+        ldy.b   BaseEntity.MetaSprite.collisionBoxes,x
 
         _BranchIfCollision(entityA.hitboxAabb, Shield, ShieldCollision)
         _BranchIfCollision(entityA.hitboxAabb, Hurtbox, HurtboxCollision)
 
     ContinueLoop:
         // X = entity address
-        ldy.b   BaseEntity.next,x
+        txy
+        ldx.b   BaseEntity.next,y
         bne     Loop
 
 Return:
@@ -1029,8 +1005,8 @@ ShieldCollision:
     __CallCollisionCallbacks(ShieldCollision, 0, HurtboxCollision, 1)
 
 ContinueLoopAfterCollision:
-    ldx.b   entityB.entityAddress
-    ldy.b   BaseEntity.next,x
+    ldy.b   entityB.entityAddress
+    ldx.b   BaseEntity.next,y
     beq     Return
 
 Fallthrough:
@@ -1045,7 +1021,7 @@ Fallthrough:
 //
 // REQUIRES: 16 bit A, 16 bit Index, DP = 0, DB = CollisionBoxBank
 //
-// INPUT: Y = first item in listB (NOT NULL)
+// INPUT: X = first item in listB (NOT NULL)
 // INPUT: entityA.hurtboxAabb = the aabb of the hurtbox to compare against
 // INPUT: entityA.entityAddress = the address of the entity to compare against
 a16()
@@ -1055,28 +1031,16 @@ function __ProcessList_Hurtbox_vs_ShieldAndHitbox {
     assert(pc() == Fallthrough)
 
     Loop:
-        // Y = entity address
-
-        // ::TODO add collisionBoxes index to BaseEntity::
-        ldx.b   BaseEntity.MetaSprite.currentFrame,y
-
-        if Data.FrameList >> 16 == CollisionBoxBank {
-            lda.w   Format.Frame.collisionBoxes,x
-        } else {
-            lda.l   Format.Frame.collisionBoxes,x
-        }
-        tyx
-        tay
-
         // X = entity address
-        // Y = hitbox address
+        ldy.b   BaseEntity.MetaSprite.collisionBoxes,x
 
         _BranchIfCollision(entityA.hurtboxAabb, Shield, ShieldCollision)
         _BranchIfCollision(entityA.hurtboxAabb, Hitbox, HitboxCollision)
 
     ContinueLoop:
         // X = entity address
-        ldy.b   BaseEntity.next,x
+        txy
+        ldx.b   BaseEntity.next,y
         bne     Loop
 
 Return:
@@ -1106,8 +1070,8 @@ HitboxShieldCollision:
 
 
 ContinueLoopAfterCollision:
-    ldx.b   entityB.entityAddress
-    ldy.b   BaseEntity.next,x
+    ldy.b   entityB.entityAddress
+    ldx.b   BaseEntity.next,y
     beq     Return
 
 Fallthrough:
@@ -1119,7 +1083,7 @@ Fallthrough:
 //
 // REQUIRES: 16 bit A, 16 bit Index, DP = 0, DB = CollisionBoxBank
 //
-// INPUT: Y = first item in listB (NOT NULL)
+// INPUT: X = first item in listB (NOT NULL)
 // INPUT: entityA.hittboxAabb = the aabb of the hitbox to compare against
 // INPUT: entityA.hurtboxAabb = the aabb of the hurtbox to compare against
 a16()
@@ -1129,21 +1093,8 @@ function __ProcessList_PlayerHitboxAndHurtbox_vs_EntityList {
     assert(pc() == Fallthrough)
 
     Loop:
-        // Y = entity address
-
-        // ::TODO add collisionBoxes index to BaseEntity::
-        ldx.b   BaseEntity.MetaSprite.currentFrame,y
-
-        if Data.FrameList >> 16 == CollisionBoxBank {
-            lda.w   Format.Frame.collisionBoxes,x
-        } else {
-            lda.l   Format.Frame.collisionBoxes,x
-        }
-        tyx
-        tay
-
         // X = entity address
-        // Y = hitbox address
+        ldy.b   BaseEntity.MetaSprite.collisionBoxes,x
 
         _BranchIfCollision(entityA.hitboxAabb, Shield, HitboxShieldCollision)
         _BranchIfCollision(entityA.hurtboxAabb, Shield, HurtboxShieldCollision)
@@ -1152,7 +1103,8 @@ function __ProcessList_PlayerHitboxAndHurtbox_vs_EntityList {
 
     ContinueLoop:
         // X = entity address
-        ldy.b   BaseEntity.next,x
+        txy
+        ldx.b   BaseEntity.next,y
         beq     +
             jmp     Loop
         +

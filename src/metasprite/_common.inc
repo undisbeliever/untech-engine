@@ -74,6 +74,7 @@ macro _InitEntity() {
     // failure mode for any entity that does not call SetFrame or
     // SetAnimation before the entity is rendered.
     stz.b   BaseEntity.MetaSprite.currentFrame
+    stz.b   BaseEntity.MetaSprite.collisionBoxes
 
     sep     #$10
 i8()
@@ -239,6 +240,9 @@ a16()
 
         stx.b   BaseEntity.MetaSprite.currentFrame
 
+        lda.l   MetaSprite.Format.Frame.collisionBoxes,x
+        sta.b   BaseEntity.MetaSprite.collisionBoxes
+
         bra     ProcessActionPoints
 
 ReturnFalse:
@@ -263,6 +267,9 @@ DynamicTileset:
         bcc     Return
 
         stx.b   BaseEntity.MetaSprite.currentFrame
+
+        lda.l   MetaSprite.Format.Frame.collisionBoxes,x
+        sta.b   BaseEntity.MetaSprite.collisionBoxes
 
 
 ProcessActionPoints:
