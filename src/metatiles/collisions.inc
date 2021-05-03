@@ -38,8 +38,8 @@ assert(BaseEntity.yMomentum.sx - BaseEntity.xMomentum.sx == 3)
 allocate(_leftRightPair, wram7e, 3)
 allocate(_yOffsetHeightPair, wram7e, 3)
 
-assert(MetaSprite.Format.Frame.TileHitbox.left + 1 == MetaSprite.Format.Frame.TileHitbox.right)
-assert(MetaSprite.Format.Frame.TileHitbox.yOffset + 1 == MetaSprite.Format.Frame.TileHitbox.height)
+assert(MetaSprite.Format.CollisionBoxes.TileHitbox.left + 1 == MetaSprite.Format.CollisionBoxes.TileHitbox.right)
+assert(MetaSprite.Format.CollisionBoxes.TileHitbox.yOffset + 1 == MetaSprite.Format.CollisionBoxes.TileHitbox.height)
 
 
 // Holds the X-component of a tile index.
@@ -308,13 +308,13 @@ a16()
 i16()
     // Calculate tile index for the top of the tile hitbox (if any)
 
-    ldx.b   BaseEntity.MetaSprite.currentFrame
-    // currentFrame is never null
-    lda.l   MetaSprite.Format.Frame.TileHitbox.yOffset,x
+    ldx.b   BaseEntity.MetaSprite.collisionBoxes
+    // collisionBoxes is never null
+    lda.l   MetaSprite.Format.CollisionBoxes.TileHitbox.yOffset,x
     sta.w   _yOffsetHeightPair
     bmi     NoHitbox
 
-    lda.l   MetaSprite.Format.Frame.TileHitbox.left,x
+    lda.l   MetaSprite.Format.CollisionBoxes.TileHitbox.left,x
     sta.w   _leftRightPair
 
     assert(Entity.MovementState.MOVING_RIGHT_FLAG == 0x40)

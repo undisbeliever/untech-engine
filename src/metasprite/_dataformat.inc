@@ -10,7 +10,7 @@
 
 
 // Data format may be subject to changes
-if MetaSprite.Data.METASPRITE_FORMAT_VERSION != 40 {
+if MetaSprite.Data.METASPRITE_FORMAT_VERSION != 41 {
     error "Invalid UnTech MetaSprite Format"
 }
 
@@ -142,37 +142,6 @@ namespace Format {
             // Optional: Never read on fixed tilesets
             // (Index+1 format)
             field(tileset, 2)
-
-            // The frame's tile hitbox, used for collision testing between
-            // the entity and the tilemap.
-            //
-            // NOTE: The frame's origin point MUST BE inside the tile
-            //       hitbox and not touching the hitbox edges.
-            //
-            // Optional: If the frame has no tile hitbox then all 32
-            //           bits of TileHitbox MUST be set.
-            //
-            // ::TODO move into CollisionBoxes::
-            namespace TileHitbox {
-                // Distance from origin to the left side of the hitbox.
-                // Cannot be zero.
-                // (uint8)
-                field(left, 1)
-                // Distance from origin to the right side of the hitbox.
-                // Cannot be zero.
-                // (uint8)
-                field(right, 1)
-
-                // Distance from the origin to the top of the hitbox
-                // Equal to `-top`.  Cannot be zero.  Must be a negative value.
-                // (sint8)
-                field(yOffset, 1)
-
-                // Height of the hitbox
-                // Cannot be zero. `height + yOffset` cannot be zero.
-                // (uint8, max value = 127)
-                field(height, 1)
-            }
         endstruct()
     }
 
@@ -303,6 +272,37 @@ namespace Format {
                 field(width, 1)   // uint8 (offset by 1)
                 field(yOffset, 1) // int_ms8 format
                 field(height, 1)  // uint8 (offset by 1)
+            }
+
+            // The frame's tile hitbox, used for collision testing between
+            // the entity and the tilemap.
+            //
+            // NOTE: This box uses a different format then the other collision boxes.
+            //
+            // NOTE: The frame's origin point MUST BE inside the tile
+            //       hitbox and not touching the hitbox edges.
+            //
+            // Optional: If the frame has no tile hitbox then all 32
+            //           bits of TileHitbox MUST be set.
+            namespace TileHitbox {
+                // Distance from origin to the left side of the hitbox.
+                // Cannot be zero.
+                // (uint8)
+                field(left, 1)
+                // Distance from origin to the right side of the hitbox.
+                // Cannot be zero.
+                // (uint8)
+                field(right, 1)
+
+                // Distance from the origin to the top of the hitbox
+                // Equal to `-top`.  Cannot be zero.  Must be a negative value.
+                // (sint8)
+                field(yOffset, 1)
+
+                // Height of the hitbox
+                // Cannot be zero. `height + yOffset` cannot be zero.
+                // (uint8, max value = 127)
+                field(height, 1)
             }
         endstruct()
     }
