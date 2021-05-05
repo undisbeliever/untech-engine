@@ -707,7 +707,7 @@ inline _ListHitboxVsListHurtbox_End(labelSuffix) {
     assert16i()
 
     NoHurtboxLabel_{labelSuffix}:
-        ldy.w   MetaSprite.CollisionBoxes.entityA.entityAddress
+        ldy.b   MetaSprite.CollisionBoxes.entityA.entityAddress
         ldx.b   BaseEntity.next,y
         bne     Loop_{labelSuffix}
 
