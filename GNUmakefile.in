@@ -106,7 +106,7 @@ $(foreach d, $(TABLE_DIRS), $(eval $(call TABLE_template, $d)))
 
 .INTERMEDIATE: project-data
 project-data: $(call rwildcard_all, $(dir $(PROJECT_FILE))) $(PROJECT_FILE)
-	$(untech-compiler) --output-bin "$(PROJECT_BIN)" --output-inc "$(PROJECT_INC)" "$(PROJECT_FILE)"
+	$(untech-compiler) --output-bin '$(PROJECT_BIN)' --output-inc '$(PROJECT_INC)' '$(PROJECT_FILE)'
 
 $(PROJECT_BIN) $(PROJECT_INC): project-data
 
@@ -117,12 +117,12 @@ ifdef BASS_DIR
 
   .PHONY: bass
   bass: $(call rwildcard_all $(BASS_DIR))
-	$(MAKE) -C "$(BASS_DIR)/bass"
+	$(MAKE) -C '$(BASS_DIR)/bass'
 
   $(bass): bass
 
   # Test if bass needs recompiling
-  __UNUESED__ := $(shell $(MAKE) --quiet --question -C "$(BASS_DIR)/bass")
+  __UNUESED__ := $(shell $(MAKE) --quiet --question -C '$(BASS_DIR)/bass')
   ifneq ($(.SHELLSTATUS), 0)
     $(BINARY): bass
   endif
@@ -136,7 +136,7 @@ ifdef UTEDITOR_DIR
   .PHONY: untech-editor-cli
 
   untech-editor-cli:
-	$(MAKE) -C "$(UTEDITOR_DIR)" cli
+	$(MAKE) -C '$(UTEDITOR_DIR)' cli
 
   $(untech-lz4c): untech-editor-cli
   $(untech-compiler): untech-editor-cli
@@ -146,7 +146,7 @@ ifdef UTEDITOR_DIR
   $(untech-write-sfc-checksum): untech-editor-cli
 
   # Test if untech-editor-cli needs recompiling
-  __UNUSED__ := $(shell $(MAKE) --quiet --question -C "$(UTEDITOR_DIR)" cli)
+  __UNUSED__ := $(shell $(MAKE) --quiet --question -C '$(UTEDITOR_DIR)' cli)
   ifneq ($(.SHELLSTATUS), 0)
     project-data: untech-editor-cli
   endif
@@ -158,7 +158,7 @@ ifdef UTEDITOR_DIR
   .PHONY: untech-editor-gui
 
   untech-editor-gui:
-	$(MAKE) -C "$(UTEDITOR_DIR)" gui
+	$(MAKE) -C '$(UTEDITOR_DIR)' gui
 
   $(untech-editor-gui): untech-editor-gui
 endif
@@ -193,7 +193,7 @@ ifeq ($(LOCAL_TOOLS), n)
 
   .PHONY: clean-tools
   clean-tools:
-	$(MAKE) -C "$(BASS_DIR)/bass" clean
-	$(MAKE) -C "$(UTEDITOR_DIR)" clean
+	$(MAKE) -C '$(BASS_DIR)/bass' clean
+	$(MAKE) -C '$(UTEDITOR_DIR)' clean
 endif
 

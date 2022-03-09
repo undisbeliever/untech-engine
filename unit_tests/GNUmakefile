@@ -31,7 +31,7 @@ static-tests/%.error.asm: FORCE_TEST
   ifeq ($(VANILLA_BASS), n)
 	python3 static-tests/errortest.py -b $(bass) $@
   else
-	$(warning "Cannot test '$@' in vanilla bass: Skipped")
+	$(warning 'Cannot test $@ in vanilla bass: Skipped')
   endif
 
 FORCE_TEST:
@@ -44,14 +44,14 @@ endif
 
 
 gen/font-fixed.1bpp: resources/text/font-fixed.png
-	$(untech-png2tileset) -b 1 -o "$@" "$<"
+	$(untech-png2tileset) -b 1 -o '$@' '$<'
 
 gen/lz4-test/font-fixed.1bpp.lz4b: gen/font-fixed.1bpp
-	$(untech-lz4c) -v -o "$@" "$<"
+	$(untech-lz4c) -v -o '$@' '$<'
 
 gen/lz4-test/%.lz4b: gen/lz4-test/%.bin
-	$(untech-lz4c) -v -o "$@" "$<"
+	$(untech-lz4c) -v -o '$@' '$<'
 
 gen/lz4-test/%.bin: resources/lz4-test/%.asm
-	$(bass) -strict -o "$@" "$<"
+	$(bass) -strict -o '$@' '$<'
 
