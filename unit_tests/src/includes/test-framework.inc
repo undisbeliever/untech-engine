@@ -97,9 +97,6 @@ inline finalizeTable() {
 
 // Process all of the tests in the table one by one
 //
-// The CPU usage will be enabled if the user presses start or select
-// during the non-interactive tests.
-//
 // REQUIRES: None
 au()
 iu()
@@ -161,18 +158,6 @@ i16()
         // Run at full speed unless a button is held down
         lda.w   Controller.Joy1.current
         beq     NoButtonsPressed
-            // Enable CPU usage if start or select if pressed
-            lda.w   Controller.Joy1.pressed
-            bit.w   #JOY.start | JOY.select
-            beq     +
-                sep     #$20
-            a8()
-                lda.b   #0xff
-                sta.w   showCpuUsageMeter
-
-                rep     #$30
-            a16()
-            +
             jsr     WaitFrame
     NoButtonsPressed:
 

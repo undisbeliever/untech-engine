@@ -13,10 +13,6 @@
 // (byte, shadow, project editable)
 allocate(inidispBuffer, shadow, 1)
 
-// If non-zero then show the CPU usage meter on screen
-// (byte flag, shadow)
-allocate(showCpuUsageMeter, shadow, 1)
-
 // Frame counter, updated on every `WaitFrame` call.
 //
 // This frame counter will include lag frames in the count as long as NMI is
@@ -127,9 +123,6 @@ a8()
 //
 // If in force blank then this routine will skip the wait.
 //
-// If `showCpuUsageMeter` is non-zero then the screen brightness is changed to
-// show the user the scanline that this routine is called at.
-//
 // If the define `COUNT_FREE_CYCLES` exists then this routine will count
 // the number of free cycles in the frame and store it in the variable
 // `freeCycles`.
@@ -189,16 +182,6 @@ i8()
     +
 
 		// Screen is active
-
-        // Show CPU usage meter (if enabled)
-        ldx.w   showCpuUsageMeter
-        beq     +
-			// Y = inidispBuffer
-			tya
-            eor.w   #7
-            tax
-            stx.w   INIDISP
-        +
 
         // Calculate inidispBuffer | INIDISP.force
         // Y = inidispBuffer
