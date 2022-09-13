@@ -138,8 +138,8 @@ namespace MetaTiles {
         // No need to test if buffer is on a single page - we never read from it with index addressing
 
         // Vram word address to transfer the buffer to
-        // (word address - shadow)
-        allocate(vramWaddr, shadow, 2)
+        // (word address - lowram)
+        allocate(vramWaddr, lowram, 2)
 
         // Index of the leftmost visible tile in the buffer
         // (word index)
@@ -160,8 +160,8 @@ namespace MetaTiles {
         // No need to test if buffer is on a single page - we never read from it with index addressing
 
         // Vram word address to transfer the buffer to
-        // (word address - shadow)
-        allocate(vramWaddr, shadow, 2)
+        // (word address - lowram)
+        allocate(vramWaddr, lowram, 2)
 
         // Index of the topmost visible tile in the buffer
         // (word index)
@@ -179,7 +179,7 @@ namespace MetaTiles {
     // Used by `Dma.MetaTiles` to determine if horizontalBuffer or verticalBuffer is to be transferred to VRAM.
     //
     // (byte flags)
-    allocate(bufferState, shadow, 1)
+    allocate(bufferState, lowram, 1)
     namespace bufferState {
         constant VERTICAL = 0x80
         constant HORIZONTAL = 0x7f
@@ -192,15 +192,15 @@ namespace MetaTiles {
         constant BUFFER_SIZE = 4
 
         // Vram word address to transfer the MetaTile to
-        // (word address - shadow)
-        allocate(vramWaddr, shadow, BUFFER_SIZE * 2)
+        // (word address - lowram)
+        allocate(vramWaddr, lowram, BUFFER_SIZE * 2)
 
         // The four map tiles to transfer to VRAM
         // (Tilemap word * 4)
-        allocate(topLeft, shadow, BUFFER_SIZE * 2)
-        allocate(topRight, shadow, BUFFER_SIZE * 2)
-        allocate(bottomLeft, shadow, BUFFER_SIZE * 2)
-        allocate(bottomRight, shadow, BUFFER_SIZE * 2)
+        allocate(topLeft, lowram, BUFFER_SIZE * 2)
+        allocate(topRight, lowram, BUFFER_SIZE * 2)
+        allocate(bottomLeft, lowram, BUFFER_SIZE * 2)
+        allocate(bottomRight, lowram, BUFFER_SIZE * 2)
 
 
         assertOnePage(vramWaddr,    BUFFER_SIZE * 2)
@@ -211,7 +211,7 @@ namespace MetaTiles {
     }
     // Index to the current position on the drawMapCellBuffer
     // (word index)
-    allocate(drawMapCellBufferIndex, shadow, 2)
+    allocate(drawMapCellBufferIndex, lowram, 2)
 
     // If `drawMapCellBufferIndex` is >= `END` value then the buffer is full
     constant drawMapCellBufferIndex.END = drawMapCellBuffer.BUFFER_SIZE * 2

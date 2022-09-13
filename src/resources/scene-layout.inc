@@ -101,7 +101,7 @@ macro _SetupPpuRegisters_RegisterDB() {
     sta.w   OBSEL
 
 
-    assertShadowRam(SceneLayout.dataIndex)
+    assertLowRam(SceneLayout.dataIndex)
     ldx.w   SceneLayout.dataIndex
 
 

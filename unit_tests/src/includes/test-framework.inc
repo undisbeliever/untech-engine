@@ -22,7 +22,7 @@ constant FAILURE_COLOR = 20 << Palette.red.shift
 constant TMP_SIZE = 32
 allocate(dpTmp, dp, TMP_SIZE)
 
-allocate(tmp, shadow, TMP_SIZE)
+allocate(tmp, lowram, TMP_SIZE)
 
 
 // TABLE LOCATIONS
@@ -37,8 +37,8 @@ TestNameList:
 // MEMORY ALLOCATIONS
 // ==================
 
-allocate(testId, shadow, 2)
-allocate(currentTestName, shadow, 2)
+allocate(testId, lowram, 2)
+allocate(currentTestName, lowram, 2)
 
 // MACROS
 // ======

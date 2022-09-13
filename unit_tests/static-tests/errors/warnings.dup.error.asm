@@ -9,7 +9,7 @@ include "../../../src/common/memory.inc"
 include "../../../src/common/cpu.inc"
 
 createCodeBlock(code,       0xc08000, 0xc0ffaf)
-createRamBlock(shadow,      0x7e1100, 0x7e1f7f)
+createRamBlock(lowram,      0x7e1100, 0x7e1f7f)
 
 include "../../../src/errors/warnings.inc"
 

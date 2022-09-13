@@ -1,4 +1,4 @@
-// Allocate block inside shadow RAM
+// Allocate block inside Low-RAM
 
 define MEMORY_MAP = HIROM
 define ROM_SIZE = 32

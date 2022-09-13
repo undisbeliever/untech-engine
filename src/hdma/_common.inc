@@ -13,7 +13,7 @@ namespace Hdma {
 
 // Initializes the module
 //
-// REQUIRES: DB access shadow
+// REQUIRES: DB access lowram
 macro Init() {
     stz.w   Hdma.ChannelSettings.enabled
 }
@@ -21,7 +21,7 @@ macro Init() {
 
 // Deactivate the HDMA buffer
 //
-// REQUIRES: DB access shadow
+// REQUIRES: DB access lowram
 macro Deactivate() {
     stz.w   Hdma.ChannelSettings.enabled
 }

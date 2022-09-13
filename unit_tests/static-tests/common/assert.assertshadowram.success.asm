@@ -9,10 +9,10 @@ constant d = 0x7e0000
 constant e = 0x7e0420
 constant f = 0x7e1fff
 
-assertShadowRam(a)
-assertShadowRam(b)
-assertShadowRam(c)
-assertShadowRam(d)
-assertShadowRam(e)
-assertShadowRam(f)
+assertLowRam(a)
+assertLowRam(b)
+assertLowRam(c)
+assertLowRam(d)
+assertLowRam(e)
+assertLowRam(f)
 

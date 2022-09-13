@@ -12,7 +12,7 @@ include "../../../src/common/memory.inc"
 include "../../../src/common/tmp_words.inc"
 
 createRamBlock(dp,     0x000000, 0x000100)
-createRamBlock(shadow, 0x7e0100, 0x7e1f80)
+createRamBlock(lowram, 0x7e0100, 0x7e1f80)
 createRamBlock(stack,  0x7e1f80, 0x7e1fff)
 
 
@@ -27,7 +27,7 @@ namespace test {
 }
 
 
-allocate(dataBlock, shadow, 0x200)
+allocate(dataBlock, lowram, 0x200)
 
 markTmpWord(dataBlock + 0x0e)
 markTmpWord(dataBlock + 0x1e)

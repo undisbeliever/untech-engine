@@ -38,8 +38,8 @@ allocate(animationSpeed, wram7e, 2)
 namespace Scene {
     // SceneSettings Function Table Index
     // See `Resources.Format.SceneSettingsFunctionTable`
-    // (byte index, shadow)
-    allocate(functionTableIndex, shadow, 1)
+    // (byte index, lowram)
+    allocate(functionTableIndex, lowram, 1)
 
 
     // Current scene ID
@@ -64,8 +64,8 @@ namespace SceneLayout {
     //
     // Equal to `sceneId * Format.SceneLayout.size`
     //
-    // (word index, shadow)
-    allocate(dataIndex, shadow, 2)
+    // (word index, lowram)
+    allocate(dataIndex, lowram, 2)
 }
 constant BG_INDEX_MASK = Format.SceneLayout.BG_INDEX_MASK
 constant BG_INDEX_INCREMENT = Format.SceneLayout.BG_INDEX_INCREMENT
@@ -75,41 +75,41 @@ namespace AnimatedTileset {
     //
     // This variable MUST BE masked by BG_INDEX_MASK before storing it.
     //
-    // (byte index inc2, shadow)
-    allocate(bgIndex, shadow, 1)
+    // (byte index inc2, lowram)
+    allocate(bgIndex, lowram, 1)
 
     // VRAM word address of the tilemap of the BG used by the animated BG
     // (vram word address)
     allocate(tilemapVramWaddr, wram7e, 2)
 
     // The BG scroll register values used by the animated tileset
-    // (2 * uint16, shadow)
-    allocate(displayHoffset, shadow, 2)
-    allocate(displayVoffset, shadow, 2)
+    // (2 * uint16, lowram)
+    allocate(displayHoffset, lowram, 2)
+    allocate(displayVoffset, lowram, 2)
 
 
     // Vram word address to store the upload the buffer to
     // (vram word address)
-    allocate(animationVramWaddr, shadow, 2)
+    allocate(animationVramWaddr, lowram, 2)
 
     // The size of the animation frame in bytes
     // NOTE: After setting this value you MUST INVOKE
     //       `Dma.Resources.CalcualateDmaTime(AnimatedTileset)`
-    // (uint16 - shadow)
-    allocate(animationFrameSize, shadow, 2)
+    // (uint16 - lowram)
+    allocate(animationFrameSize, lowram, 2)
 
 
     // Address of the current animation frame
     // If 0 then animation is disabled
-    // (word addr - shadow)
-    allocate(animationBufferPos, shadow, 2)
+    // (word addr - lowram)
+    allocate(animationBufferPos, lowram, 2)
 
     // The starting address of the animation buffer
-    // (word addr - shadow)
+    // (word addr - lowram)
     allocate(animationBufferBegin, wram7e, 2)
 
     // The address following the end of the data in the animation buffer
-    // (word addr - shadow)
+    // (word addr - lowram)
     allocate(animationBufferEnd, wram7e, 2)
 
 
@@ -139,17 +139,17 @@ namespace Palette {
 
 
     // Address of the current animation frame in the paletteBuffer
-    // (word addr - shadow)
-    allocate(animationPos, shadow, 2)
+    // (word addr - lowram)
+    allocate(animationPos, lowram, 2)
 
     // The size of the palette animation frame in bytes
     // NOTE: After setting this value you MUST INVOKE
     //       `Dma.Resources.CalcualateDmaTime(Palette)`
-    // (uint16 - shadow)
-    allocate(animationFrameSize, shadow, 2)
+    // (uint16 - lowram)
+    allocate(animationFrameSize, lowram, 2)
 
     // The address following the end of the data in the palette buffer
-    // (word addr - shadow)
+    // (word addr - lowram)
     allocate(paletteBufferEnd, wram7e, 2)
 
     // The amount of DMA time required to upload the animation frame to CGRAM
@@ -199,15 +199,15 @@ namespace VramTransferBuffer {
 
 namespace Scenes {
     // Scene Setting Function variables
-    // (7x word, shadow)
-    allocate(sceneVar0, shadow, 2)
-    allocate(sceneVar1, shadow, 2)
-    allocate(sceneVar2, shadow, 2)
-    allocate(sceneVar3, shadow, 2)
-    allocate(sceneVar4, shadow, 2)
-    allocate(sceneVar5, shadow, 2)
-    allocate(sceneVar6, shadow, 2)
-    allocate(sceneVar7, shadow, 2)
+    // (7x word, lowram)
+    allocate(sceneVar0, lowram, 2)
+    allocate(sceneVar1, lowram, 2)
+    allocate(sceneVar2, lowram, 2)
+    allocate(sceneVar3, lowram, 2)
+    allocate(sceneVar4, lowram, 2)
+    allocate(sceneVar5, lowram, 2)
+    allocate(sceneVar6, lowram, 2)
+    allocate(sceneVar7, lowram, 2)
 }
 
 // vim: ft=bass-65816 ts=4 sw=4 et:

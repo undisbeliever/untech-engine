@@ -18,7 +18,7 @@ function NmiHandler {
 
 // Number of NMIs processed since the counter was last reset
 // (byte)
-allocate(counter, shadow, 1)
+allocate(counter, lowram, 1)
 
     // Store registers
     sep     #$20

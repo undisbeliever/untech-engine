@@ -29,19 +29,19 @@ namespace ChannelSettings {
     // Settings will be copied to HDMA Channel 7 on non-zero during VBlank.
     //
     // (byte)
-    allocate(enabled, shadow, 1)
+    allocate(enabled, lowram, 1)
 
     // HDMA Setup Register Buffer
     // (data matches DMAPx)
-    allocate(dmap, shadow, 1)
+    allocate(dmap, lowram, 1)
 
     // HDMA PPU Register Selection
     // (byte - data matches DDADx)
-    allocate(register, shadow, 1)
+    allocate(register, lowram, 1)
 
     // Word address of HDMA table (bank is always 0x7E).
     // (word addr)
-    allocate(tableAddr, shadow, 2)
+    allocate(tableAddr, lowram, 2)
 }
 
 }

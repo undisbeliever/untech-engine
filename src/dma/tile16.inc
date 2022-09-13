@@ -41,7 +41,7 @@ constant TILE_QUEUE_SIZE = 30
 
 // List of transfers to process during VBlank
 //
-// LOCATION: shadow WRAM, accessible by REGISTER_DB during VBlank.
+// LOCATION: Low-RAM, accessible by REGISTER_DB during VBlank.
 //
 // The table terminates when vblankFunctionAddr == 0
 namespace transferQueue {
@@ -49,26 +49,26 @@ namespace transferQueue {
 
     // Function to call in the _VBlank
     // Equal to `nTiles * 2`
-    allocate(vblankFunctionAddr, shadow, TRANSFER_QUEUE_SIZE * 2)
+    allocate(vblankFunctionAddr, lowram, TRANSFER_QUEUE_SIZE * 2)
 
     // This value is always 0. Prevents overruns
-    allocate(forceEndTransfer, shadow, 2)
+    allocate(forceEndTransfer, lowram, 2)
 
     // The word VRAM address to send the tiles
-    allocate(wordVramAddress, shadow, TRANSFER_QUEUE_SIZE * 2)
+    allocate(wordVramAddress, lowram, TRANSFER_QUEUE_SIZE * 2)
 }
 constant TRANSFER_QUEUE_INDEX_END = TRANSFER_QUEUE_SIZE * 2
-allocate(transferQueueIndex, shadow, 2)
+allocate(transferQueueIndex, lowram, 2)
 
 
 // List of tiles to upload to VRAM
 //
-// LOCATION: shadow WRAM, accessible by REGISTER_DB during VBlank.
+// LOCATION: Low-RAM, accessible by REGISTER_DB during VBlank.
 namespace tileQueue {
     assert(TILE_QUEUE_SIZE < (256/2))
 
     // tile location in ROM
-    allocate(address, shadow, TILE_QUEUE_SIZE * 2)
+    allocate(address, lowram, TILE_QUEUE_SIZE * 2)
 
     // Tile bank in ROM
     //
@@ -79,7 +79,7 @@ namespace tileQueue {
     // Second byte contains the size of the top half of a 16x16 4bpp tile
     // (used to speedup the VBlank code).
     //
-    allocate(bank, shadow, TILE_QUEUE_SIZE * 2)
+    allocate(bank, lowram, TILE_QUEUE_SIZE * 2)
 
     // constant variable - speeds up VBlank
     // always equal to TILE_HALF_SIZE
@@ -89,12 +89,12 @@ namespace tileQueue {
     constant TILE_HALF_SIZE = 32 * 2
 }
 constant TILE_QUEUE_INDEX_END = TILE_QUEUE_SIZE * 2
-allocate(tileQueueIndex, shadow, 2)
+allocate(tileQueueIndex, lowram, 2)
 
 
 
 // Transfers the tiles during VBlank.
-allocate(processVBlankOnZero, shadow, 1)
+allocate(processVBlankOnZero, lowram, 1)
 
 
 allocateTmpWord(tmp0)
@@ -257,7 +257,7 @@ namespace _ProcessDMA {
         dw  Transfer8
     }
 
-    allocate(tileQueuePos, shadow, 2)
+    allocate(tileQueuePos, lowram, 2)
 
     inline ProcessTiles(evaluate nTiles) {
         // REMEMBER to update DmaTransferTimeTable if you change this routine

@@ -17,7 +17,7 @@ namespace Warnings {
 // If MSB is set then there is no error.
 //
 // (word - snes color)
-allocate(current, shadow, 2)
+allocate(current, lowram, 2)
 
 // The CGRAM color position to use for notifying the user.
 constant CGRAM_POS = 1
@@ -106,7 +106,7 @@ inline _CheckColorUnique(id, evaluate lc) {
 // This macro MUST BE called before enabling VBlank.
 // This macro SHOULD BE called when blanking the screen.
 //
-// REQUIRES: 8 bit A, DB access shadow
+// REQUIRES: 8 bit A, DB access lowram
 macro Reset() {
     assert8a()
 
@@ -119,7 +119,7 @@ macro Reset() {
 // This macro MUST BE called before enabling VBlank.
 // This macro SHOULD BE called when blanking the screen.
 //
-// REQUIRES: 16 bit A, DB access shadow
+// REQUIRES: 16 bit A, DB access lowram
 macro Reset_a16() {
     assert16a()
 

@@ -14,17 +14,17 @@ namespace Resources {
 
 
 // Upload animated tiles to VRAM on next vblank
-// (byte - shadow)
-allocate(uploadAnimatedTilesetOnZero, shadow, 1)
+// (byte - lowram)
+allocate(uploadAnimatedTilesetOnZero, lowram, 1)
 
 // Upload palette to CGRAM during next vblank
-// (byte - shadow)
-allocate(uploadPaletteOnZero, shadow, 1)
+// (byte - lowram)
+allocate(uploadPaletteOnZero, lowram, 1)
 
 
 // Initialize the tables/variables
 //
-// REQUIRES: 16 bit A, DB access shadow
+// REQUIRES: 16 bit A, DB access lowram
 macro _Init() {
     assert8a()
 

@@ -34,12 +34,12 @@ macro assertZeroPage(var) {
     }
 }
 
-// Asserts that a variable is inside shadow RAM
-// Breaks assembly if variable is not inside shadow RAM
-macro assertShadowRam(var) {
+// Asserts that a variable is a Low-RAM address
+// Breaks assembly if variable is not inside Low-RAM
+macro assertLowRam(var) {
     evaluate addr = {var}
     if {addr} >= 0x2000 && ({addr} < 0x7e0000 || {addr} >= 0x7e2000) {
-        error "{var} is not inside shadow RAM"
+        error "{var} is not inside Low-RAM"
     }
 }
 

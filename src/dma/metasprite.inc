@@ -16,7 +16,7 @@ constant BYTES_TO_TRANSFER = 128 * 4 + 128 / 4
 
 // Preform DMA transfer if zero
 // (byte)
-allocate(transferOnZero, shadow, 1)
+allocate(transferOnZero, lowram, 1)
 
 
 // Decrement transfers left Counter
@@ -24,7 +24,7 @@ allocate(transferOnZero, shadow, 1)
 // NOTE: This macro will always succeed, even if `Dma.transfersLeft`
 // does not contain enough time to upload the OAM buffer.
 //
-// REQUIRES: 16 bit A, DB access shadow
+// REQUIRES: 16 bit A, DB access lowram
 macro _InitLoop() {
     assert16a()
 
@@ -40,7 +40,7 @@ NoUnderflow{#}:
 
 // EndLoop code, enable transfer of oamBuffer to OAM on next VBlank
 //
-// REQUIRES: 8 bit A, DB access shadow
+// REQUIRES: 8 bit A, DB access lowram
 macro _EndLoop() {
     assert8a()
 

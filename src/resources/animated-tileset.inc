@@ -196,7 +196,7 @@ AddToVramTransferBuffer:
 
 
 // Disables the animated tileset animation
-// REQUIRES: 16 bit A, DB access shadow
+// REQUIRES: 16 bit A, DB access lowram
 macro DisableAnimation() {
     assert16a()
 

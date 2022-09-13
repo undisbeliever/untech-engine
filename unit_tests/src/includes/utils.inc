@@ -7,7 +7,7 @@
 // Wait until the start of the next frame, printing the number
 // of loops waited on the top-right of the screen.
 //
-// REQUIRES: DB access shadow
+// REQUIRES: DB access lowram
 //
 // RETURN: Y = number of loops waited
 code()

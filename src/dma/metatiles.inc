@@ -15,7 +15,7 @@ namespace MetaTiles {
 
 // Disables any pending horizontalBuffer or verticalBuffer updates
 //
-// REQUIRES: 8 bit A, DB access shadow
+// REQUIRES: 8 bit A, DB access lowram
 macro ResetBufferState() {
     assert8a()
 
@@ -29,7 +29,7 @@ macro ResetBufferState() {
 // NOTE: This macro will always queue the transfer, even if `Dma.transfersLeft`
 // does not contain enough time to upload the horizontal buffer.
 //
-// REQUIRES: 16 bit A, DB access shadow
+// REQUIRES: 16 bit A, DB access lowram
 macro QueueHorizontalBuffer() {
     assert16a()
 
@@ -53,7 +53,7 @@ NoUnderflow{#}:
 // NOTE: This macro will always queue the transfer, even if `Dma.transfersLeft`
 // does not contain enough time to upload the vertical buffer.
 //
-// REQUIRES: 16 bit A, DB access shadow
+// REQUIRES: 16 bit A, DB access lowram
 macro QueueVerticalBuffer() {
     assert16a()
 

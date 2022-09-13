@@ -16,7 +16,7 @@ namespace ForceBlank {
 
 // Breaks execution if not in force blank
 //
-// REQUIRES: DB access shadow
+// REQUIRES: DB access lowram
 // KEEP: A, X, Y
 macro AssertForceBlank() {
     if __CPU__.aSize == 8 {

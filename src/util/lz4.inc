@@ -48,8 +48,8 @@ allocate(_tmp3, dp, 2)
 
 // RAM location to store the block move code to
 if {BLOCK_MOVE_IN_PB} {
-    allocate(blockMoveLiteral, shadow, 6)
-    allocate(blockMoveMatch, shadow, 6)
+    allocate(blockMoveLiteral, lowram, 6)
+    allocate(blockMoveMatch, lowram, 6)
 } else {
     allocate(blockMoveLiteral, wram7e, 7)
     allocate(blockMoveMatch, wram7e, 7)
@@ -176,7 +176,7 @@ a8()
     sta.b   _destBank
 
 
-    // Copy block move code in shadow RAM
+    // Copy block move code in Low-RAM
     ldy.w   #blockMoveLiteral
     ldx.w   #BlockMoveData
     lda.b   #0

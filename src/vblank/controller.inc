@@ -13,18 +13,18 @@ namespace Controller {
 
 namespace Joy1 {
 	// The state of the joypad for the current frame
-    // (word, shadow)
-	allocate(current, shadow, 2)
+    // (word, lowram)
+	allocate(current, lowram, 2)
 
 	// The new buttons that were pressed for the current frame
-    // (word, shadow)
-	allocate(pressed, shadow, 2)
+    // (word, lowram)
+	allocate(pressed, lowram, 2)
 }
 
 if {defined CONTROLLER_USE_JOY2} {
 	namespace Joy2 {
-		allocate(current, shadow, 2)
-		allocate(pressed, shadow, 2)
+		allocate(current, lowram, 2)
+		allocate(pressed, lowram, 2)
 	}
 }
 

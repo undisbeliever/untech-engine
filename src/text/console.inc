@@ -94,7 +94,7 @@ macro PrintString(label) {
 
 // Sets the console cursor to a fixed location
 //
-// REQUIRES: 16 bit Index, DB access shadow
+// REQUIRES: 16 bit Index, DB access lowram
 macro SetCursor(evaluate x, evaluate y) {
     assert16i()
     assert({x} >= 0 && {x} < Text.Console.TEXT_WIDTH)
@@ -205,7 +205,7 @@ FallThrough:
 
 
 // Clear the Buffer
-// REQUIRES: DB access shadow
+// REQUIRES: DB access lowram
 au()
 iu()
 code()

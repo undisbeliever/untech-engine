@@ -275,7 +275,7 @@ LargeX:
 
     // using DP to access divisor saves 2 cycles
     // and allows this scope to be called with DB anywhere
-    assertShadowRam(divisor)
+    assertLowRam(divisor)
     assert((divisor & 0xff00) == ((divisor + 1) & 0xff00))
 
     // ::KUDOS codebase64 wiki for the original algorithm::
@@ -362,7 +362,7 @@ function Divide.s32_s32 {
 a16()
 i16()
     // code requires these variables to exist in the same page and in bank 0
-    assertShadowRam(dividend32)
+    assertLowRam(dividend32)
     assert((dividend32 >> 8) == ((remainder32 + 3) >> 8))
 
     phd
@@ -489,7 +489,7 @@ function Divide.u32_u32 {
 a16()
 i16()
     // the code requires these variables to exist in the same page and in bank 0
-    assertShadowRam(dividend32)
+    assertLowRam(dividend32)
     assert((dividend32 >> 8) == ((remainder32 + 3) >> 8))
 
     phd
@@ -536,7 +536,7 @@ AfterRegisters:
 
 // uint32 / uint8 Integer Division
 //
-// REQUIRES: DB access shadow
+// REQUIRES: DB access lowram
 //
 // INPUT:
 //  dividend32: uint32 dividend

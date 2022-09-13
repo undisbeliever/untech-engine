@@ -10,29 +10,29 @@
 
 
 // Buffer of the INIDISP register
-// (byte, shadow, project editable)
-allocate(inidispBuffer, shadow, 1)
+// (byte, lowram, project editable)
+allocate(inidispBuffer, lowram, 1)
 
 // Frame counter, updated on every `WaitFrame` call.
 //
 // This frame counter will include lag frames in the count as long as NMI is
 // enabled.
 //
-// (uint32, shadow, project editable)
-allocate(frameCounter, shadow, 4)
+// (uint32, lowram, project editable)
+allocate(frameCounter, lowram, 4)
 
 // Value of the INIDISP register at the end of the `WaitFrame` call.
 //
 // This variable is used to test if we are in ForceBlank or not.
 //
-// (byte, shadow)
-allocate(inidispAfterWaitFrame, shadow, 1)
+// (byte, lowram)
+allocate(inidispAfterWaitFrame, lowram, 1)
 
 
 if {defined COUNT_FREE_CYCLES} {
     // Number of free cycles in a WaitFrame call
-    // (word, shadow)
-    allocate(freeCycles, shadow, 2)
+    // (word, lowram)
+    allocate(freeCycles, lowram, 2)
 }
 
 

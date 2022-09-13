@@ -95,7 +95,7 @@ a8()
 
 // Multiply uint16 * uint8 = uint32
 //
-// REQUIRES: 8 bit A, 16 bit Index, DB access shadow
+// REQUIRES: 8 bit A, 16 bit Index, DB access lowram
 //
 // INPUT:
 //  Y: 16 bit unsigned integer
@@ -156,7 +156,7 @@ a8()
 //
 // The signs of the inputs and outputs are in the parameters.
 //
-// REQUIRES: nothing, 16 bit Index, DB access shadow
+// REQUIRES: nothing, 16 bit Index, DB access lowram
 //
 // INPUT:
 //  Y: 16 bit factor
@@ -235,7 +235,7 @@ a8()
 
 // Multiply uint16 * uint16 = uint32
 //
-// REQUIRES: 16 bit Index, DB access shadow
+// REQUIRES: 16 bit Index, DB access lowram
 //
 // INPUT:
 //  Y: 16 bit factor
@@ -338,7 +338,7 @@ a16()
 
 // Multiply sint16 * sint16 = sint32
 //
-// REQUIRES: 16 bit Index, DB access shadow
+// REQUIRES: 16 bit Index, DB access lowram
 //
 // INPUT:
 //  Y: 16 bit factor
@@ -395,7 +395,7 @@ FallThrough:
 
 // Multiply a 32 bit integer by another 32 bit integer.
 //
-// REQUIRES: 16 bit Index, DB access shadow
+// REQUIRES: 16 bit Index, DB access lowram
 //
 // INPUT:
 //  factor32: 32 bit factor
@@ -605,7 +605,7 @@ i16()
 
 // Multiply a 32 bit integer by an 8 bit unsigned integer
 //
-// REQUIRES: 16 bit Index, DB access shadow
+// REQUIRES: 16 bit Index, DB access lowram
 //
 // INPUT:
 //  XY: 32 bit factor (Y loword)

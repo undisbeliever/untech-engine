@@ -64,7 +64,7 @@ namespace Format {
             //
             // Save format as the BGMODE register
             //
-            // (byte, BGMODE, shadow ram)
+            // (byte, BGMODE, lowram)
             field(bgMode, 1)
 
             // Layer types for each BG layer

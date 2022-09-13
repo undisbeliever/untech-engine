@@ -18,8 +18,8 @@ constant buffer.size = 128 * 2
 allocate(buffer, wram7e, buffer.size)
 
 // If zero then the buffer will be transferred to CGRAM on the next VBlank.
-// (shadow word)
-allocate(transferOnZero, shadow, 1)
+// (lowram word)
+allocate(transferOnZero, lowram, 1)
 
 
 // Initialize the tables/variables

@@ -39,7 +39,7 @@ macro _VBlank_dp4300() {
             ldx.b   #VMAIN.incrementMode.low | VMAIN.increment.by1
             stx.w   VMAIN
 
-            assertShadowRam(Text.tilemapVramWaddr)
+            assertLowRam(Text.tilemapVramWaddr)
             lda.w   Text.tilemapVramWaddr
             sta.w   VMADD
 

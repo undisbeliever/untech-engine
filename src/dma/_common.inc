@@ -16,12 +16,12 @@ namespace Dma {
 // This is reset every NMI interrupt.
 //
 // Each value represents transferring TRANSFER_SCALE bytes during DMA.
-allocate(transfersLeft, shadow, 2)
+allocate(transfersLeft, lowram, 2)
 
 
 // Initialize the counters
 //
-// REQUIRES: 16 bit A, 16 bit Index, DB access shadow
+// REQUIRES: 16 bit A, 16 bit Index, DB access lowram
 macro ResetTransfersLeft() {
     assert16a()
 

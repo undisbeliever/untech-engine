@@ -14,15 +14,15 @@ namespace Text {
     //
     // If negative then the text console is not loaded
     //
-    // (vram word address, shadow)
-    allocate(tilesVramWaddr, shadow, 2)
+    // (vram word address, lowram)
+    allocate(tilesVramWaddr, lowram, 2)
 
     // Word address of the tilemap of the BG used by the text
     //
     // If negative then the text console is not loaded
     //
-    // (vram word address, shadow)
-    allocate(tilemapVramWaddr, shadow, 2)
+    // (vram word address, lowram)
+    allocate(tilemapVramWaddr, lowram, 2)
 
 
     // The buffer in which to hold the data to transfer to VRAM

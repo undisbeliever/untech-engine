@@ -449,8 +449,8 @@ macro PrintStack() {
     constant N_LINES = 28 - YPOS - YBOTTOM
     constant PADDING = 32 - (BYTES_PER_LINE * 3)
 
-    allocate(byteCount, shadow, 1)
-    allocate(lineCount, shadow, 1)
+    allocate(byteCount, lowram, 1)
+    allocate(lineCount, lowram, 1)
 
 
     assert8a()

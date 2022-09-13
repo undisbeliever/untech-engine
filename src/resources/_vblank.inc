@@ -36,9 +36,9 @@ a16()
 i8()
 code()
 function VBlank_dp2100_AnimatedTileset_Bg1 {
-    assertShadowRam(Resources.AnimatedTileset.bgIndex)
-    assertShadowRam(Resources.AnimatedTileset.displayHoffset)
-    assertShadowRam(Resources.AnimatedTileset.displayVoffset)
+    assertLowRam(Resources.AnimatedTileset.bgIndex)
+    assertLowRam(Resources.AnimatedTileset.displayHoffset)
+    assertLowRam(Resources.AnimatedTileset.displayVoffset)
 
     ldy.w   Resources.AnimatedTileset.displayHoffset
     sty.b   BG1HOFS
@@ -62,9 +62,9 @@ a16()
 i8()
 code()
 function VBlank_dp2100_AnimatedTileset_Bg2 {
-    assertShadowRam(Resources.AnimatedTileset.bgIndex)
-    assertShadowRam(Resources.AnimatedTileset.displayHoffset)
-    assertShadowRam(Resources.AnimatedTileset.displayVoffset)
+    assertLowRam(Resources.AnimatedTileset.bgIndex)
+    assertLowRam(Resources.AnimatedTileset.displayHoffset)
+    assertLowRam(Resources.AnimatedTileset.displayVoffset)
 
     ldy.w   Resources.AnimatedTileset.displayHoffset
     sty.b   BG2HOFS
@@ -90,9 +90,9 @@ a16()
 i8()
 code()
 function VBlank_dp2100_AnimatedTileset_Bg3 {
-    assertShadowRam(Resources.AnimatedTileset.bgIndex)
-    assertShadowRam(Resources.AnimatedTileset.displayHoffset)
-    assertShadowRam(Resources.AnimatedTileset.displayVoffset)
+    assertLowRam(Resources.AnimatedTileset.bgIndex)
+    assertLowRam(Resources.AnimatedTileset.displayHoffset)
+    assertLowRam(Resources.AnimatedTileset.displayVoffset)
 
     ldy.w   Resources.AnimatedTileset.displayHoffset
     sty.b   BG3HOFS

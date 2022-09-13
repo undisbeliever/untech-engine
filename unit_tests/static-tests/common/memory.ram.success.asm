@@ -7,7 +7,7 @@ include "../../../src/common/assert.inc"
 include "../../../src/common/memory.inc"
 
 createRamBlock(dp,     0x000000, 0x0000ff)
-createRamBlock(shadow, 0x7e0100, 0x7e1f7f)
+createRamBlock(lowram, 0x7e0100, 0x7e1f7f)
 createRamBlock(stack,  0x7e1f80, 0x7e1fff)
 
 assert(__MEMORY__.ramBlocks.stack.size == 0)
@@ -24,16 +24,16 @@ assert(__MEMORY__.ramBlocks.dp.remaining == 0x100 - 6)
 
 constant c = 8
 
-allocate(var1, shadow, 0x100)
+allocate(var1, lowram, 0x100)
 
 namespace testInScope {
-    allocate(var2, shadow, 0x020 * 2)
-    allocate(var3, shadow, c * 4)
+    allocate(var2, lowram, 0x020 * 2)
+    allocate(var3, lowram, c * 4)
 }
 
-assert(__MEMORY__.ramBlocks.shadow.size == 0x160)
-assert(__MEMORY__.ramBlocks.shadow.pos == 0x7e0260)
-assert(__MEMORY__.ramBlocks.shadow.remaining == 0x1e80 - 0x160)
+assert(__MEMORY__.ramBlocks.lowram.size == 0x160)
+assert(__MEMORY__.ramBlocks.lowram.pos == 0x7e0260)
+assert(__MEMORY__.ramBlocks.lowram.remaining == 0x1e80 - 0x160)
 
 // vim: ft=bass-65816 ts=4 sw=4 et:
 
