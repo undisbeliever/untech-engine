@@ -1,7 +1,10 @@
 UnTech Game Engine
 ==================
 
-A homebrew game engine designed for a Super Nintendo Metroidvania game.
+A overly-complicated homebrew platformer game engine designed for a Super Nintendo.
+
+
+**ENGINE STATUS**: Stalled.  The MetaSprite subsystem a major bottleneck and needs to be redesigned and replaced.
 
 
 NOTICE
