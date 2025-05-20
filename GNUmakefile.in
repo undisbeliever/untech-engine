@@ -37,13 +37,13 @@ endif
 ifeq ($(LOCAL_TOOLS), n)
   UTEDITOR_DIR := $(UNTECH_DIR)/untech-editor
 
-  untech-editor-gui         := $(UTEDITOR_DIR)/bin/untech-editor-gui
-  untech-compiler           := $(UTEDITOR_DIR)/bin/untech-compiler
-  untech-lz4c               := $(UTEDITOR_DIR)/bin/untech-lz4c
-  untech-png2snes           := $(UTEDITOR_DIR)/bin/untech-png2snes
-  untech-png2tileset        := $(UTEDITOR_DIR)/bin/untech-png2tileset
-  untech-utsi2utms          := $(UTEDITOR_DIR)/bin/untech-utsi2utms
-  untech-write-sfc-checksum := $(UTEDITOR_DIR)/bin/untech-write-sfc-checksum
+  untech-editor-gui         := $(UTEDITOR_DIR)/build/untech-editor-gui
+  untech-compiler           := $(UTEDITOR_DIR)/build/untech-compiler
+  untech-lz4c               := $(UTEDITOR_DIR)/build/untech-lz4c
+  untech-png2snes           := $(UTEDITOR_DIR)/build/untech-png2snes
+  untech-png2tileset        := $(UTEDITOR_DIR)/build/untech-png2tileset
+  untech-utsi2utms          := $(UTEDITOR_DIR)/build/untech-utsi2utms
+  untech-write-sfc-checksum := $(UTEDITOR_DIR)/build/untech-write-sfc-checksum
 else
   untech-editor-gui         := untech-editor-gui
   untech-compiler           := untech-compiler
@@ -126,41 +126,6 @@ ifdef BASS_DIR
   ifneq ($(.SHELLSTATUS), 0)
     $(BINARY): bass
   endif
-endif
-
-
-ifdef UTEDITOR_DIR
-  tools: untech-editor-cli untech-editor-gui
-
-
-  .PHONY: untech-editor-cli
-
-  untech-editor-cli:
-	$(MAKE) -C '$(UTEDITOR_DIR)' cli
-
-  $(untech-lz4c): untech-editor-cli
-  $(untech-compiler): untech-editor-cli
-  $(untech-png2snes): untech-editor-cli
-  $(untech-png2tileset): untech-editor-cli
-  $(untech-utsi2utms): untech-editor-cli
-  $(untech-write-sfc-checksum): untech-editor-cli
-
-  # Test if untech-editor-cli needs recompiling
-  __UNUSED__ := $(shell $(MAKE) --quiet --question -C '$(UTEDITOR_DIR)' cli)
-  ifneq ($(.SHELLSTATUS), 0)
-    project-data: untech-editor-cli
-  endif
-
-
-
-  edit-project: untech-editor-gui
-
-  .PHONY: untech-editor-gui
-
-  untech-editor-gui:
-	$(MAKE) -C '$(UTEDITOR_DIR)' gui
-
-  $(untech-editor-gui): untech-editor-gui
 endif
 
 
