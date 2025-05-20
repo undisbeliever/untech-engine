@@ -312,7 +312,7 @@ constant _nRollbacks   = Test.dpTmp + 4
 
     jsr     Resources.TransferToPpu
 
-    jsr     MetaTiles.Render.DrawFullScreen_ForceBlank
+    jsl     MetaTiles.Render.DrawFullScreen_ForceBlank__far
 
     sep     #$20
 a8()

@@ -16,8 +16,8 @@
 
 namespace MetaTiles {
 
-code()
-namespace MoveEntityAndProcessTileCollisions {
+farCode()
+namespace MoveEntityAndProcessTileCollisions__far {
 
 assert(METATILE_SIZE_PX == 16)
 
@@ -602,7 +602,7 @@ i16()
 MovingDown:
     namespace MovingDown {
         // Entity is moving down and was not standing on the floor in the
-        // previous `MoveEntityAndProcessTileCollisions` call.
+        // previous `MoveEntityAndProcessTileCollisions__far` call.
         //
         // The code first tests the tile on the hitbox's bottom edge at the
         // entity's xPos (refered to as the bottom-center tile).
@@ -615,7 +615,7 @@ MovingDown:
         //
         // If the tile being tested is an UP_PLATFORM then collision only
         // occurs if the entity was above (or on top of) the tile before the
-        // `MoveEntityAndProcessTileCollisions` call.
+        // `MoveEntityAndProcessTileCollisions__far` call.
         //
         // If there is a collision then the entity will be moved one pixel
         // above the tile's collision area.
@@ -769,7 +769,7 @@ MovingDown:
         stz.b   BaseEntity.yPos.sx
 
         sec
-        rts
+        rtl
 
 
     a8()
@@ -989,7 +989,7 @@ MovingDown:
         stz.b   BaseEntity.yPos.sx
 
         sec
-        rts
+        rtl
 
 
     a8()
@@ -1059,7 +1059,7 @@ MovingDown:
     a16()
         // Y = entity top-center map tile
         // carry clear
-        rts
+        rtl
     }
 
 
@@ -1130,7 +1130,7 @@ MovingDown:
         stz.b   BaseEntity.yPos.sx
 
         sec
-        rts
+        rtl
     }
 
 a16()
@@ -1139,7 +1139,7 @@ MovingDown_Standing:
     namespace MovingDown_Standing {
         // Entity is moving down and was standing on the floor of a
         // slope/platform/solid on the previous
-        // `MoveEntityAndProcessTileCollisions` call.
+        // `MoveEntityAndProcessTileCollisions__far` call.
         //
         // The Y momentum is not processed when standing.  The entity's Y
         // position will be set so it is always 1 pixel above the floor height.
@@ -1149,7 +1149,7 @@ MovingDown_Standing:
         //
         // The routine will then test up to five tiles below the hitbox's
         // bottom.  We test the tile below the hitbox for two reasons:
-        //    1. The previous call to `MoveEntityAndProcessTileCollisions`
+        //    1. The previous call to `MoveEntityAndProcessTileCollisions__far`
         //    moved the entity so it is one pixel above the floor.
         //    2. It allows the entity to gracefully walk/run down slopes.
         //
@@ -1339,7 +1339,7 @@ MovingDown_Standing:
 
         // Y = tile index of tile below the bottom-center of hitbox
         // carry clear
-        rts
+        rtl
 
 
     a8()
@@ -1383,7 +1383,7 @@ MovingDown_Standing:
         stz.b   BaseEntity.yPos.sx
 
         sec
-        rts
+        rtl
     }
 
 
@@ -1392,7 +1392,7 @@ i16()
 MovingUp:
     namespace MovingUp {
         // Entity moving up and was not standing on a ceiling in the previous
-        // `MoveEntityAndProcessTileCollisions` call
+        // `MoveEntityAndProcessTileCollisions__far` call
 
         // Subtract 24 bit Y Momentum from 32 bit Position, saving the change in Ypos.px to _yDelta
         sec
@@ -1521,7 +1521,7 @@ MovingUp:
         stz.b   BaseEntity.yPos.sx
 
         sec
-        rts
+        rtl
 
 
 
@@ -1613,7 +1613,7 @@ MovingUp:
         stz.b   BaseEntity.yPos.sx
 
         sec
-        rts
+        rtl
 
 
     a8()
@@ -1680,7 +1680,7 @@ MovingUp:
     a16()
         // Y = entity bottom-center map tile
         // carry clear
-        rts
+        rtl
     }
 
 
@@ -1748,7 +1748,7 @@ MovingUp:
         stz.b   BaseEntity.yPos.sx
 
         sec
-        rts
+        rtl
     }
 
 a16()
@@ -1757,7 +1757,7 @@ MovingUp_Standing:
     namespace MovingUp_Standing {
         // Entity is moving up and was standing on the ceiling of a
         // slope/platform/solid on the previous
-        // `MoveEntityAndProcessTileCollisions` call.
+        // `MoveEntityAndProcessTileCollisions__far` call.
 
 
         // Calculate tile index for top-center of tile hitbox
@@ -1835,7 +1835,7 @@ MovingUp_Standing:
 
         // Y = tile index of tile below the bottom-center of hitbox
         // carry clear
-        rts
+        rtl
 
 
     a8()
@@ -1873,7 +1873,7 @@ MovingUp_Standing:
         stz.b   BaseEntity.yPos.sx
 
         sec
-        rts
+        rtl
     }
 
 
@@ -1884,7 +1884,7 @@ assert(pc() - MovementState_FunctionTable == Entity.Movement.N_Y_AXIS_MOVEMENT_S
 }
 
 
-namespace MoveEntityAndProcessTileCollisions {
+namespace MoveEntityAndProcessTileCollisions__far {
 namespace LargeMapHeight {
     // DP = entity
     a16()
@@ -1894,7 +1894,7 @@ namespace LargeMapHeight {
         _xPosA_To_tileIndexTmp()
 
         clc
-        rts
+        rtl
 }
 }
 
@@ -1921,7 +1921,7 @@ namespace LargeMapHeight {
 //       For instance, if the entity is moving right then a left collision test
 //       is not preformed.
 //
-// NOTE: `MoveEntityAndProcessTileCollisions` will only preform a y-axis test
+// NOTE: `MoveEntityAndProcessTileCollisions__far` will only preform a y-axis test
 //       on the first 32 pixels to the left and right of the entity's xPos.
 //
 //       The x-axis test will be preformed using the full width of the tile hitbox.
@@ -1972,8 +1972,8 @@ namespace LargeMapHeight {
 //
 a16()
 i16()
-code()
-function MoveEntityAndProcessTileCollisions {
+farCode()
+function MoveEntityAndProcessTileCollisions__far {
     BranchIfMapIsSmall_Long(SmallMapHeight)
 
     LargeMapHeight:
@@ -1990,7 +1990,7 @@ function MoveEntityAndProcessTileCollisions {
         _xPosA_To_tileIndexTmp()
 
         clc
-        rts
+        rtl
     }
 
     SmallMapHeight:

@@ -31,7 +31,7 @@ assertPowerOfTwo(verticalBuffer.buffer.size)
 // PARAM: mapHeight - map height (SMALL or LARGE)
 //
 // REQUIRES: 16 bit A, 16 bit Index, DB = 0x7e, DP = 2100
-inline DrawFullScreen_ForceBlank.__CalcVisibleMapPtrAndDrawTiles(mapHeight) {
+inline DrawFullScreen_ForceBlank__far.__CalcVisibleMapPtrAndDrawTiles(mapHeight) {
     assert16a()
     assert16i()
 
@@ -214,8 +214,8 @@ a16()
 // REQUIRES: 16 bit A, 16 bit Index, DB = 0x7e, Force Blank
 a16()
 i16()
-code()
-function DrawFullScreen_ForceBlank {
+farCode()
+function DrawFullScreen_ForceBlank__far {
 
 allocateTmpWord(_vramWaddr)
 allocateTmpWord(_vramWaddrEnd)
@@ -279,13 +279,13 @@ allocateTmpWord(_mapEndColumnPtr)
     namespace LargeMapHeight {
         __CalcVisibleMapPtrAndDrawTiles(LARGE)
         pld
-        rts
+        rtl
     }
     SmallMapHeight:
     namespace SmallMapHeight {
         __CalcVisibleMapPtrAndDrawTiles(SMALL)
         pld
-        rts
+        rtl
     }
 }
 
@@ -506,7 +506,7 @@ macro __DrawVerticalBuffer() {
 //
 // NOTE: This macro may change the camera position
 //
-// ASSUMES: DrawFullScreen_ForceBlank has been called to setup map state
+// ASSUMES: DrawFullScreen_ForceBlank__far has been called to setup map state
 // ASSUMES: Camera position inside map
 //
 // REQUIRES: 16 bit A, 16 bit Index, DB = 0x7e, DP = 0
@@ -741,13 +741,13 @@ SkipDrawHorizontalBuffer:
 namespace _DrawMapCell {
 au()
 iu()
-code()
+farCode()
 DrawMapCell_BufferFull:
     break(DRAW_MAP_CELL_BUFFER_OVERRUN)
 
 a16()
 i16()
-code()
+farCode()
 DrawMapCell_Offscreen:
     // buffer is unchanged so it will never be full
     clc
@@ -758,7 +758,7 @@ DrawMapCell_Offscreen:
 //
 // You MUST NOT call this function if the drawMapCellBuffer is full.
 //
-// ASSUMES: DrawFullScreen_ForceBlank has been called to setup map state
+// ASSUMES: DrawFullScreen_ForceBlank__far has been called to setup map state
 // ASSUMES: Camera position inside map
 // ASSUMES: X is inside the map
 // ASSUMES: `drawMapCellBuffer` is not full.
@@ -775,7 +775,7 @@ DrawMapCell_Offscreen:
 // OUTPUT: Carry set if the drawMapCellBuffer is full
 a16()
 i16()
-code()
+farCode()
 function _DrawMapCell {
 allocateTmpWord(_tmp)
 assert(METATILE_SIZE_PX == 16)

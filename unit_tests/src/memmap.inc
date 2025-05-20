@@ -12,7 +12,9 @@ createDataBlock(rom0,                   0xc02200, 0xc059ff)
 createCodeBlock(code,                   0xc05a00, 0xc0ff8f)
 createCodeBlock(interrupt_code,         0xc0ff90, 0xc0ffaf)
 
-createDataBlock(RES_Block0,             0xc10000, 0xc1ffff)
+createDataBlock(RES_Block0,             0xc10000, 0xc17fff)
+
+createCodeBlock(farCode,                0xc18000, 0xc1ffff)
 
 
 createRamBlock(dp,          0x000000, 0x0000ff)

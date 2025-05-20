@@ -185,6 +185,10 @@ macro code() {
     code(code)
 }
 
+macro farCode() {
+    code(farCode)
+}
+
 
 // Creates a constant containing the starting address of a block
 inline storeBlockStart(name, blockId) {

@@ -71,11 +71,11 @@ i16()
 code()
 function MoveEntityWithTileCollisionsAndInteractiveTiles {
 
-// Set in `MoveEntityAndProcessTileCollisions`
-constant _tileIndexTmp      = MoveEntityAndProcessTileCollisions._tileIndexTmp
+// Set in `MoveEntityAndProcessTileCollisions__far`
+constant _tileIndexTmp      = MoveEntityAndProcessTileCollisions__far._tileIndexTmp
 
 
-    jsr     MoveEntityAndProcessTileCollisions
+    jsl     MoveEntityAndProcessTileCollisions__far
     bcc     NoYCollision
         // Collision occurred in the Y-Axis, call the `EntityCollision` tile function
         // Y = map data index of tile that collided with entity
@@ -117,17 +117,17 @@ i16()
 code()
 function MovePlayerWithTileCollisionsAndInteractiveTiles {
 
-// These variables are set in `MoveEntityAndProcessTileCollisions` and will be used by the function
-constant _tileIndexTmp      = MoveEntityAndProcessTileCollisions._tileIndexTmp
-constant _yOffsetHeightPair = MoveEntityAndProcessTileCollisions._yOffsetHeightPair
-constant _leftRightPair     = MoveEntityAndProcessTileCollisions._leftRightPair
+// These variables are set in `MoveEntityAndProcessTileCollisions__far` and will be used by the function
+constant _tileIndexTmp      = MoveEntityAndProcessTileCollisions__far._tileIndexTmp
+constant _yOffsetHeightPair = MoveEntityAndProcessTileCollisions__far._yOffsetHeightPair
+constant _leftRightPair     = MoveEntityAndProcessTileCollisions__far._leftRightPair
 
-// Reuse temporary variables from MoveEntityAndProcessTileCollisions
-constant _originTileIndex   = MoveEntityAndProcessTileCollisions._xTmp
-constant _counter           = MoveEntityAndProcessTileCollisions._counter
+// Reuse temporary variables from MoveEntityAndProcessTileCollisions__far
+constant _originTileIndex   = MoveEntityAndProcessTileCollisions__far._xTmp
+constant _counter           = MoveEntityAndProcessTileCollisions__far._counter
 
 
-    jsr     MoveEntityAndProcessTileCollisions
+    jsl     MoveEntityAndProcessTileCollisions__far
     bcs     +
         jmp     NoYCollision
     +
@@ -231,7 +231,7 @@ NoTilesOnLeft:
 NoYCollision:
     // Call `PlayerAirCollision` functions on all tiles between the top-center and bottom-center of tile hitbox.
 
-    // NOTE: If I modify this code, also modify `MoveEntityAndProcessTileCollisions` `MovingLeft` and `MovingRight`
+    // NOTE: If I modify this code, also modify `MoveEntityAndProcessTileCollisions__far` `MovingLeft` and `MovingRight`
     // _top = MS.TileHitbox[x].yOffset + entity.yPos.px
     lda.w   _yOffsetHeightPair
     ora.w   #0xff00                 // yOffset is always a negative value
@@ -245,7 +245,7 @@ NoYCollision:
     lsr
     lsr
     lsr
-    ora.w   MoveEntityAndProcessTileCollisions._tileIndexTmp
+    ora.w   MoveEntityAndProcessTileCollisions__far._tileIndexTmp
     tay
     // Y = tile index at top-centre of player's tile hitbox
 

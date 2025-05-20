@@ -67,7 +67,7 @@ macro MoveEntityAndProcessTileCollisions() {
     assert16a()
     assert16i()
 
-    jsr     MetaTiles.MoveEntityAndProcessTileCollisions
+    jsl     MetaTiles.MoveEntityAndProcessTileCollisions__far
 }
 
 

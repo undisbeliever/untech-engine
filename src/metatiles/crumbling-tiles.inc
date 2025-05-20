@@ -490,13 +490,13 @@ SkipThirdQueue:
 }
 a16()
 i8()
-code()
+farCode()
 function _Process_ChainA {
     __Process(ChainA)
 }
 a16()
 i8()
-code()
+farCode()
 function _Process_ChainB {
     __Process(ChainB)
 }

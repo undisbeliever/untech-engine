@@ -221,7 +221,7 @@ function Test {
 
 
     jsr     Resources.TransferToPpu
-    jsr     MetaTiles.Render.DrawFullScreen_ForceBlank
+    jsl     MetaTiles.Render.DrawFullScreen_ForceBlank__far
 
     jsr     Test.PrintCurrentTestName
 

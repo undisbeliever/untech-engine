@@ -116,7 +116,7 @@ function ProcessFrame {
 
     jsr     Camera.CenterOnPlayer
 
-    jsr     MetaTiles.Process
+    jsl     MetaTiles.Process__far
 
     jsr     Resources.ProcessAnimations
 
@@ -162,7 +162,7 @@ function ProcessFrame {
             jsr     Room.LoadRoom
 
             jsr     Resources.TransferToPpu
-            jsr     MetaTiles.Render.DrawFullScreen_ForceBlank
+            jsl     MetaTiles.Render.DrawFullScreen_ForceBlank__far
             jsr     EnableDisplay_Full
 
         // Restore inidispBuffer

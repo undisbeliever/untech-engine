@@ -145,7 +145,7 @@ a16()
 //
 // This routine will set the tile within `map.data` but it will not draw
 // the tile to the screen.  Instead it will add the tile to a queue and
-// the tile will be drawn at a later time by `MetaTiles.Process`.
+// the tile will be drawn at a later time by `MetaTiles.Process_far`.
 //
 // If the queue is full then the map cell will still be changed, no draw
 // call will be made and a warning will be emitted.
@@ -272,14 +272,14 @@ QueueEmpty:
 //
 //
 // ASSUMES: The screen is active
-// ASSUMES: MetaTiles.Render.DrawFullScreen_ForceBlank has been called to setup map state
+// ASSUMES: MetaTiles.Render.DrawFullScreen_ForceBlank__far has been called to setup map state
 // ASSUMES: Camera position inside map
 //
 // REQUIRES: 16 bit A, 16 bit Index, DB = 0x7e, DP = 0
 a16()
 i16()
-code()
-function Process {
+farCode()
+function Process__far {
 constant _mapPtr = utDpTmp0
 constant _mapPtrRend = utDpTmp2
 
@@ -335,7 +335,7 @@ assert8i()
         rep     #$30
     a16()
     i16()
-        rts
+        rtl
 
 
     a16()
@@ -356,7 +356,7 @@ DrawMapCellBufferFull:
     rep     #$30
 a16()
 i16()
-    rts
+    rtl
 }
 
 

@@ -719,7 +719,7 @@ constant _timer  = Test.dpTmp + 0
     ldy.w   #0
     jsr     InteractiveTests.GameLoop.Init_LoadRoom
 
-    jsr     MetaTiles.Render.DrawFullScreen_ForceBlank
+    jsl     MetaTiles.Render.DrawFullScreen_ForceBlank__far
 
 
     lda.w   #TEST_TIME
