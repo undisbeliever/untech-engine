@@ -73,8 +73,8 @@ a8()
 // MODIFIES: Disables Interrupts and HDMA, enables Force Blank
 au()
 iu()
-code()
-function ForceBlank {
+farCode()
+function ForceBlank__far {
 	php
 	phb
 
@@ -100,7 +100,7 @@ a8()
         // not in force blank, set force blank bit and wait one Frame
         ora.b   #INIDISP.force
         sta.w   inidispBuffer
-        bra     WaitFrame._AfterPHB
+        bra     WaitFrame__far._AfterPHB
     +
 
     // INIDISP buffer variables indicate we are in force blank
@@ -113,7 +113,7 @@ a8()
 
 	plb
 	plp
-	rts
+	rtl
 }
 
 
@@ -131,8 +131,8 @@ a8()
 // MODIFIES: May enable Force Blank
 au()
 iu()
-code()
-function WaitFrame {
+farCode()
+function WaitFrame__far {
 
     php
 	phb
@@ -297,10 +297,10 @@ assert16a()
 assert16i()
 
     pld
-	plb
+    plb
     plp
 
-    rts
+    rtl
 }
 
 // vim: ft=bass-65816 ts=4 sw=4 et:

@@ -32,7 +32,7 @@ a8()
     plb
     // DB = REGISTER_DB
 
-    jsr     ForceBlank
+    jsl     ForceBlank__far
 
     // Dirty all entity memory
     Dma.ForceBlank.DirtyWram(entityPool, ENTITY_SIZE * N_ENTITIES)

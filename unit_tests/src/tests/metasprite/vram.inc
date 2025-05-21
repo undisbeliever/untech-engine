@@ -128,7 +128,7 @@ inline _ActivateDynamicTest(FrameSet, nSlots, staticUploads) {
         cpx.w   #({nSlots} + {staticUploads}) * 2
         bne     Fail
 
-        jsr     WaitFrame
+        jsl     WaitFrame__far
 
         // Second entity
         // also a frame 0 upload
@@ -302,7 +302,7 @@ inline _DeallocateTest(type) {
 
 
         // Must wait one frame to free the DMA slots
-        jsr     WaitFrame
+        jsl     WaitFrame__far
 
         // Finally create single slot
         lda.w   #EntityPool.entity12
@@ -506,7 +506,7 @@ inline _ReferenceCountTest(type) {
         bcc     Fail
 
         // Prevent dma buffer from overflowing
-        jsr     WaitFrame
+        jsl     WaitFrame__far
 
         // entity 0: single fixed, count = 2
 

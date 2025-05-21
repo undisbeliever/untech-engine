@@ -16,7 +16,7 @@ function QueueOneTileFromList {
     constant VRAM_1 = VRAM_BLOCK + 32 * 2
 
     jsr     _Init
-    jsr     _ProcessDma16Queue      // Reset Dma.transfersLeft
+    jsl     _ProcessDma16Queue__far     // Reset Dma.transfersLeft
 
     ldx.w   #TileData.TileList2
     stx.w   Dma.Tile16.tileListAddr
@@ -31,7 +31,7 @@ au()
     rep     #$30
 a16()
 
-    jsr     _ProcessDma16Queue
+    jsl     _ProcessDma16Queue__far
 
     ldx.w   #TileData.Tile2
     ldy.w   #VRAM_1 + 32 * 0
@@ -56,7 +56,7 @@ function QueueTwoTilesFromList {
     constant VRAM_2 = VRAM_BLOCK + 32 * 6
 
     jsr     Dma.Init
-    jsr     _ProcessDma16Queue      // Reset Dma.transfersLeft
+    jsl     _ProcessDma16Queue__far     // Reset Dma.transfersLeft
 
     ldx.w   #TileData.TileList10
     stx.w   Dma.Tile16.tileListAddr
@@ -73,7 +73,7 @@ au()
 
     rep     #$30
 a16()
-    jsr     _ProcessDma16Queue
+    jsl     _ProcessDma16Queue__far
 
 
     ldx.w   #TileData.Tile7
@@ -104,7 +104,7 @@ function QueueOneRowFromList {
     constant VRAM_1 = VRAM_BLOCK
 
     jsr     Dma.Init
-    jsr     _ProcessDma16Queue      // Reset Dma.transfersLeft
+    jsl     _ProcessDma16Queue__far     // Reset Dma.transfersLeft
 
     ldx.w   #TileData.TileList3
     stx.w   Dma.Tile16.tileListAddr
@@ -117,7 +117,7 @@ au()
 
     rep     #$30
 a16()
-    jsr     _ProcessDma16Queue
+    jsl     _ProcessDma16Queue__far
 
     ldx.w   #TileData.Tile4
     ldy.w   #VRAM_1 + 32 * 0
@@ -151,7 +151,7 @@ function QueueTwoRowsFromList_one {
     constant VRAM_1 = VRAM_BLOCK + 32 * 4
 
     jsr     Dma.Init
-    jsr     _ProcessDma16Queue      // Reset Dma.transfersLeft
+    jsl     _ProcessDma16Queue__far     // Reset Dma.transfersLeft
 
     ldx.w   #TileData.TileList2
     stx.w   Dma.Tile16.tileListAddr
@@ -168,7 +168,7 @@ au()
 
     rep     #$30
 a16()
-    jsr     _ProcessDma16Queue
+    jsl     _ProcessDma16Queue__far
 
     ldx.w   #TileData.Tile2
     ldy.w   #VRAM_1 + 32 * 0
@@ -198,7 +198,7 @@ function QueueTwoRowsFromList_two {
     constant VRAM_2 = VRAM_BLOCK + 3 * 32 * 16
 
     jsr     Dma.Init
-    jsr     _ProcessDma16Queue      // Reset Dma.transfersLeft
+    jsl     _ProcessDma16Queue__far     // Reset Dma.transfersLeft
 
     ldx.w   #TileData.TileList10
     stx.w   Dma.Tile16.tileListAddr
@@ -215,7 +215,7 @@ au()
 
     rep     #$30
 a16()
-    jsr     _ProcessDma16Queue
+    jsl     _ProcessDma16Queue__far
 
     rep     #$30
 a16()
@@ -290,7 +290,7 @@ function QueueListAtEndOfRow {
     constant VRAM_1 = VRAM_BLOCK + 10 * 32 * 16
 
     jsr     Dma.Init
-    jsr     _ProcessDma16Queue      // Reset Dma.transfersLeft
+    jsl     _ProcessDma16Queue__far     // Reset Dma.transfersLeft
 
     ldx.w   #TileData.TileList5
     stx.w   Dma.Tile16.tileListAddr
@@ -304,7 +304,7 @@ au()
 
     rep     #$30
 a16()
-    jsr     _ProcessDma16Queue
+    jsl     _ProcessDma16Queue__far
 
     ldx.w   #TileData.Tile4
     ldy.w   #VRAM_1 + 32 * 7
@@ -351,7 +351,7 @@ function QueueListAtEndOfTwoRows_one {
     constant VRAM_2 = VRAM_BLOCK + 14 * 32 * 16
 
     jsr     Dma.Init
-    jsr     _ProcessDma16Queue      // Reset Dma.transfersLeft
+    jsl     _ProcessDma16Queue__far     // Reset Dma.transfersLeft
 
     ldx.w   #TileData.TileList2
     stx.w   Dma.Tile16.tileListAddr
@@ -368,7 +368,7 @@ au()
 
     rep     #$30
 a16()
-    jsr     _ProcessDma16Queue
+    jsl     _ProcessDma16Queue__far
 
     ldx.w   #TileData.Tile2
     ldy.w   #VRAM_2 + 32 * 6
@@ -398,7 +398,7 @@ function QueueListAtEndOfTwoRows_two {
     constant VRAM_2 = VRAM_BLOCK +  6 * 32 * 16
 
     jsr     Dma.Init
-    jsr     _ProcessDma16Queue      // Reset Dma.transfersLeft
+    jsl     _ProcessDma16Queue__far      // Reset Dma.transfersLeft
 
     ldx.w   #TileData.TileList10
     stx.w   Dma.Tile16.tileListAddr
@@ -415,7 +415,7 @@ au()
 
     rep     #$30
 a16()
-    jsr     _ProcessDma16Queue
+    jsl     _ProcessDma16Queue__far
 
     ldx.w   #TileData.Tile7
     ldy.w   #VRAM_1 + 32 * 6
@@ -712,9 +712,9 @@ SkipLoop:
 // REQUIRES: 16 bit A, 16 bit Index
 a16()
 i16()
-code()
-_ProcessDma16Queue:
-namespace WaitFrame {
+farCode()
+_ProcessDma16Queue__far:
+namespace WaitFrame__far {
     // ::ANNOY namespace statements are required to make Dma.Tile16._VBlank_dp4300() work::
 
     _CheckTileQueueBankWords()
@@ -753,7 +753,8 @@ i8()
     pld
     plb
     plp
-    rts
+
+    rtl
 }
 
 }

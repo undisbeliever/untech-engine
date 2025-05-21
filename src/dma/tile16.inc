@@ -243,10 +243,10 @@ macro _ResetQueue() {
 // OUTPUT: _ProcessDMA.tileQueuePos updated to new location
 a16()
 i16()
-code()
+farCode()
 namespace _ProcessDMA {
     FunctionTable: {
-        dw  WaitFrame.Dma.VBlank_dp4300.Dma.Tile16._VBlank_dp4300.EndLoopFunction
+        dw  WaitFrame__far.Dma.VBlank_dp4300.Dma.Tile16._VBlank_dp4300.EndLoopFunction
         dw  Transfer1
         dw  Transfer2
         dw  Transfer3
@@ -264,7 +264,7 @@ namespace _ProcessDMA {
 
         a16()
         i8()
-        code()
+        farCode()
         function Transfer{nTiles} {
             if {nTiles} < 8 {
                 pha
@@ -311,7 +311,7 @@ namespace _ProcessDMA {
 
             sty.w   MDMAEN
 
-            jmp     WaitFrame.Dma.VBlank_dp4300.Dma.Tile16._VBlank_dp4300.ContinueLoop
+            jmp     WaitFrame__far.Dma.VBlank_dp4300.Dma.Tile16._VBlank_dp4300.ContinueLoop
         }
     }
 

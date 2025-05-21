@@ -158,7 +158,7 @@ i16()
         // Run at full speed unless a button is held down
         lda.w   Controller.Joy1.current
         beq     NoButtonsPressed
-            jsr     WaitFrame
+            jsl     WaitFrame__far
     NoButtonsPressed:
 
 
@@ -212,7 +212,7 @@ i16()
     pha
     plb
 
-    jsr     ForceBlank
+    jsl     ForceBlank__far
 
     stz.w   CGADD
 
@@ -235,7 +235,7 @@ i16()
 
     // Don't use STP, it causes some versions of snes9x to stall
 -
-    jsr     WaitFrame
+    jsl     WaitFrame__far
     bra     -
 }
 
@@ -258,7 +258,7 @@ i16()
     pha
     plb
 
-    jsr     ForceBlank
+    jsl     ForceBlank__far
 
     // Show failure color
 
@@ -305,7 +305,7 @@ a8()
 
     // Don't use STP, it causes some versions of snes9x to stall
 -
-    jsr     WaitFrame
+    jsl     WaitFrame__far
     bra     -
 }
 

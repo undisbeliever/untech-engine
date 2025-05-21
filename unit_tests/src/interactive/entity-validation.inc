@@ -96,7 +96,7 @@ function Test {
         _PrintMenu()
 
         Loop:
-            jsr     WaitFrame
+            jsl     WaitFrame__far
 
             lda.w   Controller.Joy1.pressed
             beq     Loop

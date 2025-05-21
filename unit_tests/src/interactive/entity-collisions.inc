@@ -436,7 +436,7 @@ function Test {
 
         jsr     _DirtyUtDpTmp
 
-        jsr     WaitFrame
+        jsl     WaitFrame__far
 
         lda.w   Controller.Joy1.pressed
         and.w   #JOY.buttons

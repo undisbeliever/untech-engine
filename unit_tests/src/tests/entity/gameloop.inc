@@ -244,7 +244,7 @@ assert(N_SPAWNED_LISTS == 10)
     jsr     Entity.Init
 
     // Prevent the entities from spawning
-    jsr     WaitFrame
+    jsl     WaitFrame__far
     stz.w   Dma.transfersLeft
 
     function CreateEntities {
@@ -294,7 +294,7 @@ assert(N_SPAWNED_LISTS == 10)
     // Test that entities are allocated in the next frame
     function TestActivateNextFrame {
         jsr     Dma.Init
-        jsr     WaitFrame
+        jsl     WaitFrame__far
 
         jsr     ProcessEntityGameLoop
 

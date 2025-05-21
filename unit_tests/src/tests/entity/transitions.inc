@@ -81,7 +81,7 @@ constant N_ENTITIES = InteractiveTests.MetaSpriteInteractiveTest.EntityTable.N_E
     Loop:
         pha
             jsr     Entity.PreloadEntityMetaSprites
-            jsr     WaitFrame
+            jsl     WaitFrame__far
         pla
         dec
         bne     Loop

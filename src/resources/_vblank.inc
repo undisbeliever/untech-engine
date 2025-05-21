@@ -20,6 +20,8 @@ macro VBlank_dp2100() {
     assert8i()
 
     assert(Resources.Format.SceneSettingsFunctionTable.tableSize < 256)  // Confirm 8 bit indexing is allowed on function table
+    assert(Resources.Format.SceneSettingsFunctionTable.VBlank_dp2100 >> 16 == pc() >> 16) // Confirm correct Program Bank
+
     ldx.w   Resources.Scene.functionTableIndex
     jsr     (Resources.Format.SceneSettingsFunctionTable.VBlank_dp2100,x)
 }
@@ -34,7 +36,7 @@ namespace Scenes {
 // REQUIRES: 16 bit A, 8 bit Index, DB = $80, DP = $2100
 a16()
 i8()
-code()
+farCode()
 function VBlank_dp2100_AnimatedTileset_Bg1 {
     assertLowRam(Resources.AnimatedTileset.bgIndex)
     assertLowRam(Resources.AnimatedTileset.displayHoffset)
@@ -60,7 +62,7 @@ function VBlank_dp2100_AnimatedTileset_Bg1 {
 // REQUIRES: 16 bit A, 8 bit Index, DB = $80, DP = $2100
 a16()
 i8()
-code()
+farCode()
 function VBlank_dp2100_AnimatedTileset_Bg2 {
     assertLowRam(Resources.AnimatedTileset.bgIndex)
     assertLowRam(Resources.AnimatedTileset.displayHoffset)
@@ -88,7 +90,7 @@ function VBlank_dp2100_AnimatedTileset_Bg2 {
 // REQUIRES: 16 bit A, 8 bit Index, DB = $80, DP = $2100
 a16()
 i8()
-code()
+farCode()
 function VBlank_dp2100_AnimatedTileset_Bg3 {
     assertLowRam(Resources.AnimatedTileset.bgIndex)
     assertLowRam(Resources.AnimatedTileset.displayHoffset)

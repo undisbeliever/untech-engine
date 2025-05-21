@@ -295,7 +295,7 @@ function DoTest {
 
 
 RedrawMap:
-    jsr     ForceBlank
+    jsl     ForceBlank__far
 
     jsl     MetaTiles.Render.DrawFullScreen_ForceBlank__far
 

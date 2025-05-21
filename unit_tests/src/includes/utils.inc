@@ -16,7 +16,7 @@ function WaitFrame_PrintFreeCycles {
 
     // Using hex as it is constant time
 
-    jsr     WaitFrame
+    jsl     WaitFrame__far
 
     ldy.w   freeCycles
     jmp     Text.Console.PrintHex16Y

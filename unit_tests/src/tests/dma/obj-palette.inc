@@ -15,7 +15,7 @@ function MarkDirtyTest {
     lda.w   Dma.transfersLeft
     cmp.w   #5
     bcs     +
-        jsr     WaitFrame
+        jsl     WaitFrame__far
     +
 
     // Fill the entirety of the buffer with 0x1f
@@ -52,11 +52,11 @@ a8()
     bne     Fail
 
 
-    jsr     WaitFrame
+    jsl     WaitFrame__far
 
     // verify that colors 128 - 255 of CGRAM is 0x1f1f
 
-    jsr     ForceBlank
+    jsl     ForceBlank__far
 
 
     lda.b   #128
@@ -102,7 +102,7 @@ function MarkDirty_NotCalled {
     sep     #$20
 a8()
 
-    jsr     WaitFrame
+    jsl     WaitFrame__far
 
     // Fill the entirety of the buffer with 0x7f
     lda.w   #0x7f7f
@@ -114,11 +114,11 @@ a8()
         bpl     -
 
 
-    jsr     WaitFrame
+    jsl     WaitFrame__far
 
     // verify that colors 128 - 255 of CGRAM are not 0x7f7f
 
-    jsr     ForceBlank
+    jsl     ForceBlank__far
 
 
     lda.b   #128

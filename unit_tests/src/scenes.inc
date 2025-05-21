@@ -21,7 +21,7 @@ namespace UnitTests {
 
     a16()
     i8()
-    code()
+    farCode()
     function VBlank_dp2100 {
         rts
     }
@@ -89,7 +89,7 @@ namespace SettingSun {
     // REQUIRES: 16 bit A, 8 bit Index, DB = 0x7e, DP = 0x2100
     a16()
     i8()
-    code()
+    farCode()
     function VBlank_dp2100 {
         ldx.w   yPosition
         stx.b   BG2VOFS

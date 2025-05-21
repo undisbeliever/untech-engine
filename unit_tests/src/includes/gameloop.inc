@@ -157,7 +157,7 @@ function ProcessFrame {
         pha
 
             // This prevents screen tearing
-            jsr     WaitFrame
+            jsl     WaitFrame__far
 
             jsr     Room.LoadRoom
 

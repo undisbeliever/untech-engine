@@ -53,7 +53,7 @@ constant PaletteList.count = Project.PaletteList.count
 
 
 namespace Format {
-    if Resources.SCENE_FORMAT_VERSION != 2 {
+    if Resources.SCENE_FORMAT_VERSION != 3 {
         error "Invalid untech-compiler Scene Format"
     }
 

@@ -30,7 +30,7 @@ function Test {
     Warnings.Warn(UNIT_TEST_WARNING)
 
     Loop:
-        jsr     WaitFrame
+        jsl     WaitFrame__far
 
         lda.w   Controller.Joy1.pressed
         bit.w   #JOY.select

@@ -186,7 +186,7 @@ a8()
     pea     (0x7e << 8) | REGISTER_DB
     plb
 
-    jsr     ForceBlank
+    jsl     ForceBlank__far
 
     lda.b   #(WSEL.win1.enable | WSEL.win1.outside) << WOBJSEL.color.shift
     sta.w   WOBJSEL

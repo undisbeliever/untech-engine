@@ -21,7 +21,7 @@ assert(Entity.N_ENTITIES >= Entity.N_ENTITY_LISTS)
     jsr     Entity.Init
 
     // Prevent the entities from spawning
-    jsr     WaitFrame
+    jsl     WaitFrame__far
     stz.w   Dma.transfersLeft
 
 

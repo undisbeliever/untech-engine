@@ -146,7 +146,7 @@ Test.add("WaitFrame (frameCounter)")
 function WaitFrame_FrameCounter {
 constant _oldFrameCounter = Test.tmp
 
-    jsr     WaitFrame
+    jsl     WaitFrame__far
 
     lda.w   frameCounter
     sta.w   _oldFrameCounter
@@ -155,7 +155,7 @@ constant _oldFrameCounter = Test.tmp
     wai
     wai
 
-    jsr     WaitFrame
+    jsl     WaitFrame__far
 
     // 2 lag frames + 1 waitFrame = 3 frames
 
@@ -167,7 +167,7 @@ constant _oldFrameCounter = Test.tmp
 
     // Test frameCounter is incremented again
     // on next WaitFrame
-    jsr     WaitFrame
+    jsl     WaitFrame__far
 
     lda.w   frameCounter
     sec
@@ -189,18 +189,18 @@ code()
 Test.add("WaitFrame (freeCycles 0 on lag frame)")
 function WaitFrame_FreeCyclesZeroOnLagFrame {
 
-    jsr     WaitFrame
+    jsl     WaitFrame__far
 
     // Simulate lag frames
     wai
-    jsr     WaitFrame
+    jsl     WaitFrame__far
 
     // assert freeCycles is 0
     lda.w   freeCycles
     bne     Fail
 
     // non lag frame, freeCycles should be non-zero
-    jsr     WaitFrame
+    jsl     WaitFrame__far
 
     lda.w   freeCycles
     beq     Fail
@@ -223,12 +223,12 @@ Test.add("ForceBlank (called twice)")
 function ForceBlankTest_CallTwice {
 constant _oldFrameCounter = Test.tmp
 
-    jsr     WaitFrame
+    jsl     WaitFrame__far
 
     lda.w   frameCounter
     sta.w   _oldFrameCounter
 
-    jsr     ForceBlank
+    jsl     ForceBlank__far
 
     Dma.ForceBlank.AssertForceBlank()
 
@@ -240,7 +240,7 @@ constant _oldFrameCounter = Test.tmp
     cmp.w   #1
     bne     Fail
 
-    jsr     ForceBlank
+    jsl     ForceBlank__far
 
     // test ForceBlank did not call WaitFrame
     // (frameCounter is not incremented)
