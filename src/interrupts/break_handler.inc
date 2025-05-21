@@ -193,7 +193,7 @@ StringNotFound:
 // INPUT: X = cstring to print
 au()
 iu()
-code()
+farCode()
 function PrintString {
     php
     rep     #$30
@@ -225,7 +225,7 @@ EndLoop:
 // INPUT: A = byte to print as hex
 a8()
 i16()
-code()
+farCode()
 function PrintStringAndHex8 {
     pha
     jsr     PrintString
@@ -242,7 +242,7 @@ FallThrough:
 // KEEP: X
 a8()
 i16()
-code()
+farCode()
 function PrintHex8 {
     assert(PrintStringAndHex8.FallThrough == pc())
 
@@ -276,7 +276,7 @@ function PrintHex8 {
 // INPUT: A = word to print as hex
 a16()
 i16()
-code()
+farCode()
 function PrintStringAndHex16 {
     pha
     jsr     PrintString
@@ -292,7 +292,7 @@ FallThrough:
 // INPUT: A = word to print
 a16()
 i16()
-code()
+farCode()
 function PrintHex16 {
     assert(PrintStringAndHex16.FallThrough == pc())
 
@@ -507,10 +507,21 @@ Return:
 }
 
 
-// Breakpoint Interrupt Service Routine
+
+// Hack to call ResetRegisters from farCode
 au()
 iu()
 code()
+function __ResetRegisters__far {
+    jsr     ResetRegisters
+    rtl
+}
+
+
+// Breakpoint Interrupt Service Routine
+au()
+iu()
+farCode()
 function ISR {
     // Store registers
     rep     #$30
@@ -524,7 +535,7 @@ i16()
 
     // ResetRegisters disables interrupts so I do not have to
 
-    jsr     ResetRegisters
+    jsl     __ResetRegisters__far
 
     // Set DB = 0, DP = $2100
 
