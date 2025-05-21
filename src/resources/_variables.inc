@@ -37,7 +37,7 @@ allocate(animationSpeed, wram7e, 2)
 
 namespace Scene {
     // SceneSettings Function Table Index
-    // See `Resources.Format.SceneSettingsFunctionTable`
+    // See `Resources.Format.SceneSettingsFunctionTable_*`
     // (byte index, lowram)
     allocate(functionTableIndex, lowram, 1)
 

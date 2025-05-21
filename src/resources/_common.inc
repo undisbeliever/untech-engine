@@ -134,12 +134,9 @@ a8()
     // A/Y = scene settings id
 
     // MUST NOT MODIFY Y
-    // Scene.functionTableIndex = sceneSettingsId * Format.SceneSettingsFunctionTable.size
-    assert(Format.SceneSettingsFunctionTable.size == ((1 << 1) + 1) << 1)
+    // Scene.functionTableIndex = sceneSettingsId * Format.SceneSettingsFunctionTable_*.size
+    assert(Format.SceneSettingsFunctionTable.elementSize == 2)
     sta.w   Scene.functionTableIndex
-    asl
-    clc
-    adc.w   Scene.functionTableIndex
     asl
     sta.w   Scene.functionTableIndex
 
@@ -279,7 +276,7 @@ function ProcessAnimations {
 
     sep     #$10
 i8()
-    assert(SceneSettingsFunctionTable.tableSize < 256)  // Confirm 8 bit indexing is allowed on function table
+    assert(Format.SceneSettingsFunctionTable.tableSize < 256)  // Confirm 8 bit indexing is allowed on function table
     ldx.w   Scene.functionTableIndex
     jsr     (Resources.Format.SceneSettingsFunctionTable.Process,x)
 
@@ -445,7 +442,7 @@ NoCgramTransfer:
 
     sep     #$10
 i8()
-    assert(SceneSettingsFunctionTable.tableSize < 256)  // Confirm 8 bit indexing is allowed on function table
+    assert(Resources.Format.SceneSettingsFunctionTable.tableSize < 256)  // Confirm 8 bit indexing is allowed on function table
     ldx.w   Scene.functionTableIndex
     jsr     (Resources.Format.SceneSettingsFunctionTable.SetupPpu_dp2100,x)
 

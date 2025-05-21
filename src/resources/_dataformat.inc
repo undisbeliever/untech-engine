@@ -27,8 +27,9 @@ constant SceneSettingsData.count = Project.SceneSettingsData.count
 
 // Scene settings function table
 // (function table, SceneSettingsFunctionTable layout)
-constant SceneSettingsFunctionTable = Project.SceneSettingsFunctionTable
-constant SceneSettingsFunctionTable.tableSize = Project.SceneSettingsFunctionTable.size
+constant SceneSettingsFunctionTable_SetupPpu_dp2100 = Project.SceneSettingsFunctionTable_SetupPpu_dp2100
+constant SceneSettingsFunctionTable_Process = Project.SceneSettingsFunctionTable_Process
+constant SceneSettingsFunctionTable_VBlank_dp2100 = Project.SceneSettingsFunctionTable_VBlank_dp2100
 
 // Scene layout data
 // (SceneLayout table, long addressing)
@@ -52,7 +53,7 @@ constant PaletteList.count = Project.PaletteList.count
 
 
 namespace Format {
-    if Resources.SCENE_FORMAT_VERSION != 1 {
+    if Resources.SCENE_FORMAT_VERSION != 2 {
         error "Invalid untech-compiler Scene Format"
     }
 
@@ -113,36 +114,40 @@ namespace Format {
     }
 
 
-    // SceneSettings Function Table.
-    //
-    // Each SceneSettings entry has its own function table.
+    // SceneSettings Function Tables.
     namespace SceneSettingsFunctionTable {
-        struct(SceneSettingsFunctionTable)
-            // Scene PPU setup routine.
-            //
-            // This function is called by `TransferToPpu` and is used to
-            // setup the PPU registers for the scene.
-            //
-            // REGS: 16 bit A, 8 bit Index, DB = 0x7e, DP = 0x2100
-            field(SetupPpu_dp2100, 2)
+        // Scene PPU setup routine function Table.
+        //
+        // This function is called by `TransferToPpu` and is used to
+        // setup the PPU registers for the scene.
+        //
+        // REGS: 16 bit A, 8 bit Index, DB = 0x7e, DP = 0x2100
+        constant SetupPpu_dp2100 = Project.SceneSettingsFunctionTable_SetupPpu_dp2100
 
-            // Scene process routine.
-            //
-            // Called once per frame by `Resources.ProcessAnimations`
-            //
-            // REGS: 16 bit A, 8 bit Index, DB = 0x7e, DP = 0
-            field(Process, 2)
+        // Scene process routine.
+        //
+        // Called once per frame by `Resources.ProcessAnimations`
+        //
+        // REGS: 16 bit A, 8 bit Index, DB = 0x7e, DP = 0
+        constant Process = Project.SceneSettingsFunctionTable_Process
 
-            // Scene VBlank routine.
-            //
-            // Called once per frame during VBlank.
-            //
-            // REGS: 16 bit A, 8 bit Index, DB = 0x80, DP = 0
-            field(VBlank_dp2100, 2)
-        endstruct()
+        // Scene VBlank routine.
+        //
+        // Called once per frame during VBlank.
+        //
+        // REGS: 16 bit A, 8 bit Index, DB = 0x80, DP = 0
+        constant VBlank_dp2100 = Project.SceneSettingsFunctionTable_VBlank_dp2100
+
+
+        constant tableSize = Project.SceneSettingsFunctionTable_Process.size
+        constant elementSize = 2
+
+        assert(Project.SceneSettingsFunctionTable_SetupPpu_dp2100.size == SceneSettingsData.count * 2)
+        assert(Project.SceneSettingsFunctionTable_Process.size         == SceneSettingsData.count * 2)
+        assert(Project.SceneSettingsFunctionTable_VBlank_dp2100.size   == SceneSettingsData.count * 2)
+
+        assert(Project.SceneSettingsFunctionTable_Process.size < 256)  // allow 8 bit indexing
     }
-    assert(SceneSettingsFunctionTable.tableSize == SceneSettingsData.count * SceneSettingsFunctionTable.size)
-    assert(SceneSettingsFunctionTable.tableSize < 256)  // allow 8 bit indexing
 
 
 

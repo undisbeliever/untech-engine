@@ -19,7 +19,7 @@ macro VBlank_dp2100() {
     assert16a()
     assert8i()
 
-    assert(Resources.SceneSettingsFunctionTable.tableSize < 256)  // Confirm 8 bit indexing is allowed on function table
+    assert(Resources.Format.SceneSettingsFunctionTable.tableSize < 256)  // Confirm 8 bit indexing is allowed on function table
     ldx.w   Resources.Scene.functionTableIndex
     jsr     (Resources.Format.SceneSettingsFunctionTable.VBlank_dp2100,x)
 }
