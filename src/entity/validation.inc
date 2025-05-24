@@ -457,7 +457,8 @@ a16()
 
 
 
-namespace ValidateEntityLists {
+farCode()
+namespace ValidateEntityLists__far {
 
 PlayerIsInvalid:
     break(PLAYER_IS_INVALID)
@@ -512,8 +513,8 @@ EntityIsNotActivated:
 // REQUIRES: 16 bit A, 16 bit Index, DP = 0, DB = 0x7e
 a16()
 i16()
-code()
-function ValidateEntityLists {
+farCode()
+function ValidateEntityLists__far {
 
     __ValidatePlayer()
 
@@ -562,7 +563,7 @@ function ValidateEntityLists {
     lda.w   #0
     tcd
 
-    rts
+    rtl
 }
 
 }

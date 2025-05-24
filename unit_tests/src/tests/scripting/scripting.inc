@@ -749,7 +749,7 @@ constant _timer  = Test.dpTmp + 0
     bne     Fail
 
 
-    jsr     Entity.ValidateEntityLists
+    jsl     Entity.ValidateEntityLists__far
 
     jmp     Test.ResetPpuState
 

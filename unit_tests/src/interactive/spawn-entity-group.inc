@@ -150,7 +150,7 @@ a16()
     Resources.AnimatedTileset.DisableAnimation()
     Resources.Palette.DisableAnimation()
 
-    jsr     Entity.ValidateEntityLists
+    jsl     Entity.ValidateEntityLists__far
 
     jmp     Test.ResetPpuState
 

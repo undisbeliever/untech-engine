@@ -143,7 +143,7 @@ function ProcessFrame {
 
     jsr     Scripting.ProcessScripts
 
-    jsr     Entity.ValidateEntityLists
+    jsl     Entity.ValidateEntityLists__far
 
 
     // Load a new room if roomChangeRequested set.

@@ -133,7 +133,7 @@ EndLoop:
     // X = new cursorIndex
     jsr     (MenuRoutines,x)
 
-    jsr     Entity.ValidateEntityLists
+    jsl     Entity.ValidateEntityLists__far
 
     sec
     rts

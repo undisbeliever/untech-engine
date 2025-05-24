@@ -65,7 +65,9 @@ a8()
     // Ensure test room uses all available script triggers
     lda.w   Room.ScriptTriggers.lastTriggerIndex
     cmp.b   #Room.Format.Header.ScriptTriggers.LAST_INDEX
-    bne     Fail
+    beq     +
+        jmp     Fail
+    +
 
     rep     #$30
 a16()
@@ -117,7 +119,7 @@ a16()
     bne     Fail
 
 
-    jsr     Entity.ValidateEntityLists
+    jsl     Entity.ValidateEntityLists__far
 
     jmp     Test.ResetPpuState
 

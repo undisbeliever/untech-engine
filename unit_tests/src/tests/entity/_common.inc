@@ -29,7 +29,9 @@ function ProcessEntityGameLoop {
         evaluate n = {n} + 1
     }
 
-    jmp     Entity.ValidateEntityLists
+    jsl     Entity.ValidateEntityLists__far
+
+    rts
 }
 
 // REQUIRES: 16 bit A, 16 bit Index, DB = 0x7e
@@ -146,7 +148,7 @@ allocateTmpWord(tmp_count)
     cmp.w   #Entity.N_ENTITIES
     bne     Fail
 
-    jsr     Entity.ValidateEntityLists
+    jsl     Entity.ValidateEntityLists__far
 
     sec
     rts
