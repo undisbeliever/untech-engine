@@ -88,7 +88,10 @@ a8()
     plb
 
     Hdma.Init()
-    jsr     Hdma.CircularWindow.Init
+
+    rep     #$20
+a16()
+    Hdma.CircularWindow.Init()
 
 
     Loop:

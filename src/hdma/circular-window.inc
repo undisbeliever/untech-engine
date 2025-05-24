@@ -38,13 +38,10 @@ allocateTmpWord(deltaTableRadius)
 // The caller is responsible for setting up the Window settings.
 //
 // REQUIRES: DB = 0x7e
-au()
-code()
-function Init {
-    // invalidate deltaTable value
-    stz.w   deltaTableRadius
+macro Init() {
+    assert16a()
 
-    rts
+    stz.w   Hdma.CircularWindow.deltaTableRadius
 }
 
 
