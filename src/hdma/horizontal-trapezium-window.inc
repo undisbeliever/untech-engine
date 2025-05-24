@@ -29,7 +29,7 @@ namespace Hdma {
 //         height < 256
 a16()
 i16()
-code()
+farCode()
 function HorizontalTrapeziumWindow {
 // trapezium coordinates
 // (6 * sint16)

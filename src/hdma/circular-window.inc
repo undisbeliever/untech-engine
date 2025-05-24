@@ -57,7 +57,7 @@ macro Init() {
 // REQUIRES: 8 bit A, 16 bit Index, DB = 0x7e, DP = 0, unused utDpTmp variables
 a8()
 i16()
-code()
+farCode()
 function DrawCircle {
 
 assert(BUFFER_SIZE >= (255 * 2 + 3) * 3 + 1)

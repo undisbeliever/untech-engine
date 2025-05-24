@@ -137,7 +137,7 @@ NotVisible:
 // NOTE: SetupWindowBuffer.yPos is temporary and overridden in DrawLine
 a16()
 i16()
-code()
+farCode()
 function SetupWindowBuffer {
 assert(BUFFER_SIZE > _HdmaIndirectTableOffset + 20)
 
@@ -339,7 +339,7 @@ a16()
 //
 a16()
 i16()
-code()
+farCode()
 function FinalizeBuffer {
     // Setup HDMA Channel
 
@@ -378,7 +378,7 @@ function FinalizeBuffer {
 // OUTPUT: A - x coordinate within the line at Y
 a16()
 i16()
-code()
+farCode()
 function CalcLineXpos {
     //  dx = abs(x1 - x0)
     //
@@ -423,7 +423,7 @@ function CalcLineXpos {
 a8()
     tya
     txy
-    jsr     Math.Multiply.u16y_u8a_u16y
+    jsl     Math.Multiply.u16y_u8a_u16y__far
 
     rep     #$20
 a16()
@@ -481,7 +481,7 @@ a16()
 //         nScanlines + skip <= height
 a16()
 i16()
-code()
+farCode()
 function DrawLine {
 // Reuse variables to reduce load/stores
 constant x0 = _xPos
@@ -565,7 +565,7 @@ constant height = _height
     a8()
         tya
         ldy.b   _dx2
-        jsr     Math.Multiply.u16y_u8a_u16y
+        jsl     Math.Multiply.u16y_u8a_u16y__far
 
         rep     #$20
     a16()
@@ -639,7 +639,7 @@ _DrawSteepLine_Followthrough:
 // OUTPUT: X - address of the HDMA window buffer after final scanline
 a16()
 i16()
-code()
+farCode()
 function _DrawSteepLine {
     assert(pc() == DrawLine._DrawSteepLine_Followthrough)
 
@@ -849,7 +849,7 @@ a8()
 // OUTPUT: X - address of the HDMA window buffer after final scanline
 a16()
 i16()
-code()
+farCode()
 function _DrawShallowLine {
 
 constant EarlyExit = _DrawSteepLine.EarlyExit

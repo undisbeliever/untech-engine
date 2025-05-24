@@ -134,10 +134,7 @@ a16()
 
         jsr     _DirtyUtDpTmp
 
-        ldx.b   xPos
-        ldy.b   yPos
-        lda.b   radius
-        jsr     Hdma.CircularWindow.DrawCircle
+        jsl     _DrawHdma__far
 
 
         rep     #$30
@@ -156,6 +153,20 @@ Pass:
 
     jmp     Test.ResetPpuState
 }
+
+
+a16()
+i16()
+farCode()
+function _DrawHdma__far {
+    ldx.b   xPos
+    ldy.b   yPos
+    lda.b   radius
+    jsr     Hdma.CircularWindow.DrawCircle
+
+    rtl
+}
+
 
 }
 }

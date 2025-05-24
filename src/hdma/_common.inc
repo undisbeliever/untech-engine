@@ -35,7 +35,7 @@ macro Deactivate() {
 // REQUIRES: 8 bit A, 16 bit X, DB = $7E
 a8()
 i16()
-code()
+farCode()
 function GetBuffer {
     lda.w   currentBuffer
     bne     +

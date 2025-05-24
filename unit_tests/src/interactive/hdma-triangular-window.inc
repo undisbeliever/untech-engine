@@ -220,17 +220,8 @@ a16()
 
         PrintWindowInput()
 
-        macro CopyVar(name) {
-            lda.b   {name}
-            sta.b   Hdma.TriangularWindow.{name}
-        }
-        CopyVar(x0)
-        CopyVar(y0)
-        CopyVar(x1)
-        CopyVar(y1)
-        CopyVar(x2)
-        CopyVar(y2)
-        jsr     Hdma.TriangularWindow
+        jsl     _DrawHdma__far
+
 
         lda.w   Controller.Joy1.pressed
         and.w   #JOY.buttons
@@ -243,6 +234,27 @@ Pass:
 
     jmp     Test.ResetPpuState
 }
+
+
+a16()
+i16()
+farCode()
+function _DrawHdma__far {
+    macro CopyVar(name) {
+        lda.b   {name}
+        sta.b   Hdma.TriangularWindow.{name}
+    }
+    CopyVar(x0)
+    CopyVar(y0)
+    CopyVar(x1)
+    CopyVar(y1)
+    CopyVar(x2)
+    CopyVar(y2)
+    jsr     Hdma.TriangularWindow
+
+    rtl
+}
+
 
 rodata(rom0)
 UnitTestMessage:

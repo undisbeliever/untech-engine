@@ -52,7 +52,7 @@ function Multiply.16y_u8a_16y {
         ldy.w   tableData
         lda.w   tableData + 2
 
-        jsr     Math.Multiply.u16y_u8a_u16y
+        jsl     Math.Multiply.u16y_u8a_u16y__far
 
         rep     #$20
     a16()
@@ -72,7 +72,7 @@ Table:
         dw  {a} * {b}
     }
 
-assert(Math.Multiply.s16y_u8a_s16y == Math.Multiply.u16y_u8a_u16y)
+assert(Math.Multiply.s16y_u8a_s16y__far == Math.Multiply.u16y_u8a_u16y__far)
 
     macro manyRows(evaluate a, evaluate b) {
         row({a}, {b})

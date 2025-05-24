@@ -68,16 +68,7 @@ a16()
     Loop:
         jsr     WaitFrame_PrintFreeCycles
 
-        lda.w   #Camera.DISPLAY_WIDTH / 2
-        sta.b   Hdma.RotatedTriangularWindow.xPos
-
-        lda.w   #Camera.DISPLAY_HEIGHT / 2
-        sta.b   Hdma.RotatedTriangularWindow.yPos
-
-        lda.b   angle
-        ldy.b   diameter
-
-        jsr     Hdma.RotatedTriangularWindow
+        jsl     _DrawHdma__far
 
 
         inc.b   angle
@@ -114,6 +105,25 @@ a16()
     Hdma.Deactivate()
 
     jmp     Test.ResetPpuState
+}
+
+
+a16()
+i16()
+farCode()
+function _DrawHdma__far {
+    lda.w   #Camera.DISPLAY_WIDTH / 2
+    sta.b   Hdma.RotatedTriangularWindow.xPos
+
+    lda.w   #Camera.DISPLAY_HEIGHT / 2
+    sta.b   Hdma.RotatedTriangularWindow.yPos
+
+    lda.b   angle
+    ldy.b   diameter
+
+    jsr     Hdma.RotatedTriangularWindow
+
+    rtl
 }
 
 }

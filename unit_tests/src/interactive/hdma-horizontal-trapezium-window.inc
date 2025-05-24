@@ -342,17 +342,7 @@ a16()
 
         PrintWindowInput()
 
-        macro CopyVar(name) {
-            lda.b   {name}
-            sta.b   Hdma.HorizontalTrapeziumWindow.{name}
-        }
-        CopyVar(yPos)
-        CopyVar(height)
-        CopyVar(topLeft)
-        CopyVar(topRight)
-        CopyVar(bottomLeft)
-        CopyVar(bottomRight)
-        jsr     Hdma.HorizontalTrapeziumWindow
+        jsl     _DrawHdma__far
 
         lda.w   Controller.Joy1.pressed
         and.w   #JOY.buttons
@@ -365,6 +355,27 @@ Pass:
 
     jmp     Test.ResetPpuState
 }
+
+
+a16()
+i16()
+farCode()
+function _DrawHdma__far {
+    macro CopyVar(name) {
+        lda.b   {name}
+        sta.b   Hdma.HorizontalTrapeziumWindow.{name}
+    }
+    CopyVar(yPos)
+    CopyVar(height)
+    CopyVar(topLeft)
+    CopyVar(topRight)
+    CopyVar(bottomLeft)
+    CopyVar(bottomRight)
+    jsr     Hdma.HorizontalTrapeziumWindow
+
+    rtl
+}
+
 
 rodata(rom0)
 UnitTestMessage:

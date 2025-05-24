@@ -29,7 +29,7 @@ namespace Hdma {
 //       width and height is < 256.
 a16()
 i16()
-code()
+farCode()
 function TriangularWindow {
 // triangle coordinates
 // (6 * sint16)
@@ -276,7 +276,7 @@ NotVisible:
 // NOTE: xPos/yPos are overwritten by this routine
 a16()
 i16()
-code()
+farCode()
 function RotatedTriangularWindow {
 
 constant xPos = TriangularWindow.x0

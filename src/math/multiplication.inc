@@ -59,9 +59,9 @@ a8()
 //  Y: 16 bit product
 a8()
 i16()
-code()
-Multiply.s16y_u8a_s16y:
-function Multiply.u16y_u8a_u16y {
+farCode()
+Multiply.s16y_u8a_s16y__far:
+function Multiply.u16y_u8a_u16y__far {
     sta.l   WRMPYA
     tya
     sta.l   WRMPYB
@@ -89,7 +89,7 @@ a8()
     xba
     tay
 
-    rts
+    rtl
 }
 
 
