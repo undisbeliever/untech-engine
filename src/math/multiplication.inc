@@ -93,6 +93,8 @@ a8()
 }
 
 
+if {defined ENABLE_32_BIT_MULTIPLICATION} {
+
 // Multiply uint16 * uint8 = uint32
 //
 // REQUIRES: 8 bit A, 16 bit Index, DB access lowram
@@ -149,6 +151,8 @@ a8()
 
     pld
     rts
+}
+
 }
 
 
@@ -231,6 +235,10 @@ a8()
     plp
     rts
 }
+
+
+
+if {defined ENABLE_32_BIT_MULTIPLICATION} {
 
 
 // Multiply uint16 * uint16 = uint32
@@ -684,6 +692,8 @@ i16()
 
     pld
     rts
+}
+
 }
 
 }

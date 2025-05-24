@@ -341,6 +341,8 @@ a16()
 
 
 
+if {defined ENABLE_32_BIT_DIVISION} {
+
 // sint32 / sint32 Integer Division
 //
 // INPUT:
@@ -532,6 +534,7 @@ AfterRegisters:
     rts
 }
 
+}
 
 
 // uint32 / uint8 Integer Division

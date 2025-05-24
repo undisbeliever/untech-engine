@@ -19,6 +19,9 @@ define COUNT_FREE_CYCLES
 define DEBUG_BUILD
 
 
+define ENABLE_32_BIT_MULTIPLICATION
+define ENABLE_32_BIT_DIVISION
+
 
 include "../../src/common.inc"
 include "memmap.inc"
