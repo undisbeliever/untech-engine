@@ -16,7 +16,8 @@ major and unexpected changes to the engine API.
 
 License
 =======
-This code is licensed under the MIT license.
+
+The untech-engine is licensed under the [zlib license](LICENSE).
 
 
 Build Requirements
