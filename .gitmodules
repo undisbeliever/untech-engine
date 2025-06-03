@@ -4,3 +4,6 @@
 [submodule "tools/untech-editor"]
 	path = untech-editor
 	url = https://github.com/undisbeliever/untech-editor.git
+[submodule "terrific-audio-driver"]
+	path = terrific-audio-driver
+	url = https://github.com/undisbeliever/terrific-audio-driver.git

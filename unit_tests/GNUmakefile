@@ -1,12 +1,14 @@
 
 .PHONY: all
-all: static-tests
+all: static-tests audio-api-test
 
 
 BINARY         := bin/unit-tests.sfc
 MAIN           := src/unit-tests.asm
 
 PROJECT_FILE   := resources/unit-tests.utproject
+
+TAD_PROJECT    := ../terrific-audio-driver/examples/example-project.terrificaudio
 
 SRC_DIRS       := src resources
 UNTECH_DIR     := ..
@@ -33,6 +35,18 @@ static-tests/%.error.asm: FORCE_TEST
   else
 	$(warning 'Cannot test $@ in vanilla bass: Skipped')
   endif
+
+
+.PHONY: audio-api-test
+audio-api-test: bin/audio-api-bass.bin bin/audio-api-64tass.bin
+	diff --report-identical-files bin/audio-api-bass.bin bin/audio-api-64tass.bin
+
+bin/audio-api-bass.bin: audio-api-test/bass.asm $(wildcard $(UNTECH_DIR)/src/audio/*.inc)
+	$(bass) -strict -o '$@' audio-api-test/bass.asm
+
+bin/audio-api-64tass.bin: audio-api-test/64tass.asm $(wildcard ../terrific-audio-driver/audio-driver/64tass-api/*.inc)
+	64tass -a -x -X --nostart -Wall -C -o '$@' audio-api-test/64tass.asm
+
 
 FORCE_TEST:
 

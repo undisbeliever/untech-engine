@@ -35,6 +35,8 @@ createDataBlock(RES_Block0,             0xc10000, 0xc17fff)
 
 createCodeBlock(farCode,                0xc18000, 0xc1ffff)
 
+createCodeBlock(TadData0,               0xc20000, 0xc2ffff)
+createCodeBlock(TadData1,               0xc30000, 0xc3ffff)
 
 createRamBlock(dp,          0x000000, 0x0000ff)
 createRamBlock(entityBlock, 0x7e0100, 0x7e10ff)

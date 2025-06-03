@@ -23,7 +23,7 @@
 
 
 define MEMORY_MAP = HIROM
-define ROM_SIZE = 1
+define ROM_SIZE = 2
 define ROM_SPEED = slow
 define REGION = US
 define ROM_NAME = "UNTECH UNIT TESTS"
@@ -47,12 +47,15 @@ include "memmap.inc"
 
 include "resources.inc"
 
+include "../gen/audio-data.inc"
+
 include "../gen/tables/entityhitbox-collisionorder.inc"
 include "../gen/tables/sine-table.inc"
 
 include "../../src/untech.inc"
 
 include "includes/test-framework.inc"
+include "includes/audio-tests.inc"
 include "includes/utils.inc"
 include "includes/gameloop.inc"
 include "includes/blank-player.inc"
@@ -116,6 +119,8 @@ include "tests/scripting/scripting.inc"
 include "interactive/script-trigger-test.inc"
 include "interactive/spawn-entity-group.inc"
 include "interactive/interactive-tiles-test.inc"
+
+PlaySfxTest(SFX.menu_select)
 include "interactive/tile-collision-test.inc"
 include "interactive/entity-validation.inc"
 include "interactive/entity-collisions.inc"

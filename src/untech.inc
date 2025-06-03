@@ -56,6 +56,7 @@ include "metatiles/_dataformat.inc"
 include "resources/_dataformat.inc"
 include "room/_dataformat.inc"
 
+include "audio/_variables.inc"
 include "scripting/_variables.inc"
 include "resources/_variables.inc"
 include "hdma/_variables.inc"
@@ -65,6 +66,8 @@ include "metasprite/_variables.inc"
 include "entity/_variables.inc"
 include "camera/_variables.inc"
 
+include "audio/process.inc"
+include "audio/control.inc"
 
 include "hdma/circular-window.inc"
 include "hdma/_window-buffer.inc"

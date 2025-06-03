@@ -158,15 +158,23 @@ function WaitFrame__far {
 _AfterPHB:
     phd
 
+    sep     #$20
+    rep     #$10
+a8()
+i16()
+
+    lda.b   #0x80
+    pha
+    plb
+// DB = 0x80
+
+    jsl     Audio.Process__far
+
+
     sep     #$30
     rep     #$20
 a16()
 i8()
-
-    ldx.b   #0x80
-    phx
-    plb
-// DB = 0x80
 
     lda.w   #0x4300
     tcd

@@ -13,7 +13,15 @@ TABLE_INCS     := $(foreach d,$(TABLE_DIRS),$(patsubst $d/%.py,$(GEN_DIR)/tables
 PROJECT_BIN    := $(GEN_DIR)/project.bin
 PROJECT_INC    := $(GEN_DIR)/project.inc
 
-RESOURCES      += $(PROJECT_BIN) $(PROJECT_INC)
+AUDIO_FILES    := $(GEN_DIR)/audio-data.bin $(GEN_DIR)/audio-data.ca65 $(GEN_DIR)/audio-data.inc
+
+RESOURCES      += $(PROJECT_BIN) $(PROJECT_INC) $(AUDIO_FILES)
+
+
+ifeq ($(strip $(TAD_PROJECT)),)
+  $(error "TAD_PROJECT not defined")
+endif
+AUDIO_FILES := $(call rwildcard_all $(dir $(TAD_PROJECT))) $(TAD_PROJECT)
 
 
 # If VANILLA_BASS is not 'n' then the Makefile will use vanilla bass instead of bass-untech
@@ -44,6 +52,8 @@ ifeq ($(LOCAL_TOOLS), n)
   untech-png2tileset        := $(UTEDITOR_DIR)/build/untech-png2tileset
   untech-utsi2utms          := $(UTEDITOR_DIR)/build/untech-utsi2utms
   untech-write-sfc-checksum := $(UTEDITOR_DIR)/build/untech-write-sfc-checksum
+
+  tad-compiler              := $(UNTECH_DIR)/terrific-audio-driver/target/release/tad-compiler
 else
   untech-editor-gui         := untech-editor-gui
   untech-compiler           := untech-compiler
@@ -52,6 +62,8 @@ else
   untech-png2tileset        := untech-png2tileset
   untech-utsi2utms          := untech-utsi2utms
   untech-write-sfc-checksum := untech-write-sfc-checksum
+
+  tad-compiler              := tad-compiler
 endif
 
 
@@ -109,6 +121,17 @@ project-data: $(call rwildcard_all, $(dir $(PROJECT_FILE))) $(PROJECT_FILE)
 	$(untech-compiler) --output-bin '$(PROJECT_BIN)' --output-inc '$(PROJECT_INC)' '$(PROJECT_FILE)'
 
 $(PROJECT_BIN) $(PROJECT_INC): project-data
+
+
+
+.INTERMEDIATE: audio-data
+audio-data: $(GEN_DIR)/audio-data.bin $(GEN_DIR)/audio-data.inc
+
+$(GEN_DIR)/audio-data.bin $(GEN_DIR)/audio-data.ca65: $(TAD_PROJECT)
+	$(tad-compiler) ca65-export --output-asm '$(GEN_DIR)/audio-data.ca65' --output-bin '$(GEN_DIR)/audio-data.bin' --segment 'TadData0' --hirom '$(TAD_PROJECT)'
+
+$(GEN_DIR)/audio-data.inc: $(GEN_DIR)/audio-data.ca65 $(TAD_PROJECT) $(UNTECH_DIR)/tools/convert-tad-inc-file.py
+	python3 -bb $(UNTECH_DIR)/tools/convert-tad-inc-file.py -o '$@' '$(TAD_PROJECT)' '$(GEN_DIR)/audio-data.ca65'
 
 
 

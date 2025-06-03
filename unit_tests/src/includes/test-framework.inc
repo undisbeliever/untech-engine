@@ -121,6 +121,17 @@ au()
 iu()
 code()
 function ProcessTests {
+    // Initialise audio
+    rep     #$30
+    sep     #$20
+a8()
+i16()
+    jsl     Audio.Init__far
+
+    lda.b   #Song.ode_to_joy
+    jsr     Audio.LoadSong
+
+
     jsr     ResetPpuState
 
     rep     #$30
@@ -225,6 +236,11 @@ AllTestsPassed:
     sep     #$20
 a8()
 i16()
+
+    lda.b   #SFX.menu_select
+    jsr     Audio.QueueSoundEffect
+
+
     // Change text color to green
 
     lda.b   #REGISTER_DB
