@@ -41,7 +41,7 @@ include "../../src/common/memory.inc"
 createCodeBlock(code,       0x808000, 0x80ff8f)
 createCodeBlock(farCode,    0x818000, 0x81ff8f)
 
-createRamBlock(dp,          0x000000, 0x0000ff)
+createRamBlock(zeropage,    0x000000, 0x0000ff)
 createRamBlock(lowram,      0x7e0200, 0x7e1fff)
 
 

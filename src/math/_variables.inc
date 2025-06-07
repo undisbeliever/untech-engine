@@ -36,12 +36,12 @@ if {defined ENABLE_32_BIT_MULTIPLICATION} {
 }
 
 if {defined ENABLE_32_BIT_DIVISION} {
-    allocate(divisor32, dp, 4)
+    allocate(divisor32, zeropage, 4)
 }
 
 // Used in `Divide.u32_u8a` for printing decimal Text
-allocate(dividend32, dp, 4)
-allocate(remainder32, dp, 4)
+allocate(dividend32, zeropage, 4)
+allocate(remainder32, zeropage, 4)
 constant result32 = dividend32
 
 

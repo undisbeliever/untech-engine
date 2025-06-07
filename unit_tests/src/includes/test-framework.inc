@@ -39,7 +39,7 @@ constant SUCCESS_COLOR = 22 << Palette.green.shift
 constant FAILURE_COLOR = 20 << Palette.red.shift
 
 constant TMP_SIZE = 32
-allocate(dpTmp, dp, TMP_SIZE)
+allocate(dpTmp, zeropage, TMP_SIZE)
 
 allocate(tmp, lowram, TMP_SIZE)
 

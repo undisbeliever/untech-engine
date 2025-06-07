@@ -41,7 +41,7 @@ while {_n} < UT_DP_TMP_COUNT {
     // UnTech Engine Direct Page Temporary variable.
     // MUST NOT BE USED by the subproject.
     // (dp word)
-    allocate(utDpTmp{_n}, dp, 2)
+    allocate(utDpTmp{_n}, zeropage, 2)
     evaluate _n = {_n} + 1
 }
 

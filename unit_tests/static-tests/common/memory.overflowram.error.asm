@@ -5,15 +5,15 @@ define ROM_SIZE = 1
 
 include "../../../src/common/memory.inc"
 
-createRamBlock(dp,     0x000000, 0x0000ff)
-createRamBlock(lowram, 0x7e0100, 0x7e1f7f)
-createRamBlock(stack,  0x7e1f80, 0x7e1fff)
+createRamBlock(zeropage, 0x000000, 0x0000ff)
+createRamBlock(lowram,   0x7e0100, 0x7e1f7f)
+createRamBlock(stack,    0x7e1f80, 0x7e1fff)
 
-allocate(dpVar1, dp, 0x80)
+allocate(zpVar1, zeropage, 0x80)
 
 namespace innerScope {
-    allocate(dpVar1, dp, 0x80)
+    allocate(zpVar1, zeropage, 0x80)
 }
 
-allocate(over, dp, 1) // ERROR
+allocate(over, zeropage, 1) // ERROR
 

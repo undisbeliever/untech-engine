@@ -53,15 +53,15 @@ evaluate BLOCK_MOVE_IN_PB = ((pc() >> 16) & 0x7e) <= 0x3f
 
 // Pointer the compressed data in ROM
 // (dp - faraddr)
-allocate(ptr, dp, 3)
+allocate(ptr, zeropage, 3)
 
 // The end of the output buffer
 // (dp - addr)
-allocate(outputBufferEnd, dp, 2)
+allocate(outputBufferEnd, zeropage, 2)
 
-allocate(_tmp1, dp, 2)
-allocate(_tmp2, dp, 2)
-allocate(_tmp3, dp, 2)
+allocate(_tmp1, zeropage, 2)
+allocate(_tmp2, zeropage, 2)
+allocate(_tmp3, zeropage, 2)
 
 
 

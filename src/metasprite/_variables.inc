@@ -150,8 +150,8 @@ namespace MetaSprite {
     namespace Collision {
         // The centre position of the collision
         // (2x uint16)
-        allocate(xPos, dp, 2)
-        allocate(yPos, dp, 2)
+        allocate(xPos, zeropage, 2)
+        allocate(yPos, zeropage, 2)
     }
 
 

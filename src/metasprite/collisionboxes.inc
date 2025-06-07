@@ -402,8 +402,8 @@ constant CollisionBoxBank = Data.CollisionBoxData >> 16
 // Used to convert width/height from uint8 to uint16
 // Also used to store the last hitbox read by the test collision code
 // (2x 3x uint8_t, third byte always 0)
-allocate(_xPosWidthPair, dp, 3)
-allocate(_yPosHeightPair, dp, 3)
+allocate(_xPosWidthPair, zeropage, 3)
+allocate(_yPosHeightPair, zeropage, 3)
 
 // Test assumption made by _xPosWidthPair/_yPosHeightPair optimisation
 assert(Format.CollisionBoxes.Shield.xOffset + 1 == Format.CollisionBoxes.Shield.width)
@@ -418,26 +418,26 @@ assert(Format.CollisionBoxes.Hitbox.yOffset + 1 == Format.CollisionBoxes.Hitbox.
 namespace entityA {
     // address of the entity
     // (word addr)
-    allocate(entityAddress, dp, 2)
+    allocate(entityAddress, zeropage, 2)
 
     // The hurtbox to test against.
     // all values are offset by INT_MS8_OFFSET
     // (4x uint16)
     namespace hurtboxAabb {
-        allocate(left, dp, 2)
-        allocate(right, dp, 2)
-        allocate(top, dp, 2)
-        allocate(bottom, dp, 2)
+        allocate(left, zeropage, 2)
+        allocate(right, zeropage, 2)
+        allocate(top, zeropage, 2)
+        allocate(bottom, zeropage, 2)
     }
 
     // The hitbox to test against.
     // all values are offset by INT_MS8_OFFSET
     // (4x uint16)
     namespace hitboxAabb {
-        allocate(left, dp, 2)
-        allocate(right, dp, 2)
-        allocate(top, dp, 2)
-        allocate(bottom, dp, 2)
+        allocate(left, zeropage, 2)
+        allocate(right, zeropage, 2)
+        allocate(top, zeropage, 2)
+        allocate(bottom, zeropage, 2)
     }
 }
 
@@ -446,7 +446,7 @@ namespace entityA {
 namespace entityB {
     // entityAddress must survive a ProcessCollision function call
     // (word addr)
-    allocate(entityAddress, dp, 2)
+    allocate(entityAddress, zeropage, 2)
 }
 
 // Temporary Variables

@@ -55,20 +55,20 @@ namespace Text {
 
     // If non-zero then the buffer is transferred to VRAM on vblank
     // (dp)
-    allocate(bufferDirty, dp, 1)
+    allocate(bufferDirty, zeropage, 1)
 
     // Variables used by the different text modes
     // (dp)
     constant vars.size = 4
-    allocate(vars, dp, vars.size)
+    allocate(vars, zeropage, vars.size)
 
     // string pointer 1
     // (dp far addr)
-    allocate(str1, dp, 3)
+    allocate(str1, zeropage, 3)
 
     // string pointer 2
     // (dp far addr)
-    allocate(str2, dp, 3)
+    allocate(str2, zeropage, 3)
 
     // A temporary buffer used for string generation
     // (wram7e)

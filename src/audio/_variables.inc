@@ -349,8 +349,8 @@ if !{defined TAD_CUSTOM_DEFAULTS} {
 // Queue 4 - The next sound effect to play
 // ---------------------------------------
     // see tad-audio.inc
-    allocate(sfxQueue_sfx, dp, 1)
-    allocate(sfxQueue_pan, dp, 1)
+    allocate(sfxQueue_sfx, zeropage, 1)
+    allocate(sfxQueue_pan, zeropage, 1)
 
 }
 

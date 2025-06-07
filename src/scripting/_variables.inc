@@ -47,7 +47,7 @@ constant scriptData.size = Room.roomData.size
 //       the bytecode does not need to save the `programCounter` register (Y).
 //
 // (word addr)
-allocate(programCounter, dp, 2)
+allocate(programCounter, zeropage, 2)
 
 
 constant __VariablesBegin = __MEMORY__.ramBlocks.wram7e.pos
