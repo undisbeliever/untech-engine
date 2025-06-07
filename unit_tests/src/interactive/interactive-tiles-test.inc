@@ -300,10 +300,10 @@ function Test {
 
 // Number of frames remaining in this test
 // (sint16)
-constant _framesRemaining = Test.dpTmp
+constant _framesRemaining = Test.zpTmp
 
-constant _previousTime = Test.dpTmp + 2
-constant _nRollbacks   = Test.dpTmp + 4
+constant _previousTime = Test.zpTmp + 2
+constant _nRollbacks   = Test.zpTmp + 4
 
 
     // A = room Id

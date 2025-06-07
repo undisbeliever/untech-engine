@@ -315,7 +315,7 @@ i16()
 code()
 Test.add("Test Sleep_AnimationTicks")
 function TestSleepAnimationTicks {
-constant _loopCounter = Test.dpTmp
+constant _loopCounter = Test.zpTmp
 
     jsr     _LoadScriptTestsRoom
 
@@ -374,7 +374,7 @@ i16()
 code()
 Test.add("Test Yielding Helpers")
 function TestYieldingHelpers {
-constant _oldCounter = Test.dpTmp
+constant _oldCounter = Test.zpTmp
 
 
     jsr     _LoadScriptTestsRoom
@@ -730,7 +730,7 @@ function LoadRoomTest {
 
 constant TEST_TIME = 3
 
-constant _timer  = Test.dpTmp + 0
+constant _timer  = Test.zpTmp + 0
 
 
     lda.w   #Project.RoomList.LoadRoomScriptTest_1

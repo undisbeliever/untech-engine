@@ -39,7 +39,7 @@ constant SUCCESS_COLOR = 22 << Palette.green.shift
 constant FAILURE_COLOR = 20 << Palette.red.shift
 
 constant TMP_SIZE = 32
-allocate(dpTmp, zeropage, TMP_SIZE)
+allocate(zpTmp, zeropage, TMP_SIZE)
 
 allocate(tmp, lowram, TMP_SIZE)
 
@@ -154,14 +154,14 @@ i16()
         lda.w   #0
         tcd
 
-        // corrupt utDpTmp values
+        // corrupt zpTmp values
 
-        jsr     _DirtyUtDpTmp
+        jsr     _DirtyUtZpTmp
 
         ldx.w   #TMP_SIZE - 2
         -
             dec
-            sta.b   Test.dpTmp,x
+            sta.b   Test.zpTmp,x
             dec
             sta.w   Test.tmp,x
 

@@ -28,7 +28,7 @@ architecture wdc65816-strict
 constant UNTECH_VERSION_ID = 29
 
 
-include "util/_dptmp.inc"
+include "util/_zptmp.inc"
 
 include "errors/break.inc"
 include "errors/warnings.inc"

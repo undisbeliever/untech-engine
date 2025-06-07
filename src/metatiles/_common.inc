@@ -299,8 +299,8 @@ a16()
 i16()
 farCode()
 function Process__far {
-constant _mapPtr = utDpTmp0
-constant _mapPtrRend = utDpTmp2
+constant _mapPtr = zpTmp0
+constant _mapPtrRend = zpTmp2
 
     BranchIfMapIsSmall_Long(SmallMapHeight)
 

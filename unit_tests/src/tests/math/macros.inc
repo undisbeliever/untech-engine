@@ -118,19 +118,19 @@ Test.add("Negate32.b")
 function Negate32.b {
     macro test(evaluate num) {
         lda.w   #{num} & 0xffff
-        sta.b   Test.dpTmp
+        sta.b   Test.zpTmp
         lda.w   #{num} >> 16
-        sta.b   Test.dpTmp + 2
+        sta.b   Test.zpTmp + 2
 
         lda.w   #0
 
-        Math.Negate32.b(Test.dpTmp)
+        Math.Negate32.b(Test.zpTmp)
 
-        lda.b   Test.dpTmp
+        lda.b   Test.zpTmp
         cmp.w   #(0-{num}) & 0xffff
         bne     Fail
 
-        lda.b   Test.dpTmp + 2
+        lda.b   Test.zpTmp + 2
         cmp.w   #(0-{num}) >> 16
         bne     Fail
     }

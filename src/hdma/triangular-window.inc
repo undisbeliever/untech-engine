@@ -36,10 +36,10 @@ namespace Hdma {
 // NOTE: Only checks if the window is visible in the Y axis
 //
 // REQUIRES: 16 bit A, 16 bit Index, DB = 0x7e, DP = 0
-// REQUIRES: all utDpTmp variables unused
+// REQUIRES: all zpTmp variables unused
 //
 // INPUT: x0, y0, x1, y1, x2, y2 - triangle coordinates
-//          (in utDpTmp, will be modified by this routine)
+//          (in zpTmp, will be modified by this routine)
 //
 // LIMITS: triangle height < 256
 //
@@ -52,16 +52,16 @@ farCode()
 function TriangularWindow {
 // triangle coordinates
 // (6 * sint16)
-constant x0 = utDpTmp0
-constant y0 = utDpTmp1
-constant x1 = utDpTmp2
-constant y1 = utDpTmp3
-constant x2 = utDpTmp4
-constant y2 = utDpTmp5
+constant x0 = zpTmp0
+constant y0 = zpTmp1
+constant x1 = zpTmp2
+constant y1 = zpTmp3
+constant x2 = zpTmp4
+constant y2 = zpTmp5
 
-constant _tmp = utDpTmp6
+constant _tmp = zpTmp6
 
-assert(_tmp < _WindowBuffer.LAST_DP_TMP)
+assert(_tmp < _WindowBuffer.LAST_ZP_TMP)
 
 allocateTmpWord(_bufferPos)
 
@@ -283,7 +283,7 @@ NotVisible:
 // equilateral triangle rotated by a given angle.
 //
 // REQUIRES: 16 bit A, 16 bit Index, DB = 0x7e, DP = 0
-// REQUIRES: all utDpTmp variables unused
+// REQUIRES: all zpTmp variables unused
 // REQUIRES: not in Mode 7
 //
 // INPUT: xPos, yPos - location of the centre of the triangle

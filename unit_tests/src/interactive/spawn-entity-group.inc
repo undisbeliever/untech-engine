@@ -46,11 +46,11 @@ function Test {
 
 // Number of frames to wait between entity count tests
 // (uint16)
-constant _enemyCountTestDelay  = Test.dpTmp + 0
+constant _enemyCountTestDelay  = Test.zpTmp + 0
 
 // Expected number of enemies for the next enemy count test
 // (uint16)
-constant _expectedEnemyCount   = Test.dpTmp + 2
+constant _expectedEnemyCount   = Test.zpTmp + 2
 
 assert(Test.TMP_SIZE > 2)
 

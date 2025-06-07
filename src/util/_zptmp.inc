@@ -1,13 +1,13 @@
-// util/_dptmp.inc
+// util/_zptmp.inc
 // ===============
 //
-// UnTech Engine Direct Page Temporary Variables.
+// UnTech Engine zeropage Temporary Variables.
 //
 // These variables may be used by the system to store state that crosses
 // call boundaries and MUST NOT BE USED by the subproject.
 //
 // It is expected that the subproject create its own set of direct page
-// temporary variables in order to ensure that the utDpTmp variables are
+// temporary variables in order to ensure that the zpTmp variables are
 // not accidentally overwritten.
 //
 //
@@ -35,22 +35,22 @@
 //    3. This notice may not be removed or altered from any source distribution.
 
 
-constant UT_DP_TMP_COUNT = 20
+constant UT_ZP_TMP_COUNT = 20
 evaluate _n = 0
-while {_n} < UT_DP_TMP_COUNT {
-    // UnTech Engine Direct Page Temporary variable.
+while {_n} < UT_ZP_TMP_COUNT {
+    // UnTech Engine zeropage Temporary variable.
     // MUST NOT BE USED by the subproject.
     // (dp word)
-    allocate(utDpTmp{_n}, zeropage, 2)
+    allocate(zpTmp{_n}, zeropage, 2)
     evaluate _n = {_n} + 1
 }
 
 
-// Dirties all the utDpTmp variables
+// Dirties all the zpTmp variables
 //
 // REQUIRES: none
 code()
-function _DirtyUtDpTmp {
+function _DirtyUtZpTmp {
     php
     phd
 
@@ -66,10 +66,10 @@ a16()
     eor.l   JOY2
     eor.w   #0xffff
 
-    ldx.w   #UT_DP_TMP_COUNT * 2 - 2
+    ldx.w   #UT_ZP_TMP_COUNT * 2 - 2
     -
         dec
-        sta.b   utDpTmp0,x
+        sta.b   zpTmp0,x
 
         dex
         dex

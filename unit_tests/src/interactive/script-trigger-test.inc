@@ -49,7 +49,7 @@ code()
 Test.add("Room Script Trigger Test")
 function Test {
 
-constant _timer  = Test.dpTmp + 0
+constant _timer  = Test.zpTmp + 0
 
 
     lda.w   #Project.RoomList.ScriptTriggerTest

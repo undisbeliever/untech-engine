@@ -631,7 +631,7 @@ i16()
 code()
 Test.add("GameLoop (Spawn And Change List)")
 function GameLoop_SpawnAndChangeList {
-constant _loopsLeft = Test.dpTmp + 0
+constant _loopsLeft = Test.zpTmp + 0
 
     jsr     Entity.Init
 

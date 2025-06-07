@@ -23,8 +23,8 @@
 
 namespace GameStateTests {
 
-constant _wordBefore = Test.dpTmp
-constant _wordAfter  = Test.dpTmp + 2
+constant _wordBefore = Test.zpTmp
+constant _wordAfter  = Test.zpTmp + 2
 
 
 // Fills GameStateData with 0xff (and the words before/after GameStateData with 0x77)

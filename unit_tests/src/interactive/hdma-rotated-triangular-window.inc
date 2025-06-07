@@ -27,8 +27,8 @@ namespace HdmaRotatedTriangularWindowTest {
 // Tests:
 //  * Hdma.RotatedTriangularWindow
 
-constant angle = Test.dpTmp
-constant diameter = Test.dpTmp + 2
+constant angle = Test.zpTmp
+constant diameter = Test.zpTmp + 2
 
 
 // The Test

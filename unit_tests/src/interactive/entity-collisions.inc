@@ -399,12 +399,12 @@ function PrintProcessCollisionArgs {
     jsr     Text.Console.NewLine
 
 
-    // Corrupt all utDpTmp variables.
+    // Corrupt all zpTmp variables.
     //
-    // Tests that the utDpTmp variables used by EntityHitbox subsystem
+    // Tests that the zpTmp variables used by EntityHitbox subsystem
     // are not used across a call boundary.
 
-    jmp     _DirtyUtDpTmp
+    jmp     _DirtyUtZpTmp
 }
 
 
@@ -453,7 +453,7 @@ function Test {
 
         jsr     GameLoop.ProcessFrame
 
-        jsr     _DirtyUtDpTmp
+        jsr     _DirtyUtZpTmp
 
         jsl     WaitFrame__far
 

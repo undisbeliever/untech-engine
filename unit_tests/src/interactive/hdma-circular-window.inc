@@ -28,9 +28,9 @@ namespace HdmaCircularWindowTest {
 //  * Hdma
 //  * Hdma.CircularWindow
 
-constant xPos = Test.dpTmp
-constant yPos = Test.dpTmp + 2
-constant radius = Test.dpTmp + 4
+constant xPos = Test.zpTmp
+constant yPos = Test.zpTmp + 2
+constant radius = Test.zpTmp + 4
 
 
 // Prints the positions on the screen
@@ -151,7 +151,7 @@ a16()
 
         PrintWindowInput()
 
-        jsr     _DirtyUtDpTmp
+        jsr     _DirtyUtZpTmp
 
         jsl     _DrawHdma__far
 

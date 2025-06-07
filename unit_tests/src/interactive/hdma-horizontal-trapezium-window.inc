@@ -29,14 +29,14 @@ namespace HdmaHorizontalTrapeziumTest {
 //  * Hdma.HorizontalTrapezium
 
 
-constant yPos =         Test.dpTmp + 0
-constant height =       Test.dpTmp + 2
-constant topLeft =      Test.dpTmp + 4
-constant topRight =     Test.dpTmp + 6
-constant bottomLeft =   Test.dpTmp + 8
-constant bottomRight =  Test.dpTmp + 10
+constant yPos =         Test.zpTmp + 0
+constant height =       Test.zpTmp + 2
+constant topLeft =      Test.zpTmp + 4
+constant topRight =     Test.zpTmp + 6
+constant bottomLeft =   Test.zpTmp + 8
+constant bottomRight =  Test.zpTmp + 10
 
-constant cursor =       Test.dpTmp + 12
+constant cursor =       Test.zpTmp + 12
 
 constant FIRST_VAR = yPos
 constant N_VARIABLES =  6

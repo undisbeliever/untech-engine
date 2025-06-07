@@ -28,14 +28,14 @@ namespace HdmaTriangularWindowTest {
 //  * Hdma.TriangularWindow
 
 
-constant x0 = Test.dpTmp + 0
-constant y0 = Test.dpTmp + 2
-constant x1 = Test.dpTmp + 4
-constant y1 = Test.dpTmp + 6
-constant x2 = Test.dpTmp + 8
-constant y2 = Test.dpTmp + 10
+constant x0 = Test.zpTmp + 0
+constant y0 = Test.zpTmp + 2
+constant x1 = Test.zpTmp + 4
+constant y1 = Test.zpTmp + 6
+constant x2 = Test.zpTmp + 8
+constant y2 = Test.zpTmp + 10
 
-constant cursor = Test.dpTmp + 12
+constant cursor = Test.zpTmp + 12
 
 constant FIRST_POINT_X = x0
 constant FIRST_POINT_Y = y0

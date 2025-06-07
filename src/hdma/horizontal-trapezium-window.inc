@@ -36,11 +36,11 @@ namespace Hdma {
 // NOTE: Only checks if the window is visible in the Y axis
 //
 // REQUIRES: 16 bit A, 16 bit Index, DB = 0x7e, DP = 0
-// REQUIRES: all utDpTmp variables unused
+// REQUIRES: all zpTmp variables unused
 //
 // INPUT:
 //      yPos, height, topLeft, topRight, bottomLeft, bottomRight - trapezium
-//          (in utDpTmp, may be modified by this routine)
+//          (in zpTmp, may be modified by this routine)
 //
 // LIMITS: topLeft <= topRight
 //         bottomLeft <= bottomRight
@@ -54,14 +54,14 @@ function HorizontalTrapeziumWindow {
 // (6 * sint16)
 constant yPos =         _WindowBuffer.SetupWindowBuffer.yPos
 constant height =       _WindowBuffer.SetupWindowBuffer.height
-constant topLeft =      utDpTmp0
-constant topRight =     utDpTmp1
-constant bottomLeft =   utDpTmp2
-constant bottomRight =  utDpTmp3
+constant topLeft =      zpTmp0
+constant topRight =     zpTmp1
+constant bottomLeft =   zpTmp2
+constant bottomRight =  zpTmp3
 
-constant _bufferPos =   utDpTmp4
+constant _bufferPos =   zpTmp4
 
-assert(_bufferPos < _WindowBuffer.LAST_DP_TMP)
+assert(_bufferPos < _WindowBuffer.LAST_ZP_TMP)
 
 constant _skip = _WindowBuffer.skip
 constant _nLines = _WindowBuffer.nLines

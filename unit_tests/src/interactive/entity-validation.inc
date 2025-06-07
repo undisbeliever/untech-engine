@@ -32,8 +32,8 @@ namespace EntityValidation {
 // Tests:
 //  * Entity.ValidateEntityLists
 
-constant cursorIndex = Test.dpTmp + 0
-constant menuLineIndex = Test.dpTmp + 2
+constant cursorIndex = Test.zpTmp + 0
+constant menuLineIndex = Test.zpTmp + 2
 
 
 constant N_MENU_ITEMS = 17
