@@ -105,6 +105,7 @@ constant QueueCommandOverride = QueueCommand.WriteCommand
 // A8
 // I unknown
 // DB access lowram
+// DP = 0
 // KEEP: Y, X
 a8()
 iu()
@@ -133,6 +134,7 @@ EndIf:
 // A8
 // I unknown
 // DB access lowram
+// DP = 0
 // KEEP: Y, X
 a8()
 iu()

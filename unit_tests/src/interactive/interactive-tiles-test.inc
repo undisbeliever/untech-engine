@@ -30,6 +30,7 @@
 //  * MetaTiles.MovePlayerWithTileCollisionsAndInteractiveTiles
 //  * MetaTiles.CrumblingTiles
 //  * MetaSprite Tile Collision Hitbox
+//  * QueueSoundEffect
 
 
 namespace Entities {
@@ -138,6 +139,8 @@ namespace InteractiveTilesTest_Player {
 
             lda.b   #X_MOMENTUM_PX
             sta.b   EntityStruct.xMomentum.px
+
+            QueueSoundEffect(menu_cursor)
         +
 
         rep     #$30

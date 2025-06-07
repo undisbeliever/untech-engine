@@ -68,6 +68,7 @@ include "camera/_variables.inc"
 
 include "audio/process.inc"
 include "audio/control.inc"
+include "audio/entity.inc"
 
 include "hdma/circular-window.inc"
 include "hdma/_window-buffer.inc"

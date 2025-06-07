@@ -442,6 +442,150 @@ inline GetEntityWithIdOrBranchIfEmpty_A8X(label) {
     Entity.GetEntityWithIdOrBranchIfEmpty_A8X({label})
 }
 
+
+
+// SEE: Audio.QueueCommand
+macro QueueAudioCommand_BranchOk(name, label) {
+    assert8a()
+
+    lda.b   #TadCommand.{name}
+    jsr     Audio.QueueCommand
+    bcs     {label}
+}
+
+// SEE: Audio.QueueCommand
+macro QueueAudioCommand_X_BranchOk(name, label) {
+    assert8a()
+
+    lda.b   #TadCommand.{name}
+    jsr     Audio.QueueCommand
+    bcs     {label}
+}
+
+// SEE: Audio.QueueCommand
+macro QueueAudioCommand_XY_BranchOk(name, label) {
+    assert8a()
+
+    lda.b   #TadCommand.{name}
+    jsr     Audio.QueueCommand
+    bcs     {label}
+}
+
+
+// SEE: Audio.QueueCommand
+macro QueueAudioCommand_BranchErr(name, label) {
+    assert8a()
+
+    lda.b   #TadCommand.{name}
+    jsr     Audio.QueueCommand
+    bcc     {label}
+}
+
+// SEE: Audio.QueueCommand
+macro QueueAudioCommand_X_BranchErr(name, label) {
+    assert8a()
+
+    lda.b   #TadCommand.{name}
+    jsr     Audio.QueueCommand
+    bcc     {label}
+}
+
+// SEE: Audio.QueueCommand
+macro QueueAudioCommand_XY_BranchErr(name, label) {
+    assert8a()
+
+    lda.b   #TadCommand.{name}
+    jsr     Audio.QueueCommand
+    bcc     {label}
+}
+
+
+
+// SEE: Audio.QueueCommand
+macro QueueAudioCommandOverride(name) {
+    assert8a()
+
+    lda.b   #TadCommandOverride.{name}
+    jsr     Audio.QueueCommandOverride
+}
+
+// SEE: Audio.QueueCommandOverride
+macro QueueAudioCommandOverride_X(name) {
+    assert8a()
+
+    lda.b   #TadCommandOverride.{name}
+    jsr     Audio.QueueCommandOverride
+}
+
+// SEE: Audio.QueueCommandOverride
+macro QueueAudioCommandOverride_XY(name) {
+    assert8a()
+
+    lda.b   #TadCommandOverride.{name}
+    jsr     Audio.QueueCommandOverride
+}
+
+
+// SEE: Audio.LoadSong
+macro LoadSong_A() {
+    assert8a()
+
+    jsr     Audio.LoadSong
+}
+
+// SEE: Audio.LoadSong
+macro LoadSong(name) {
+    assert8a()
+
+    lda.b   #Song.{name}
+    jsr     Audio.LoadSong
+}
+
+// SEE: Audio.LoadSongIfChanged
+macro LoadSongIfChanged_A() {
+    assert8a()
+
+    jsr     Audio.LoadSongIfChanged
+}
+
+// SEE: Audio.LoadSongIfChanged
+macro LoadSongIfChanged(name) {
+    assert8a()
+
+    lda.b   #Song.{name}
+    jsr     Audio.LoadSongIfChanged
+}
+
+// SEE: Audio.QueueSoundEffect
+macro QueueSoundEffect_A() {
+    assert8a()
+
+    jsr     Audio.QueueSoundEffect__DpUnknown
+}
+
+// SEE: Audio.QueueSoundEffect
+macro QueueSoundEffect(name) {
+    assert8a()
+
+    lda.b   #SFX.{name}
+    jsr     Audio.QueueSoundEffect__DpUnknown
+}
+
+// SEE: Audio.QueuePannedSoundEffect
+macro QueuePannedSoundEffect_A_X(name) {
+    assert8a()
+
+    jsr     Audio.QueuePannedSoundEffect__DpUnknown
+}
+
+// SEE: Audio.QueuePannedSoundEffect
+macro QueuePannedSoundEffect_X(name) {
+    assert8a()
+
+    lda.b   #SFX.{name}
+    jsr     Audio.QueuePannedSoundEffect__DpUnknown
+}
+
 }
 
 // vim: ft=bass-65816 ts=4 sw=4 et:
