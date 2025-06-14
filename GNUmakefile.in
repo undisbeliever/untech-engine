@@ -83,13 +83,28 @@ BINARY_SYMBOLS := $(BINARY:.sfc=.sym) $(BINARY:.sfc=.cpu.sym)
 
 ifeq ($(VANILLA_BASS), n)
   $(BINARY) $(BINARY_SYMBOLS): $(MAIN) $(UNTECH_DIR)/tools/convert-symbols-file.py
+    ifeq ($(MEMORY_MAP), hirom)
 	$(bass) -strict -o $(BINARY) -sym $(BINARY:.sfc=.sym) $(MAIN)
 	$(untech-write-sfc-checksum) --hirom $(BINARY)
 	python3 $(UNTECH_DIR)/tools/convert-symbols-file.py --bsnes-plus --hirom -o $(BINARY:.sfc=.cpu.sym) $(BINARY:.sfc=.sym)
+    else ifeq ($(MEMORY_MAP), lorom)
+	$(bass) -strict -o $(BINARY) -sym $(BINARY:.sfc=.sym) $(MAIN)
+	$(untech-write-sfc-checksum) --lorom $(BINARY)
+	python3 $(UNTECH_DIR)/tools/convert-symbols-file.py --bsnes-plus --lorom -o $(BINARY:.sfc=.cpu.sym) $(BINARY:.sfc=.sym)
+    else
+      $(error "Unknown memory map, please set MEMORY_MAP to 'hirom' or 'lorom'")
+    endif
 else
   $(BINARY): $(MAIN)
+    ifeq ($(MEMORY_MAP), hirom)
 	$(bass) -strict -o $(BINARY) $(MAIN)
 	$(untech-write-sfc-checksum) --hirom $(BINARY)
+    else ifeq ($(MEMORY_MAP), lorom)
+	$(bass) -strict -o $(BINARY) $(MAIN)
+	$(untech-write-sfc-checksum) --lorom $(BINARY)
+    else
+      $(error "Unknown memory map, please set MEMORY_MAP to 'hirom' or 'lorom'")
+    endif
 endif
 
 
@@ -128,7 +143,15 @@ $(PROJECT_BIN) $(PROJECT_INC): project-data
 audio-data: $(GEN_DIR)/audio-data.bin $(GEN_DIR)/audio-data.inc
 
 $(GEN_DIR)/audio-data.bin $(GEN_DIR)/audio-data.ca65: $(TAD_PROJECT)
+  ifeq ($(MEMORY_MAP), hirom)
 	$(tad-compiler) ca65-export --output-asm '$(GEN_DIR)/audio-data.ca65' --output-bin '$(GEN_DIR)/audio-data.bin' --segment 'TadData0' --hirom '$(TAD_PROJECT)'
+  else ifeq ($(MEMORY_MAP), lorom)
+$(GEN_DIR)/audio-data.bin $(GEN_DIR)/audio-data.ca65: $(TAD_PROJECT)
+	$(tad-compiler) ca65-export --output-asm '$(GEN_DIR)/audio-data.ca65' --output-bin '$(GEN_DIR)/audio-data.bin' --segment 'TadData0' --lorom '$(TAD_PROJECT)'
+  else
+    $(error "Unknown memory map, please set MEMORY_MAP to 'hirom' or 'lorom'")
+  endif
+
 
 $(GEN_DIR)/audio-data.inc: $(GEN_DIR)/audio-data.ca65 $(TAD_PROJECT) $(UNTECH_DIR)/tools/convert-tad-inc-file.py
 	python3 -bb $(UNTECH_DIR)/tools/convert-tad-inc-file.py -o '$@' '$(TAD_PROJECT)' '$(GEN_DIR)/audio-data.ca65'

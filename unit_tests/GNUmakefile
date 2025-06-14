@@ -6,6 +6,8 @@ all: static-tests audio-api-test
 BINARY         := bin/unit-tests.sfc
 MAIN           := src/unit-tests.asm
 
+MEMORY_MAP     := hirom
+
 PROJECT_FILE   := resources/unit-tests.utproject
 
 TAD_PROJECT    := ../terrific-audio-driver/examples/example-project.terrificaudio
