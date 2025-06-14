@@ -2021,7 +2021,7 @@ function MoveEntityAndProcessTileCollisions__far {
 
 // Table of offsets for the left/right tile tests
 // First item in this table cannot have an index of 0
-rodata(rom0)
+rodata()
 constant LeftRightPlatformTileOffsetTable = pc() - 1
 namespace LeftRightPlatformTileOffsetTable {
     assert(MAP_HEIGHT_SMALL == 64)
@@ -2053,7 +2053,7 @@ namespace LeftRightPlatformTileOffsetTable {
 // NOTE: If you change these values, you must also change them in untech-editor
 //
 // Values must be between 0-15 or >= 32
-rodata(rom0)
+rodata()
 TopHeightTable:
     db  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0
     db 15, 14, 13, 12, 11, 10,  9,  8,  7,  6,  5,  4,  3,  2,  1,  0
@@ -2077,7 +2077,7 @@ assert(pc() - TopHeightTable == 16 * 16)
 // NOTE: If you change these values, you must also change them in untech-editor
 //
 // Values must be between 0-15
-rodata(rom0)
+rodata()
 BottomHeightTable:
     db 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15
     db 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15

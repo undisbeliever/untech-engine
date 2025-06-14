@@ -109,7 +109,7 @@ inline word(name, evaluate v) {
     evaluate n = {n} + 2
 }
 
-rodata(rom0)
+rodata()
 Small:
     word(bytesPerColumn,          MAP_HEIGHT_SMALL)
     word(dataIndexScreenOffset,   MAP_HEIGHT_SMALL * METATILE_DISPLAY_WIDTH + METATILE_DISPLAY_HEIGHT)
@@ -118,7 +118,7 @@ Small:
     word(yPositionMask,           Y_POSITION_MASK_SMALL)
 assertPowerOfTwo(MAP_HEIGHT_SMALL)
 
-rodata(rom0)
+rodata()
 Large:
 evaluate n = 0
     word(bytesPerColumn,          MAP_HEIGHT_LARGE)

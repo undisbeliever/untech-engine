@@ -173,7 +173,7 @@ function DirtyWram {
     rts
 
 
-rodata(rom0)
+rodata()
 BaByte:
     db  0xba
 }

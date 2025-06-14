@@ -142,7 +142,7 @@ a16()
 }
 
 
-rodata(rom0)
+rodata()
 OrientationTable:
 namespace OrientationTable {
     constant LEFT = 0

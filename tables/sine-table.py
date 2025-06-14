@@ -38,7 +38,7 @@ DW_PER_LINE = 8
 def main():
     print("constant SineTable.size =", N_ROTATIONS)
     print("")
-    print("rodata(rom0)")
+    print("rodata()")
     print("SineTable:", end="")
 
     for a in range(N_ROTATIONS):

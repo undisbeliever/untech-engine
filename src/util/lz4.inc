@@ -77,7 +77,7 @@ if {BLOCK_MOVE_IN_PB} {
 
 // Block move code
 // To be copied and executed in RAM
-rodata(rom0)
+rodata()
 function BlockMoveData {
     if {BLOCK_MOVE_IN_PB} {
         define JMP_INS = jmp

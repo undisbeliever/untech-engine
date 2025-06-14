@@ -195,6 +195,10 @@ inline createCodeBlock(id, start, end) {
     createDataBlock({id}, {start}, {end})
 }
 
+macro rodata() {
+    rodata({DEFAULT_RODATA_BLOCK})
+}
+
 // duplicate of `rodata` written for clarity.
 macro code(id) {
     rodata({id})

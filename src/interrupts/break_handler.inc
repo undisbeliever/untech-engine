@@ -582,7 +582,7 @@ a8()
     bra     -
 }
 
-rodata(rom0)
+rodata()
 constant TextBank = pc() >> 16
 
 BreakString:

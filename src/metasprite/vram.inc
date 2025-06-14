@@ -1029,7 +1029,7 @@ namespace _ActivateDynamic {
 
 
 // Read only slot data.
-rodata(rom0)
+rodata()
 namespace slots {
     constant ROW_START = ((VRAM_TILE_SLOTS + 7) / 8)
 

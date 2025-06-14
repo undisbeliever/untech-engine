@@ -22,6 +22,9 @@
 //    3. This notice may not be removed or altered from any source distribution.
 
 
+define DEFAULT_RODATA_BLOCK = rom0
+
+
 createDataBlock(breakIdStrings,         0xc00000, 0xc004ff)
 createDataBlock(testNameBlock,          0xc00500, 0xc01fff)
 createDataBlock(testTableBlock,         0xc02000, 0xc021ff)

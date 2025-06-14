@@ -675,7 +675,7 @@ a8()
 // Flag Tables
 // ===========
 
-rodata(rom0)
+rodata()
 SetFlagBits:
     variable _n = 0
     while _n < 8 {
@@ -683,7 +683,7 @@ SetFlagBits:
         _n = _n + 1
     }
 
-rodata(rom0)
+rodata()
 ClearFlagBits:
     variable _n = 0
     while _n < 8 {

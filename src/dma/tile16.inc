@@ -346,7 +346,7 @@ namespace _ProcessDMA {
 
 
 // DMA Time required for each tile count
-rodata(rom0)
+rodata()
 DmaTransferTimeTable:
 namespace DmaTransferTimeTable {
 
