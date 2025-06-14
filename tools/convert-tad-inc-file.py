@@ -67,7 +67,7 @@ i16()
 code(TadData0)
 function LoadAudioData {
     assert(MEMORY_MAP.{MEMORY_MAP} == MEMORY_MAP.LOROM)
-    assert(N_TAD_DATA_ITEMS > 1)
+    assert(N_TAD_DATA_ITEMS >= 1)
 
     constant AUDIO_DATA_BANK = Tad_DataTable >> 16
 
@@ -137,7 +137,7 @@ i16()
 code(TadData0)
 function LoadAudioData {
     assert(MEMORY_MAP.{MEMORY_MAP} == MEMORY_MAP.HIROM)
-    assert(N_TAD_DATA_ITEMS > 1)
+    assert(N_TAD_DATA_ITEMS >= 1)
 
     constant AUDIO_DATA_BANK = Tad_DataTable >> 16
 
