@@ -73,7 +73,7 @@ macro Init() {
 //
 // ASSUMES: xOrigin >= 0 and xOrigin < 255
 //
-// REQUIRES: 8 bit A, 16 bit Index, DB = 0x7e, DP = 0, unused zpTmp variables
+// REQUIRES: 8 bit A, 16 bit Index, DB = 0x7e, DP = 0, unused utZpTmp variables
 a8()
 i16()
 farCode()
@@ -81,17 +81,17 @@ function DrawCircle {
 
 assert(BUFFER_SIZE >= (255 * 2 + 3) * 3 + 1)
 
-constant _xOrigin = zpTmp0
-constant _yOrigin = zpTmp1
-constant _radius = zpTmp2
+constant _xOrigin = utZpTmp0
+constant _yOrigin = utZpTmp1
+constant _radius = utZpTmp2
 
-constant _hdmaBuffer = zpTmp3
-constant _hdmaCenterRow = zpTmp4
+constant _hdmaBuffer = utZpTmp3
+constant _hdmaCenterRow = utZpTmp4
 
-constant _linesLeft = zpTmp5
+constant _linesLeft = utZpTmp5
 
-constant _j = zpTmp6
-constant _d = zpTmp7
+constant _j = utZpTmp6
+constant _d = utZpTmp7
 
 
 // The HdmaTable is offset by two rows as:

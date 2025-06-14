@@ -43,9 +43,9 @@ a16()
 i16()
 code()
 function LoadBackgroundImage {
-constant _mapVramWaddr    = zpTmp0
-constant _tilesVramWaddr  = zpTmp1
-constant _tilemapDataSize = zpTmp2
+constant _mapVramWaddr    = utZpTmp0
+constant _tilesVramWaddr  = utZpTmp1
+constant _tilemapDataSize = utZpTmp2
 
 constant _ptr = LZ4.ptr
 assertZeroPage(_ptr)

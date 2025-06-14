@@ -57,10 +57,10 @@ a16()
 i16()
 code()
 function LoadRoom {
-constant _tmp    = zpTmp0
-constant _tmpEnd = zpTmp1
-constant _tmpX   = zpTmp2
-constant _count  = zpTmp3
+constant _tmp    = utZpTmp0
+constant _tmpEnd = utZpTmp1
+constant _tmpX   = utZpTmp2
+constant _count  = utZpTmp3
 
     sep     #$10
 i8()

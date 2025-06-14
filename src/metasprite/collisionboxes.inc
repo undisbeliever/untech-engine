@@ -451,7 +451,7 @@ namespace entityB {
 
 // Temporary Variables
 
-constant _tmp                   = zpTmp0
+constant _tmp                   = utZpTmp0
 
 
 

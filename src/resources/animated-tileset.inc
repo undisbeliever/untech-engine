@@ -67,9 +67,9 @@ i16()
 code()
 function LoadAnimatedTileset_FromPtr {
 constant _ptr = LZ4.ptr
-constant _animatedTilesSize = zpTmp0
-constant _vramUploadSize = zpTmp1
-constant _vramTileWaddr = zpTmp2
+constant _animatedTilesSize = utZpTmp0
+constant _vramUploadSize = utZpTmp1
+constant _vramTileWaddr = utZpTmp2
 
 assertZeroPage(_ptr)
 assert(Format.AnimatedTilesetHeader.size == 4)

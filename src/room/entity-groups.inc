@@ -175,7 +175,7 @@ namespace Spawn_Entity_Group__BgTask {
     i16()
     code()
     function SetupBgTask___EntityGroup {
-    constant _tmp = zpTmp0
+    constant _tmp = utZpTmp0
 
         // First argument: entity group
         lda.w   Scripting.scriptData,y

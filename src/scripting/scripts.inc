@@ -773,7 +773,7 @@ code()
 function Yield__XYarg_Aopcode {
     // ::ANNOY no `sty addr,x` instruction::
 
-    sty.b   zpTmp0
+    sty.b   utZpTmp0
 
     ldy.w   currentScriptIndex
 
@@ -789,7 +789,7 @@ a16()
     sta.w   scripts.resumeArg1,y
 
     // Y = second argument
-    lda.b   zpTmp0
+    lda.b   utZpTmp0
     sta.w   scripts.resumeArg2,y
 
     sep     #$30

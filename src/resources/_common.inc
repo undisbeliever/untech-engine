@@ -40,7 +40,7 @@ a16()
 i16()
 code()
 macro _Init() {
-constant _tmp = zpTmp0
+constant _tmp = utZpTmp0
 
     Palette.DisableAnimation()
 
@@ -98,11 +98,11 @@ a16()
 i16()
 code()
 function LoadScene {
-constant _tmp           = zpTmp19
-constant _sceneIndex    = zpTmp18
-constant _layoutTypes   = zpTmp17
-constant _layerIndex    = zpTmp16
-constant _tmBit         = zpTmp15
+constant _tmp           = utZpTmp19
+constant _sceneIndex    = utZpTmp18
+constant _layoutTypes   = utZpTmp17
+constant _layerIndex    = utZpTmp16
+constant _tmBit         = utZpTmp15
 
     pha
 
@@ -248,7 +248,7 @@ i16()
 
     // Load a layer into the decompression buffer
     //
-    // This routine MUST NOT use zpTmp19 - zpTmp15 variables
+    // This routine MUST NOT use utZpTmp19 - utZpTmp15 variables
     //
     // INPUT: A = layer Id
     //        Y = bgIndex
@@ -375,7 +375,7 @@ a16()
 i16()
 code()
 function TransferToPpu {
-constant _tmp = zpTmp0
+constant _tmp = utZpTmp0
 
     pea     (0x7e << 8) | REGISTER_DB
     plb

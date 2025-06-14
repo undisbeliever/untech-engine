@@ -7,7 +7,7 @@
 // call boundaries and MUST NOT BE USED by the subproject.
 //
 // It is expected that the subproject create its own set of direct page
-// temporary variables in order to ensure that the zpTmp variables are
+// temporary variables in order to ensure that the utZpTmp variables are
 // not accidentally overwritten.
 //
 //
@@ -41,12 +41,12 @@ while {_n} < UT_ZP_TMP_COUNT {
     // UnTech Engine zeropage Temporary variable.
     // MUST NOT BE USED by the subproject.
     // (dp word)
-    allocate(zpTmp{_n}, zeropage, 2)
+    allocate(utZpTmp{_n}, zeropage, 2)
     evaluate _n = {_n} + 1
 }
 
 
-// Dirties all the zpTmp variables
+// Dirties all the utZpTmp variables
 //
 // REQUIRES: none
 code()
@@ -69,7 +69,7 @@ a16()
     ldx.w   #UT_ZP_TMP_COUNT * 2 - 2
     -
         dec
-        sta.b   zpTmp0,x
+        sta.b   utZpTmp0,x
 
         dex
         dex
