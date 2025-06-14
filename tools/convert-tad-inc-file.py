@@ -106,7 +106,7 @@ a16()
 
     sep     #$20
 a8()
-    lda,l   Tad_DataTable+2,x
+    lda.l   Tad_DataTable+2,x
     rol
     clc
     adc.b   #AUDIO_DATA_BANK
