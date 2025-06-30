@@ -405,12 +405,7 @@ allocateTmpWord(_tileIndexTmp)
         // X = (entity->yPos & Y_POSITION_MASK) / 16
         //     + ((entity.xPos.px & X_POSITION_MASK) / 16 * MAP_HEIGHT)
 
-        lda.b   BaseEntity.yPos.px
-        and.w   #Y_POSITION_MASK
-        lsr
-        lsr
-        lsr
-        lsr
+        and.w   #Y_POSITION_MASK >> 4
         sta.w   _tileIndexTmp
 
         lda.b   BaseEntity.xPos.px
@@ -430,6 +425,13 @@ allocateTmpWord(_tileIndexTmp)
         tay
     }
 
+    lda.b   BaseEntity.yPos.px
+    lsr
+    lsr
+    lsr
+    lsr
+
+    // bit instruction (does not modify A)
     BranchIfMapIsSmall(SmallMapHeight)
 
     LargeMapHeight:
