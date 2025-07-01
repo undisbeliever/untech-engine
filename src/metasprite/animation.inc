@@ -100,11 +100,32 @@ macro __LoadAnimationData() {
 // REQUIRES: 16 bit A, 16 bit Index
 //
 // INPUT: dp = Entity
+// INPUT: Y = animation Id
+a16()
+i16()
+code()
+function SetAnimationId_Y {
+    tya
+
+Fallthrough:
+}
+
+
+
+// Sets the entity's animation.
+//
+// Will not reset the animation if the animation Id is unchanged.
+//
+// REQUIRES: 16 bit A, 16 bit Index
+//
+// INPUT: dp = Entity
 // INPUT: A = animation Id
 a16()
 i16()
 code()
 function SetAnimationId {
+assert(pc() == SetAnimationId_Y.Fallthrough)
+
     ldx.b   BaseEntity.MetaSprite.frameSet
 
     sep     #$20
