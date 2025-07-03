@@ -85,17 +85,24 @@ inline __jmp_InteractiveTileFunction(type) {
 //
 // REQUIRES: 16 bit A, 16 bit Index, DB = 0x7e
 // INPUT: dp = entity
+// OUTPUT:
+//      tileIndexTmp - the x component of the tile index at entity's x-position
+//      yCollisionMapIndex - The tile index of the tile that collided in the Y-Axis (only valid if standing).
 a16()
 i16()
 code()
 function MoveEntityWithTileCollisionsAndInteractiveTiles {
 
 // Set in `MoveEntityAndProcessTileCollisions__far`
-constant _tileIndexTmp      = MoveEntityAndProcessTileCollisions__far._tileIndexTmp
+constant tileIndexTmp      = MoveEntityAndProcessTileCollisions__far._tileIndexTmp
+allocateTmpWord(yCollisionMapIndex)
 
 
     jsl     MoveEntityAndProcessTileCollisions__far
     bcc     NoYCollision
+        // Store yCollisionMapIndex
+        sty.w   yCollisionMapIndex
+
         // Collision occurred in the Y-Axis, call the `EntityCollision` tile function
         // Y = map data index of tile that collided with entity
         __jsr_InteractiveTileFunction(EntityCollision)
@@ -114,7 +121,7 @@ NoYCollision:
     lsr
     lsr
     lsr
-    ora.w   _tileIndexTmp
+    ora.w   tileIndexTmp
     tay
     // Y = tile index at entity position
 

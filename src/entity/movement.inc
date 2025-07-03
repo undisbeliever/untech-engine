@@ -280,6 +280,51 @@ YAxis_NoGravity_Down:
     rts
 }
 
+
+
+// Move entity to with tile collisions, interactive tiles and detecting ledges.
+//
+// REQUIRES: 16 bit A, 16 bit Index, DB = 0x7e
+// INPUT: dp = entity
+// OUTPUT: carry set if the entity is standing on a ledge
+a8()
+i16()
+code()
+function MoveEntityWithTileCollisionsInteractiveTilesAndDetectEdges {
+    jsr     MetaTiles.MoveEntityWithTileCollisionsAndInteractiveTiles
+
+    assert(Entity.MovementState.MOVING_RIGHT_FLAG == 0x40)
+    lda.w   #Entity.MovementState.STANDING_FLAG << 8
+    bit.b   BaseEntity.movementState - 1
+    beq     ReturnFalse
+        // Entity is standing
+        bvc     MovingLeft
+            // Moving right
+            // Return true if the Y-axis collision is to the right of the entity's y-position
+            //   return (yCollisionMapIndex & dataIndexXmask) < tileMapIndex
+            lda.w   MetaTiles.MoveEntityWithTileCollisionsAndInteractiveTiles.yCollisionMapIndex
+            and.w   MetaTiles.map.dataIndexXmask
+            cmp.w   MetaTiles.MoveEntityWithTileCollisionsAndInteractiveTiles.tileIndexTmp
+            bcc     ReturnTrue
+        ReturnFalse:
+            clc
+            rts
+
+        ReturnTrue:
+            sec
+            rts
+
+        MovingLeft:
+            // Moving Left
+            // Return true if the Y-axis collision is to the left of the entity's y-position
+            //   return (yCollisionMapIndex & dataIndexXmask) > tileMapIndex
+            lda.w   MetaTiles.MoveEntityWithTileCollisionsAndInteractiveTiles.yCollisionMapIndex
+            and.w   MetaTiles.map.dataIndexXmask
+            dec
+            cmp.w   MetaTiles.MoveEntityWithTileCollisionsAndInteractiveTiles.tileIndexTmp
+            rts
+}
+
 }
 }
 

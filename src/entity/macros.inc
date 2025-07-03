@@ -108,6 +108,25 @@ macro MoveEntityWithTileCollisionsAndInteractiveTiles() {
 
 
 
+// Move entity, process tile collisions, call any interactive tile functions involving the entity
+// and detect ledges.
+//
+// This function will call the `InteractiveTiles.Entity*` interactive tile functions.
+//
+// This function SHOULD NOT be called by a player entity.
+//
+// REQUIRES: 16 bit A, 16 bit Index, DB = 0x7e
+// INPUT: dp = entity
+// OUTPUT: carry set if the entity is standing on a ledge
+macro MoveEntityWithTileCollisionsInteractiveTilesAndDetectEdges() {
+    assert16a()
+    assert16i()
+
+    jsr     Entity.Movement.MoveEntityWithTileCollisionsInteractiveTilesAndDetectEdges
+}
+
+
+
 // Move player, process tile collisions and call any interactive tile functions involving the player.
 //
 // This function will call the `InteractiveTiles.Player*` interactive tile functions.
