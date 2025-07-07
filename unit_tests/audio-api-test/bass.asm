@@ -33,9 +33,9 @@ define ROM_SPEED = slow
 define REGION = US
 define VERSION = 0
 
-include "../../src/common/assert.inc"
-include "../../src/common/cpu.inc"
-include "../../src/common/memory.inc"
+include "../../engine/common/assert.inc"
+include "../../engine/common/cpu.inc"
+include "../../engine/common/memory.inc"
 
 
 createCodeBlock(code,       0x808000, 0x80ff8f)
@@ -47,9 +47,9 @@ createRamBlock(lowram,      0x7e0200, 0x7e1fff)
 
 constant TAD_IO_VERSION = 20
 
-include "../../src/audio/_variables.inc"
-include "../../src/audio/process.inc"
-include "../../src/audio/control.inc"
+include "../../engine/audio/_variables.inc"
+include "../../engine/audio/process.inc"
+include "../../engine/audio/control.inc"
 
 
 namespace Audio {

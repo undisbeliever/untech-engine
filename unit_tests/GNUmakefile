@@ -43,10 +43,10 @@ static-tests/%.error.asm: FORCE_TEST
 audio-api-test: bin/audio-api-bass.bin bin/audio-api-64tass.bin
 	diff --report-identical-files bin/audio-api-bass.bin bin/audio-api-64tass.bin
 
-bin/audio-api-bass.bin: audio-api-test/bass.asm $(wildcard $(UNTECH_DIR)/src/audio/*.inc)
+bin/audio-api-bass.bin: audio-api-test/bass.asm bin $(wildcard $(UNTECH_DIR)/src/audio/*.inc)
 	$(bass) -strict -o '$@' audio-api-test/bass.asm
 
-bin/audio-api-64tass.bin: audio-api-test/64tass.asm $(wildcard ../terrific-audio-driver/audio-driver/64tass-api/*.inc)
+bin/audio-api-64tass.bin: audio-api-test/64tass.asm bin $(wildcard ../terrific-audio-driver/audio-driver/64tass-api/*.inc)
 	64tass -a -x -X --nostart -Wall -C -o '$@' audio-api-test/64tass.asm
 
 
