@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="UTF_8"?>
+<!DOCTYPE untech>
+<spriteimporter id="player" tilesettype="ONE_ROW" exportorder="player" image="player.png">
+  <grid width="32" height="48" xoffset="0" yoffset="0" xpadding="0" ypadding="0" xorigin="16" yorigin="28"/>
+  <palette position="TOP_LEFT" npalettes="1" colorsize="1"/>
+  <frame id="standing_right" order="2">
+    <gridlocation x="1" y="0"/>
+    <tilehitbox x="10" y="14" width="12" height="24"/>
+    <object size="large" x="8" y="8"/>
+    <object size="large" x="8" y="24"/>
+  </frame>
+  <frame id="rising_right" order="2">
+    <gridlocation x="2" y="0"/>
+    <tilehitbox x="10" y="14" width="12" height="24"/>
+    <object size="large" x="8" y="8"/>
+    <object size="large" x="8" y="24"/>
+  </frame>
+  <frame id="falling_right" order="2">
+    <gridlocation x="3" y="0"/>
+    <tilehitbox x="10" y="14" width="12" height="24"/>
+    <object size="large" x="8" y="8"/>
+    <object size="large" x="8" y="24"/>
+  </frame>
+  <frame id="walking_right_1" order="2">
+    <gridlocation x="4" y="0"/>
+    <tilehitbox x="10" y="14" width="12" height="24"/>
+    <object size="large" x="8" y="8"/>
+    <object size="large" x="8" y="24"/>
+  </frame>
+  <frame id="walking_right_2" order="2">
+    <gridlocation x="5" y="0"/>
+    <tilehitbox x="10" y="14" width="12" height="24"/>
+    <object size="large" x="8" y="8"/>
+    <object size="large" x="8" y="24"/>
+  </frame>
+  <frame id="walking_right_3" order="2">
+    <gridlocation x="6" y="0"/>
+    <tilehitbox x="10" y="14" width="12" height="24"/>
+    <object size="large" x="8" y="8"/>
+    <object size="large" x="8" y="24"/>
+  </frame>
+  <frame id="running_right_1" order="2">
+    <gridlocation x="7" y="0"/>
+    <tilehitbox x="10" y="14" width="12" height="24"/>
+    <object size="large" x="8" y="8"/>
+    <object size="large" x="8" y="24"/>
+  </frame>
+  <frame id="running_right_2" order="2">
+    <gridlocation x="8" y="0"/>
+    <tilehitbox x="10" y="14" width="12" height="24"/>
+    <object size="large" x="8" y="8"/>
+    <object size="large" x="8" y="24"/>
+  </frame>
+  <frame id="running_right_3" order="2">
+    <gridlocation x="9" y="0"/>
+    <tilehitbox x="10" y="14" width="12" height="24"/>
+    <object size="large" x="8" y="8"/>
+    <object size="large" x="8" y="24"/>
+  </frame>
+  <frame id="sliding_left" order="2">
+    <gridlocation x="10" y="0"/>
+    <tilehitbox x="10" y="14" width="12" height="24"/>
+    <object size="large" x="8" y="8"/>
+    <object size="large" x="8" y="24"/>
+  </frame>
+  <frame id="breaking_right" order="2">
+    <gridlocation x="11" y="0"/>
+    <tilehitbox x="10" y="14" width="12" height="24"/>
+    <object size="large" x="8" y="8"/>
+    <object size="large" x="8" y="24"/>
+  </frame>
+  <frame id="ladder_0" order="2">
+    <gridlocation x="12" y="0"/>
+    <tilehitbox x="10" y="14" width="12" height="24"/>
+    <object size="large" x="8" y="8"/>
+    <object size="large" x="8" y="24"/>
+  </frame>
+  <frame id="ladder_1" order="2">
+    <gridlocation x="13" y="0"/>
+    <tilehitbox x="10" y="14" width="12" height="24"/>
+    <object size="large" x="8" y="8"/>
+    <object size="large" x="8" y="24"/>
+  </frame>
+  <animation id="standing_right" durationformat="FRAME" oneshot="true">
+    <aframe frame="standing_right" duration="0"/>
+  </animation>
+  <animation id="rising_right" durationformat="FRAME" oneshot="true">
+    <aframe frame="standing_right" duration="0"/>
+  </animation>
+  <animation id="falling_right" durationformat="FRAME" oneshot="true">
+    <aframe frame="falling_right" duration="0"/>
+  </animation>
+  <animation id="walking_right" durationformat="DISTANCE_HORIZONTAL">
+    <aframe frame="walking_right_1" duration="160"/>
+    <aframe frame="walking_right_2" duration="160"/>
+    <aframe frame="walking_right_3" duration="160"/>
+    <aframe frame="walking_right_2" duration="160"/>
+  </animation>
+  <animation id="running_right" durationformat="DISTANCE_HORIZONTAL">
+    <aframe frame="running_right_1" duration="96"/>
+    <aframe frame="running_right_2" duration="96"/>
+    <aframe frame="running_right_3" duration="96"/>
+    <aframe frame="running_right_2" duration="96"/>
+  </animation>
+  <animation id="sliding_right" durationformat="FRAME" oneshot="true">
+    <aframe frame="sliding_left" duration="0"/>
+  </animation>
+  <animation id="breaking_right" durationformat="FRAME" oneshot="true">
+    <aframe frame="breaking_right" duration="0"/>
+  </animation>
+</spriteimporter>

@@ -1,0 +1,7 @@
+
+Simple samples in this directory were created by undisbeliever.
+
+The wave samples are tuned to B +21 cents.
+
+All samples include a .txt file that details their origins.
+

@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF_8"?>
+<!DOCTYPE untech>
+<metatile-tileset name="blocky">
+  <palette name="blocky"/>
+  <crumbling-tile chain="a" first-tile="0" first-delay="300" second-tile="0" no-third-tile="true"/>
+  <crumbling-tile chain="b" first-tile="0" first-delay="300" second-tile="0" no-third-tile="true"/>
+  <tile t="15" ft="Ladder"/>
+  <tile t="16" collision="solid"/>
+  <tile t="17" collision="drs"/>
+  <tile t="18" collision="dls"/>
+  <tile t="19" collision="drss"/>
+  <tile t="20" collision="drts"/>
+  <tile t="21" collision="dlts"/>
+  <tile t="22" collision="dlss"/>
+  <tile t="23" collision="up"/>
+  <tile t="31" ft="Ladder"/>
+  <tile t="32" collision="es"/>
+  <tile t="33" collision="urs"/>
+  <tile t="34" collision="uls"/>
+  <tile t="35" collision="urss"/>
+  <tile t="36" collision="urts"/>
+  <tile t="37" collision="ults"/>
+  <tile t="38" collision="ulss"/>
+  <tile t="39" collision="dp"/>
+  <tile t="47" collision="up" ft="Ladder"/>
+  <tile-priorities>
+    AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+    AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+    AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=
+  </tile-priorities>
+  <animation-frames palette="blocky" bit-depth="4" animation-delay="30">
+    <frame image="blocky-frame-0.png"/>
+  </animation-frames>
+</metatile-tileset>

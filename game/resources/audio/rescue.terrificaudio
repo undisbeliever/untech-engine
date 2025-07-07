@@ -1,0 +1,95 @@
+{
+  "_about": {
+    "file_type": "Terrific Audio Driver project file",
+    "version": "0.1.1-beta.1"
+  },
+  "instruments": [
+    {
+      "name": "noise",
+      "source": "samples/simple/noise.brr",
+      "freq": 500.0,
+      "loop": "none",
+      "evaluator": "default",
+      "ignore_gaussian_overflow": false,
+      "first_octave": 0,
+      "last_octave": 6,
+      "envelope": "gain F127",
+      "comment": "This sample creates noise by BRR overflow"
+    },
+    {
+      "name": "sine",
+      "source": "samples/simple/sine.wav",
+      "freq": 500.0,
+      "loop": "dupe_block_hack",
+      "loop_setting": 3,
+      "evaluator": "default",
+      "ignore_gaussian_overflow": false,
+      "first_octave": 0,
+      "last_octave": 6,
+      "envelope": "adsr 12 1 1 16",
+      "comment": null
+    },
+    {
+      "name": "sineP1O",
+      "source": "samples/simple/sine.wav",
+      "freq": 1000.0,
+      "loop": "dupe_block_hack",
+      "loop_setting": 3,
+      "evaluator": "default",
+      "ignore_gaussian_overflow": false,
+      "first_octave": 0,
+      "last_octave": 7,
+      "envelope": "adsr 12 1 1 16",
+      "comment": null
+    },
+    {
+      "name": "square",
+      "source": "samples/simple/square.wav",
+      "freq": 500.0,
+      "loop": "loop_reset_filter",
+      "loop_setting": 0,
+      "evaluator": "default",
+      "ignore_gaussian_overflow": false,
+      "first_octave": 0,
+      "last_octave": 6,
+      "envelope": "adsr 12 1 1 16",
+      "comment": null
+    },
+    {
+      "name": "sawtooth",
+      "source": "samples/simple/sawtooth.wav",
+      "freq": 500.0,
+      "loop": "dupe_block_hack",
+      "loop_setting": 2,
+      "evaluator": "default",
+      "ignore_gaussian_overflow": false,
+      "first_octave": 0,
+      "last_octave": 6,
+      "envelope": "adsr 12 1 1 16",
+      "comment": null
+    },
+    {
+      "name": "triangle",
+      "source": "samples/simple/triangle.wav",
+      "freq": 500.0,
+      "loop": "dupe_block_hack",
+      "loop_setting": 4,
+      "evaluator": "default",
+      "ignore_gaussian_overflow": false,
+      "first_octave": 0,
+      "last_octave": 6,
+      "envelope": "adsr 12 1 1 16",
+      "comment": null
+    }
+  ],
+  "samples": [],
+  "default_sfx_flags": {
+    "one_channel": true,
+    "interruptible": true
+  },
+  "high_priority_sound_effects": [],
+  "sound_effects": [],
+  "low_priority_sound_effects": [],
+  "sound_effect_file": null,
+  "songs": []
+}

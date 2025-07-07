@@ -1,0 +1,52 @@
+//
+// This sample is manually created.
+//
+// It deliberately uses BRR overflow (and maybe Gaussian overflow???) to
+// generate noise.
+//
+// Special thanks to _aitchFactor for letting me know about this technique.
+
+
+// I started with random hex digits `hex(random.randint(-6, 6) & 0xf)`
+// and tweaked the sample until it sounded like noise.
+
+// Filter 1 sounds like a normal tone
+// Filter 2 sounds like noise
+// Filter 3 sounds like a glitched square wave
+
+// 1 'noise' block does not sound like noise
+// 2 'noise' blocks sounds repetitive
+// 3 'noise' blocks sounds like noise (still repetitive, but less annoying)
+// 4 'noise' blocks sounds like noise with less repetition
+
+
+    // loop point (in bytes)
+    dw  9
+
+
+    // BRR block 0
+    // Required, otherwise it sounds like square wave noise
+    db  (11 << 4) | (0 << 2)            // shift=11, filter=0
+    db  0x00, 0x00, 0x00, 0x1d, 0x3a, 0x31, 0xcf, 0xbc
+
+
+    // BRR block 1
+    db  (11 << 4) | (2 << 2)            // shift=11, filter=2
+    db  0x04, 0x1e, 0x20, 0xe1, 0xcb, 0x4f, 0xc3, 0xd6
+
+
+    // BRR block 2
+    db  (11 << 4) | (2 << 2)            // shift=11, filter=2
+    db  0xc3, 0xd5, 0x2d, 0x35, 0x4c, 0xf0, 0xa4, 0xf2
+
+
+    // BRR block 3
+    db  (11 << 4) | (2 << 2)            // shift=11, filter=2
+    db  0x14, 0xc2, 0x1d, 0xec, 0x2e, 0x42, 0xdf, 0x1e
+
+
+    // BRR block 4
+    db  (11 << 4) | (2 << 2) | 0b11     // shift=11, filter=2, loop=true, end=true
+    db  0x5f, 0x1f, 0x3a, 0xbc, 0xf4, 0x4e, 0x2f, 0xcb
+
+

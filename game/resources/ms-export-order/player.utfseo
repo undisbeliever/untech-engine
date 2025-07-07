@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF_8"?>
+<!DOCTYPE untech>
+<fsexportorder name="player">
+  <frame id="ladder_0"/>
+  <frame id="ladder_1"/>
+  <animation id="standing_left">
+    <alt name="standing_right" hflip="true"/>
+  </animation>
+  <animation id="standing_right">
+    <alt name="standing_left" hflip="true"/>
+  </animation>
+  <animation id="rising_left">
+    <alt name="rising_right" hflip="true"/>
+  </animation>
+  <animation id="rising_right">
+    <alt name="rising_left" hflip="true"/>
+  </animation>
+  <animation id="falling_left">
+    <alt name="falling_right" hflip="true"/>
+  </animation>
+  <animation id="falling_right">
+    <alt name="falling_left" hflip="true"/>
+  </animation>
+  <animation id="walking_left">
+    <alt name="walking_right" hflip="true"/>
+  </animation>
+  <animation id="walking_right">
+    <alt name="walking_left" hflip="true"/>
+  </animation>
+  <animation id="running_left">
+    <alt name="running_right" hflip="true"/>
+  </animation>
+  <animation id="running_right">
+    <alt name="running_left" hflip="true"/>
+  </animation>
+  <animation id="sliding_left">
+    <alt name="sliding_right" hflip="true"/>
+  </animation>
+  <animation id="sliding_right">
+    <alt name="sliding_left" hflip="true"/>
+  </animation>
+  <animation id="breaking_left">
+    <alt name="breaking_right" hflip="true"/>
+  </animation>
+  <animation id="breaking_right">
+    <alt name="breaking_left" hflip="true"/>
+  </animation>
+</fsexportorder>

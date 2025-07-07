@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF_8"?>
+<!DOCTYPE untech>
+<spriteimporter id="cleaning_bot" tilesettype="ONE_ROW_FIXED" exportorder="walk_and_turn" image="cleaning-bot.png">
+  <grid width="24" height="24" xoffset="0" yoffset="0" xpadding="0" ypadding="0" xorigin="12" yorigin="14"/>
+  <palette position="TOP_LEFT" npalettes="3" colorsize="1"/>
+  <frame id="left" order="2">
+    <gridlocation x="1" y="0"/>
+    <tilehitbox x="3" y="10" width="18" height="10"/>
+    <hitbox x="2" y="10" width="19" height="10"/>
+    <object size="large" x="0" y="6"/>
+    <object size="small" x="16" y="6"/>
+    <object size="small" x="16" y="14"/>
+  </frame>
+  <frame id="turn_left_1" order="2">
+    <gridlocation x="2" y="0"/>
+    <tilehitbox x="5" y="10" width="13" height="10"/>
+    <hitbox x="5" y="10" width="14" height="10"/>
+    <object size="large" x="4" y="6"/>
+  </frame>
+  <frame id="turn_left_2" order="2">
+    <gridlocation x="3" y="0"/>
+    <tilehitbox x="7" y="10" width="12" height="10"/>
+    <hitbox x="7" y="10" width="12" height="10"/>
+    <object size="large" x="4" y="6"/>
+  </frame>
+  <animation id="walk_left" durationformat="FRAME">
+    <aframe frame="left" duration="0"/>
+  </animation>
+  <animation id="turn_left" durationformat="TIME" oneshot="true">
+    <aframe frame="turn_left_1" hflip="true" duration="6"/>
+    <aframe frame="turn_left_2" duration="6"/>
+    <aframe frame="turn_left_1" duration="6"/>
+  </animation>
+</spriteimporter>
