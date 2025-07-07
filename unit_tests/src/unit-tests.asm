@@ -49,7 +49,6 @@ include "resources.inc"
 
 include "../gen/audio-data.inc"
 
-include "../gen/tables/entityhitbox-collisionorder.inc"
 include "../gen/tables/sine-table.inc"
 
 include "../../engine/untech.inc"
