@@ -677,7 +677,7 @@ constant TileList10 = pc() - DMA_Tile16Data + 1
 // ------------------------------------------------------------------------------------
 
 constant Project.DMA_Tile16Data = TileData.DMA_Tile16Data
-include "../../../../src/dma/tile16.inc"
+include "../../../../engine/dma/tile16.inc"
 
 
 // Initialize the DmaTest.Tile16.Dma.Tile16 module

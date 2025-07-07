@@ -3,7 +3,7 @@
 define MEMORY_MAP = LOROM
 define ROM_SIZE = 1
 
-include "../../../src/common/memory.inc"
+include "../../../engine/common/memory.inc"
 
 createRamBlock(zeropage, 0x000000, 0x0000ff)
 createRamBlock(lowram,   0x7e0100, 0x7e1f7f)

@@ -1,5 +1,5 @@
 
-include "../../../src/common/enum.inc"
+include "../../../engine/common/enum.inc"
 
 namespace test {
     createEnum()

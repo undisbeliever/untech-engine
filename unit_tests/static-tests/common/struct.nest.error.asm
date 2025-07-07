@@ -1,5 +1,5 @@
 
-include "../../../src/common/struct.inc"
+include "../../../engine/common/struct.inc"
 
 // should error on nested fields
 namespace test {

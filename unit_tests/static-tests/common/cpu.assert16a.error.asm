@@ -2,7 +2,7 @@
 
 architecture wdc65816-strict
 
-include "../../../src/common/cpu.inc"
+include "../../../engine/common/cpu.inc"
 
 a16()
 au()

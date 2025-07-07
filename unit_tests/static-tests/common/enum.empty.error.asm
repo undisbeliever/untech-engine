@@ -1,5 +1,5 @@
 
-include "../../../src/common/enum.inc"
+include "../../../engine/common/enum.inc"
 
 // Try to create an empty enum
 namespace test {

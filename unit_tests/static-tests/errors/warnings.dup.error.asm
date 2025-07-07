@@ -5,13 +5,13 @@ architecture wdc65816-strict
 define MEMORY_MAP = HIROM
 define ROM_SIZE = 1
 
-include "../../../src/common/memory.inc"
-include "../../../src/common/cpu.inc"
+include "../../../engine/common/memory.inc"
+include "../../../engine/common/cpu.inc"
 
 createCodeBlock(code,       0xc08000, 0xc0ffaf)
 createRamBlock(lowram,      0x7e1100, 0x7e1f7f)
 
-include "../../../src/errors/warnings.inc"
+include "../../../engine/errors/warnings.inc"
 
 Warnings.Register(ONE,   18,  0, 18)
 Warnings.Register(TEST,  18, 24, 31)

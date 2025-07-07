@@ -2,8 +2,8 @@
 
 architecture wdc65816-strict
 
-include "../../../src/common/assert.inc"
-include "../../../src/common/cpu.inc"
+include "../../../engine/common/assert.inc"
+include "../../../engine/common/cpu.inc"
 
 a8()
 assert8a()

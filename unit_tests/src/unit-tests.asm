@@ -42,7 +42,7 @@ define ENABLE_32_BIT_MULTIPLICATION
 define ENABLE_32_BIT_DIVISION
 
 
-include "../../src/common.inc"
+include "../../engine/common.inc"
 include "memmap.inc"
 
 include "resources.inc"
@@ -52,7 +52,7 @@ include "../gen/audio-data.inc"
 include "../gen/tables/entityhitbox-collisionorder.inc"
 include "../gen/tables/sine-table.inc"
 
-include "../../src/untech.inc"
+include "../../engine/untech.inc"
 
 include "includes/test-framework.inc"
 include "includes/audio-tests.inc"

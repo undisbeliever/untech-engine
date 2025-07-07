@@ -1,6 +1,6 @@
 
-include "../../../src/common/struct.inc"
-include "../../../src/common/assert.inc"
+include "../../../engine/common/struct.inc"
+include "../../../engine/common/assert.inc"
 
 namespace toolarge {
     struct()

@@ -3,7 +3,7 @@
 define MEMORY_MAP = HIROM
 define ROM_SIZE = 32
 
-include "../../../src/common/memory.inc"
+include "../../../engine/common/memory.inc"
 
 createCodeBlock(code,  0x800000, 0x802000) // ERROR
 

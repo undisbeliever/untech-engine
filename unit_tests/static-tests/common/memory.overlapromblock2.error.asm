@@ -3,7 +3,7 @@
 define MEMORY_MAP = LOROM
 define ROM_SIZE = 1
 
-include "../../../src/common/memory.inc"
+include "../../../engine/common/memory.inc"
 
 createDataBlock(rom0,  0x808000, 0x80ffaf)
 createDataBlock(rom1,  0x81c000, 0x81ffff)

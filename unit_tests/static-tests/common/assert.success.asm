@@ -2,7 +2,7 @@
 
 architecture wdc65816-strict
 
-include "../../../src/common/assert.inc"
+include "../../../engine/common/assert.inc"
 
 assert(1)
 assert(1 + 1 == 2)

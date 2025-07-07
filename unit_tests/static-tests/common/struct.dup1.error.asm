@@ -1,6 +1,6 @@
 
-include "../../../src/common/assert.inc"
-include "../../../src/common/struct.inc"
+include "../../../engine/common/assert.inc"
+include "../../../engine/common/struct.inc"
 
 // reuse struct should error out
 namespace point {

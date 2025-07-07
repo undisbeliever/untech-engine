@@ -1,6 +1,6 @@
 architecture wdc65816-strict
 
-include "../../../src/common/assert.inc"
+include "../../../engine/common/assert.inc"
 
 constant a = 0x0000
 constant b = 0x0420

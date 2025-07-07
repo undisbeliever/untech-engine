@@ -1,7 +1,7 @@
 // Test enum.inc
 
-include "../../../src/common/assert.inc"
-include "../../../src/common/struct.inc"
+include "../../../engine/common/assert.inc"
+include "../../../engine/common/struct.inc"
 
 namespace point {
     struct()

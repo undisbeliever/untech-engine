@@ -22,7 +22,7 @@ STATIC_TESTS   := $(wildcard static-tests/*.success.asm static-tests/*/*.success
 STATIC_TESTS   += $(wildcard static-tests/*.error*.asm static-tests/*/*.error*.asm)
 
 
-include ../GNUmakefile.in
+include ../engine/GNUmakefile.in
 
 
 .PHONY: static-tests
