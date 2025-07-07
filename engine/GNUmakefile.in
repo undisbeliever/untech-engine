@@ -82,15 +82,13 @@ $(BINARY): $(RESOURCES)
 BINARY_SYMBOLS := $(BINARY:.sfc=.sym) $(BINARY:.sfc=.cpu.sym)
 
 ifeq ($(VANILLA_BASS), n)
-  $(BINARY) $(BINARY_SYMBOLS): $(MAIN) $(UNTECH_DIR)/tools/convert-symbols-file.py
+  $(BINARY) $(BINARY_SYMBOLS): $(MAIN)
     ifeq ($(MEMORY_MAP), hirom)
 	$(bass) -strict -o $(BINARY) -sym $(BINARY:.sfc=.sym) $(MAIN)
 	$(untech-write-sfc-checksum) --hirom $(BINARY)
-	python3 $(UNTECH_DIR)/tools/convert-symbols-file.py --bsnes-plus --hirom -o $(BINARY:.sfc=.cpu.sym) $(BINARY:.sfc=.sym)
     else ifeq ($(MEMORY_MAP), lorom)
 	$(bass) -strict -o $(BINARY) -sym $(BINARY:.sfc=.sym) $(MAIN)
 	$(untech-write-sfc-checksum) --lorom $(BINARY)
-	python3 $(UNTECH_DIR)/tools/convert-symbols-file.py --bsnes-plus --lorom -o $(BINARY:.sfc=.cpu.sym) $(BINARY:.sfc=.sym)
     else
       $(error "Unknown memory map, please set MEMORY_MAP to 'hirom' or 'lorom'")
     endif
