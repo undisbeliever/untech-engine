@@ -75,7 +75,7 @@ all: directories $(BINARY)
 
 
 
-$(BINARY): $(call rwildcard_all, $(SRC_DIRS) $(UNTECH_DIR)/src)
+$(BINARY): $(call rwildcard_all, $(SRC_DIRS) $(UNTECH_DIR)/engine)
 $(BINARY): $(TABLE_INCS)
 $(BINARY): $(RESOURCES)
 
