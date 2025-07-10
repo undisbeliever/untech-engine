@@ -85,7 +85,7 @@
     <aframe frame="standing_right" duration="0"/>
   </animation>
   <animation id="rising_right" durationformat="FRAME" oneshot="true">
-    <aframe frame="standing_right" duration="0"/>
+    <aframe frame="rising_right" duration="0"/>
   </animation>
   <animation id="falling_right" durationformat="FRAME" oneshot="true">
     <aframe frame="falling_right" duration="0"/>
