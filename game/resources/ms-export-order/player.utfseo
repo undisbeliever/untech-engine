@@ -3,6 +3,12 @@
 <fsexportorder name="player">
   <frame id="ladder_0"/>
   <frame id="ladder_1"/>
+  <frame id="ladder_0_up">
+    <alt name="ladder_0" hflip="true" vflip="true"/>
+  </frame>
+  <frame id="ladder_1_up">
+    <alt name="ladder_1" hflip="true" vflip="true"/>
+  </frame>
   <animation id="standing_left">
     <alt name="standing_right" hflip="true"/>
   </animation>

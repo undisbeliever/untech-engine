@@ -175,6 +175,16 @@ function _Movement {
     sep     #$20
 a8()
 
+    // ::TODO remove::
+    lda.w   Controller.Joy1.pressed
+    bit.b   #JOYL.x
+    beq     +
+        lda.b   EntityStruct.movementState
+        eor.b   #Entity.MovementState.UP_GRAVITY_FLAG | Entity.MovementState.MOVING_DOWN_FLAG
+        sta.b   EntityStruct.movementState
+    +
+
+
     ldx.w   #MovementTableIndex.PlayerWalk
 
     lda.w   Controller.Joy1.current + 1
@@ -416,6 +426,8 @@ a16()
 i16()
 code()
 function Process__Ladder {
+constant _tmp = zpTmp0
+
     // Clear momentum
     assert(EntityStruct.xMomentum.sx + 3 == EntityStruct.yMomentum.sx)
     stz.b   EntityStruct.xMomentum.sx
@@ -554,11 +566,19 @@ i8()
     // Use player y-position to determine metasprite frame
     assert({GetFrameId(ladder_0)} == 0)
     assert({GetFrameId(ladder_1)} == 1)
+    assert({GetFrameId(ladder_0_up)} == {GetFrameId(ladder_0)} | Entity.MovementState.UP_GRAVITY_FLAG)
+    assert({GetFrameId(ladder_1_up)} == {GetFrameId(ladder_1)} | Entity.MovementState.UP_GRAVITY_FLAG)
+
+    lda.b   EntityStruct.movementState
+    and.b   #Entity.MovementState.UP_GRAVITY_FLAG
+    sta.w   _tmp
+
     lda.b   EntityStruct.yPos.px
     and.b   #8
     lsr
     lsr
     lsr
+    ora.w   _tmp
 
     rep     #$30
 a16()
