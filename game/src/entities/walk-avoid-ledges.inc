@@ -179,7 +179,7 @@ a8()
 a16()
 
     ldy.w   #{GetAnimationId(walk_left)}
-    jmp     SetAnimationWithGravityCheck_Y
+    jmp     SetAnimation_FacingAndGravity_Y
 }
 
 
@@ -208,7 +208,7 @@ a8()
 a16()
 
     ldy.w   #{GetAnimationId(walk_right)}
-    jmp     SetAnimationWithGravityCheck_Y
+    jmp     SetAnimation_FacingAndGravity_Y
 }
 
 
@@ -315,16 +315,12 @@ function SetState__Turn {
     stz.b   EntityStruct.xMomentum.sx
     stz.b   EntityStruct.xMomentum.px - 1
 
-    assert(Entity.MovementState.FACING_RIGHT_FLAG == 1)
-    assert({GetAnimationId(turn_right)} == {GetAnimationId(turn_left)} + 2)
-    ldy.w   #{GetAnimationId(turn_left)}
     lda.b   EntityStruct.movementState
-    lsr
-    bcs     +
-        iny
-        iny
-    +
-    jmp     SetAnimationWithGravityCheck_Y
+    eor.w   #Entity.MovementState.FACING_RIGHT_FLAG
+    sta.b   EntityStruct.movementState
+
+    ldy.w   #{GetAnimationId(turn_left)}
+    jmp     SetAnimation_FacingAndGravity_Y
 }
 
 
@@ -341,7 +337,7 @@ function Process__Turn {
         assert(Entity.MovementState.FACING_RIGHT_FLAG == 1)
         lda.b   EntityStruct.movementState
         lsr
-        bcc     +
+        bcs     +
             jsr     SetState_WalkLeft
             bra     EndIf
         +

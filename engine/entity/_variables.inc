@@ -155,14 +155,14 @@ namespace Entity.MovementState {
     // When set entity is facing right, when clear entity is facing left
     constant FACING_RIGHT_FLAG      = %00000001
 
+    // When set entity experiences upwards gravity, when clear entity experiences downwards gravity
+    constant UP_GRAVITY_FLAG        = %00000010
+
     // When set entity is moving down, when clear entity is moving up
-    constant MOVING_DOWN_FLAG       = %00000010
+    constant MOVING_DOWN_FLAG       = %00000100
 
     // When set entity is in a Standing state, when clear entity is Falling
-    constant STANDING_FLAG          = %00000100
-
-    // When set entity experiences upwards gravity, when clear entity experiences downwards gravity
-    constant UP_GRAVITY_FLAG        = %00001000
+    constant STANDING_FLAG          = %00001000
 
     // Set if the entity is unaffected by gravity
     constant NO_GRAVITY_FLAG        = %00010000

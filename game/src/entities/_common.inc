@@ -31,13 +31,18 @@ namespace Entities {
 a16()
 i16()
 code()
-function SetAnimationWithGravityCheck_Y {
+function SetAnimation_FacingAndGravity_Y {
+constant _tmp = zpTmp0
+
+    assert(Entity.MovementState.FACING_RIGHT_FLAG == 1)
+    assert(Entity.MovementState.UP_GRAVITY_FLAG == 2)
+
+    sty.w   _tmp
+
     lda.b   BaseEntity.movementState
-    bit.w   #Entity.MovementState.UP_GRAVITY_FLAG
-    beq     +
-        iny
-    +
-    jmp     MetaSprite.Animation.SetAnimationId_Y
+    and.w   #3
+    ora.w   _tmp
+    jmp     MetaSprite.Animation.SetAnimationId
 }
 
 

@@ -48,32 +48,33 @@ assert(BaseEntity.yMomentum.sx - BaseEntity.xMomentum.sx == 3)
 // PARAM: prefix = the prefix on all the functions
 // PARAM: processStanding = If zero then the STANDING_FLAG will be ignored
 inline _GenerateYAxisMovementStateFunctionTable(define prefix, evaluate processStanding) {
-    assert(Entity.MovementState.MOVING_DOWN_FLAG == %00010)
-    assert(Entity.MovementState.STANDING_FLAG    == %00100)
-    assert(Entity.MovementState.UP_GRAVITY_FLAG  == %01000)
+    assert(Entity.MovementState.UP_GRAVITY_FLAG  == %00010)
+    assert(Entity.MovementState.MOVING_DOWN_FLAG == %00100)
+    assert(Entity.MovementState.STANDING_FLAG    == %01000)
     assert(Entity.MovementState.NO_GRAVITY_FLAG  == %10000)
 
+    assert(Entity.MovementState.UP_GRAVITY_FLAG | Entity.MovementState.MOVING_DOWN_FLAG | Entity.MovementState.STANDING_FLAG | Entity.MovementState.NO_GRAVITY_FLAG == 30)
 
     evaluate _n = 0
     while {_n} < 32 {
-        if {_n} & %00010 {
+        if {_n} & Entity.MovementState.MOVING_DOWN_FLAG {
             define _label = Down
         } else {
             define _label = Up
         }
 
         if {processStanding} {
-            if {_n} & %00100 {
+            if {_n} & Entity.MovementState.STANDING_FLAG {
                 define _label = Standing_{_label}
             } else {
                 define _label = Falling_{_label}
             }
         }
 
-        if {_n} & %10000 {
+        if {_n} & Entity.MovementState.NO_GRAVITY_FLAG {
             define _label = NoGravity_{_label}
         } else {
-            if {_n} & %01000 {
+            if {_n} & Entity.MovementState.UP_GRAVITY_FLAG {
                 define _label = UpGravity_{_label}
             } else {
                 define _label = DownGravity_{_label}

@@ -4,12 +4,12 @@
   <animation id="walk_left">
     <alt name="walk_right" hflip="true"/>
   </animation>
+  <animation id="walk_right">
+    <alt name="walk_left" hflip="true"/>
+  </animation>
   <animation id="walk_left_up">
     <alt name="walk_left" vflip="true"/>
     <alt name="walk_right" hflip="true" vflip="true"/>
-  </animation>
-  <animation id="walk_right">
-    <alt name="walk_left" hflip="true"/>
   </animation>
   <animation id="walk_right_up">
     <alt name="walk_left" hflip="true" vflip="true"/>
@@ -18,12 +18,12 @@
   <animation id="turn_left">
     <alt name="turn_right" hflip="true"/>
   </animation>
+  <animation id="turn_right">
+    <alt name="turn_left" hflip="true"/>
+  </animation>
   <animation id="turn_left_up">
     <alt name="turn_left" vflip="true"/>
     <alt name="turn_right" hflip="true" vflip="true"/>
-  </animation>
-  <animation id="turn_right">
-    <alt name="turn_left" hflip="true"/>
   </animation>
   <animation id="turn_right_up">
     <alt name="turn_right" hflip="true"/>

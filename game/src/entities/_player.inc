@@ -264,7 +264,7 @@ i16()
 code()
 function _SetAnimation {
 
-constant _rightFlag = zpTmp0
+constant _msAnimationBits = zpTmp0
 
     sep     #$20
 a8()
@@ -273,9 +273,10 @@ a8()
 
 
     assert(Entity.MovementState.FACING_RIGHT_FLAG == 1)
+    assert(Entity.MovementState.UP_GRAVITY_FLAG == 2)
     lda.b   EntityStruct.movementState
-    and.b   #1
-    sta.w   _rightFlag
+    and.b   #3
+    sta.w   _msAnimationBits
 
     // ::TODO up gravity::
 
@@ -338,8 +339,7 @@ a8()
 
 a8()
 _SetAnimation:
-    clc
-    adc.w   _rightFlag
+    ora.w   _msAnimationBits
 
     rep     #$30
 a16()

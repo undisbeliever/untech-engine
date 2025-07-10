@@ -9,11 +9,23 @@
   <animation id="standing_right">
     <alt name="standing_left" hflip="true"/>
   </animation>
+  <animation id="standing_left_up">
+    <alt name="standing_right" hflip="true" vflip="true"/>
+  </animation>
+  <animation id="standing_right_up">
+    <alt name="standing_right" vflip="true"/>
+  </animation>
   <animation id="rising_left">
     <alt name="rising_right" hflip="true"/>
   </animation>
   <animation id="rising_right">
     <alt name="rising_left" hflip="true"/>
+  </animation>
+  <animation id="rising_left_up">
+    <alt name="rising_right" hflip="true" vflip="true"/>
+  </animation>
+  <animation id="rising_right_up">
+    <alt name="rising_right" vflip="true"/>
   </animation>
   <animation id="falling_left">
     <alt name="falling_right" hflip="true"/>
@@ -21,11 +33,23 @@
   <animation id="falling_right">
     <alt name="falling_left" hflip="true"/>
   </animation>
+  <animation id="falling_left_up">
+    <alt name="falling_right" hflip="true" vflip="true"/>
+  </animation>
+  <animation id="falling_right_up">
+    <alt name="falling_right" vflip="true"/>
+  </animation>
   <animation id="walking_left">
     <alt name="walking_right" hflip="true"/>
   </animation>
   <animation id="walking_right">
     <alt name="walking_left" hflip="true"/>
+  </animation>
+  <animation id="walking_left_up">
+    <alt name="walking_right" hflip="true" vflip="true"/>
+  </animation>
+  <animation id="walking_right_up">
+    <alt name="walking_right" vflip="true"/>
   </animation>
   <animation id="running_left">
     <alt name="running_right" hflip="true"/>
@@ -33,16 +57,35 @@
   <animation id="running_right">
     <alt name="running_left" hflip="true"/>
   </animation>
+  <animation id="running_left_up">
+    <alt name="running_right" hflip="true" vflip="true"/>
+  </animation>
+  <animation id="running_right_up">
+    <alt name="running_right" vflip="true"/>
+  </animation>
   <animation id="sliding_left">
     <alt name="sliding_right" hflip="true"/>
   </animation>
   <animation id="sliding_right">
     <alt name="sliding_left" hflip="true"/>
   </animation>
+  <animation id="sliding_left_up">
+    <alt name="sliding_right" hflip="true" vflip="true"/>
+  </animation>
+  <animation id="sliding_right_up">
+    <alt name="sliding_right" vflip="true"/>
+  </animation>
   <animation id="breaking_left">
     <alt name="breaking_right" hflip="true"/>
   </animation>
   <animation id="breaking_right">
     <alt name="breaking_left" hflip="true"/>
+  </animation>
+  <animation id="breaking_left_up">
+    <alt name="breaking_right" hflip="true" vflip="true"/>
+  </animation>
+  <animation id="breaking_right_up">
+    <alt name="breaking_left" hflip="true" vflip="true"/>
+    <alt name="breaking_right" vflip="true"/>
   </animation>
 </fsexportorder>
