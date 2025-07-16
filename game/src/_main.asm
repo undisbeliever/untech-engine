@@ -73,6 +73,9 @@ include "scenes/basic-room.inc"
 
 
 
+au()
+iu()
+code()
 function Main {
 
     // Set Data Bank to Work RAM
