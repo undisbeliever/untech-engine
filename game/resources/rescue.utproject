@@ -3,7 +3,9 @@
 <project>
   <memory-map mode="lorom" first-bank="83" n-banks="5"/>
   <room-settings room-data-size="16384"/>
-  <game-state starting-room="_scratchpad" starting-entrance="start" starting-player="player"/>
+  <game-state starting-room="_scratchpad" starting-entrance="start" starting-player="player">
+    <word index="0" name="playerHealth" value="6"/>
+  </game-state>
   <bytecode/>
   <interactive-tiles>
     <tile-function-table name="Ladder" tint="ffc800"/>

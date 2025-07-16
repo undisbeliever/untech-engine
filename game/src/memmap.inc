@@ -49,7 +49,7 @@ createRamBlock(wram7f,      0x7f0000, 0x7fffff)
 // Store small rodata immediately after audio data
 // Requires `gen/audio-data.inc` to be loaded first
 define DEFAULT_RODATA_BLOCK = TadData0
-
+define Text.Console.StringBlock = TadData0
 
 // Allocate 2 pages (512 bytes) to store the game state
 constant N_GAME_STATE_PAGES = 2

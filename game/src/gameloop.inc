@@ -53,6 +53,9 @@ i16()
     jsl     MetaTiles.Render.DrawFullScreen_ForceBlank__far
 
 
+    Healthbar.Init()
+
+
     jsr     EnableDisplay_Full
 
     Loop:
@@ -68,6 +71,7 @@ i16()
     a8()
     i8()
         InputBuffer.Process()
+        Healthbar.Process()
 
         rep     #$30
     a16()

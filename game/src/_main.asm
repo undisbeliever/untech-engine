@@ -57,6 +57,7 @@ include "_variables.inc"
 
 
 include "input.inc"
+include "healthbar.inc"
 include "gameloop.inc"
 include "bytecodes.inc"
 

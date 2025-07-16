@@ -41,6 +41,10 @@ constant COYOTE_TIME_FRAMES = 8
 constant LADDER_COYOTE_TIME_FRAMES = 5
 
 
+// Player gamestate variables
+constant playerHealth = Project.GameState.Words.playerHealth
+
+
 // Player entity
 //
 // Manually controlled by Joypad1
@@ -174,6 +178,18 @@ code()
 function _Movement {
     sep     #$20
 a8()
+    // ::TODO remove::
+    lda.w   Controller.Joy1.pressed
+    bit.b   #JOYL.l
+    beq     +
+        dec.w   playerHealth
+    +
+    lda.w   Controller.Joy1.pressed
+    bit.b   #JOYL.r
+    beq     +
+        inc.w   playerHealth
+    +
+
 
     // ::TODO remove::
     lda.w   Controller.Joy1.pressed

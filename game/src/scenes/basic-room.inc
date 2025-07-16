@@ -42,8 +42,15 @@ function Process {
 
 a16()
 i8()
-code()
-constant VBlank_dp2100 = VBlank_dp2100_AnimatedTileset_Bg1
+// DB = 0x80
+// DP = $2100
+farCode()
+function VBlank_dp2100 {
+    Healthbar.VBlank_dp2100()
+
+    jmp     VBlank_dp2100_AnimatedTileset_Bg1
+}
+
 
 }
 }
