@@ -2,82 +2,95 @@
 <!DOCTYPE untech>
 <spriteimporter id="player" tilesettype="ONE_ROW" exportorder="player" image="player.png">
   <grid width="32" height="48" xoffset="0" yoffset="0" xpadding="0" ypadding="0" xorigin="16" yorigin="28"/>
-  <palette position="TOP_LEFT" npalettes="1" colorsize="1"/>
+  <palette position="TOP_LEFT" npalettes="2" colorsize="1"/>
   <frame id="standing_right" order="2">
     <gridlocation x="1" y="0"/>
     <tilehitbox x="10" y="14" width="12" height="24"/>
+    <hurtbox x="10" y="12" width="12" height="25"/>
     <object size="large" x="8" y="8"/>
     <object size="large" x="8" y="24"/>
   </frame>
   <frame id="rising_right" order="2">
     <gridlocation x="2" y="0"/>
     <tilehitbox x="10" y="14" width="12" height="24"/>
+    <hurtbox x="10" y="12" width="12" height="25"/>
     <object size="large" x="8" y="8"/>
     <object size="large" x="8" y="24"/>
   </frame>
   <frame id="falling_right" order="2">
     <gridlocation x="3" y="0"/>
     <tilehitbox x="10" y="14" width="12" height="24"/>
+    <hurtbox x="10" y="12" width="12" height="25"/>
     <object size="large" x="8" y="8"/>
     <object size="large" x="8" y="24"/>
   </frame>
   <frame id="walking_right_1" order="2">
     <gridlocation x="4" y="0"/>
     <tilehitbox x="10" y="14" width="12" height="24"/>
+    <hurtbox x="10" y="12" width="12" height="25"/>
     <object size="large" x="8" y="8"/>
     <object size="large" x="8" y="24"/>
   </frame>
   <frame id="walking_right_2" order="2">
     <gridlocation x="5" y="0"/>
     <tilehitbox x="10" y="14" width="12" height="24"/>
+    <hurtbox x="10" y="12" width="12" height="25"/>
     <object size="large" x="8" y="8"/>
     <object size="large" x="8" y="24"/>
   </frame>
   <frame id="walking_right_3" order="2">
     <gridlocation x="6" y="0"/>
     <tilehitbox x="10" y="14" width="12" height="24"/>
+    <hurtbox x="10" y="12" width="12" height="25"/>
     <object size="large" x="8" y="8"/>
     <object size="large" x="8" y="24"/>
   </frame>
   <frame id="running_right_1" order="2">
     <gridlocation x="7" y="0"/>
     <tilehitbox x="10" y="14" width="12" height="24"/>
+    <hurtbox x="10" y="12" width="12" height="25"/>
     <object size="large" x="8" y="8"/>
     <object size="large" x="8" y="24"/>
   </frame>
   <frame id="running_right_2" order="2">
     <gridlocation x="8" y="0"/>
     <tilehitbox x="10" y="14" width="12" height="24"/>
+    <hurtbox x="10" y="12" width="12" height="25"/>
     <object size="large" x="8" y="8"/>
     <object size="large" x="8" y="24"/>
   </frame>
   <frame id="running_right_3" order="2">
     <gridlocation x="9" y="0"/>
     <tilehitbox x="10" y="14" width="12" height="24"/>
+    <hurtbox x="10" y="12" width="12" height="25"/>
     <object size="large" x="8" y="8"/>
     <object size="large" x="8" y="24"/>
   </frame>
   <frame id="sliding_left" order="2">
     <gridlocation x="10" y="0"/>
     <tilehitbox x="10" y="14" width="12" height="24"/>
+    <hurtbox x="10" y="12" width="12" height="25"/>
     <object size="large" x="8" y="8"/>
     <object size="large" x="8" y="24"/>
   </frame>
   <frame id="breaking_right" order="2">
     <gridlocation x="11" y="0"/>
     <tilehitbox x="10" y="14" width="12" height="24"/>
+    <hurtbox x="10" y="12" width="12" height="25"/>
     <object size="large" x="8" y="8"/>
     <object size="large" x="8" y="24"/>
   </frame>
   <frame id="ladder_0" order="2">
     <gridlocation x="12" y="0"/>
     <tilehitbox x="10" y="14" width="12" height="24"/>
+    <hurtbox x="10" y="12" width="12" height="25"/>
     <object size="large" x="8" y="8"/>
     <object size="large" x="8" y="24"/>
   </frame>
   <frame id="ladder_1" order="2">
     <gridlocation x="13" y="0"/>
     <tilehitbox x="10" y="14" width="12" height="24"/>
+    <hurtbox x="10" y="12" width="12" height="25"/>
     <object size="large" x="8" y="8"/>
     <object size="large" x="8" y="24"/>
   </frame>

@@ -33,6 +33,10 @@ constant LADDER_X_MOMENTUM = 0x0120
 constant LADDER_Y_MOMENTUM = 0x0120
 
 
+// ::TODO adjust::
+constant HURT_IFRAMES = 40
+
+
 // Number of frames after standing before the player can jump
 // ::TODO adjust::
 constant COYOTE_TIME_FRAMES = 8
@@ -70,6 +74,11 @@ constant DrawPlayer = MetaSprite.Render.RenderEntity
 namespace EntityStruct {
     childstruct(BaseEntity)
         field(state, 2)
+
+        // Player i-frame counter
+        // If set, the player has been recently hurt and will not take damage a second time
+        // (byte)
+        field(iFrames, 1)
 
         // Used for coyote time
         //  * Right shifted every frame
@@ -131,6 +140,7 @@ function HitboxCollision {
 }
 
 
+// ASSUMES: Collision enemy has a `BaseEnemy`
 // REQUIRES: 16 bit A, 16 bit Index, DB = 0x7e
 // INPUT: DP = entity
 //        Y = other entity
@@ -139,6 +149,38 @@ a16()
 i16()
 code()
 function HurtboxCollision {
+    sep     #$20
+a8()
+
+    // ::TODO test for shield::
+
+    lda.b   EntityStruct.iFrames
+    bne     Return
+        lda.b   #HURT_IFRAMES
+        sta.b   EntityStruct.iFrames
+
+        // Enemy hurts the player
+        ldx.b   BaseEntity.romPtr,y
+
+        lda.w   playerHealth
+        sec
+        sbc.l   Project.EntityRomStructs.BaseEnemy.attack,x
+        sta.w   playerHealth
+
+
+        // ::TODO add optional knockback (stored in BaseEntity struct)::
+
+
+        // Change the player to the hurt palette
+        SetPalette(1)
+
+
+        // ::TODO play sound::
+
+Return:
+    rep     #$30
+a16()
+i16()
     rts
 }
 
@@ -161,6 +203,20 @@ a16()
 i16()
 code()
 function Process {
+    sep     #$20
+a8()
+    lda.b   EntityStruct.iFrames
+    beq     +
+        dec
+        sta.b   EntityStruct.iFrames
+        bne     +
+            // Restore the player's palette
+            SetPalette(0)
+    +
+
+    rep     #$30
+a16()
+
     ldx.b   EntityStruct.state
     jsr     (ProcessFunctionTable,x)
 
