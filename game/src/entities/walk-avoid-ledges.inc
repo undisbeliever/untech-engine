@@ -31,6 +31,7 @@ namespace State {
         enum(WALK_RIGHT)
         enum(FALL_AND_TURN)
         enum(TURN)
+        enum(DEFEATED)
     endEnum()
 }
 
@@ -39,6 +40,7 @@ ProcessFunctionTable:
     dw  Process__WalkRight
     dw  Process__FallAndTurn
     dw  Process__Turn
+    dw  Process__Defeated
 
 
 buildFunctionTable(BaseEntityFunctionTable, WalkAvoidLedges)
@@ -127,6 +129,14 @@ a16()
 i16()
 code()
 function HurtboxCollision {
+    bcs     Return
+        lda.w   #State.DEFEATED
+        sta.b   EntityStruct.state
+
+        ldy.w   #{GetAnimationId(defeated_left)}
+        jmp     SetAnimation_FacingAndGravity_Y
+
+Return:
     rts
 }
 
@@ -343,6 +353,26 @@ function Process__Turn {
         +
             jsr     SetState_WalkRight
     EndIf:
+
+    MoveEntityAndProcessTileCollisions()
+
+    jmp     Entity.DeactivateIfOutsideOrDrawAndGotoNextEntity
+}
+
+
+// REQUIRES: 16 bit A, 16 bit Index, DB = 0x7e
+// INPUT: DP = entity
+a16()
+i16()
+code()
+function Process__Defeated {
+    // Stop x movement when on the ground
+    lda.b   EntityStruct.movementState
+    bit.w   #Entity.MovementState.STANDING_FLAG
+    beq     +
+        stz.b   EntityStruct.xMomentum.sx
+        stz.b   EntityStruct.xMomentum.sx + 1
+    +
 
     MoveEntityAndProcessTileCollisions()
 

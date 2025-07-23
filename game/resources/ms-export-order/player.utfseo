@@ -94,4 +94,16 @@
     <alt name="breaking_left" hflip="true" vflip="true"/>
     <alt name="breaking_right" vflip="true"/>
   </animation>
+  <animation id="melee_left">
+    <alt name="melee_right" hflip="true"/>
+  </animation>
+  <animation id="melee_right">
+    <alt name="melee_left" hflip="true"/>
+  </animation>
+  <animation id="melee_left_up">
+    <alt name="melee_right" hflip="true" vflip="true"/>
+  </animation>
+  <animation id="melee_right_up">
+    <alt name="melee_right" vflip="true"/>
+  </animation>
 </fsexportorder>

@@ -57,12 +57,14 @@ namespace Player {
 namespace State {
     createEnum(0, 2)
         enum(NORMAL)
+        enum(MELEE_ATTACK)
         enum(LADDER)
     endEnum()
 }
 
 ProcessFunctionTable:
     dw  Process__Normal
+    dw  Process__MeleeAttack
     dw  Process__Ladder
 
 
@@ -375,7 +377,7 @@ a8()
             bit.b   #Entity.MovementState.MOVING_RIGHT_FLAG
             beq     WalkingOrRunning
                 lda.b   #{GetAnimationId(sliding_left)}
-                bra     _SetAnimation
+                bra     _EndIf
 
         NoLeft:
             // A = Joy1.current + 1
@@ -385,42 +387,43 @@ a8()
                 bit.b   #Entity.MovementState.MOVING_RIGHT_FLAG
                 bne     WalkingOrRunning
                     lda.b   #{GetAnimationId(sliding_left)}
-                    bra     _SetAnimation
+                    bra     _EndIf
 
                 WalkingOrRunning:
                     ldx.b   EntityStruct.xMomentum.px - 1
                     cpx.w   #MIN_RUN_MOMENTUM
                     bcs     _Running
                         lda.b   #{GetAnimationId(walking_left)}
-                        bra     _SetAnimation
+                        bra     _EndIf
 
                     _Running:
                         lda.b   #{GetAnimationId(running_left)}
-                        bra     _SetAnimation
+                        bra     _EndIf
 
         NoRight:
             ldx.b   EntityStruct.xMomentum.px - 1
             beq     Stopped
                 lda.b   #{GetAnimationId(breaking_left)}
-                bra     _SetAnimation
+                bra     _EndIf
 
             Stopped:
                 lda.b   #{GetAnimationId(standing_left)}
-                bra     _SetAnimation
+                bra     _EndIf
 
     NotStanding:
         // A = movementState
         bit.b   #Entity.MovementState.MOVING_DOWN_FLAG
         beq     +
             lda.b   #{GetAnimationId(falling_left)}
-            bra     _SetAnimation
+            bra     _EndIf
         +
         lda.b   #{GetAnimationId(rising_left)}
-        bra     _SetAnimation
+        bra     _EndIf
 
 
 a8()
-_SetAnimation:
+_EndIf:
+    // A = animation
     ora.w   _msAnimationBits
 
     rep     #$30
@@ -441,10 +444,58 @@ a16()
 i16()
 code()
 function Process__Normal {
+    sep     #$20
+a8()
+
+    lda.w   InputBuffer.attack
+    bne     __SetMeleeAttackState_A8
+
+    rep     #$30
+a16()
+i16()
     jsr     _Movement
     jmp     _SetAnimation
 }
 
+
+// REQUIRES: 8 bit A, 16 bit Index, DB = 0x7e
+// RETURNS: 16 bit A
+// INPUT: dp = entity
+a8()
+i16()
+code()
+function __SetMeleeAttackState_A8 {
+    stz.w   InputBuffer.attack
+
+    lda.b   #State.MELEE_ATTACK
+    sta.b   EntityStruct.state
+
+    lda.b   EntityStruct.movementState
+    and.b   #3
+    ora.b   #{GetAnimationId(melee_left)}
+    jmp     MetaSprite.Animation.SetAnimationId
+}
+
+
+// REQUIRES: 8 bit A, 16 bit Index, DB = 0x7e
+// INPUT: dp = entity
+a16()
+i16()
+code()
+function Process__MeleeAttack {
+    jsr     _Movement
+
+    // Switch to normal state when attack animation is over
+    lda.b   EntityStruct.MetaSprite.Animation.id - 1
+    cmp.w   #0xff00
+    bcc     +
+        assert(State.NORMAL == 0)
+        stz.b   EntityStruct.state
+
+        jmp     _SetAnimation
+    +
+    rts
+}
 
 
 // Called by interactive tile

@@ -28,6 +28,7 @@ namespace InputBuffer {
     //  * Right shifted every gameloop frame
     //  * Set to `1 << N` if the button is pressed
     // (byte)
+    allocate(attack, zeropage, 1)
     allocate(jump, zeropage, 1)
 
 }

@@ -14,5 +14,5 @@ metatiles/%-frame-0.png: metatiles/%.aseprite
 
 
 metasprites/%.png: metasprites/%.aseprite
-	aseprite --batch '$<' --sheet-rows 8 --sheet '$@'
+	aseprite --batch '$<' --sheet-columns 6 --sheet '$@'
 

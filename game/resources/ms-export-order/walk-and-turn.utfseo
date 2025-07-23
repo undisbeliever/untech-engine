@@ -29,4 +29,18 @@
     <alt name="turn_right" hflip="true"/>
     <alt name="turn_left" hflip="true" vflip="true"/>
   </animation>
+  <animation id="defeated_left">
+    <alt name="defeated_right" hflip="true"/>
+  </animation>
+  <animation id="defeated_right">
+    <alt name="defeated_left" hflip="true"/>
+  </animation>
+  <animation id="defeated_left_up">
+    <alt name="defeated_left" vflip="true"/>
+    <alt name="defeated_right" hflip="true" vflip="true"/>
+  </animation>
+  <animation id="defeated_right_up">
+    <alt name="defeated_right" hflip="true"/>
+    <alt name="defeated_left" hflip="true" vflip="true"/>
+  </animation>
 </fsexportorder>
