@@ -1,0 +1,75 @@
+;Boss Theme for undisbeliever's Space Station Game for SNESDev Compo 2025
+;By KungFuFurby
+;Made for undisbeliever's Terrific Audio Driver v0.1.1
+
+#Title Boss Theme
+#Game SNESDev 2025 Space Station Game
+#Author KungFuFurby
+#Composer KungFuFurby
+#Copyright 2025 undisbeliever
+#Date 2025
+#License Intended for exclusive use for this game.
+
+;Instrument Definitions
+@SineWave16 SineWave16
+@SuperMiniGlitchNoiseA15_3_0_28 SuperMiniGlitchNoise adsr 15 3 0 28
+@SuperMiniGlitchNoiseA15_7_7_28 SuperMiniGlitchNoise adsr 15 7 7 28
+@ElectricBass ElectricBass
+@_808SD _808SD
+@Triangle16_DBH2_2 Triangle16_DBH2_2
+@Triangle16_DBH3_2 Triangle16_DBH3_2
+@Saw16_DBH3_2 Saw16_DBH3_2 adsr 15 7 7 21
+
+#Timer 150
+#ZenLen 96
+
+A @SineWave16 V128 L
+A {o2e <<e}8,,128 GIT31 o1e16 GT e16
+
+!BRiff1 @SuperMiniGlitchNoiseA15_3_0_28 V16 o7b8 !BRiff1a
+!BRiff1a @SuperMiniGlitchNoiseA15_7_7_28 V16 o7b16b16
+B [!BRiff1 ]16 L
+B [!BRiff1 [
+B @_808SD V128 o5c8 : !BRiff1a
+B A15,3,0,28 o7b16 @_808SD V128 o5c16 !BRiff1a
+B ]2 : !BRiff1a
+B ]4 o5c16c16
+
+C @ElectricBass V56 p~16,12 L
+C o1[e16]4>e16<[e16]3
+
+D l1 r^^.
+D @_808SD V128 [o5c16]8
+!DRiff1aa @Triangle16_DBH2_2 o3g8f+8e8 @Triangle16_DBH3_2 o3d8e8
+!DRiff1a !DRiff1aa o3b8a8d8
+!DRiff1 l1 r^^^^^^^ [
+!DRiff1 !DRiff1a
+!DRiff1 !DRiff1aa @Triangle16_DBH2_2 o3e8b8g16f+16 :
+!DRiff1 !DRiff1a
+!DRiff1 [Q8 o3e16 [Q3 o2e16]2]4 Q8 o3e8 [Q3 o3e16]2 Q8
+!DRiff1 ]2
+!DRiff1 !DRiff1aa o3b8>e8d16<a16
+!DRiff1 o3a8& {b}4& r4 o3a16g16a16g16e16d16
+!DRiff1 [[o3e8r2.d8e8:r2.g8]2r2..]2
+D V36 L !DRiff1
+
+E l1 r^^^
+!ERiff1 [o4c+8.]4c+4
+!Saw16_DBH3_2_V24 @Saw16_DBH3_2 V24
+E !Saw16_DBH3_2_V24 px-16 L [
+E [o3b8.]4b4 !ERiff1 [o4d8.]4d4 : !ERiff1
+E ]2 [o4e8.]4e4
+
+F l1 r^^^
+!FRiff1 [o3a8.]4a4
+F !Saw16_DBH3_2_V24 px+16 L [
+F [o3g8.]4g4 !FRiff1 [o3b8.]4b4 : !FRiff1
+F ]2 !ERiff1
+
+G l1 r^^^
+G !Saw16_DBH3_2_V24 L [
+G [o3e8.]4e4 [o3f+8.]4f+4 [o3g8.]4g4 : [o3f+8.]4f+4
+G ]2 !FRiff1
+
+H l1 r^^^
+H ^16 L V16 ~1,4 !DRiff1

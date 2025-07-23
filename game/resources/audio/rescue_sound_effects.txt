@@ -1,0 +1,24 @@
+=== Click === mml
+@HardwareOverflowGlitch HardwareOverflowGlitch adsr 14 7 7 28
+
+A @HardwareOverflowGlitch V192 P1,%10
+=== Beep === mml
+@HardwareOverflowGlitch HardwareOverflowGlitch adsr 14 7 7 0
+
+A @HardwareOverflowGlitch V48 [P128,%14 r%14]2
+=== MachSND1 === mml
+@mach mach
+
+A @mach V192 {P1200 P1600}%24& r%8
+=== MachSND2 === mml
+@mach mach
+
+A @mach V192 {P1600 P1400}%16
+=== GetSomething === mml
+@Pulse32WFF Pulse32WFF
+@Pulse32WBF Pulse32WBF
+@Pulse32W7F Pulse32W7F
+
+A @Pulse32WFF V96 o4f%4&>c%4&>f%4&>c%4&
+A @Pulse32WBF V24 o4f%4&>c%4&>f%4&>c%4&
+A @Pulse32W7F V6 o4f%4&>c%4&>f%4&>c%4

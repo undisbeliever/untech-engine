@@ -1,0 +1,100 @@
+;Title Theme for undisbeliever's Space Station Game for SNESDev Compo 2025
+;By KungFuFurby
+;Made for undisbeliever's Terrific Audio Driver v0.1.1
+
+#Title Title Theme
+#Game SNESDev 2025 Space Station Game
+#Author KungFuFurby
+#Composer KungFuFurby
+#Copyright 2025 undisbeliever
+#Date 2025
+#License Intended for exclusive use for this game.
+
+;Echo Parameters
+#EchoLength 240
+#EchoFeedback 96
+#EchoInvert right
+#EchoVolume 36
+#FirFilter 64 32 16 8 4 2 1 0
+
+;Instrument Definitions
+@Saw16 Saw16 adsr 15 7 7 24
+@SineWave16 SineWave16
+@SineWave8A15_7_7_13 SineWave8 adsr 15 7 7 13
+@SineWave8A15_7_7_16 SineWave8 adsr 15 7 7 16
+@Pulse32WFFGI3 Pulse32WFF gain I3
+@Pulse32WEFGI3 Pulse32WEF gain I3
+@Pulse32WDFGI3 Pulse32WDF gain I3
+@Pulse32WCFGI3 Pulse32WCF gain I3
+@Pulse32WBFGI3 Pulse32WBF gain I3
+@Pulse32WAFGI3 Pulse32WAF gain I3
+@Pulse32W9FGI3 Pulse32W9F gain I3
+@Pulse32W8FGI3 Pulse32W8F gain I3
+@Pulse32W7FGI3 Pulse32W7F gain I3
+
+#Timer 160
+#ZenLen 192
+
+A @Saw16 V0
+A E1 p~16,24
+!ARiff1 l24 o1b>f+e>f+<be
+A [V+6 !ARiff1 ]8
+A L
+A !ARiff1
+
+B l1 r^
+B ~2,8,24
+!BRiff1 @SineWave16 V24 E1 GB16
+!BRiff1a ?@SineWave16
+!BRiff1a o3b4& {>f+}8 ^4& GDT6 r4.
+!BRiff1a o3b4& {>e}8 ^4& GT r4.
+!BRiff1 !BRiff1a
+!BRiff1 o3f+4& {>c+}8 ^4& {d}32 ^16.& {c+}32 ^16.& <{a}32 ^16.&
+!BRiff1 {o3b}32 ^2 ^16.& GT r4.
+!BRiff1 !BRiff1a
+!BRiff1 o4d8^24& {c+}24& {d}24& {c+}16^16& {<a}16^16&
+!BRiff1 {o3f+}16^16& {o3g+}16^16& {o3a}16^16& {o3b}16^16&
+!BRiff1 {o3f+}16^8.& {<b}8 ^4& GT r4.
+B !BRiff1 ~0 L
+B l1 r^^^ @SineWave16 V4
+B Q4 [[[o5b24]3:r24[b12]3r24]2 r4.^24]4
+
+C l1 r^
+C D-4
+C !BRiff1
+
+D l1 r^^^^^^8
+D @SineWave8A15_7_7_13 V0
+D o6a8<a8>a4 [
+D o6g8<g8>g4
+D o6f8<f8>f4
+D ]2
+D o6e8<e8>e4
+D o6d8<d8>d8
+D o5a4d2
+D [o7d2<d2]8
+
+E l1 r^^^^^^8
+E @SineWave8A15_7_7_16 V12 PM1 E1 ~2,4 _-1 
+E px-16 o6f+8 px+16 o5f+8 px0 o6f+4 [
+E px-16 o6e8 px+16 o5e8 px0 o6e4
+E px-16 o6d8 px+16 o5d8 px0 o6d4
+E ]2
+E px-16 o6c+8 px+16 o5c+8 px0 o6c+4
+E px-16 o5b8 px+16 o4b8 px0 o5b8
+E o5f+4<b2 V4
+!ERiff1 _-1 o6b2<b2
+E !ERiff1
+E GF64 q254,1,E15 !ERiff1
+E GF32 q254,1,E14 !ERiff1
+E GF16 q254,1,E13 !ERiff1
+E GF8 q254,1,E10 !ERiff1
+E GF4 q254,1,E7 !ERiff1
+E GF2 q254,1,E4 !ERiff1
+E GF1 q254,1,E1 !ERiff1
+
+F l1 r^^^^^ V24 L
+F @Pulse32WFFGI3 o1b32& [@Pulse32WEFGI3 w32 : [@Pulse32WDFGI3 w32 : [@Pulse32WCFGI3 w32 :
+F [@Pulse32WBFGI3 w32 : [@Pulse32WAFGI3 w32 : [@Pulse32W9FGI3 w32 : [@Pulse32W8FGI3 w32 :
+F @Pulse32W7FGI3 w32 ]2 ]2 ]2
+F ]2 ]2 ]2 ]2

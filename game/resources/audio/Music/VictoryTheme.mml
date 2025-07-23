@@ -1,0 +1,42 @@
+;Victory Theme for undisbeliever's Space Station Game for SNESDev Compo 2025
+;By KungFuFurby
+;Made for undisbeliever's Terrific Audio Driver v0.1.1
+
+#Title Victory Theme
+#Game SNESDev 2025 Space Station Game
+#Author KungFuFurby
+#Composer KungFuFurby
+#Copyright 2025 undisbeliever
+#Date 2025
+#License Intended for exclusive use for this game.
+
+;Echo Parameters
+#EchoLength 48
+#EchoFeedback 96
+#EchoVolume 48
+#FirFilter 127 0 0 0 0 0 0 0
+
+;Instrument Definitions
+@Saw16 Saw16
+@_808SD _808SD
+@Bass Bass
+@Pulse8WBF Pulse8WBF
+
+#Timer 130
+#ZenLen 192
+
+A @Bass V128 Q8 o0a8[Q6 a24]3 g12e12g12 Q8 a4^16
+
+B @Saw16 A10,1,2,12 V48 E1 ~1,6 px-16 o4e8[e24]3d12<b12>d12e1
+
+C @Saw16 A10,1,2,12 V48 E1 ~1,6 px+16 o4c+8[c+24]3<b12g12b12>c+1
+
+D @Saw16 A10,1,2,12 V48 E1 ~1,6 o3a8[a24]3g12e12g12a1
+
+E @_808SD V128 o5c8[c24]3[c12]3[c48]12c2.
+
+!FRiff1 o2c+48e48a48>c+48e48a48>c+48e48a48>c+48e48a48
+F r2 @Pulse8WBF V24 E1 ~1,2 px-16 ps+32,48 o1a48 !FRiff1
+F GF40 ps-32,48 !FRiff1
+F GF12 ps+32,48 !FRiff1
+F GF4 ps-32,48 !FRiff1
