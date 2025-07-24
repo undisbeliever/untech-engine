@@ -8,7 +8,19 @@ A simple platformer game for the [2025 SNESDEV game jam](https://itch.io/jam/sne
 License
 =======
 
-The untech-engine is licensed under the [zlib license](LICENSE).
+All engine code and game code is licensed under the [zlib license](LICENSE).
+
+This project uses the [Terrific Audio Driver](https://github.com/undisbeliever/terrific-audio-driver)
+which is licensed under the zlib license.
+
+The game's resources (everything in the `game/resources` directory) are intended for only this game
+and are not to be used in other projects.
+
+ * Music by KungFuFurby
+ * Sound effects by undisbeliever and KungFuFurby
+ * Aseprite and PNG files for sprites, palettes, images and tiles
+ * untech-editor files
+ * Rooms and levels
 
 
 Build Requirements

@@ -1,3 +1,15 @@
+
+All game resources in the `game/resources` directories are source available and
+only intended to be used in this game.  They are not to be used in other
+projects.
+
+
+----
+
+
+All assembly code in the `engine`, `unit_tests` and `game/src` directories are
+licensed under the zlib License.
+
 zlib License
 
 Copyright © 2016 Marcus Rowe <undisbeliever@gmail.com>
