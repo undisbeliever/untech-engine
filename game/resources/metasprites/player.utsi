@@ -9,6 +9,7 @@
     <hurtbox x="10" y="12" width="12" height="25"/>
     <object size="large" x="8" y="8"/>
     <object size="large" x="8" y="24"/>
+    <actionpoint type="ManualPlayerProjectile" x="22" y="24"/>
   </frame>
   <frame id="melee_right_1" order="2">
     <gridlocation x="2" y="0"/>
@@ -18,6 +19,7 @@
     <object size="large" x="8" y="8"/>
     <object size="large" x="8" y="24"/>
     <object size="small" x="24" y="24"/>
+    <actionpoint type="ManualPlayerProjectile" x="22" y="24"/>
   </frame>
   <frame id="melee_right_2" order="2">
     <gridlocation x="3" y="0"/>
@@ -27,6 +29,7 @@
     <object size="large" x="8" y="8"/>
     <object size="large" x="8" y="24"/>
     <object size="small" x="24" y="24"/>
+    <actionpoint type="ManualPlayerProjectile" x="22" y="24"/>
   </frame>
   <frame id="melee_right_3" order="2">
     <gridlocation x="4" y="0"/>
@@ -36,6 +39,7 @@
     <object size="large" x="8" y="8"/>
     <object size="large" x="8" y="24"/>
     <object size="small" x="24" y="28"/>
+    <actionpoint type="ManualPlayerProjectile" x="22" y="24"/>
   </frame>
   <frame id="melee_right_4" order="2">
     <gridlocation x="5" y="0"/>
@@ -45,6 +49,7 @@
     <object size="large" x="8" y="8"/>
     <object size="large" x="8" y="24"/>
     <object size="small" x="24" y="28"/>
+    <actionpoint type="ManualPlayerProjectile" x="22" y="24"/>
   </frame>
   <frame id="walking_right_1" order="2">
     <gridlocation x="0" y="1"/>
@@ -52,6 +57,7 @@
     <hurtbox x="10" y="12" width="12" height="25"/>
     <object size="large" x="8" y="8"/>
     <object size="large" x="8" y="24"/>
+    <actionpoint type="ManualPlayerProjectile" x="22" y="24"/>
   </frame>
   <frame id="walking_right_2" order="2">
     <gridlocation x="1" y="1"/>
@@ -59,6 +65,7 @@
     <hurtbox x="10" y="12" width="12" height="25"/>
     <object size="large" x="8" y="8"/>
     <object size="large" x="8" y="24"/>
+    <actionpoint type="ManualPlayerProjectile" x="22" y="24"/>
   </frame>
   <frame id="walking_right_3" order="2">
     <gridlocation x="2" y="1"/>
@@ -66,6 +73,7 @@
     <hurtbox x="10" y="12" width="12" height="25"/>
     <object size="large" x="8" y="8"/>
     <object size="large" x="8" y="24"/>
+    <actionpoint type="ManualPlayerProjectile" x="22" y="24"/>
   </frame>
   <frame id="running_right_1" order="2">
     <gridlocation x="3" y="1"/>
@@ -73,6 +81,7 @@
     <hurtbox x="10" y="12" width="12" height="25"/>
     <object size="large" x="8" y="8"/>
     <object size="large" x="8" y="24"/>
+    <actionpoint type="ManualPlayerProjectile" x="22" y="24"/>
   </frame>
   <frame id="running_right_2" order="2">
     <gridlocation x="4" y="1"/>
@@ -80,6 +89,7 @@
     <hurtbox x="10" y="12" width="12" height="25"/>
     <object size="large" x="8" y="8"/>
     <object size="large" x="8" y="24"/>
+    <actionpoint type="ManualPlayerProjectile" x="22" y="24"/>
   </frame>
   <frame id="running_right_3" order="2">
     <gridlocation x="5" y="1"/>
@@ -87,6 +97,7 @@
     <hurtbox x="10" y="12" width="12" height="25"/>
     <object size="large" x="8" y="8"/>
     <object size="large" x="8" y="24"/>
+    <actionpoint type="ManualPlayerProjectile" x="22" y="24"/>
   </frame>
   <frame id="sliding_left" order="2">
     <gridlocation x="0" y="2"/>
@@ -94,6 +105,7 @@
     <hurtbox x="10" y="12" width="12" height="25"/>
     <object size="large" x="8" y="8"/>
     <object size="large" x="8" y="24"/>
+    <actionpoint type="ManualPlayerProjectile" x="22" y="24"/>
   </frame>
   <frame id="breaking_right" order="2">
     <gridlocation x="1" y="2"/>
@@ -101,6 +113,7 @@
     <hurtbox x="10" y="12" width="12" height="25"/>
     <object size="large" x="8" y="8"/>
     <object size="large" x="8" y="24"/>
+    <actionpoint type="ManualPlayerProjectile" x="22" y="24"/>
   </frame>
   <frame id="rising_right" order="2">
     <gridlocation x="2" y="2"/>
@@ -108,6 +121,7 @@
     <hurtbox x="10" y="12" width="12" height="25"/>
     <object size="large" x="8" y="8"/>
     <object size="large" x="8" y="24"/>
+    <actionpoint type="ManualPlayerProjectile" x="22" y="24"/>
   </frame>
   <frame id="falling_right" order="2">
     <gridlocation x="3" y="2"/>
@@ -115,6 +129,7 @@
     <hurtbox x="10" y="12" width="12" height="25"/>
     <object size="large" x="8" y="8"/>
     <object size="large" x="8" y="24"/>
+    <actionpoint type="ManualPlayerProjectile" x="22" y="24"/>
   </frame>
   <frame id="ladder_0" order="2">
     <gridlocation x="4" y="2"/>

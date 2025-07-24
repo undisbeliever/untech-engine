@@ -37,6 +37,10 @@ constant LADDER_Y_MOMENTUM = 0x0120
 constant HURT_IFRAMES = 40
 
 
+// Minimum number of frames between player particle shots
+constant PROJECTILE_COOLDOWN_FRAMES = 20
+
+
 // Number of frames after standing before the player can jump
 // ::TODO adjust::
 constant COYOTE_TIME_FRAMES = 8
@@ -81,6 +85,11 @@ namespace EntityStruct {
         // If set, the player has been recently hurt and will not take damage a second time
         // (byte)
         field(iFrames, 1)
+
+
+        // Projectile cooldown timer
+        // (byte)
+        field(projectileCooldown, 1)
 
         // Used for coyote time
         //  * Right shifted every frame
@@ -249,16 +258,6 @@ a8()
     +
 
 
-    // ::TODO remove::
-    lda.w   Controller.Joy1.pressed
-    bit.b   #JOYL.x
-    beq     +
-        lda.b   EntityStruct.movementState
-        eor.b   #Entity.MovementState.UP_GRAVITY_FLAG | Entity.MovementState.MOVING_DOWN_FLAG
-        sta.b   EntityStruct.movementState
-    +
-
-
     ldx.w   #MovementTableIndex.PlayerWalk
 
     lda.w   Controller.Joy1.current + 1
@@ -330,6 +329,25 @@ a8()
     NoJump:
 a8()
 
+
+    // Launch projectile with cooldown
+    lda.b   EntityStruct.projectileCooldown
+    beq     +
+        dec.b   EntityStruct.projectileCooldown
+        bra     ++
+    +
+        lda.w   InputBuffer.projectile
+        beq     +
+            stz.w   InputBuffer.projectile
+
+            lda.b   #PROJECTILE_COOLDOWN_FRAMES
+            sta.b   EntityStruct.projectileCooldown
+
+            rep     #$30
+        a16()
+            SpawnManualPlayerProjectiles()
+    +
+au()
     rep     #$30
 a16()
 i16()

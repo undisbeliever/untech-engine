@@ -29,6 +29,7 @@ namespace InputBuffer {
     //  * Set to `1 << N` if the button is pressed
     // (byte)
     allocate(attack, zeropage, 1)
+    allocate(projectile, zeropage, 1)
     allocate(jump, zeropage, 1)
 
 }

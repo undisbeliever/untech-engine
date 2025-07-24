@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF_8"?>
+<!DOCTYPE untech>
+<fsexportorder name="projectile">
+  <animation id="move_left">
+    <alt name="move_right" hflip="true"/>
+  </animation>
+  <animation id="move_right">
+    <alt name="move_left" hflip="true"/>
+  </animation>
+  <animation id="pop"/>
+</fsexportorder>

@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF_8"?>
+<!DOCTYPE untech>
+<spriteimporter id="player_projectile" tilesettype="ONE_TILE_FIXED" exportorder="projectile" image="player-projectile.png">
+  <grid width="16" height="16" xoffset="0" yoffset="0" xpadding="0" ypadding="0" xorigin="8" yorigin="8"/>
+  <palette position="TOP_LEFT" npalettes="1" colorsize="1"/>
+  <frame id="frame1" order="2">
+    <gridlocation x="1" y="0"/>
+    <tilehitbox x="6" y="6" width="4" height="4"/>
+    <hitbox x="6" y="5" width="4" height="6"/>
+    <object size="small" x="4" y="4"/>
+  </frame>
+  <frame id="frame2" order="2">
+    <gridlocation x="2" y="0"/>
+    <tilehitbox x="7" y="6" width="2" height="4"/>
+    <hitbox x="6" y="5" width="4" height="6"/>
+    <object size="small" x="4" y="4"/>
+  </frame>
+  <frame id="frame3" order="2">
+    <gridlocation x="3" y="0"/>
+    <tilehitbox x="7" y="6" width="2" height="4"/>
+    <hitbox x="6" y="5" width="4" height="6"/>
+    <object size="small" x="4" y="4"/>
+  </frame>
+  <frame id="pop1" order="2">
+    <gridlocation x="4" y="0"/>
+    <object size="small" x="4" y="4"/>
+  </frame>
+  <frame id="pop2" order="2">
+    <gridlocation x="5" y="0"/>
+    <object size="small" x="4" y="4"/>
+  </frame>
+  <animation id="move_left" durationformat="FRAME">
+    <aframe frame="frame1" duration="2"/>
+    <aframe frame="frame2" duration="2"/>
+    <aframe frame="frame3" duration="2"/>
+  </animation>
+  <animation id="pop" durationformat="TIME" oneshot="true">
+    <aframe frame="pop1" duration="15"/>
+    <aframe frame="pop2" duration="15"/>
+  </animation>
+</spriteimporter>
