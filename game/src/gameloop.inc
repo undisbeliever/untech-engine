@@ -111,6 +111,10 @@ i16()
             Entity.ProcessEntityList(enemies)
         jsr     MetaSprite.Render.EndLoop
 
+        jsr     Room.Process
+
+        jsr     Scripting.ProcessScripts
+
         jmp     Loop
 }
 

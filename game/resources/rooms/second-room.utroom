@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF_8"?>
+<!DOCTYPE untech>
+<room name="second_room" scene="blocky">
+  <map width="16" height="14">
+    EBAQEBAQEBAQEBAQEBAQEBAQEAAAAAAAAAAAAAAAABAQEBAAAAAAAAAAAAAAAAAQ
+    EP8AAAAAAAAAAAAAAAAAEBD/AAAAAAAAAAAAAAAAABAQ/wAAAAAAAAAAAAAAAAAQ
+    EBAQEBAXFxcXAAAAAAATEBAQEAAAAAAAAAAAABMUIBAQEBAAAAAAAAAAExQgICAQ
+    EBAQAAAAAAATFCAgICAgEBD/AAAAAAAAEBAQEBAQEBAQ/wAAAAAAABAQEBAQEBAQ
+    EP8AAAAAAAAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBA=
+  </map>
+  <entrance name="upper" x="40" y="84" orientation="down-right"/>
+  <entrance name="lower" x="40" y="198" orientation="down-right"/>
+  <script name="Startup"/>
+  <script name="UpperDoor">
+    <statement opcode="Load_Room" arg1="_scratchpad" arg2="upper_door"/>
+  </script>
+  <script name="LowerDoor">
+    <statement opcode="Load_Room" arg1="_scratchpad" arg2="lower_door"/>
+  </script>
+  <script-trigger script="UpperDoor" x="1" y="3" width="1" height="3"/>
+  <script-trigger script="UpperDoor" x="1" y="10" width="1" height="3"/>
+</room>

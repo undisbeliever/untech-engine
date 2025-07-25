@@ -25,7 +25,7 @@ namespace InteractiveTiles {
 
 constant NullFunction = InteractiveTiles.NoTileInteraction.NullFunction
 
-constant LADDER_INTERACTIVE_TILES_INDEX = 2
+constant LADDER_INTERACTIVE_TILES_INDEX = 4
 
 
 namespace Ladder {

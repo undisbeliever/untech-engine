@@ -8,6 +8,7 @@
   </game-state>
   <bytecode/>
   <interactive-tiles>
+    <tile-function-table name="PlayerScriptTrigger" tint="4a4aff"/>
     <tile-function-table name="Ladder" tint="ffc800"/>
   </interactive-tiles>
   <entity-rom-data>
@@ -57,6 +58,7 @@
   <palette name="blocky" image="palettes/blocky.png" rows-per-frame="8" animation-delay="35"/>
   <metatile-tileset src="metatiles/blocky.utmt"/>
   <room-file src="rooms/_scratchpad.utroom"/>
+  <room-file src="rooms/second-room.utroom"/>
   <scene-setting name="BasicRoom" bg-mode="1bg3" layer0-type="mt-tileset" layer1-type="" layer2-type="text" layer3-type=""/>
   <scene name="blocky" settings="BasicRoom" palette="blocky" layer0="blocky"/>
 </project>

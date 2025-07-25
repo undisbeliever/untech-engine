@@ -23,6 +23,7 @@
   <tile t="38" collision="ulss"/>
   <tile t="39" collision="dp"/>
   <tile t="47" collision="up" ft="Ladder"/>
+  <tile t="255" ft="PlayerScriptTrigger"/>
   <tile-priorities>
     AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
     AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
