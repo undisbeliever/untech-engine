@@ -9,6 +9,7 @@
   <bytecode/>
   <interactive-tiles>
     <tile-function-table name="PlayerScriptTrigger" tint="4a4aff"/>
+    <tile-function-table name="PlayerActivateScriptTrigger" tint="4a4aff"/>
     <tile-function-table name="Ladder" tint="ffc800"/>
   </interactive-tiles>
   <entity-rom-data>

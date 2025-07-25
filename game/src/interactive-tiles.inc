@@ -25,7 +25,36 @@ namespace InteractiveTiles {
 
 constant NullFunction = InteractiveTiles.NoTileInteraction.NullFunction
 
-constant LADDER_INTERACTIVE_TILES_INDEX = 4
+constant LADDER_INTERACTIVE_TILES_INDEX = 6
+
+
+namespace PlayerActivateScriptTrigger {
+
+constant EntityCollision = NullFunction
+constant EntityAirCollision = NullFunction
+constant PlayerLeftRightCollision = NullFunction
+constant PlayerAirCollision = NullFunction
+
+
+// Activate a room script if the player is standing on the tile
+// and the up button is pressed.
+//
+// REQUIRES: 16 bit A, 16 bit Index, DB = 0x7e
+// INPUT: dp = entity
+// INPUT: Y = map data index
+a16()
+i16()
+code()
+function PlayerOriginCollision {
+    lda.w   Controller.Joy1.pressed
+    bit.w   #JOY.up
+    beq     +
+        jmp     InteractiveTiles.PlayerScriptTrigger.PlayerOriginCollision
+    +
+    rts
+}
+
+}
 
 
 namespace Ladder {

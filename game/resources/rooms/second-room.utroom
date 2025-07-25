@@ -4,12 +4,13 @@
   <map width="16" height="14">
     EBAQEBAQEBAQEBAQEBAQEBAQEAAAAAAAAAAAAAAAABAQEBAAAAAAAAAAAAAAAAAQ
     EP8AAAAAAAAAAAAAAAAAEBD/AAAAAAAAAAAAAAAAABAQ/wAAAAAAAAAAAAAAAAAQ
-    EBAQEBAXFxcXAAAAAAATEBAQEAAAAAAAAAAAABMUIBAQEBAAAAAAAAAAExQgICAQ
+    EBAQEBAXFxcXAAAAAEAAEBAQEAAAAAAAAAAAAABAABAQEBAAAAAAAAAAExQg/hAQ
     EBAQAAAAAAATFCAgICAgEBD/AAAAAAAAEBAQEBAQEBAQ/wAAAAAAABAQEBAQEBAQ
     EP8AAAAAAAAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBA=
   </map>
-  <entrance name="upper" x="40" y="84" orientation="down-right"/>
-  <entrance name="lower" x="40" y="198" orientation="down-right"/>
+  <entrance name="upper" x="40" y="85" orientation="down-right"/>
+  <entrance name="lower" x="40" y="197" orientation="down-right"/>
+  <entrance name="door" x="208" y="117" orientation="down-left"/>
   <script name="Startup"/>
   <script name="UpperDoor">
     <statement opcode="Load_Room" arg1="_scratchpad" arg2="upper_door"/>
@@ -17,6 +18,10 @@
   <script name="LowerDoor">
     <statement opcode="Load_Room" arg1="_scratchpad" arg2="lower_door"/>
   </script>
+  <script name="Door">
+    <statement opcode="Load_Room" arg1="_scratchpad" arg2="door"/>
+  </script>
   <script-trigger script="UpperDoor" x="1" y="3" width="1" height="3"/>
   <script-trigger script="UpperDoor" x="1" y="10" width="1" height="3"/>
+  <script-trigger script="Door" x="13" y="8" width="1" height="1"/>
 </room>

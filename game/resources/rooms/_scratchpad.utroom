@@ -21,13 +21,14 @@
     EAAAAAAAAAAAAAAAAAAAAAAfAAAAAAAAAAAAHwAAEBAQAAAAAAAAAAAAAAAAAAAA
     AB8AAAAAAAAAAAAfAAAQEBAAAAAAAAAAAAAAAAAAAAAAHwAAAAAAAAAAAB8AABAQ
     EAAAAAAAAAAAAAAQEBAQAAAfAAAAAAAAAAAAHwAAEBAQAAAAAAAAAAAAABAAAAAA
-    AB8AAAAAAAAAAAAfAAAQEBAAAAAAAAAAAAAAEAAAAAAAHwAAAAAAAAAAAB8AABAQ
-    EAAAAAAAAAAAAAAQAAAAAAAfAAAAAAAAAAAAHwAAEBAQEBAQEBAQEBAQEBAQEBAQ
-    EBAQEBAQEBAQEBAQEBAQEA==
+    AB8AAAAAAAAAAAAfAAAQEBAAAAAAAAAAAAAAEAAAAAAAHwAAAAAAQAAAAB8AABAQ
+    EAAAAAAAAAAAAAAQAAAAAAAfAAAAAABAAAAAHwAAEBAQEBAQEBAQEBAQEBAQEBAQ
+    EBAQEBAQEP4QEBAQEBAQEA==
   </map>
-  <entrance name="start" x="391" y="196" orientation="down-right"/>
+  <entrance name="start" x="391" y="197" orientation="down-right"/>
   <entrance name="upper_door" x="472" y="85" orientation="down-left"/>
   <entrance name="lower_door" x="472" y="197" orientation="down-left"/>
+  <entrance name="door" x="384" y="485" orientation="down-right"/>
   <entity-group name="spawn">
     <entity entity="cleaning_bot_slow" x="95" y="489" parameter="0"/>
     <entity entity="cleaning_bot_fast" x="74" y="489" parameter="1"/>
@@ -46,6 +47,10 @@
   <script name="LowerDoor">
     <statement opcode="Load_Room" arg1="second_room" arg2="lower"/>
   </script>
+  <script name="Door">
+    <statement opcode="Load_Room" arg1="second_room" arg2="door"/>
+  </script>
   <script-trigger script="UpperDoor" x="30" y="3" width="1" height="3"/>
   <script-trigger script="LowerDoor" x="30" y="10" width="1" height="3"/>
+  <script-trigger script="Door" x="23" y="31" width="1" height="1"/>
 </room>
