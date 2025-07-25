@@ -60,6 +60,7 @@ include "input.inc"
 include "healthbar.inc"
 include "gameloop.inc"
 include "bytecodes.inc"
+include "misc.inc"
 
 include "entities/_common.inc"
 include "entities/_movement.inc"

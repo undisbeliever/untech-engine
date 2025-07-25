@@ -41,6 +41,9 @@ RoomChangeRequested:
 a16()
 i16()
 
+    jsr     FadeOut
+
+
     jsr     Room.LoadRoom
 
 
@@ -56,12 +59,9 @@ i16()
     Healthbar.Init()
 
 
-    jsr     EnableDisplay_Full
+    stz.w   inidispBuffer
 
     Loop:
-        jsl     WaitFrame__far
-
-
         assert(Room.roomChangeRequested.LOAD_NEW_ROOM_FLAG == 0x80)
         bit.w   Room.roomChangeRequested - 1
         bmi     RoomChangeRequested
@@ -72,6 +72,14 @@ i16()
     i8()
         InputBuffer.Process()
         Healthbar.Process()
+
+        // Fade in
+        lda.w   inidispBuffer
+        cmp.b   #INIDISP.brightness.mask
+        bcs     +
+            inc
+            sta.w   inidispBuffer
+        +
 
         rep     #$30
     a16()
@@ -114,6 +122,8 @@ i16()
         jsr     Room.Process
 
         jsr     Scripting.ProcessScripts
+
+        jsl     WaitFrame__far
 
         jmp     Loop
 }
