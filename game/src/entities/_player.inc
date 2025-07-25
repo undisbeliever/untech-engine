@@ -117,10 +117,6 @@ function Init {
     assert(State.NORMAL == 0)
     stz.b   EntityStruct.state
 
-    // Set Facing right
-    lda.w   #Entity.MovementState.FACING_RIGHT_FLAG
-    tsb.b   EntityStruct.movementState
-
     SetAnimation(standing_right)
 
     rts

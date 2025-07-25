@@ -25,7 +25,7 @@
     EAAAAAAAAAAAAAAQAAAAAAAfAAAAAAAAAAAAHwAAABAQEBAQEBAQEBAQEBAQEBAQ
     EBAQEBAQEBAQEBAQEBAQEA==
   </map>
-  <entrance name="start" x="184" y="421" orientation="down-right"/>
+  <entrance name="start" x="184" y="421" orientation="down-left"/>
   <entity-group name="spawn">
     <entity entity="cleaning_bot_slow" x="95" y="489" parameter="0"/>
     <entity entity="cleaning_bot_fast" x="74" y="489" parameter="1"/>
