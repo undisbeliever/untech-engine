@@ -673,7 +673,7 @@ i8()
     tax
     lda.w   MetaTiles.Tileset.interactiveTilesMap,x
     and.b   #MetaTiles.Tileset.interactiveTilesMap.MASK
-    cmp.b   #2
+    cmp.b   #InteractiveTiles.LADDER_INTERACTIVE_TILES_INDEX
     beq     +
         // Not on a ladder
 
