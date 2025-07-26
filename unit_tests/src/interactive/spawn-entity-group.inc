@@ -29,8 +29,6 @@
 namespace InteractiveTests {
 namespace SpawnEntityGroup {
 
-constant GRAVITY = 10000
-
 constant FRAMES_PER_SECOND = 60
 
 constant ENEMIES_SPAWNED_PER_SECOND = 4
@@ -60,9 +58,6 @@ assert(Test.TMP_SIZE > 2)
     ldy.w   #0
     jsr     GameLoop.Init_LoadRoom
 
-
-    lda.w   #GRAVITY
-    sta.w   Room.gravity_sx
 
     // Force NTSC timing
     lda.w   #Resources.ANIMATION_TICKS_PER_SECOND / FRAMES_PER_SECOND

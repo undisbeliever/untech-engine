@@ -30,10 +30,6 @@
 //    3. This notice may not be removed or altered from any source distribution.
 
 
-// ::TODO move into room subsystem::
-// (0:0:16 unsigned fixed point)
-allocate(Room.gravity_sx, wram7e, 2)
-
 namespace Entity {
 namespace Movement {
 
@@ -137,10 +133,15 @@ macro _SubtractMomentumFromPosition(axis) {
 // INPUT: dp = entity
 macro _AddGravityToYMomentum() {
     assert16a()
+    assert16i()
+
+    sep     #$10
+i8()
+    ldx.b   BaseEntity.gravity
 
     clc
     lda.b   BaseEntity.yMomentum.sx
-    adc.w   Room.gravity_sx
+    adc.l   Project.GravityTable,x
     sta.b   BaseEntity.yMomentum.sx
     bcc     EndIf{#}
         lda.b   BaseEntity.yMomentum.px - 1
@@ -154,6 +155,9 @@ macro _AddGravityToYMomentum() {
     NotMaxMomentum{#}:
         sta.b   BaseEntity.yMomentum.px - 1
 EndIf{#}:
+
+    rep     #$30
+i16()
 }
 
 
@@ -167,11 +171,16 @@ EndIf{#}:
 // BRANCH: goto {branch} label if Y direction changes
 macro _SubtractGravityFromYMomentum_AndBranchIfDirectionChanges(branch, change_direction) {
     assert16a()
+    assert16i()
+
+    sep     #$11
+i8()
+    ldx.b   BaseEntity.gravity
 
     // Subtract 16 bit gravity from 24 bit yMomentum
-    sec
+    // carry set
     lda.b   BaseEntity.yMomentum.sx
-    sbc.w   Room.gravity_sx
+    sbc.l   Project.GravityTable,x
     sta.b   BaseEntity.yMomentum.sx
     bcs     End{#}
         sep     #$20
@@ -191,18 +200,23 @@ macro _SubtractGravityFromYMomentum_AndBranchIfDirectionChanges(branch, change_d
             stz.b   BaseEntity.yMomentum.px
 
             // yMomentum.sx = -yMomentum.sx
-            rep     #$21
+            rep     #$31
         a16()
+        i16()
             // carry clear
             lda.w   #1
             sbc.b   BaseEntity.yMomentum.sx
             sta.b   BaseEntity.yMomentum.sx
 
             jmp     {branch}
+
+    a8()
     YMomentum_Positive{#}:
-        rep     #$30
-    a16()
+au()
 End{#}:
+    rep     #$30
+a16()
+i16()
 }
 namespace __Y_Axis {
     constant Up = 1

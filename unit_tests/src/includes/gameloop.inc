@@ -202,5 +202,25 @@ function ProcessFrame {
 }
 }
 
+
+namespace Gravity {
+    createEnum(0, 2)
+        enum(NORMAL)
+        enum(STRONGEST)
+        enum(PLAYER)
+    endEnum()
+}
+
+namespace Project {
+
+// 0.16 fixed point px/frame/frame table
+GravityTable:
+    dw  10000       // normal gravity
+    dw  0xffff      // strongest gravity (interactive tile test requires max gravity)
+    dw  1555        // player gravity
+
+}
+
+
 // vim: ft=bass-65816 ts=4 sw=4 et:
 

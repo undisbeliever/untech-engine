@@ -158,10 +158,9 @@ allocateTmpWord(yPos)
         stz.b   BaseEntity.xMomentum.sx + 2
         stz.b   BaseEntity.xMomentum.sx + 4
 
-        // ::TODO move into BaseEntityRomStruct::
-        // confirm it is safe to override the byte before movementState
-        assert(BaseEntity.movementState - 1 == BaseEntity.yMomentum.px)
-        stz.b   BaseEntity.movementState - 1
+        // Clear movementState and gravity
+        assert(BaseEntity.gravity == BaseEntity.movementState + 1)
+        stz.b   BaseEntity.movementState
 
 
         // Set projectileId and listId
@@ -270,6 +269,8 @@ a8()
     bcc     +
         break(INVALID_ENTITY_ID)
     +
+
+    stz.w   Entity.playerEntity + BaseEntity.gravity
 
     rep     #$31
 a16()
@@ -450,10 +451,9 @@ macro _SpawnRoomEntity() {
     stz.b   BaseEntity.xMomentum.sx + 2
     stz.b   BaseEntity.xMomentum.sx + 4
 
-    // ::TODO move into BaseEntityRomStruct::
-    // confirm it is safe to override the byte before movementState
-    assert(BaseEntity.movementState - 1 == BaseEntity.yMomentum.px)
-    stz.b   BaseEntity.movementState - 1
+    // Clear movementState and gravity
+    assert(BaseEntity.gravity == BaseEntity.movementState + 1)
+    stz.b   BaseEntity.movementState
 
 
     // Set projectileId and listId
@@ -846,10 +846,9 @@ function __SpawnAtActionPoint {
         stz.b   BaseEntity.xMomentum.sx + 2
         stz.b   BaseEntity.xMomentum.sx + 4
 
-        // ::TODO move into BaseEntityRomStruct::
-        // confirm it is safe to override the byte before movementState
-        assert(BaseEntity.movementState - 1 == BaseEntity.yMomentum.px)
-        stz.b   BaseEntity.movementState - 1
+        // Clear movementState and gravity
+        assert(BaseEntity.gravity == BaseEntity.movementState + 1)
+        stz.b   BaseEntity.movementState
 
 
         // Initiate entity data

@@ -68,6 +68,14 @@ namespace Data {
     //
     // (word index array - points EntityRomData data)
     constant EntityRomDataList = Project.EntityRomDataList
+
+
+    // Project supplied gravity acceleration table - 0.16 fixed-point px/frame/frame.
+    //
+    // Indexed by `BaseEntity.gravityIndex`.
+    //
+    // (long addressed 0.16 fixed-point words)
+    constant GravityTable = Project.GravityTable
 }
 }
 

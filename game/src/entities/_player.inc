@@ -239,8 +239,9 @@ a16()
 i16()
 code()
 function _Movement {
-    sep     #$20
+    sep     #$30
 a8()
+i8()
     // ::TODO remove::
     lda.w   Controller.Joy1.pressed
     bit.b   #JOYL.l
@@ -254,15 +255,29 @@ a8()
     +
 
 
-    ldx.w   #MovementTableIndex.PlayerWalk
+    // Use different gravity if the jump button is held down
+    assert(JOY_H_JUMP_BUTTON == 0x80)
+    ldy.b   #Gravity.PLAYER
 
     lda.w   Controller.Joy1.current + 1
+    bpl     +
+        ldy.b   #Gravity.PLAYER_HOLDING_JUMP
+    +
+    sty.b   EntityStruct.gravity
+
+
+    ldx.b   #MovementTableIndex.PlayerWalk
+
+    // A = Controller.Joy1.current + 1
     bit.b   #JOY_H_RUN_BUTTON
     beq     NoRun
         assert(MovementTableIndex.PlayerRun - MovementTableIndex.PlayerWalk == 2)
         inx
         inx
     NoRun:
+
+    rep     #$10
+i16()
 
     bit.b   #JOYH.left
     beq     NoLeft

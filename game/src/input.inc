@@ -23,14 +23,13 @@
 
 
 constant JOY_H_RUN_BUTTON  = JOYH.y
+constant JOY_H_JUMP_BUTTON = JOYH.b
 
 
 namespace InputBuffer {
 
 constant JOY_L_ATTACK_BUTTON      = JOYL.a
 constant JOY_L_PROJECTILE_BUTTON  = JOYL.x
-
-constant JOY_H_JUMP_BUTTON = JOYH.b
 
 // ::TODO adjust::
 constant ATTACK_BUFFER_FRAMES = 3
@@ -65,7 +64,7 @@ macro Process() {
 
 
     lda.w   Controller.Joy1.pressed + 1
-    bit.b   #InputBuffer.JOY_H_JUMP_BUTTON
+    bit.b   #JOY_H_JUMP_BUTTON
     beq     +
         assert(InputBuffer.JUMP_BUFFER_FRAMES < 9)
         ldx.b   #1 << (InputBuffer.JUMP_BUFFER_FRAMES - 1)

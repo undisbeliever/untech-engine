@@ -29,6 +29,7 @@
 //  * MetaTiles.MoveEntityWithTileCollisionsAndInteractiveTiles
 //  * MetaTiles.MovePlayerWithTileCollisionsAndInteractiveTiles
 //  * MetaTiles.CrumblingTiles
+//  * BaseEntity.gravity
 //  * MetaSprite Tile Collision Hitbox
 //  * QueueSoundEffect
 
@@ -66,6 +67,10 @@ namespace InteractiveTilesTest_Player {
 
         sep     #$20
     a8()
+        lda.b   #Gravity.STRONGEST
+        sta.b   BaseEntity.gravity
+
+
         lda.w   GameState.roomId
         cmp.b   #Project.RoomList.InteractiveTilesTestLarge
         beq     +
@@ -267,9 +272,6 @@ function PlayerAirCollision {
 namespace InteractiveTests {
 namespace InteractiveTilesTest {
 
-// Strong gravity makes the tests faster
-constant GRAVITY = 0xFFFF
-
 
 a16()
 i16()
@@ -323,10 +325,6 @@ constant _nRollbacks   = Test.zpTmp + 4
     // Execute test for 5 seconds (on NTSC)
     lda.w   #60 * 5
     sta.b   _framesRemaining
-
-
-    lda.w   #GRAVITY
-    sta.w   Room.gravity_sx
 
 
     jsr     Test.PrintCurrentTestName

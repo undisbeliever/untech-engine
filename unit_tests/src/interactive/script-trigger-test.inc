@@ -33,8 +33,6 @@ namespace ScriptTriggerTest {
 //       that do not have a script trigger attached to them.
 
 
-constant GRAVITY = 10000
-
 constant TEST_TIME       = 4 * 60
 
 constant EXPECTED_FIRST  = 2
@@ -56,10 +54,6 @@ constant _timer  = Test.zpTmp + 0
     ldx.w   #Project.PlayerIds.InteractiveTilesTest_Player
     ldy.w   #0
     jsr     GameLoop.Init_LoadRoom
-
-
-    lda.w   #GRAVITY
-    sta.w   Room.gravity_sx
 
 
     jsr     Test.PrintCurrentTestName

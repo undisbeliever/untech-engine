@@ -119,6 +119,17 @@ namespace BaseEntity {
 
         MetaSprite.EntityData()
 
+        // Entity movement state
+        // (uint8, Entity.MovementState bitfield, project editable)
+        field(movementState, 1)
+
+        // Index into the project's GravityTable.
+        //
+        // This allows for entities to have different gravity states (ie, float and fall).
+        //
+        // (byte index into 0.16 fixed-point `Project.GravityTable`)
+        field(gravity, 1)
+
         // Position of entities relative to map
         // (2 x unsigned 0:16:16 fixed point, project editable)
         field(xPos.sx, 2)   // subpixel position
@@ -142,10 +153,6 @@ namespace BaseEntity {
         field(xMomentum.px, 1)
         field(yMomentum.sx, 2)
         field(yMomentum.px, 1)
-
-        // Entity movement state
-        // (uint8, Entity.MovementState bitfield, project editable)
-        field(movementState, 1)
     endstruct()
 }
 

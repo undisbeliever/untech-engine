@@ -27,6 +27,7 @@
 //  * MetaTiles.MoveEntityAndProcessTileCollisions
 //  * MetaSprite Tile Collision Hitbox
 //  * MetaTile Tile Priority
+//  * BaseEntity.gravity
 
 namespace Entities {
 namespace Players {
@@ -59,6 +60,13 @@ namespace TileCollisionTestPlayer {
         sta.b   EntityStruct.currentFrame
         SetFrame_A()
 
+        sep     #$20
+    a8()
+        lda.b   #Gravity.PLAYER
+        sta.b   EntityStruct.gravity
+
+        rep     #$30
+    a16()
         rts
     }
 
@@ -220,8 +228,6 @@ namespace TileCollisionTestPlayer {
 namespace InteractiveTests {
 namespace TileCollisionTest {
 
-constant GRAVITY = 1555
-
 
 a16()
 i16()
@@ -263,10 +269,6 @@ function Test {
     ldx.w   #Project.PlayerIds.TileCollisionTestPlayer
     ldy.w   #2              // Test loading a non-zero entranceId
     jsr     GameLoop.Init_LoadRoom
-
-
-    lda.w   #GRAVITY
-    sta.w   Room.gravity_sx
 
 
     jsr     Test.PrintCurrentTestName

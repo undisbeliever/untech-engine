@@ -22,9 +22,6 @@
 //    3. This notice may not be removed or altered from any source distribution.
 
 
-constant DEFAULT_ROOM_GRAVITY = 0x1c80
-
-
 // Loads a room and plays it
 //
 // REQUIRES: 16 bit A, 16 bit Index, DP = 0, DB = 0x7e
@@ -45,11 +42,6 @@ i16()
 
 
     jsr     Room.LoadRoom
-
-
-    // Set gravity
-    lda.w   #DEFAULT_ROOM_GRAVITY
-    sta.w   Room.gravity_sx
 
 
     jsr     Resources.TransferToPpu

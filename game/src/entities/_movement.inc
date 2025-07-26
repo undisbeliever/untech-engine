@@ -22,6 +22,27 @@
 //    3. This notice may not be removed or altered from any source distribution.
 
 
+namespace Gravity {
+    createEnum(0, 2)
+        enum(NORMAL)
+        enum(PLAYER)
+        enum(PLAYER_HOLDING_JUMP)
+    endEnum()
+}
+
+rodata()
+namespace Project {
+    constant _PLAYER_GRAVITY = 8600
+
+// 0.16 fixed point px/frame/frame
+GravityTable:
+    // ::TODO tweak::
+    dw  _PLAYER_GRAVITY         // default
+    dw  _PLAYER_GRAVITY         // player
+    dw  _PLAYER_GRAVITY / 2     // player holding jump
+}
+
+
 namespace Entities {
 
 
