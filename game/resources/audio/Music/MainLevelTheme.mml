@@ -1,0 +1,75 @@
+;Main Level Theme for undisbeliever's Space Station Game for SNESDev Compo 2025
+;By KungFuFurby
+;Made for undisbeliever's Terrific Audio Driver v0.1.1
+
+#Title Main Level Theme
+#Game SNESDev 2025 Space Station Game
+#Author KungFuFurby
+#Composer KungFuFurby
+#Copyright 2025 undisbeliever
+#Date 2025
+#License Intended for exclusive use for this game.
+
+;Instrument Definitions
+@Bass Bass
+@SuperMiniGlitchNoise SuperMiniGlitchNoise adsr 15 3 0 28
+@Triangle16 Triangle16 adsr 11 2 3 14
+@Saw16 Saw16 adsr 5 7 7 0
+
+#Timer 160
+#ZenLen 96
+
+A @Bass V64 L
+!ARiff1 Q4 [o0f8>f8]3
+A [
+A Q4 !ARiff1 Q8 o0b8>c16r16 :
+A Q4 !ARiff1 Q8 o1f8<f16>c16
+A ]2
+A Q4 !ARiff1 o1f8<f8
+
+B V16 L
+B @SuperMiniGlitchNoise o7b8 A15,7,7,28 o7b16b16
+
+C L
+C l1 r^^^
+C ^8 @Triangle16 V64 px-16
+!CRiff1 o3f8g8a8a+8>c8<a+8a8g8
+C [
+C !CRiff1 o3f8g2..
+C !CRiff1 : o3g8a2..
+C !CRiff1 o3f8g4.f8d+8d8
+C o3c8<a+8>c1...
+C ]2
+C o3f8d+8d8c8<a+8a8>c8 [
+C o2a+8>c8<a+8a8g8f8 : o2g8a8
+C o2a+8>c8d8d+8f8d+8d8c8 ]2
+C o2d+8f8[g8f8]2d+8d8c8<a+8
+C l1 o1f^^^
+
+D L
+D l1 r^^^
+D ^8 @Triangle16 V64 px+16
+!DRiff1 o3d8d+8f8g8a8g8f8d+8
+D [
+D !DRiff1 o3d8d+2..
+D !DRiff1 : o3d+8f2..
+D !DRiff1 o3d8d+4.d8c8<a+8
+D o2g8f8g1...
+D ]2
+D o3d8c8<a+8a8g8f8g8 [
+D o2g8a8g8f8d+8d8 : o2d8f8
+D o2g8a8a+8>[c8]3<a+8a8 ]2
+D o2c8d8[d+8d8]2c8<a+8a8g8
+D l1 o1c^^^
+
+E L
+E l1 r^^^^^^^^^^^
+!ERiff1 @Saw16 V8
+!ERiff1 o6c1<a+1a1g1f1d+1d1c1
+!ERiff1 o4f1^1& GDT2 r1^1
+E !ERiff1
+
+F r16 L
+F l1 r^^^^^^^^^^^
+F ~16,2
+F !ERiff1
