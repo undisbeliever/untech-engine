@@ -298,6 +298,10 @@ i8()
         dex
         bpl     -
 
+    // Set fixed-color to black
+    lda.b   #COLDATA.plane.all | 0
+    sta.b   COLDATA
+
 
     // reset all of the DMA registers
     // Registers $4300 - $437f
