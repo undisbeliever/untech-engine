@@ -456,7 +456,7 @@ NoCgramTransfer:
 // DB = 0x7e
 
 
-    lda.w   #2100
+    lda.w   #$2100
     tcd
 
     sep     #$10

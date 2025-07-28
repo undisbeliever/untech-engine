@@ -26,6 +26,8 @@ namespace BasicRoom {
 
 a16()
 i8()
+// DB = 0x7e
+// DP = 0x2100
 code()
 function SetupPpu_dp2100 {
     rts
@@ -34,6 +36,7 @@ function SetupPpu_dp2100 {
 
 a16()
 i8()
+// DB = 0x7e
 code()
 function Process {
     rts
