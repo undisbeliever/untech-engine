@@ -863,9 +863,9 @@ constant CGADSUB = 0x2131
 namespace CGADSUB {
     namespace color {
         constant add = %00000000
-        constant subtract = %100000000
+        constant subtract = %10000000
     }
-    constant halfColor = %010000000
+    constant halfColor = %01000000
 
     namespace enable {
         constant mask = %00111111
