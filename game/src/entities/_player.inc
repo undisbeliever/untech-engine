@@ -204,6 +204,21 @@ function ShieldCollision {
 }
 
 
+
+// REQUIRES: 8 bit A, DB = 0x7e
+// INPUT: dp = entity
+a8()
+iu()
+code()
+function InvertGravity__a8iu {
+    lda.b   EntityStruct.movementState
+    eor.b   #Entity.MovementState.UP_GRAVITY_FLAG | Entity.MovementState.MOVING_DOWN_FLAG
+    sta.b   EntityStruct.movementState
+
+    rts
+}
+
+
 // REQUIRES: 16 bit A, 16 bit Index, DB = 0x7e
 // INPUT: dp = entity
 a16()
@@ -242,18 +257,6 @@ function _Movement {
     sep     #$30
 a8()
 i8()
-    // ::TODO remove::
-    lda.w   Controller.Joy1.pressed
-    bit.b   #JOYL.l
-    beq     +
-        dec.w   playerHealth
-    +
-    lda.w   Controller.Joy1.pressed
-    bit.b   #JOYL.r
-    beq     +
-        inc.w   playerHealth
-    +
-
 
     // Use different gravity if the jump button is held down
     assert(JOY_H_JUMP_BUTTON == 0x80)

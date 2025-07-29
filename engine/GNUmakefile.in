@@ -7,6 +7,8 @@ rwildcard_all = $(foreach d,$(wildcard $(addsuffix /*,$(1))),$d $(call rwildcard
 
 GEN_DIR        ?= gen
 
+BASS_FLAGS     ?=
+
 TABLE_DIRS     += $(UNTECH_DIR)/tables
 TABLE_INCS     := $(foreach d,$(TABLE_DIRS),$(patsubst $d/%.py,$(GEN_DIR)/tables/%.inc,$(wildcard $d/*.py)))
 
@@ -79,15 +81,15 @@ $(BINARY): $(call rwildcard_all, $(SRC_DIRS) $(UNTECH_DIR)/engine)
 $(BINARY): $(TABLE_INCS)
 $(BINARY): $(RESOURCES)
 
-BINARY_SYMBOLS := $(BINARY:.sfc=.sym) $(BINARY:.sfc=.cpu.sym)
+BINARY_SYMBOLS := $(BINARY:.sfc=.sym)
 
 ifeq ($(VANILLA_BASS), n)
   $(BINARY) $(BINARY_SYMBOLS): $(MAIN)
     ifeq ($(MEMORY_MAP), hirom)
-	$(bass) -strict -o $(BINARY) -sym $(BINARY:.sfc=.sym) $(MAIN)
+	$(bass) $(BASS_FLAGS) -strict -o $(BINARY) -sym $(BINARY:.sfc=.sym) $(MAIN)
 	$(untech-write-sfc-checksum) --hirom $(BINARY)
     else ifeq ($(MEMORY_MAP), lorom)
-	$(bass) -strict -o $(BINARY) -sym $(BINARY:.sfc=.sym) $(MAIN)
+	$(bass) $(BASS_FLAGS) -strict -o $(BINARY) -sym $(BINARY:.sfc=.sym) $(MAIN)
 	$(untech-write-sfc-checksum) --lorom $(BINARY)
     else
       $(error "Unknown memory map, please set MEMORY_MAP to 'hirom' or 'lorom'")
@@ -95,10 +97,10 @@ ifeq ($(VANILLA_BASS), n)
 else
   $(BINARY): $(MAIN)
     ifeq ($(MEMORY_MAP), hirom)
-	$(bass) -strict -o $(BINARY) $(MAIN)
+	$(bass) $(BASS_FLAGS) -strict -o $(BINARY) $(MAIN)
 	$(untech-write-sfc-checksum) --hirom $(BINARY)
     else ifeq ($(MEMORY_MAP), lorom)
-	$(bass) -strict -o $(BINARY) $(MAIN)
+	$(bass) $(BASS_FLAGS) -strict -o $(BINARY) $(MAIN)
 	$(untech-write-sfc-checksum) --lorom $(BINARY)
     else
       $(error "Unknown memory map, please set MEMORY_MAP to 'hirom' or 'lorom'")

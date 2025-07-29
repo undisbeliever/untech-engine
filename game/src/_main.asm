@@ -24,10 +24,18 @@
 
 define MEMORY_MAP = LOROM
 define ROM_SIZE = 2
-define ROM_SPEED = slow // ::TODO change in debug/release build::
 define REGION = US // NTSC
 define ROM_NAME = "RESCUE"
 define VERSION = 0
+
+if {defined RELEASE_BUILD} {
+    define ROM_SPEED = fast
+} else if {defined DEBUG_BUILD} {
+    define ROM_SPEED = slow
+    define CONTROLLER_USE_JOY2
+} else {
+    error "Unknown build"
+}
 
 include "../../engine/common.inc"
 include "memmap.inc"
@@ -54,6 +62,10 @@ rodata()
 include "../../engine/untech.inc"
 
 include "_variables.inc"
+
+if {defined DEBUG_BUILD} {
+    include "debug.inc"
+}
 
 
 include "input.inc"

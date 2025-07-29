@@ -73,6 +73,10 @@ i16()
             sta.w   inidispBuffer
         +
 
+        if {defined DEBUG_BUILD} {
+            ProcessDebugCommands()
+        }
+    iu()
         rep     #$30
     a16()
     i16()
