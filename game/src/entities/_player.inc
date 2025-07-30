@@ -360,26 +360,6 @@ a8()
             jsr     SetJumpYVelocity__a8i16
     NoJump:
 a8()
-
-
-    // Launch projectile with cooldown
-    lda.b   EntityStruct.projectileCooldown
-    beq     +
-        dec.b   EntityStruct.projectileCooldown
-        bra     ++
-    +
-        lda.w   InputBuffer.projectile
-        beq     +
-            stz.w   InputBuffer.projectile
-
-            lda.b   #PROJECTILE_COOLDOWN_FRAMES
-            sta.b   EntityStruct.projectileCooldown
-
-            rep     #$30
-        a16()
-            SpawnManualPlayerProjectiles()
-    +
-au()
     rep     #$30
 a16()
 i16()
@@ -663,6 +643,25 @@ a8()
     lda.w   InputBuffer.attack
     bne     __SetMeleeAttackState_A8
 
+
+    // Launch projectile with cooldown
+    lda.b   EntityStruct.projectileCooldown
+    beq     +
+        dec.b   EntityStruct.projectileCooldown
+        bra     ++
+    +
+        lda.w   InputBuffer.projectile
+        beq     +
+            stz.w   InputBuffer.projectile
+
+            lda.b   #PROJECTILE_COOLDOWN_FRAMES
+            sta.b   EntityStruct.projectileCooldown
+
+            rep     #$30
+        a16()
+            SpawnManualPlayerProjectiles()
+    +
+au()
     rep     #$30
 a16()
 i16()
