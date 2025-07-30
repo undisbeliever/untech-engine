@@ -84,7 +84,7 @@ include "entities/walk-avoid-ledges.inc"
 include "interactive-tiles.inc"
 
 include "scenes/basic-room.inc"
-
+include "scenes/water-room.inc"
 
 
 

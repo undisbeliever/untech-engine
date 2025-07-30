@@ -41,6 +41,12 @@ i16()
     jsr     FadeOut
 
 
+    // Reset water height
+    assert(0x8000 > MetaTiles.map.TOP + MetaTiles.MAP_HEIGHT_LARGE * MetaTiles.METATILE_SIZE_PX)
+    lda.w   #0x8000
+    sta.w   Project.GameState.Words.waterPosition
+
+
     jsr     Room.LoadRoom
 
 

@@ -27,19 +27,24 @@ namespace Gravity {
         enum(NORMAL)
         enum(PLAYER)
         enum(PLAYER_HOLDING_JUMP)
+        enum(SWIMMING_PLAYER)
+        enum(SWIMMING_PLAYER_HOLDING_JUMP)
     endEnum()
 }
 
 rodata()
 namespace Project {
     constant _PLAYER_GRAVITY = 8600
+    constant _PLAYER_SWIM_GRAVITY = 2000
 
 // 0.16 fixed point px/frame/frame
 GravityTable:
     // ::TODO tweak::
-    dw  _PLAYER_GRAVITY         // default
-    dw  _PLAYER_GRAVITY         // player
-    dw  _PLAYER_GRAVITY / 2     // player holding jump
+    dw  _PLAYER_GRAVITY             // default
+    dw  _PLAYER_GRAVITY             // player
+    dw  _PLAYER_GRAVITY / 2         // player holding jump
+    dw  _PLAYER_SWIM_GRAVITY        // swimming player
+    dw  _PLAYER_SWIM_GRAVITY / 2    // swimming player holding jump
 }
 
 

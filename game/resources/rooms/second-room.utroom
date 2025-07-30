@@ -1,17 +1,24 @@
 <?xml version="1.0" encoding="UTF_8"?>
 <!DOCTYPE untech>
-<room name="second_room" scene="blocky">
-  <map width="16" height="14">
+<room name="second_room" scene="water">
+  <map width="16" height="26">
     EBAQEBAQEBAQEBAQEBAQEBAQEAAAAAAAAAAAAAAAABAQEBAAAAAAAAAAAAAAAAAQ
     EP8AAAAAAAAAAAAAAAAAEBD/AAAAAAAAAAAAAAAAABAQ/wAAAAAAAAAAAAAAAAAQ
-    EBAQEBAXFxcXAAAAAEAAEBAQEAAAAAAAAAAAAABAABAQEBAAAAAAAAAAExQg/hAQ
-    EBAQAAAAAAATFCAgICAgEBD/AAAAAAAAEBAQEBAQEBAQ/wAAAAAAABAQEBAQEBAQ
-    EP8AAAAAAAAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBA=
+    EBAQEBAXFxcXAAAAAAAAEBAQEAAAAAAAAAAAAAAAABAQEBAAAAAAAAAAExQgEBAQ
+    EBAQAAAAAAATFCAgICAgEBD/AAAPAAAAEBAAAAAAABAQ/wAAHwAAABAQAAAAAAAQ
+    EP8AAB8AAAAQEAAAEBAQEBAQEBAfAAAAEBAAAAAAEBAQAAAAHwAAABAQAAAAABAQ
+    EAAAAB8AAAAQAAAAAAAAEBAAAAAfAAAAEAAAAAAAABAQAAAAHwAAABAAAAAAAAAQ
+    EAAAAB8AAAAQAAAAAAAAEBAAAAAfAAAAAAAAAAAAABAQAAAAHwAAAAAAAAAAAAAQ
+    EAAAAB8AAAAAAAAAAAAAEBAAAAAfAAAAAAAAAAAAABAQAAAAHwAAAAAAAABAAAAQ
+    EAAAAB8AAAAAAAAAQAAAEBAQEBAQEBAQEBAQEP4QEBA=
   </map>
   <entrance name="upper" x="40" y="85" orientation="down-right"/>
   <entrance name="lower" x="40" y="197" orientation="down-right"/>
-  <entrance name="door" x="208" y="117" orientation="down-left"/>
-  <script name="Startup"/>
+  <entrance name="door" x="192" y="388" orientation="down-left"/>
+  <script name="Startup">
+    <statement opcode="Set_Word" arg1="waterPosition" arg2="0x10d8"/>
+  </script>
+  <script name="ChangeWaterLevel"/>
   <script name="UpperDoor">
     <statement opcode="Load_Room" arg1="_scratchpad" arg2="upper_door"/>
   </script>
@@ -22,6 +29,6 @@
     <statement opcode="Load_Room" arg1="_scratchpad" arg2="door"/>
   </script>
   <script-trigger script="UpperDoor" x="1" y="3" width="1" height="3"/>
-  <script-trigger script="UpperDoor" x="1" y="10" width="1" height="3"/>
-  <script-trigger script="Door" x="13" y="8" width="1" height="1"/>
+  <script-trigger script="LowerDoor" x="1" y="10" width="1" height="3"/>
+  <script-trigger script="Door" x="12" y="25" width="1" height="1"/>
 </room>

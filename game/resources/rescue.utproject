@@ -3,8 +3,9 @@
 <project>
   <memory-map mode="lorom" first-bank="83" n-banks="5"/>
   <room-settings room-data-size="16384"/>
-  <game-state starting-room="_scratchpad" starting-entrance="start" starting-player="player">
+  <game-state starting-room="second_room" starting-entrance="door" starting-player="player">
     <word index="0" name="playerHealth" value="6"/>
+    <word index="1" name="waterPosition" value="0"/>
   </game-state>
   <bytecode/>
   <interactive-tiles>
@@ -57,9 +58,12 @@
   <frameset src="metasprites/cleaning-bot.utsi" type="spriteimporter"/>
   <frameset src="metasprites/player-projectile.utsi" type="spriteimporter"/>
   <palette name="blocky" image="palettes/blocky.png" rows-per-frame="8" animation-delay="35"/>
+  <background-image name="water" bit-depth="4" image="bg-images/water.png" palette="blocky" first-palette="7" npalettes="1" default-order="0"/>
   <metatile-tileset src="metatiles/blocky.utmt"/>
   <room-file src="rooms/_scratchpad.utroom"/>
   <room-file src="rooms/second-room.utroom"/>
   <scene-setting name="BasicRoom" bg-mode="1bg3" layer0-type="mt-tileset" layer1-type="" layer2-type="text" layer3-type=""/>
+  <scene-setting name="WaterRoom" bg-mode="1bg3" layer0-type="bg-image" layer1-type="mt-tileset" layer2-type="text" layer3-type=""/>
   <scene name="blocky" settings="BasicRoom" palette="blocky" layer0="blocky"/>
+  <scene name="water" settings="WaterRoom" palette="blocky" layer0="water" layer1="blocky"/>
 </project>

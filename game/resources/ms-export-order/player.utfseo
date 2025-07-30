@@ -9,6 +9,30 @@
   <frame id="ladder_1_up">
     <alt name="ladder_1" hflip="true" vflip="true"/>
   </frame>
+  <frame id="underwater_left">
+    <alt name="underwater_right" hflip="true"/>
+  </frame>
+  <frame id="underwater_right">
+    <alt name="underwater_left" hflip="true"/>
+  </frame>
+  <frame id="underwater_left_up">
+    <alt name="underwater_right" hflip="true" vflip="true"/>
+  </frame>
+  <frame id="underwater_right_up">
+    <alt name="underwater_right" vflip="true"/>
+  </frame>
+  <frame id="swimming_left">
+    <alt name="swimming_right" hflip="true"/>
+  </frame>
+  <frame id="swimming_right">
+    <alt name="swimming_left" hflip="true"/>
+  </frame>
+  <frame id="swimming_left_up">
+    <alt name="swimming_right" hflip="true" vflip="true"/>
+  </frame>
+  <frame id="swimming_right_up">
+    <alt name="swimming_right" vflip="true"/>
+  </frame>
   <animation id="standing_left">
     <alt name="standing_right" hflip="true"/>
   </animation>

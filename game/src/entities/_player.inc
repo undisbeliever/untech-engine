@@ -33,6 +33,14 @@ constant LADDER_X_MOMENTUM = 0x0120
 constant LADDER_Y_MOMENTUM = 0x0120
 
 
+// 8:8 fixed point
+constant MAX_WATER_Y_MOMENTUM = 0x0180
+
+
+// Number of pixels the player must be out of the water before switching to normal state
+constant SWIMMING_YPOS_BEFORE_OUT_OF_WATER = 10
+
+
 // ::TODO adjust::
 constant HURT_IFRAMES = 40
 
@@ -48,6 +56,10 @@ constant COYOTE_TIME_FRAMES = 8
 // ::TODO adjust::
 constant LADDER_COYOTE_TIME_FRAMES = 5
 
+// Number of frames between B swim up/down actions
+// ::TODO adjust::
+constant SWIM_COOLDOWN_FRAMES = 20
+
 
 // Player gamestate variables
 constant playerHealth = Project.GameState.Words.playerHealth
@@ -62,6 +74,8 @@ namespace State {
     createEnum(0, 2)
         enum(NORMAL)
         enum(MELEE_ATTACK)
+        enum(UNDERWATER)
+        enum(UNDERWATER_ATTACK)
         enum(LADDER)
     endEnum()
 }
@@ -69,6 +83,8 @@ namespace State {
 ProcessFunctionTable:
     dw  Process__Normal
     dw  Process__MeleeAttack
+    dw  Process__Underwater
+    dw  Process__UnderwaterAttack
     dw  Process__Ladder
 
 
@@ -99,10 +115,14 @@ namespace EntityStruct {
         field(coyoteJumpBuffer, 1)
 
 
+        // Decrementing counter until an underwater player can swim again
+        // (byte)
+        field(swimCooldown, 1)
+
+
         // The X-position of the ladder the player is on
         // (word)
         field(ladderXpos, 2)
-
     endstruct()
 }
 
@@ -117,9 +137,7 @@ function Init {
     assert(State.NORMAL == 0)
     stz.b   EntityStruct.state
 
-    SetAnimation(standing_right)
-
-    rts
+    jmp     _SetNormalOrUnderwaterState
 }
 
 
@@ -475,6 +493,169 @@ _Return:
 a16()
 i16()
 code()
+function _SetUnderwaterAnimation {
+
+constant _msFrameBits = zpTmp0
+
+    sep     #$30
+a8()
+i8()
+    lda.b   EntityStruct.movementState
+    bit.b   #Entity.MovementState.STANDING_FLAG
+    bne     Standing
+
+        assert(Entity.MovementState.FACING_RIGHT_FLAG == 1)
+        assert(Entity.MovementState.UP_GRAVITY_FLAG == 2)
+        and.b   #3
+        sta.w   _msFrameBits
+
+
+        lda.b   #{GetFrameId(underwater_left)}
+        ldy.b   EntityStruct.swimCooldown
+        beq     +
+            lda.b   #{GetFrameId(swimming_left)}
+        +
+        ora.w   _msFrameBits
+
+        rep     #$30
+    a16()
+    i16()
+        // ::TODO add a DisableAnimationAndSetFrameIfChanged function::
+        jsr     MetaSprite.SetFrame
+        jmp     MetaSprite.Animation.DisableAnimation
+
+
+a8()
+i8()
+Standing:
+    rep     #$30
+a16()
+i16()
+    ldy.w   #{GetAnimationId(walking_left)}
+    jmp     SetAnimation_FacingAndGravity_Y
+}
+
+
+
+// REQUIRES: 16 bit A, 16 bit Index, DB = 0x7e
+// INPUT: dp = entity
+a16()
+i16()
+code()
+function _UnderwaterMovement {
+    sep     #$30
+a8()
+i8()
+    // Use different gravity if the jump button is held down
+    assert(JOY_H_JUMP_BUTTON == 0x80)
+    ldy.b   #Gravity.SWIMMING_PLAYER
+
+    lda.w   Controller.Joy1.current + 1
+    bpl     +
+        ldy.b   #Gravity.SWIMMING_PLAYER_HOLDING_JUMP
+    +
+    sty.b   EntityStruct.gravity
+
+
+    ldx.b   #MovementTableIndex.PlayerSwim
+
+    // A = Controller.Joy1.current + 1
+    bit.b   #JOY_H_RUN_BUTTON
+    beq     NoRun
+        assert(MovementTableIndex.PlayerSwimFast == MovementTableIndex.PlayerSwim + 2)
+        inx
+        inx
+    NoRun:
+
+    lda.b   EntityStruct.movementState
+    bit.b   #Entity.MovementState.STANDING_FLAG
+    beq     +
+        ldx.b   #MovementTableIndex.PlayerSwimStanding
+    +
+
+
+    rep     #$10
+i16()
+
+    lda.w   Controller.Joy1.current + 1
+    bit.b   #JOYH.left
+    beq     NoLeft
+        lda.b   #Entity.MovementState.FACING_RIGHT_FLAG
+        trb.b   EntityStruct.movementState
+
+        rep     #$30
+    a16()
+        jsr     AccelerateLeft
+
+        bra     EndXMovement
+
+    NoLeft:
+        // A = Joy1.current + 1
+        bit.b   #JOYH.right
+        beq     NoRight
+            lda.b   #Entity.MovementState.FACING_RIGHT_FLAG
+            tsb.b   EntityStruct.movementState
+
+            rep     #$30
+        a16()
+            jsr     AccelerateRight
+
+            bra     EndXMovement
+
+    NoRight:
+        rep     #$30
+    a16()
+        // Neither left or right pressed
+        jsr     DecelerateXmomentum
+
+EndXMovement:
+a16()
+
+
+    sep     #$20
+a8()
+
+    // No coyote time when swimming
+
+    lda.b   EntityStruct.swimCooldown
+    beq     CanSwimUp
+        dec.b   EntityStruct.swimCooldown
+        bra     EndJumpTest
+        CanSwimUp:
+            lda.w   InputBuffer.jump
+            beq     EndJumpTest
+                stz.w   InputBuffer.jump
+
+                lda.b   #SWIM_COOLDOWN_FRAMES
+                sta.b   EntityStruct.swimCooldown
+
+                jsr     SetJumpYVelocity__a8i16
+    EndJumpTest:
+
+au()
+    rep     #$30
+a16()
+i16()
+
+    // Limit maximum yMomentum when in the water
+    lda.b   BaseEntity.yMomentum.px - 1
+    cmp.w   #MAX_WATER_Y_MOMENTUM
+    bcc     +
+        lda.w   #MAX_WATER_Y_MOMENTUM
+        sta.b   BaseEntity.yMomentum.px - 1
+    +
+
+    MovePlayerWithTileCollisionsAndInteractiveTiles()
+
+    rts
+}
+
+
+// REQUIRES: 16 bit A, 16 bit Index, DB = 0x7e
+// INPUT: dp = entity
+a16()
+i16()
+code()
 function Process__Normal {
     sep     #$20
 a8()
@@ -486,6 +667,16 @@ a8()
 a16()
 i16()
     jsr     _Movement
+
+    lda.b   EntityStruct.yPos.px
+    cmp.w   Project.GameState.Words.waterPosition
+    bcc     +
+        // ::TODO splash sound::
+        // ::TODO spawn splash particle::
+
+        jmp     _SetUnderwaterState
+    +
+
     jmp     _SetAnimation
 }
 
@@ -525,6 +716,128 @@ function Process__MeleeAttack {
         stz.b   EntityStruct.state
 
         jmp     _SetAnimation
+    +
+    rts
+}
+
+
+
+// REQUIRES: 16 bit A, 16 bit Index, DB = 0x7e
+// INPUT: dp = entity
+a16()
+i16()
+code()
+function _SetUnderwaterState {
+    lda.w   #State.UNDERWATER
+    sta.b   EntityStruct.state
+
+    // Safe to clear the byte after swimCooldown
+    assert(EntityStruct.swimCooldown + 1 == EntityStruct.ladderXpos)
+    stz.b   EntityStruct.swimCooldown
+
+    jmp     _SetUnderwaterAnimation
+}
+
+
+// REQUIRES: 16 bit A, 16 bit Index, DB = 0x7e
+// INPUT: dp = entity
+a16()
+i16()
+code()
+function _SetNormalOrUnderwaterState {
+    lda.b   EntityStruct.yPos.px
+    cmp.w   Project.GameState.Words.waterPosition
+    bcs     _SetUnderwaterState
+
+Fallthrough:
+}
+
+
+// REQUIRES: 16 bit A, 16 bit Index, DB = 0x7e
+// INPUT: dp = entity
+a16()
+i16()
+code()
+function _SetNormalState {
+    assert(pc() == _SetNormalOrUnderwaterState.Fallthrough)
+
+    assert(State.NORMAL == 0)
+    stz.b   EntityStruct.state
+
+    jmp     _SetAnimation
+}
+
+
+// REQUIRES: 16 bit A, 16 bit Index, DB = 0x7e
+// INPUT: dp = entity
+a16()
+i16()
+code()
+function Process__Underwater {
+    sep     #$20
+a8()
+
+    lda.w   InputBuffer.attack
+    bne     __SetUnderwaterAttackState_A8
+
+    // Cannot fire a projectile underwater
+
+    rep     #$30
+a16()
+i16()
+    jsr     _UnderwaterMovement
+
+    lda.b   EntityStruct.yPos.px
+    clc
+    adc.w   #SWIMMING_YPOS_BEFORE_OUT_OF_WATER
+    cmp.w   Project.GameState.Words.waterPosition
+    bcs     InWater
+        // Jump out of the water
+        asl.b   EntityStruct.yMomentum.px - 1
+
+        // ::TODO splash sound::
+        // ::TODO splash particle::
+
+        jmp     _SetNormalState
+    InWater:
+
+    jmp     _SetUnderwaterAnimation
+}
+
+
+// REQUIRES: 8 bit A, 16 bit Index, DB = 0x7e
+// RETURNS: 16 bit A
+// INPUT: dp = entity
+a8()
+i16()
+code()
+function __SetUnderwaterAttackState_A8 {
+    stz.w   InputBuffer.attack
+
+    lda.b   #State.UNDERWATER_ATTACK
+    sta.b   EntityStruct.state
+
+    // ::TODO underwater attack animation::
+    lda.b   EntityStruct.movementState
+    and.b   #3
+    ora.b   #{GetAnimationId(melee_left)}
+    jmp     MetaSprite.Animation.SetAnimationId
+}
+
+
+// REQUIRES: 8 bit A, 16 bit Index, DB = 0x7e
+// INPUT: dp = entity
+a16()
+i16()
+code()
+function Process__UnderwaterAttack {
+    jsr     _UnderwaterMovement
+
+    // Switch to underwater state when attack animation is over
+    lda.b   EntityStruct.MetaSprite.Animation.id - 1
+    cmp.w   #0xff00
+    bcc     +
+        jmp     _SetUnderwaterState
     +
     rts
 }
@@ -658,13 +971,13 @@ EndIf:
         lda.b   #Entity.MovementState.STANDING_FLAG | Entity.MovementState.NO_GRAVITY_FLAG
         trb.b   EntityStruct.movementState
 
-        // Set normal state
-        assert(State.LADDER & 0xff00 == State.NORMAL)
-        stz.b   EntityStruct.state
-
-        // Set jump velocity
         ldx.w   #MovementTableIndex.PlayerWalk
         jsr     SetJumpYVelocity__a8i16
+
+        rep     #$30
+    a16()
+    i16()
+        jmp     _SetNormalOrUnderwaterState
     NoJump:
 
 
@@ -704,9 +1017,6 @@ i8()
         sta.b   EntityStruct.coyoteJumpBuffer
 
         // Not on a ladder
-        assert(State.LADDER & 0xff00 == State.NORMAL)
-        stz.b   EntityStruct.state
-
         stz.b   EntityStruct.yMomentum.px
 
         rep     #$30
@@ -714,7 +1024,7 @@ i8()
     i16()
         stz.b   EntityStruct.yMomentum.sx
 
-        rts
+        jmp     _SetNormalOrUnderwaterState
     +
 
 

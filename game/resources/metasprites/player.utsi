@@ -131,15 +131,31 @@
     <object size="large" x="8" y="24"/>
     <actionpoint type="ManualPlayerProjectile" x="22" y="24"/>
   </frame>
-  <frame id="ladder_0" order="2">
+  <frame id="underwater_right" order="2">
     <gridlocation x="4" y="2"/>
+    <tilehitbox x="10" y="14" width="12" height="24"/>
+    <hurtbox x="10" y="12" width="12" height="25"/>
+    <object size="large" x="8" y="8"/>
+    <object size="large" x="8" y="24"/>
+    <actionpoint type="ManualPlayerProjectile" x="22" y="24"/>
+  </frame>
+  <frame id="swimming_right" order="2">
+    <gridlocation x="5" y="2"/>
+    <tilehitbox x="10" y="14" width="12" height="24"/>
+    <hurtbox x="10" y="12" width="12" height="25"/>
+    <object size="large" x="8" y="8"/>
+    <object size="large" x="8" y="24"/>
+    <actionpoint type="ManualPlayerProjectile" x="22" y="24"/>
+  </frame>
+  <frame id="ladder_0" order="2">
+    <gridlocation x="0" y="3"/>
     <tilehitbox x="10" y="14" width="12" height="24"/>
     <hurtbox x="10" y="12" width="12" height="25"/>
     <object size="large" x="8" y="8"/>
     <object size="large" x="8" y="24"/>
   </frame>
   <frame id="ladder_1" order="2">
-    <gridlocation x="5" y="2"/>
+    <gridlocation x="1" y="3"/>
     <tilehitbox x="10" y="14" width="12" height="24"/>
     <hurtbox x="10" y="12" width="12" height="25"/>
     <object size="large" x="8" y="8"/>
