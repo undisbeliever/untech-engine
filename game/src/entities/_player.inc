@@ -392,8 +392,6 @@ a8()
     and.b   #3
     sta.w   _msAnimationBits
 
-    // ::TODO up gravity::
-
     lda.b   EntityStruct.movementState
     bit.b   #Entity.MovementState.STANDING_FLAG
     beq     NotStanding
@@ -441,8 +439,18 @@ a8()
                 bra     _EndIf
 
     NotStanding:
+        // Determine if the player is rising or falling.
+        //
+        //  if (movementState & MOVING_DOWN_FLAG) ^ (movementState & UP_GRAVITY_FLAG):
+        //      falling
+        //  else:
+        //      rising
+        //
+        assert(Entity.MovementState.MOVING_DOWN_FLAG == Entity.MovementState.UP_GRAVITY_FLAG << 1)
         // A = movementState
-        bit.b   #Entity.MovementState.MOVING_DOWN_FLAG
+        asl
+        eor.b   EntityStruct.movementState
+        and.b   #Entity.MovementState.MOVING_DOWN_FLAG
         beq     +
             lda.b   #{GetAnimationId(falling_left)}
             bra     _EndIf
