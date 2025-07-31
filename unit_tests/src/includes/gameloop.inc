@@ -212,13 +212,24 @@ namespace Gravity {
 }
 
 namespace Project {
+namespace GravityTable {
 
 // 0.16 fixed point px/frame/frame table
-GravityTable:
+Acceleration:
     dw  10000       // normal gravity
     dw  0xffff      // strongest gravity (interactive tile test requires max gravity)
     dw  1555        // player gravity
 
+
+// 8.8 fixed point px/frame
+MaxMomentum:
+    dw  0x0800
+    dw  0x0800
+    dw  0x0800
+
+// Assert both tables are the same size
+assert(pc() - MaxMomentum == MaxMomentum - Acceleration)
+}
 }
 
 

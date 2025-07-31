@@ -33,9 +33,6 @@
 namespace Entity {
 namespace Movement {
 
-// The maximum momentum allowed by the engine
-constant MAX_MOMENTUM = 0x080000
-
 // Confirm entity momentum is a 24 bit value
 assert(BaseEntity.yMomentum.sx - BaseEntity.xMomentum.sx == 3)
 
@@ -127,7 +124,7 @@ macro _SubtractMomentumFromPosition(axis) {
 }
 
 
-// Add 16 bit gravity to 24 bit yMomentum, clamping yMomentum to MAX_MOMENTUM
+// Add 16 bit gravity to 24 bit yMomentum, clamping yMomentum to gravity's MaxMomentum.
 //
 // REQUIREMENTS: 16 bit A
 // INPUT: dp = entity
@@ -141,27 +138,28 @@ i8()
 
     clc
     lda.b   BaseEntity.yMomentum.sx
-    adc.l   Project.GravityTable,x
+    adc.l   Project.GravityTable.Acceleration,x
     sta.b   BaseEntity.yMomentum.sx
-    bcc     EndIf{#}
-        lda.b   BaseEntity.yMomentum.px - 1
+
+    lda.b   BaseEntity.yMomentum.px - 1
+    bcc     NoCarry{#}
         // carry set
         adc.w   #0x0100 - 1
+    NoCarry{#}:
 
-        // ::TODO make entity & region independent ::
-        cmp.w   #Entity.Movement.MAX_MOMENTUM >> 8
-        bcc     NotMaxMomentum{#}
-            lda.w   #Entity.Movement.MAX_MOMENTUM >> 8
-    NotMaxMomentum{#}:
-        sta.b   BaseEntity.yMomentum.px - 1
-EndIf{#}:
+    // Limit maximum yMomentum
+    cmp.l   Project.GravityTable.MaxMomentum,x
+    bcc     NotMaxMomentum{#}
+        lda.l   Project.GravityTable.MaxMomentum,x
+NotMaxMomentum{#}:
+    sta.b   BaseEntity.yMomentum.px - 1
 
     rep     #$30
 i16()
 }
 
 
-// Subtract 16 bit gravity from 24 bit yMomentum.
+// Subtract 16 bit gravity from 24 bit yMomentum, clamping it to the gravity's MaxMomentum.
 // If yMomentum becomes negative, set Y direction to {change_direction} and goto {branch}.
 //
 // REQUIREMENTS: 16 bit A
@@ -180,7 +178,7 @@ i8()
     // Subtract 16 bit gravity from 24 bit yMomentum
     // carry set
     lda.b   BaseEntity.yMomentum.sx
-    sbc.l   Project.GravityTable,x
+    sbc.l   Project.GravityTable.Acceleration,x
     sta.b   BaseEntity.yMomentum.sx
     bcs     End{#}
         sep     #$20
@@ -217,6 +215,14 @@ End{#}:
     rep     #$30
 a16()
 i16()
+
+    // Limit maximum yMomentum
+    lda.b   BaseEntity.yMomentum.px - 1
+    cmp.l   Project.GravityTable.MaxMomentum,x
+    bcc     NotMaxMomentum{#}
+        lda.l   Project.GravityTable.MaxMomentum,x
+NotMaxMomentum{#}:
+    sta.b   BaseEntity.yMomentum.px - 1
 }
 namespace __Y_Axis {
     constant Up = 1

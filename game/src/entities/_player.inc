@@ -33,10 +33,6 @@ constant LADDER_X_MOMENTUM = 0x0120
 constant LADDER_Y_MOMENTUM = 0x0120
 
 
-// 8:8 fixed point
-constant MAX_WATER_Y_MOMENTUM = 0x0180
-
-
 // Number of pixels the player must be out of the water before switching to normal state
 constant SWIMMING_YPOS_BEFORE_OUT_OF_WATER = 10
 
@@ -624,14 +620,6 @@ au()
     rep     #$30
 a16()
 i16()
-
-    // Limit maximum yMomentum when in the water
-    lda.b   BaseEntity.yMomentum.px - 1
-    cmp.w   #MAX_WATER_Y_MOMENTUM
-    bcc     +
-        lda.w   #MAX_WATER_Y_MOMENTUM
-        sta.b   BaseEntity.yMomentum.px - 1
-    +
 
     MovePlayerWithTileCollisionsAndInteractiveTiles()
 

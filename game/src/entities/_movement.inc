@@ -34,17 +34,36 @@ namespace Gravity {
 
 rodata()
 namespace Project {
+namespace GravityTable {
     constant _PLAYER_GRAVITY = 8600
     constant _PLAYER_SWIM_GRAVITY = 2000
 
 // 0.16 fixed point px/frame/frame
-GravityTable:
+Acceleration:
     // ::TODO tweak::
     dw  _PLAYER_GRAVITY             // default
     dw  _PLAYER_GRAVITY             // player
     dw  _PLAYER_GRAVITY / 2         // player holding jump
     dw  _PLAYER_SWIM_GRAVITY        // swimming player
     dw  _PLAYER_SWIM_GRAVITY / 2    // swimming player holding jump
+
+
+// Maximum Y momentum
+constant _MAX_ENEMY_YM         = 0x0800
+constant _MAX_PLAYER_YM        = 0x0600
+constant _MAX_PLAYER_WATER_YM  = 0x0180
+
+// 8.8 fixed point px/frame
+MaxMomentum:
+    // ::TODO tweak::
+    dw  _MAX_ENEMY_YM           // default
+    dw  _MAX_PLAYER_YM          // player
+    dw  _MAX_PLAYER_YM          // player holding jump
+    dw  _MAX_PLAYER_WATER_YM    // swimming player
+    dw  _MAX_PLAYER_WATER_YM    // swimming player holding jump
+
+assert(pc() - MaxMomentum == MaxMomentum - Acceleration)
+}
 }
 
 

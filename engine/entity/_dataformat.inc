@@ -75,7 +75,14 @@ namespace Data {
     // Indexed by `BaseEntity.gravityIndex`.
     //
     // (long addressed 0.16 fixed-point words)
-    constant GravityTable = Project.GravityTable
+    constant GravityTable.Acceleration = Project.GravityTable.Acceleration
+
+    // Project supplied gravity max yMomentum value - 8.8 fixed-point px/frame.
+    //
+    // Indexed by `BaseEntity.gravityIndex`.
+    //
+    // (long addressed 8.8 fixed-point words)
+    constant GravityTable.MaxMomentum = Project.GravityTable.MaxMomentum
 }
 }
 
