@@ -25,6 +25,7 @@
 namespace Gravity {
     createEnum(0, 2)
         enum(NORMAL)
+        enum(UNDERWATER)
         enum(PLAYER)
         enum(PLAYER_HOLDING_JUMP)
         enum(SWIMMING_PLAYER)
@@ -37,11 +38,13 @@ namespace Project {
 namespace GravityTable {
     constant _PLAYER_GRAVITY = 8600
     constant _PLAYER_SWIM_GRAVITY = 2000
+    constant _ENEMY_WATER_GRAVITY = 1500
 
 // 0.16 fixed point px/frame/frame
 Acceleration:
     // ::TODO tweak::
     dw  _PLAYER_GRAVITY             // default
+    dw  _ENEMY_WATER_GRAVITY        // underwater
     dw  _PLAYER_GRAVITY             // player
     dw  _PLAYER_GRAVITY / 2         // player holding jump
     dw  _PLAYER_SWIM_GRAVITY        // swimming player
@@ -50,6 +53,7 @@ Acceleration:
 
 // Maximum Y momentum
 constant _MAX_ENEMY_YM         = 0x0800
+constant _MAX_ENEMY_WATER_YM   = 0x0160
 constant _MAX_PLAYER_YM        = 0x0600
 constant _MAX_PLAYER_WATER_YM  = 0x0180
 
@@ -57,6 +61,7 @@ constant _MAX_PLAYER_WATER_YM  = 0x0180
 MaxMomentum:
     // ::TODO tweak::
     dw  _MAX_ENEMY_YM           // default
+    dw  _MAX_ENEMY_WATER_YM     // underwater
     dw  _MAX_PLAYER_YM          // player
     dw  _MAX_PLAYER_YM          // player holding jump
     dw  _MAX_PLAYER_WATER_YM    // swimming player
@@ -243,6 +248,53 @@ a8()
     rts
 }
 
+
+// REQUIRES: 16 bit A, DB = 0x7e
+// INPUT: dp = entity
+// KEEP: X/Y
+macro BranchIfUnderWater_A(label) {
+    assert16a()
+
+    lda.b   EntityStruct.yPos.px
+    cmp.w   Project.GameState.Words.waterPosition
+    bcs     {label}
+}
+
+
+// REQUIRES: 16 bit A, DB = 0x7e
+// INPUT: dp = entity
+// KEEP: X/Y
+macro BranchIfAboveWater_A(label) {
+    assert16a()
+
+    lda.b   EntityStruct.yPos.px
+    cmp.w   Project.GameState.Words.waterPosition
+    bcc     {label}
+}
+
+
+// REQUIRES: 16 bit Index, DB = 0x7e
+// INPUT: dp = entity
+// KEEP: A/X
+macro BranchIfUnderWater_Y(label) {
+    assert16i()
+
+    ldy.b   EntityStruct.yPos.px
+    cpy.w   Project.GameState.Words.waterPosition
+    bcs     {label}
+}
+
+
+// REQUIRES: 16 bit Index, DB = 0x7e
+// INPUT: dp = entity
+// KEEP: A/X
+macro BranchIfAboveWater_Y(label) {
+    assert16i()
+
+    ldy.b   EntityStruct.yPos.px
+    cpy.w   Project.GameState.Words.waterPosition
+    bcc     {label}
+}
 
 }
 

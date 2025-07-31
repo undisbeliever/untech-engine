@@ -49,6 +49,10 @@ buildFunctionTable(BaseEntityFunctionTable, WalkAndTurn)
 namespace EntityStruct {
     childstruct(BaseEntity)
         field(state, 2)
+
+        // Byte flag to manage underwater state.
+        // non-zero when underwater.
+        field(underwater, 1)
     endstruct()
 }
 
@@ -62,6 +66,8 @@ a16()
 i16()
 code()
 function Init {
+    stz.b   EntityStruct.underwater
+
     // A.bit0 = left/right flag
     // A.bit1 = down/up gravity
     sep     #$20
@@ -159,6 +165,39 @@ a16()
 i16()
 code()
 function Process {
+    sep     #$20
+a8()
+    lda.b   EntityStruct.underwater
+    bne     Underwater
+        BranchIfAboveWater_Y(EndIf)
+            // Now underwater
+            lda.b   #Gravity.UNDERWATER
+            sta.b   EntityStruct.gravity
+
+            assert(Gravity.UNDERWATER != 0)
+            sta.b   EntityStruct.underwater
+
+            bra     MaybeChangeMomentum
+
+    Underwater:
+        BranchIfUnderWater_Y(EndIf)
+            // Now above water
+            assert(Gravity.NORMAL == 0)
+            stz.b   EntityStruct.gravity
+
+            stz.b   EntityStruct.underwater
+
+            MaybeChangeMomentum:
+                // Only change momentum if moving
+                lda.b   EntityStruct.state
+                cmp.b   #State.FALL_AND_TURN
+                bcs     EndIf
+                    jsr     __SetXMomentum_a8__returnsA16
+    EndIf:
+au()
+    rep     #$30
+a16()
+
     ldx.b   EntityStruct.state
     jmp     (ProcessFunctionTable,x)
 }
@@ -173,23 +212,12 @@ function SetState_WalkLeft {
     assert(State.WALK_LEFT == 0)
     stz.b   EntityStruct.state
 
-    ldx.b   EntityStruct.romPtr
-    lda.l   {RomStruct}.speed,x
-    sta.b   EntityStruct.xMomentum.sx
-
     sep     #$20
 a8()
-    lda.l   {RomStruct}.speed + 2,x
-    sta.b   EntityStruct.xMomentum.px
-
     lda.b   #Entity.MovementState.FACING_RIGHT_FLAG | Entity.MovementState.MOVING_RIGHT_FLAG
     trb.b   EntityStruct.movementState
 
-    rep     #$30
-a16()
-
-    ldy.w   #{GetAnimationId(walk_left)}
-    jmp     SetAnimation_FacingAndGravity_Y
+    bra     __SetXMomentum_a8__returnsA16
 }
 
 
@@ -202,23 +230,52 @@ function SetState_WalkRight {
     lda.w   #State.WALK_RIGHT
     sta.b   EntityStruct.state
 
-    ldx.b   EntityStruct.romPtr
-    lda.l   {RomStruct}.speed,x
-    sta.b   EntityStruct.xMomentum.sx
-
     sep     #$20
 a8()
-    lda.l   {RomStruct}.speed + 2,x
-    sta.b   EntityStruct.xMomentum.px
-
     lda.b   #Entity.MovementState.FACING_RIGHT_FLAG | Entity.MovementState.MOVING_RIGHT_FLAG
     tsb.b   EntityStruct.movementState
 
-    rep     #$30
-a16()
+Fallthrough:
+}
 
-    ldy.w   #{GetAnimationId(walk_left)}
-    jmp     SetAnimation_FacingAndGravity_Y
+
+// REQUIRES: 8 bit A, 16 bit Index, DB = 0x7e
+// INPUT: DP = entity
+// RETURNS: 16 bit A
+a16()
+i16()
+code()
+function __SetXMomentum_a8__returnsA16 {
+    assert(pc() == SetState_WalkRight.Fallthrough)
+
+    ldx.b   EntityStruct.romPtr
+
+    lda.b   EntityStruct.underwater
+    bne     Underwater
+
+        lda.l   {RomStruct}.speed,x
+        sta.b   EntityStruct.xMomentum.sx
+
+        rep     #$30
+    a16()
+        lda.l   {RomStruct}.speed + 1,x
+        sta.b   EntityStruct.xMomentum.sx + 1
+
+        ldy.w   #{GetAnimationId(walk_left)}
+        jmp     SetAnimation_FacingAndGravity_Y
+
+
+Underwater:
+        lda.l   {RomStruct}.underwaterSpeed,x
+        sta.b   EntityStruct.xMomentum.sx
+
+        rep     #$30
+    a16()
+        lda.l   {RomStruct}.underwaterSpeed + 1,x
+        sta.b   EntityStruct.xMomentum.sx + 1
+
+        ldy.w   #{GetAnimationId(walk_left)}
+        jmp     SetAnimation_FacingAndGravity_Y
 }
 
 

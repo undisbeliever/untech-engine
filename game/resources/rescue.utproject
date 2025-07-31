@@ -23,6 +23,7 @@
     </struct>
     <struct name="WalkAndTurn" parent="BaseEnemy">
       <struct-field name="speed" type="uint24"/>
+      <struct-field name="underwaterSpeed" type="uint24"/>
     </struct>
     <function-table name="Player" type="player" export-order="player" parameter-type="unused"/>
     <function-table name="WalkAndTurn" type="entity" struct="WalkAndTurn" export-order="walk_and_turn" parameter-type="unsigned" comment="0=left, 1=right, 2=up-left, 3=up-right"/>
@@ -32,14 +33,17 @@
       <entry name="cleaning_bot_slow" function-table="WalkAndTurn" listid="enemies" frameset="cleaning_bot" frame="left" palette="0">
         <entry-field for="attack" value="2"/>
         <entry-field for="speed" value="0x010000"/>
+        <entry-field for="underwaterSpeed" value="0x002222"/>
       </entry>
       <entry name="cleaning_bot_fast" function-table="WalkAndTurn" listid="enemies" frameset="cleaning_bot" frame="left" palette="1">
         <entry-field for="attack" value="3"/>
         <entry-field for="speed" value="0x028000"/>
+        <entry-field for="underwaterSpeed" value="0x007000"/>
       </entry>
       <entry name="avoid_ledges" function-table="WalkAvoidLedges" listid="enemies" frameset="cleaning_bot" frame="left" palette="2">
         <entry-field for="attack" value="1"/>
         <entry-field for="speed" value="0x012000"/>
+        <entry-field for="underwaterSpeed" value="0x004444"/>
       </entry>
     </entities>
     <projectiles>
