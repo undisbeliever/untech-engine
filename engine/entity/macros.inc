@@ -144,10 +144,43 @@ macro MovePlayerWithTileCollisionsAndInteractiveTiles() {
 
 
 
+// Disables entity animation and sets the entity's MetaSprite frame.
+//
+// SEE: `MetaSprite.DisableAnimationAndSetFrame`
+//
+// REQUIRES: 16 bit A, 16 bit Index, DB = $7e
+//
+// PARAM: frameId - the frame to select within the current ExportOrder
+// INPUT: dp - entity
+// OUTPUT: carry set if successful
+macro DisableAnimationAndSetFrame(frameId) {
+    assert16a()
+    assert16i()
+
+    lda.w   #{ExportOrder}.Frames.{frameId}
+    jsr     MetaSprite.DisableAnimationAndSetFrame
+}
+
+
+// Disables entity animation and sets the entity's MetaSprite frame.
+//
+// SEE: `MetaSprite.DisableAnimationAndSetFrame`
+//
+// REQUIRES: 16 bit A, 16 bit Index, DB = $7e
+//
+// INPUT: dp = entity, A = frame Id
+// OUTPUT: carry set if successful
+macro DisableAnimationAndSetFrame_A() {
+    assert16a()
+    assert16i()
+
+    jsr     MetaSprite.DisableAnimationAndSetFrame
+}
+
+
 // Sets the Entity's MetaSprite frame
 //
-// NOTE: See `Entities.SetFrame_A()` for more details about how this macro
-//       works.
+// SEE: `MetaSprite.SetFrame`
 //
 // REQUIRES: 16 bit A, 16 bit Index, DB = $7e
 //
@@ -163,7 +196,14 @@ macro SetFrame(frameId) {
 }
 
 
-// SEE: MetaSprite.SetFrame
+// Sets the Entity's MetaSprite frame
+//
+// SEE: `MetaSprite.SetFrame`
+//
+// REQUIRES: 16 bit A, 16 bit Index, DB = $7e
+//
+// INPUT: dp = entity, A = frame Id
+// OUTPUT: carry set if successful
 macro SetFrame_A() {
     assert16a()
     assert16i()

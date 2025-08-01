@@ -210,7 +210,30 @@ a16()
 }
 
 
+// Disable entity animation and calls `SetFrame`.
+//
+// SEE: `SetFrame`.
+//
+// REQUIRES: 16 bit A, 16 bit Index, DB = $7e
+//
+// INPUT: DP = Entity
+// INPUT: A = frame Id
+// OUTPUT: C set if successful
+a16()
+i16()
+code()
+function DisableAnimationAndSetFrame {
+    assert(BaseEntity.MetaSprite.Animation.id + 1 == BaseEntity.MetaSprite.Animation.pos)
+    ldx.w   #0xffff
+    stx.b   BaseEntity.MetaSprite.Animation.id
+
+Fallthrough:
+}
+
+
 // Sets the entity's metasprite frame.
+//
+// CAUTION: This does not disable any running animations.
 //
 // If the frame is active and has a dynamic tileset then a new tileset
 // is loaded into vram.
@@ -236,6 +259,8 @@ a16()
 i16()
 code()
 function SetFrame {
+    assert(pc() == DisableAnimationAndSetFrame.Fallthrough)
+
     ldx.b   BaseEntity.MetaSprite.frameSet
 
     sep     #$20

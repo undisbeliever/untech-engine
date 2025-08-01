@@ -504,9 +504,7 @@ i8()
         rep     #$30
     a16()
     i16()
-        // ::TODO add a DisableAnimationAndSetFrameIfChanged function::
-        jsr     MetaSprite.SetFrame
-        jmp     MetaSprite.Animation.DisableAnimation
+        jmp     MetaSprite.DisableAnimationAndSetFrame
 
 
 a8()
@@ -1043,7 +1041,7 @@ i8()
     rep     #$30
 a16()
 i16()
-    jmp     MetaSprite.SetFrame
+    jmp     MetaSprite.DisableAnimationAndSetFrame
 }
 
 }
