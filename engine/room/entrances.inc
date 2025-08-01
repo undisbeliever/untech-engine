@@ -119,6 +119,7 @@ a16()
     and.w   #Format.RoomEntrance.POSITION_MASK
     clc
     adc.w   #MetaTiles.map.LEFT
+    sta.w   Entity.Player.spawnXPos
     sta.w   Entity.Player.xPos.px
 
     assert(Format.RoomEntrance.POSITION_SHIFT == 8 + 4)
@@ -130,6 +131,7 @@ a16()
     and.w   #Format.RoomEntrance.POSITION_MASK
     clc
     adc.w   #MetaTiles.map.TOP
+    sta.w   Entity.Player.spawnYPos
     sta.w   Entity.Player.yPos.px
 
 

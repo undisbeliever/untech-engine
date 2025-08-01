@@ -145,10 +145,12 @@ allocateTmpWord(yPos)
         // Setup BaseEntity
 
         lda.w   xPos
+        sta.b   BaseEntity.spawnXPos
         sta.b   BaseEntity.xPos.px
         stz.b   BaseEntity.xPos.sx
 
         lda.w   yPos
+        sta.b   BaseEntity.spawnYPos
         sta.b   BaseEntity.yPos.px
         stz.b   BaseEntity.yPos.sx
 
@@ -254,6 +256,7 @@ allocateTmpWord(yPos)
 // INPUT: A = movementState of the player
 //        Room.playerDataId = the Data id of the player
 //        Entity.Player.xPos.px, Entity.Player.yPos.px = player position
+//        Entity.Player.spawnXPos, Entity.Player.spawnYpos = player position
 macro _SpawnPlayer() {
     assert16a()
     assert16i()
@@ -420,6 +423,7 @@ macro _SpawnRoomEntity() {
     and.w   #Room.Format.RoomEntity.POSITION_MASK
     clc
     adc.w   #Room.Format.RoomEntity.POSITION_X_OFFSET
+    sta.b   BaseEntity.spawnXPos
     sta.b   BaseEntity.xPos.px
     stz.b   BaseEntity.xPos.sx
 
@@ -432,6 +436,7 @@ macro _SpawnRoomEntity() {
     and.w   #Room.Format.RoomEntity.POSITION_MASK
     clc
     adc.w   #Room.Format.RoomEntity.POSITION_Y_OFFSET
+    sta.b   BaseEntity.spawnYPos
     sta.b   BaseEntity.yPos.px
     stz.b   BaseEntity.yPos.sx
 
@@ -828,6 +833,7 @@ function __SpawnAtActionPoint {
         // carry clear, will set carry on overflow (thus the -1)
         adc.w   #-INT_MS8_OFFSET - 1
         adc.w   BaseEntity.xPos.px,y
+        sta.b   BaseEntity.spawnXPos
         sta.b   BaseEntity.xPos.px
         stz.b   BaseEntity.xPos.sx
 
@@ -837,6 +843,7 @@ function __SpawnAtActionPoint {
         // carry clear, will set carry on overflow (thus the -1)
         adc.w   #-INT_MS8_OFFSET - 1
         adc.w   BaseEntity.yPos.px,y
+        sta.b   BaseEntity.spawnYPos
         sta.b   BaseEntity.yPos.px
         stz.b   BaseEntity.yPos.sx
 

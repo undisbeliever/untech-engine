@@ -28,6 +28,7 @@
 //  * ActionPoints.EnemyProjectiles
 //  * ActionPoints.SpawnEntityFunction
 //  * ActionPoints.ManualEnemyProjectile
+//  * BaseEntity.spawnXPos, BaseEntity.spawnYPos
 //  * Entity.BaseEntityRomStruct.initialProjectileId
 //  * Entity.SpawnManualEnemyProjectiles
 //  * Entity.DeleteIfOutsideAndGotoNextEntity (in the EightDirectionRedProjectile)
@@ -67,6 +68,8 @@ namespace EightDirectionProjectile {
         beq     +
             break(ASSERT_FAILURE)
         +
+
+        jsr     InteractiveTests.ActionPointSpawnerTest._CheckSpawnPosVariables
 
         // Determine if projectile is diagonal or orthogonal
         lda.w   MetaSprite.ActionPoint.positionPair.xPos
@@ -186,6 +189,8 @@ namespace ActionPointSpawner {
             break(ASSERT_FAILURE)
         +
 
+        jsr     InteractiveTests.ActionPointSpawnerTest._CheckSpawnPosVariables
+
         rts
     }
 
@@ -238,6 +243,27 @@ namespace ActionPointSpawner {
 
 namespace InteractiveTests {
 namespace ActionPointSpawnerTest {
+
+
+// INPUT: dp = entity
+a16()
+i16()
+code()
+function _CheckSpawnPosVariables {
+    lda.b   BaseEntity.spawnXPos
+    cmp.b   BaseEntity.xPos.px
+    beq     +
+        break(ASSERT_FAILURE)
+    +
+
+    lda.b   BaseEntity.spawnYPos
+    cmp.b   BaseEntity.yPos.px
+    beq     +
+        break(ASSERT_FAILURE)
+    +
+
+    rts
+}
 
 // Prints the list statistics to screen
 macro PrintListSizes() {

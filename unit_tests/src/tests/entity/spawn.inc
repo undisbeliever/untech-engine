@@ -51,6 +51,14 @@ function Spawn {
     cmp.w   #0x5678
     bne     Fail
 
+    lda.w   BaseEntity.spawnXPos,y
+    cmp.w   #0x1234
+    bne     Fail
+
+    lda.w   BaseEntity.spawnYPos,y
+    cmp.w   #0x5678
+    bne     Fail
+
     // test parameter worked
     lda.w   Entities.Blank.parameterSum
     cmp.w   #0x1337

@@ -119,6 +119,11 @@ namespace BaseEntity {
 
         MetaSprite.EntityData()
 
+        // Entity spawn position
+        // (2x unsigned words)
+        field(spawnXPos, 2)
+        field(spawnYPos, 2)
+
         // Entity movement state
         // (uint8, Entity.MovementState bitfield, project editable)
         field(movementState, 1)
@@ -349,6 +354,9 @@ namespace Entity {
         constant xPos.px = playerEntity + BaseEntity.xPos.px
         constant yPos.sx = playerEntity + BaseEntity.yPos.sx
         constant yPos.px = playerEntity + BaseEntity.yPos.px
+
+        constant spawnXPos = playerEntity + BaseEntity.spawnXPos
+        constant spawnYPos = playerEntity + BaseEntity.spawnYPos
 
         // The player's movement state
         // (uint8, Entity.MovementState bitfield)
