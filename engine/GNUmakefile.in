@@ -110,7 +110,7 @@ endif
 
 .PHONY: memory-usage
 memory-usage: directories $(BINARY)
-	$(bass) -d SHOW_MEMORY_USAGE -strict $(MAIN)
+	$(bass) $(BASS_FLAGS) -d SHOW_MEMORY_USAGE -strict $(MAIN)
 
 
 
