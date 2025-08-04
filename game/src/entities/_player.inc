@@ -44,6 +44,8 @@ constant HURT_IFRAMES = 40
 // Minimum number of frames between player particle shots
 constant PROJECTILE_COOLDOWN_FRAMES = 20
 
+constant MAX_PROJECTILES = 3
+
 
 // Number of frames after standing before the player can jump
 // ::TODO adjust::
@@ -646,14 +648,17 @@ a8()
     +
         lda.w   InputBuffer.projectile
         beq     +
-            stz.w   InputBuffer.projectile
+            lda.w   nPlayerProjectiles
+            cmp.b   #MAX_PROJECTILES
+            bcs     +
+                stz.w   InputBuffer.projectile
 
-            lda.b   #PROJECTILE_COOLDOWN_FRAMES
-            sta.b   EntityStruct.projectileCooldown
+                lda.b   #PROJECTILE_COOLDOWN_FRAMES
+                sta.b   EntityStruct.projectileCooldown
 
-            rep     #$30
-        a16()
-            SpawnManualPlayerProjectiles()
+                rep     #$30
+            a16()
+                SpawnManualPlayerProjectiles()
     +
 au()
     rep     #$30

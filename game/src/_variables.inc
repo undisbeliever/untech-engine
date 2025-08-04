@@ -22,6 +22,10 @@
 //    3. This notice may not be removed or altered from any source distribution.
 
 
+// Number of active player projectiles
+allocate(nPlayerProjectiles, wram7e, 2)
+
+
 namespace InputBuffer {
 
     // Input buffer variables.

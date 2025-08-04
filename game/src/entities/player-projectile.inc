@@ -84,6 +84,9 @@ i8()
 
     stx.b   EntityStruct.movementState
 
+    assert(Players.MAX_PROJECTILES < 0x100)
+    inc.w   nPlayerProjectiles
+
     rep     #$30
 a16()
 i16()
@@ -98,6 +101,8 @@ a16()
 i16()
 code()
 function Destructor {
+    dec.w   nPlayerProjectiles
+
     rts
 }
 
