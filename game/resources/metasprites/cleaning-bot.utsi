@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF_8"?>
 <!DOCTYPE untech>
 <spriteimporter id="cleaning_bot" tilesettype="ONE_ROW_FIXED" exportorder="walk_and_turn" image="cleaning-bot.png">
-  <grid width="24" height="24" xoffset="0" yoffset="0" xpadding="0" ypadding="0" xorigin="12" yorigin="14"/>
+  <grid width="24" height="24" xoffset="0" yoffset="0" xpadding="0" ypadding="0" xorigin="12" yorigin="15"/>
   <palette position="TOP_LEFT" npalettes="3" colorsize="1"/>
   <frame id="left" order="2">
     <gridlocation x="1" y="0"/>

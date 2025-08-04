@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF_8"?>
 <!DOCTYPE untech>
 <spriteimporter id="player" tilesettype="ONE_ROW" exportorder="player" image="player.png">
-  <grid width="32" height="48" xoffset="0" yoffset="0" xpadding="0" ypadding="0" xorigin="16" yorigin="28"/>
+  <grid width="32" height="48" xoffset="0" yoffset="0" xpadding="0" ypadding="0" xorigin="16" yorigin="26"/>
   <palette position="TOP_LEFT" npalettes="2" colorsize="1"/>
   <frame id="standing_right" order="2">
     <gridlocation x="1" y="0"/>

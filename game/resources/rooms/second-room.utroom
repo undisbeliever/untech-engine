@@ -12,9 +12,9 @@
     EAAAAB8AAAAAAAAAAAAAEBAAAAAfAAAAAAAAAAAAABAQAAAAHwAAAAAAAABAAAAQ
     EAAAAB8AAAAAAAAAQAAAEBAQEBAQEBAQEBAQEP4QEBA=
   </map>
-  <entrance name="upper" x="40" y="85" orientation="down-right"/>
-  <entrance name="lower" x="40" y="197" orientation="down-right"/>
-  <entrance name="door" x="192" y="388" orientation="down-left"/>
+  <entrance name="upper" x="40" y="83" orientation="down-right"/>
+  <entrance name="lower" x="40" y="196" orientation="down-right"/>
+  <entrance name="door" x="192" y="387" orientation="down-left"/>
   <entity-group name="initial">
     <entity entity="cleaning_bot_slow" x="213" y="116" parameter="1"/>
     <entity entity="cleaning_bot_fast" x="192" y="217" parameter="1"/>
