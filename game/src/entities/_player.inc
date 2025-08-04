@@ -183,7 +183,7 @@ a8()
         sta.b   EntityStruct.iFrames
 
         // Enemy hurts the player
-        ldx.b   BaseEntity.romPtr,y
+        ldx.w   BaseEntity.romPtr,y
 
         lda.w   playerHealth
         sec
