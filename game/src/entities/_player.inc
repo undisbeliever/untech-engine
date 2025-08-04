@@ -40,6 +40,13 @@ constant SWIMMING_YPOS_BEFORE_OUT_OF_WATER = 10
 // ::TODO adjust::
 constant HURT_IFRAMES = 40
 
+// ::TODO adjust::
+constant SHORT_KNOCKBACK_TIME = 10
+
+// 8:8 fixed point
+constant SHORT_KNOCKBACK_XM = 0x0120
+constant SHORT_KNOCKBACK_YM = 0x0120
+
 
 // Minimum number of frames between player particle shots
 constant PROJECTILE_COOLDOWN_FRAMES = 20
@@ -74,19 +81,40 @@ namespace State {
         enum(MELEE_ATTACK)
         enum(UNDERWATER)
         enum(UNDERWATER_ATTACK)
+        enum(KNOCKBACK)
         enum(LADDER)
     endEnum()
 }
 
+a16()
+i16()
+code()
 ProcessFunctionTable:
     dw  Process__Normal
     dw  Process__MeleeAttack
     dw  Process__Underwater
     dw  Process__UnderwaterAttack
+    dw  Process__Knockback
     dw  Process__Ladder
 
 
 buildFunctionTable(BasePlayerFunctionTable, Player)
+
+
+
+// REQUIRES: 8 bit A, 16 bit Index, DB = 0x7e
+// INPUT: DP = entity
+//        Y = other entity
+a8()
+i16()
+code()
+_KnockbackFunctionTable:
+    dw  _Knockback__None
+    dw  _Knockback__Short
+constant _KnockbackFunctionTable.len = (pc() - _KnockbackFunctionTable) / 2
+assertPowerOfTwo(_KnockbackFunctionTable.len)
+constant _KnockbackFunctionTable.MASK = (_KnockbackFunctionTable.len - 1) * 2
+
 
 constant DrawPlayer = MetaSprite.Render.RenderEntity
 
@@ -99,6 +127,9 @@ namespace EntityStruct {
         // If set, the player has been recently hurt and will not take damage a second time
         // (byte)
         field(iFrames, 1)
+
+        // Decrementing counter until knockback ends
+        field(knockbackCountdown, 1)
 
 
         // Projectile cooldown timer
@@ -190,20 +221,84 @@ a8()
         sbc.l   Project.EntityRomStructs.BaseEnemy.attack,x
         sta.w   playerHealth
 
+        // Clear high byte
+        lda.b   #0
+        xba
 
-        // ::TODO add optional knockback (stored in BaseEntity struct)::
-
+        lda.l   Project.EntityRomStructs.BaseEnemy.knockback,x
+        asl
+        and.b   #_KnockbackFunctionTable.MASK
+        tax
+        jsr     (_KnockbackFunctionTable,x)
 
         // Change the player to the hurt palette
         SetPalette(1)
 
-
         // ::TODO play sound::
-
 Return:
     rep     #$30
 a16()
 i16()
+    rts
+}
+
+
+// REQUIRES: 8 bit A, 16 bit Index, DB = 0x7e
+// INPUT: DP = entity
+//        Y = other entity
+a8()
+i16()
+code()
+function _Knockback__None {
+    rts
+}
+
+
+// REQUIRES: 8 bit A, 16 bit Index, DB = 0x7e
+// INPUT: DP = entity
+//        Y = other entity
+a8()
+i16()
+code()
+function _Knockback__Short {
+    lda.b   #SHORT_KNOCKBACK_TIME
+    ldx.w   #SHORT_KNOCKBACK_XM
+    ldy.w   #SHORT_KNOCKBACK_YM
+
+    bra     __SetKnockbackState
+
+    rts
+}
+
+
+
+// REQUIRES: 8 bit A, 16 bit Index, DB = 0x7e
+// INPUT: DP = entity
+//         A = time until player controls restored
+//        X/Y = momentum
+a8()
+i16()
+function __SetKnockbackState {
+    sta.b   EntityStruct.knockbackCountdown
+    stx.b   EntityStruct.xMomentum.px - 1
+    sty.b   EntityStruct.yMomentum.px - 1
+
+    // Repulsed in the opposite direction of gravity and player facing direction
+    lda.b   EntityStruct.movementState
+    and.b   #~(Entity.MovementState.STANDING_FLAG | Entity.MovementState.MOVING_RIGHT_FLAG | Entity.MovementState.MOVING_DOWN_FLAG)
+    bit.b   #Entity.MovementState.FACING_RIGHT_FLAG
+    bne     +
+        ora.b   #Entity.MovementState.MOVING_RIGHT_FLAG
+    +
+    bit.b   #Entity.MovementState.UP_GRAVITY_FLAG
+    beq     +
+        ora.b   #Entity.MovementState.MOVING_DOWN_FLAG
+    +
+    sta.b   EntityStruct.movementState
+
+    ldx.w   #State.KNOCKBACK
+    stx.b   EntityStruct.state
+
     rts
 }
 
@@ -882,6 +977,29 @@ function SetLadderStateIfUpDownPressed {
 Return:
     rep     #$30
 a16()
+    rts
+}
+
+
+// REQUIRES: 16 bit A, 16 bit Index, DB = 0x7e
+// INPUT: dp = entity
+a16()
+i16()
+code()
+function Process__Knockback {
+    sep     #$20
+a8()
+    dec.b   EntityStruct.knockbackCountdown
+
+    rep     #$30
+a16()
+
+    bpl     +
+        jmp     _SetNormalOrUnderwaterState
+    +
+
+    MovePlayerWithTileCollisionsAndInteractiveTiles()
+
     rts
 }
 
