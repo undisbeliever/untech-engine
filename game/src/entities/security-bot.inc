@@ -338,18 +338,25 @@ function Process__Underwater {
 
 
     BranchIfUnderWater_Y(EndIf)
+        sep     #$30
+    a8()
+    i8()
         // Now above water
         assert(Gravity.NORMAL == 0)
         stz.b   EntityStruct.gravity
 
-        ldy.w   #State.LEFT
+        ldy.b   #State.LEFT
 
         lda.b   EntityStruct.movementState
-        bit.w   #Entity.MovementState.FACING_RIGHT_FLAG
+        bit.b   #Entity.MovementState.FACING_RIGHT_FLAG
         beq     +
-            ldy.w   #State.RIGHT
+            ldy.b   #State.RIGHT
         +
         sty.b   EntityStruct.state
+
+        rep     #$30
+    a16()
+    i16()
 
 EndIf:
     jmp     Entity.DeactivateIfOutsideOrDrawAndGotoNextEntity
