@@ -33,7 +33,7 @@
     <entity entity="cleaning_bot_slow" x="95" y="489" parameter="0"/>
     <entity entity="cleaning_bot_fast" x="74" y="489" parameter="1"/>
     <entity entity="avoid_ledges" x="415" y="90" parameter="0"/>
-    <entity entity="avoid_ledges" x="368" y="90" parameter="1"/>
+    <entity entity="secutity_bot" x="208" y="412" parameter="0"/>
     <entity entity="avoid_ledges" x="159" y="149" parameter="3"/>
     <entity entity="avoid_ledges" x="147" y="314" parameter="1"/>
     <entity entity="avoid_ledges" x="67" y="303" parameter="0"/>

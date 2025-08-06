@@ -78,6 +78,7 @@ include "entities/_common.inc"
 include "entities/_movement.inc"
 include "entities/_player.inc"
 include "entities/player-projectile.inc"
+include "entities/security-bot.inc"
 include "entities/walk-and-turn.inc"
 include "entities/walk-avoid-ledges.inc"
 
