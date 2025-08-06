@@ -3,7 +3,7 @@
 <project>
   <memory-map mode="lorom" first-bank="83" n-banks="5"/>
   <room-settings room-data-size="16384"/>
-  <game-state starting-room="second_room" starting-entrance="door" starting-player="player">
+  <game-state starting-room="second_room" starting-entrance="lower" starting-player="player">
     <word index="0" name="playerHealth" value="6"/>
     <word index="1" name="waterPosition" value="0"/>
   </game-state>
@@ -26,11 +26,18 @@
       <struct-field name="speed" type="uint24"/>
       <struct-field name="underwaterSpeed" type="uint24"/>
     </struct>
+    <struct name="JumpTowardsPlayer" parent="BaseEnemy">
+      <struct-field name="airXMomentum" type="uint24"/>
+      <struct-field name="airYMomentum" type="uint24"/>
+      <struct-field name="swimYMomentum" type="uint24"/>
+      <struct-field name="swimDelay" type="uint8"/>
+    </struct>
     <function-table name="Player" type="player" export-order="player" parameter-type="unused"/>
     <function-table name="WalkAndTurn" type="entity" struct="WalkAndTurn" export-order="walk_and_turn" parameter-type="unsigned" comment="0=left, 1=right, 2=up-left, 3=up-right"/>
     <function-table name="WalkAvoidLedges" type="entity" struct="WalkAndTurn" export-order="walk_and_turn" parameter-type="unsigned" comment="0=left, 1=right, 2=up-left, 3=up-right"/>
     <function-table name="PlayerProjectile" type="projectile" export-order="projectile" parameter-type="unused"/>
     <function-table name="SecurityBot" type="entity" struct="BaseEnemy" export-order="security_bot" parameter-type="unsigned" comment="0=normal-gravity, 1=up-gravity"/>
+    <function-table name="JumpTowardsPlayer" type="entity" struct="JumpTowardsPlayer" export-order="jump_towards_player" parameter-type="unsigned" comment="0=normal-gravity, 1=up-gravity"/>
     <entities>
       <entry name="cleaning_bot_slow" function-table="WalkAndTurn" listid="enemies" frameset="cleaning_bot" frame="left" palette="0">
         <entry-field for="attack" value="2"/>
@@ -54,6 +61,14 @@
         <entry-field for="attack" value="2"/>
         <entry-field for="knockback" value="1"/>
       </entry>
+      <entry name="jumping_bug" function-table="JumpTowardsPlayer" listid="enemies" frameset="jumping_bug" frame="fall_left" palette="0">
+        <entry-field for="airXMomentum" value="0x015000"/>
+        <entry-field for="airYMomentum" value="0x038000"/>
+        <entry-field for="attack" value="2"/>
+        <entry-field for="knockback" value="1"/>
+        <entry-field for="swimDelay" value="45"/>
+        <entry-field for="swimYMomentum" value="0x00dddd"/>
+      </entry>
     </entities>
     <projectiles>
       <entry name="PlayerProjectile" function-table="PlayerProjectile" listid="playerProjectiles" frameset="player_projectile" frame="frame1" palette="0"/>
@@ -68,10 +83,12 @@
   <exportorder src="ms-export-order/walk-and-turn.utfseo"/>
   <exportorder src="ms-export-order/projectile.utfseo"/>
   <exportorder src="ms-export-order/security-bot.utfseo"/>
+  <exportorder src="ms-export-order/jump-towards-player.utfseo"/>
   <frameset src="metasprites/player.utsi" type="spriteimporter"/>
   <frameset src="metasprites/cleaning-bot.utsi" type="spriteimporter"/>
   <frameset src="metasprites/player-projectile.utsi" type="spriteimporter"/>
   <frameset src="metasprites/security-bot.utsi" type="spriteimporter"/>
+  <frameset src="metasprites/jumping-bug.utsi" type="spriteimporter"/>
   <palette name="blocky" image="palettes/blocky.png" rows-per-frame="8" animation-delay="35"/>
   <background-image name="water" bit-depth="4" image="bg-images/water.png" palette="blocky" first-palette="7" npalettes="1" default-order="0"/>
   <metatile-tileset src="metatiles/blocky.utmt"/>

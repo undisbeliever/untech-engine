@@ -16,9 +16,10 @@
   <entrance name="lower" x="40" y="196" orientation="down-right"/>
   <entrance name="door" x="192" y="387" orientation="down-left"/>
   <entity-group name="initial">
-    <entity entity="secutity_bot" x="213" y="108" parameter="0"/>
+    <entity entity="secutity_bot" x="138" y="135" parameter="0"/>
     <entity entity="cleaning_bot_fast" x="192" y="217" parameter="1"/>
     <entity entity="avoid_ledges" x="229" y="184" parameter="1"/>
+    <entity entity="jumping_bug" x="113" y="115" parameter="0"/>
   </entity-group>
   <script name="Startup">
     <statement opcode="Spawn_Entity_Group" arg1="initial"/>

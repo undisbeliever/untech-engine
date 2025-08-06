@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF_8"?>
+<!DOCTYPE untech>
+<fsexportorder name="jump_towards_player">
+  <animation id="rise_left">
+    <alt name="rise_right" hflip="true"/>
+  </animation>
+  <animation id="rise_right">
+    <alt name="rise_left" hflip="true"/>
+  </animation>
+  <animation id="rise_left_up">
+    <alt name="rise_left" vflip="true"/>
+    <alt name="rise_right" hflip="true" vflip="true"/>
+  </animation>
+  <animation id="rise_right_up">
+    <alt name="rise_left" hflip="true" vflip="true"/>
+    <alt name="rise_right" hflip="true"/>
+  </animation>
+  <animation id="fall_left">
+    <alt name="fall_right" hflip="true"/>
+  </animation>
+  <animation id="fall_right">
+    <alt name="fall_left" hflip="true"/>
+  </animation>
+  <animation id="fall_left_up">
+    <alt name="fall_left" vflip="true"/>
+    <alt name="fall_right" hflip="true" vflip="true"/>
+  </animation>
+  <animation id="fall_right_up">
+    <alt name="fall_right" hflip="true"/>
+    <alt name="fall_left" hflip="true" vflip="true"/>
+  </animation>
+  <animation id="land_left">
+    <alt name="land_right" hflip="true"/>
+  </animation>
+  <animation id="land_right">
+    <alt name="land_left" hflip="true"/>
+  </animation>
+  <animation id="land_left_up">
+    <alt name="land_left" vflip="true"/>
+    <alt name="land_right" hflip="true" vflip="true"/>
+  </animation>
+  <animation id="land_right_up">
+    <alt name="land_left" hflip="true" vflip="true"/>
+    <alt name="land_right" hflip="true"/>
+  </animation>
+  <animation id="defeated_left">
+    <alt name="defeated_right" hflip="true"/>
+  </animation>
+  <animation id="defeated_right">
+    <alt name="defeated_left" hflip="true"/>
+  </animation>
+  <animation id="defeated_left_up">
+    <alt name="defeated_left" vflip="true"/>
+    <alt name="defeated_right" hflip="true" vflip="true"/>
+  </animation>
+  <animation id="defeated_right_up">
+    <alt name="defeated_right" hflip="true"/>
+    <alt name="defeated_left" hflip="true" vflip="true"/>
+  </animation>
+</fsexportorder>
