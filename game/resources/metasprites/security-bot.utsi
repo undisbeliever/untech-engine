@@ -6,9 +6,9 @@
   <frame id="frame" order="2">
     <gridlocation x="1" y="0"/>
     <tilehitbox x="11" y="18" width="10" height="38"/>
-    <shield x="8" y="19" width="4" height="34"/>
+    <shield x="8" y="19" width="6" height="34"/>
     <hitbox x="12" y="17" width="8" height="35"/>
-    <hurtbox x="16" y="17" width="5" height="37"/>
+    <hurtbox x="17" y="19" width="4" height="35"/>
     <object size="large" x="8" y="25"/>
     <object size="large" x="8" y="41"/>
     <object size="large" x="8" y="9"/>
@@ -16,7 +16,6 @@
   <frame id="defeated" order="2">
     <gridlocation x="2" y="0"/>
     <tilehitbox x="11" y="18" width="10" height="38"/>
-    <shield x="8" y="19" width="4" height="34"/>
     <object size="large" x="8" y="25"/>
     <object size="large" x="8" y="41"/>
     <object size="large" x="8" y="9"/>

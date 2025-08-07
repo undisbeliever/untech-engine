@@ -37,15 +37,28 @@ constant LADDER_Y_MOMENTUM = 0x0120
 constant SWIMMING_YPOS_BEFORE_OUT_OF_WATER = 10
 
 
+
+// ::TODO adjust::
+constant ENEMY_SHIELD_IFRAMES = 10
+
+// ::TODO adjust::
+constant ENEMY_SHIELD_KNOCKBACK_TIME = 10
+
+// 8:8 fixed point
+constant ENEMY_SHIELD_KNOCKBACK_XM = 0x0120
+constant ENEMY_SHIELD_KNOCKBACK_YM = 0x0120
+
+
 // ::TODO adjust::
 constant HURT_IFRAMES = 40
 
+
 // ::TODO adjust::
-constant SHORT_KNOCKBACK_TIME = 10
+constant SHORT_KNOCKBACK_TIME = 20
 
 // 8:8 fixed point
-constant SHORT_KNOCKBACK_XM = 0x0120
-constant SHORT_KNOCKBACK_YM = 0x0120
+constant SHORT_KNOCKBACK_XM = 0x0200
+constant SHORT_KNOCKBACK_YM = 0x0080
 
 
 // Minimum number of frames between player particle shots
@@ -207,6 +220,7 @@ code()
 function HurtboxCollision {
     sep     #$20
 a8()
+    bcs     __EnemyShieldCollision_a8__returnsA16
 
     // ::TODO test for shield::
 
@@ -236,12 +250,82 @@ a8()
         // Change the player to the hurt palette
         SetPalette(1)
 
+        // ::TODO particle::
         // ::TODO play sound::
 Return:
     rep     #$30
 a16()
 i16()
     rts
+}
+
+
+// ASSUMES: Collision enemy has a `BaseEnemy`
+// REQUIRES: 8 bit A, 16 bit Index, DB = 0x7e
+// RETURNS: 16 bit A
+// INPUT: DP = entity
+//        Y = other entity
+//        MetaSprite.Collision = collision point of the other entity
+a8()
+i16()
+code()
+function __EnemyShieldCollision_a8__returnsA16 {
+    lda.b   EntityStruct.iFrames
+    cmp.b   #ENEMY_SHIELD_IFRAMES
+    bcs     +
+        lda.b   #ENEMY_SHIELD_IFRAMES
+        sta.b   EntityStruct.iFrames
+    +
+
+    // Enemy hurts the player
+    ldx.w   BaseEntity.romPtr,y
+    lda.l   Project.EntityRomStructs.BaseEnemy.shieldDirection,x
+    beq     HorizontalShield
+        // Vertical shield
+
+        // ::TODO implement::
+
+    HorizontalShield:
+        // Y = enemy address
+
+        ldx.w   #State.KNOCKBACK
+        stx.b   EntityStruct.state
+
+        lda.b   #ENEMY_SHIELD_KNOCKBACK_TIME
+        sta.b   EntityStruct.knockbackCountdown
+
+        // Clearing NO_GRAVITY_FLAG to ensure player falls off a ladder
+        lda.b   EntityStruct.movementState
+        and.b   #~(Entity.MovementState.STANDING_FLAG | Entity.MovementState.MOVING_RIGHT_FLAG | Entity.MovementState.MOVING_DOWN_FLAG | Entity.MovementState.NO_GRAVITY_FLAG)
+
+        bit.b   #Entity.MovementState.UP_GRAVITY_FLAG
+        beq     +
+            ora.b   #Entity.MovementState.MOVING_DOWN_FLAG
+        +
+
+        // Player moves in the same direction as the enemy with a sightly faster momentum
+        assert(Entity.MovementState.MOVING_RIGHT_FLAG == 0x40)
+        tyx
+        bit.w   BaseEntity.movementState,x
+        bvc     +
+            ora.b   #Entity.MovementState.MOVING_RIGHT_FLAG
+        +
+        sta.b   EntityStruct.movementState
+
+        rep     #$31
+    a16()
+        lda.w   BaseEntity.xMomentum.px - 1,y
+        // Carry clear
+        adc.w   #ENEMY_SHIELD_KNOCKBACK_XM
+        sta.b   EntityStruct.xMomentum.px - 1
+
+        lda.w   #ENEMY_SHIELD_KNOCKBACK_YM
+        sta.b   EntityStruct.yMomentum.px - 1
+
+
+        // ::TODO particle::
+        // ::TODO play sound::
+        rts
 }
 
 

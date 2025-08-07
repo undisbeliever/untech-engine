@@ -21,6 +21,7 @@
     <struct name="BaseEnemy">
       <struct-field name="attack" type="uint8"/>
       <struct-field name="knockback" type="uint8"/>
+      <struct-field name="shieldDirection" type="uint8" comment="0 = horizontal, non-zero = vertical"/>
     </struct>
     <struct name="WalkAndTurn" parent="BaseEnemy">
       <struct-field name="speed" type="uint24"/>
