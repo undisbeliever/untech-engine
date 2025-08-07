@@ -30,8 +30,12 @@ define VERSION = 0
 
 if {defined RELEASE_BUILD} {
     define ROM_SPEED = fast
+    define CART_TYPE = romOnly
 } else if {defined DEBUG_BUILD} {
     define ROM_SPEED = slow
+    define CART_TYPE = romSram
+    define CART_RAM_SIZE = 16
+
     define CONTROLLER_USE_JOY2
 } else {
     error "Unknown build"
@@ -114,6 +118,16 @@ i16()
 a8()
     jsl     Audio.Init__far
 
+    rep     #$30
+a16()
+
+
+    if {defined DEBUG_BUILD} {
+        DebugSave.LoadGameStateOrBranchIfNoSave(NoSave)
+            // Game successfully loaded from Save-RAM
+            // ::TODO switch to GameLoop when loaded::
+        NoSave:
+    }
 
     // ::TODO start and options screens::
 

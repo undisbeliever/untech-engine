@@ -13,6 +13,7 @@
 // including this file.
 //
 //  * CART_TYPE  - the type of cart (see CART_TYPE scope, defaults to romOnly)
+//  * CART_RAM_SIZE - the amount of cartridge/save RAM in Kbits
 //  * ROM_SPEED  - the speed of the ROM (slow (default), fast)
 //
 //
@@ -100,6 +101,26 @@ if {ROM_SIZE} <= 1 {
 }
 constant _HEADER_MAP_MODE = MEMORY_MAP.{MEMORY_MAP}|ROM_SPEED.{ROM_SPEED}
 
+
+if !{defined CART_RAM_SIZE} {
+    constant _HEADER_CART_RAM_SIZE = 0
+} else if {CART_RAM_SIZE} == 0 {
+    constant _HEADER_CART_RAM_SIZE = 0
+} else if {CART_RAM_SIZE} == 16 {
+    constant _HEADER_CART_RAM_SIZE = 1
+} else if {CART_RAM_SIZE} == 32 {
+    constant _HEADER_CART_RAM_SIZE = 2
+} else if {CART_RAM_SIZE} == 64 {
+    constant _HEADER_CART_RAM_SIZE = 3
+} else if {CART_RAM_SIZE} == 128 {
+    constant _HEADER_CART_RAM_SIZE = 4
+} else if {CART_RAM_SIZE} == 256 {
+    constant _HEADER_CART_RAM_SIZE = 5
+} else if {CART_RAM_SIZE} == 512 {
+    constant _HEADER_CART_RAM_SIZE = 6
+}
+
+
 private.seek(0x00ffb0)
     db  "  "                    // $ffbo - 2 Digit marker code (blank - unlicensed)
     db  "    "                  // $ffb2 - 4 Character game code (blank - unlicensed)
@@ -117,7 +138,7 @@ private.seek(0x00ffd5)
     db  _HEADER_MAP_MODE        // $ffd5 - map mode
     db  CART_TYPE.{CART_TYPE}   // $ffd6 - cartridge type
     db  _HEADER_ROM_SIZE        // $ffd7 - ROM size
-    db  0                       // $ffd8 - RAM size
+    db  _HEADER_CART_RAM_SIZE   // $ffd8 - RAM size
     db  REGION.{REGION}         // $ffd9 - Destination code
     db  0x33                    // $ffda - fixed value
     db  {VERSION}               // $ffdb - ROM version

@@ -38,6 +38,11 @@ RoomChangeRequested:
 a16()
 i16()
 
+    if {defined DEBUG_BUILD} {
+        DebugSave.SaveGameState()
+    }
+
+
     jsr     FadeOut
 
 

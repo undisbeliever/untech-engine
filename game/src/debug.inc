@@ -50,3 +50,95 @@ macro ProcessDebugCommands() {
     +
 }
 
+
+namespace DebugSave {
+
+constant SNES_HEADER      = 0x80ffb0
+constant SNES_HEADER_END  = 0x80ffdc
+constant SNES_HEADER_SIZE = SNES_HEADER_END - SNES_HEADER
+
+constant SaveRam.size = {CART_RAM_SIZE} * 1024 / 8
+assert(SaveRam.size >= GameStateData.size * 2 + SNES_HEADER_SIZE)
+
+if MEMORY_MAP.{MEMORY_MAP} == MEMORY_MAP.LOROM {
+    constant SaveRam = 0x700000
+    assert(SaveRam + SaveRam.size <= 0x708000)
+} else {
+    constant SaveRam = 0x306000
+    assert(SaveRam + SaveRam.size <= 0x308000)
+}
+
+// Save RAM data format:
+//  * A copy of the $ffb0 header, excluding the checksum
+//  * 2 copies of `GameStateData`
+constant SaveRam_header     = SaveRam
+constant SaveRam_gamestate1 = SaveRam_header + SNES_HEADER_SIZE
+constant SaveRam_gamestate2 = SaveRam_gamestate1 + GameStateData.size
+
+constant SaveRamBank = SaveRam >> 16
+
+
+// Save GameState data to Save-RAM
+// REQUIRES: 16 bit A, 16 bit Index, DB = 0x7e
+macro SaveGameState() {
+    assert16a()
+    assert16i()
+
+    phb
+
+    ldy.w   #DebugSave.SaveRam
+
+    ldx.w   #DebugSave.SNES_HEADER
+    lda.w   #DebugSave.SNES_HEADER_SIZE - 1
+    mvn     DebugSave.SaveRamBank=0x80
+// DB = SaveRamBank
+
+    ldx.w   #GameStateData
+    lda.w   #GameStateData.size - 1
+    mvn     DebugSave.SaveRamBank=(GameStateData >> 16)
+
+    ldx.w   #GameStateData
+    lda.w   #GameStateData.size - 1
+    mvn     DebugSave.SaveRamBank=(GameStateData >> 16)
+
+    plb
+// DB = 0x7e
+}
+
+
+// Load GameState data to Save-RAM
+// REQUIRES: 16 bit A, 16 bit Index, DB = 0x7e
+macro LoadGameStateOrBranchIfNoSave(NoSaveLabel) {
+    assert16a()
+    assert16i()
+
+    assert(DebugSave.SNES_HEADER_SIZE % 2 == 0)
+    ldx.w   #DebugSave.SNES_HEADER_SIZE - 2
+    HeaderLoop:
+        lda.l   DebugSave.SaveRam_header,x
+        cmp.l   DebugSave.SNES_HEADER,x
+        bne     {NoSaveLabel}
+        dex
+        dex
+        bpl     HeaderLoop
+
+    // Verify the two gamestates copies match
+    assert(GameStateData.size % 2 == 0)
+    ldx.w   #GameStateData.size - 2
+    GamestateLoop:
+        lda.l   DebugSave.SaveRam_gamestate1,x
+        cmp.l   DebugSave.SaveRam_gamestate2,x
+        bne     {NoSaveLabel}
+        dex
+        dex
+        bpl     GamestateLoop
+
+    // Copy the save to GameStateData
+    ldx.w   #DebugSave.SaveRam_gamestate1
+    ldy.w   #GameStateData
+    lda.w   #GameStateData.size - 1
+    mvn     0x7e=DebugSave.SaveRamBank
+}
+
+}
+
