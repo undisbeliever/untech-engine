@@ -105,6 +105,7 @@ buildFunctionTable(BasePlayerFunctionTable, Player)
 // REQUIRES: 8 bit A, 16 bit Index, DB = 0x7e
 // INPUT: DP = entity
 //        Y = other entity
+//        MetaSprite.Collision = collision point of the other entity
 a8()
 i16()
 code()
@@ -198,6 +199,7 @@ function HitboxCollision {
 // REQUIRES: 16 bit A, 16 bit Index, DB = 0x7e
 // INPUT: DP = entity
 //        Y = other entity
+//        MetaSprite.Collision = collision point of the other entity
 //        Carry set if collision with shield
 a16()
 i16()
@@ -276,6 +278,7 @@ function _Knockback__Short {
 // INPUT: DP = entity
 //         A = time until player controls restored
 //        X/Y = momentum
+//        MetaSprite.Collision = collision point of the other entity
 a8()
 i16()
 function __SetKnockbackState {
@@ -283,14 +286,17 @@ function __SetKnockbackState {
     stx.b   EntityStruct.xMomentum.px - 1
     sty.b   EntityStruct.yMomentum.px - 1
 
-    // Repulsed in the opposite direction of gravity and player facing direction
     // Clearing NO_GRAVITY_FLAG to ensure player falls off a ladder
     lda.b   EntityStruct.movementState
     and.b   #~(Entity.MovementState.STANDING_FLAG | Entity.MovementState.MOVING_RIGHT_FLAG | Entity.MovementState.MOVING_DOWN_FLAG | Entity.MovementState.NO_GRAVITY_FLAG)
-    bit.b   #Entity.MovementState.FACING_RIGHT_FLAG
-    bne     +
+
+    // Knockback direction depends on the collision centre point
+    ldx.b   EntityStruct.xPos.px
+    cpx.w   MetaSprite.Collision.xPos
+    bcc     +
         ora.b   #Entity.MovementState.MOVING_RIGHT_FLAG
     +
+
     bit.b   #Entity.MovementState.UP_GRAVITY_FLAG
     beq     +
         ora.b   #Entity.MovementState.MOVING_DOWN_FLAG
