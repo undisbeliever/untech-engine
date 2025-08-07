@@ -48,6 +48,19 @@ macro ProcessDebugCommands() {
         jsr     Entities.Players.Player.InvertGravity__a8iu
         phd
     +
+
+    // Reset when L & R are pressed
+    lda.w   Controller.Joy2.current
+    and.b   #JOYL.l | JOYL.r
+    cmp.b   #JOYL.l | JOYL.r
+    bne     +
+        // ::TODO switch to start screen::
+        rep     #$30
+    a16()
+    i16()
+        jsr     GameState.LoadInitialGameState
+        jmp     RoomChangeRequested
+    +
 }
 
 
