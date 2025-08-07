@@ -284,8 +284,9 @@ function __SetKnockbackState {
     sty.b   EntityStruct.yMomentum.px - 1
 
     // Repulsed in the opposite direction of gravity and player facing direction
+    // Clearing NO_GRAVITY_FLAG to ensure player falls off a ladder
     lda.b   EntityStruct.movementState
-    and.b   #~(Entity.MovementState.STANDING_FLAG | Entity.MovementState.MOVING_RIGHT_FLAG | Entity.MovementState.MOVING_DOWN_FLAG)
+    and.b   #~(Entity.MovementState.STANDING_FLAG | Entity.MovementState.MOVING_RIGHT_FLAG | Entity.MovementState.MOVING_DOWN_FLAG | Entity.MovementState.NO_GRAVITY_FLAG)
     bit.b   #Entity.MovementState.FACING_RIGHT_FLAG
     bne     +
         ora.b   #Entity.MovementState.MOVING_RIGHT_FLAG
