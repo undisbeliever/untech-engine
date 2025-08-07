@@ -302,15 +302,16 @@ function __EnemyShieldCollision_a8__returnsA16 {
         beq     +
             ora.b   #Entity.MovementState.MOVING_DOWN_FLAG
         +
-
-        // Player moves in the same direction as the enemy with a sightly faster momentum
-        assert(Entity.MovementState.MOVING_RIGHT_FLAG == 0x40)
-        tyx
-        bit.w   BaseEntity.movementState,x
-        bvc     +
-            ora.b   #Entity.MovementState.MOVING_RIGHT_FLAG
-        +
         sta.b   EntityStruct.movementState
+
+        // Player moves in the direction the enemy is facing
+        assert(Entity.MovementState.FACING_RIGHT_FLAG == 0x01)
+        lda.w   BaseEntity.movementState,y
+        lsr
+        bcc     +
+            lda.b   #Entity.MovementState.MOVING_RIGHT_FLAG
+            tsb.b   EntityStruct.movementState
+        +
 
         rep     #$31
     a16()
