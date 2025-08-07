@@ -46,6 +46,15 @@ i16()
     jsr     FadeOut
 
 
+    sep     #$20
+a8()
+    lda.b   #Song.MainLevelTheme
+    jsr     Audio.LoadSongIfChanged
+
+    rep     #$20
+a16()
+
+
     stz.w   nPlayerProjectiles
 
 
