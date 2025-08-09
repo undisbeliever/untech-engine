@@ -156,6 +156,8 @@ code()
 function Process__FacePlayer {
     sep     #$20
 a8()
+    QueueSoundEffect(securityBotAlarm)
+
     lda.b   EntityStruct.movementState
     and.b   #~(Entity.MovementState.FACING_RIGHT_FLAG | Entity.MovementState.MOVING_RIGHT_FLAG)
 
@@ -387,6 +389,13 @@ code()
 function SetState__Defeated {
     ldx.w   #State.DEFEATED
     stx.b   EntityStruct.state
+
+    sep     #$20
+a8()
+    QueueSoundEffect(robotDefeated)
+
+    rep     #$30
+a16()
 
     ldy.w   #{GetAnimationId(defeated_left)}
     jmp     SetAnimation_FacingAndGravity_Y

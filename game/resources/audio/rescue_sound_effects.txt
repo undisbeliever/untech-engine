@@ -1,20 +1,30 @@
 === Click === mml
+; Author: KungFuFurby
+
 @HardwareOverflowGlitch HardwareOverflowGlitch adsr 14 7 7 28
 
 A @HardwareOverflowGlitch V192 P1,%10
 === Beep === mml
+; Author: KungFuFurby
+
 @HardwareOverflowGlitch HardwareOverflowGlitch adsr 14 7 7 0
 
 A @HardwareOverflowGlitch V48 [P128,%14 r%14]2
 === MachSND1 === mml
+; Author: KungFuFurby
+
 @mach mach
 
 A @mach V192 {P1200 P1600}%24& r%8
 === MachSND2 === mml
+; Author: KungFuFurby
+
 @mach mach
 
 A @mach V192 {P1600 P1400}%16
 === GetSomething === mml
+; Author: KungFuFurby
+
 @Pulse32WFF Pulse32WFF
 @Pulse32WBF Pulse32WBF
 @Pulse32W7F Pulse32W7F
@@ -22,3 +32,113 @@ A @mach V192 {P1600 P1400}%16
 A @Pulse32WFF V96 o4f%4&>c%4&>f%4&>c%4&
 A @Pulse32WBF V24 o4f%4&>c%4&>f%4&>c%4&
 A @Pulse32W7F V6 o4f%4&>c%4&>f%4&>c%4
+=== playerHurtLowHealth === mml one uninterruptible
+; Author: undisbeliever
+
+@1 sawtooth adsr 14 2 3 25
+@2 square gain F127
+
+A @1 V200 V~50,1 {o2e o1c}%30
+
+A @2 V90 o5 [ g%12 w%6 ]3
+
+=== playerHurt === mml one uninterruptible
+; Author: undisbeliever
+
+@1 sawtooth adsr 14 2 3 25
+
+A @1 V200 V~50,1 {o2e o1c}%30
+
+=== playerHeal === mml one uninterruptible
+; Author: undisbeliever
+
+@1 square gain F127
+
+A @1 V90 o5 g%6 e%6
+
+=== playerShieldBounce === mml one interruptible
+; Author: undisbeliever
+
+@1 Pulse32W5F adsr 15 6 4 25
+
+A @1 v8 ~200,1 o5d%30
+
+=== projectileShieldBounce === mml one interruptible
+; Author: undisbeliever
+
+@1 Pulse32W8F adsr 15 6 4 25
+
+A @1 v8 ~100,1 o5c%15
+
+=== projectileWallCollision === mml one interruptible
+; Author: undisbeliever
+
+@1 Pulse32WCF adsr 15 6 4 25
+
+A @1 v3 {o3e o3e-}%10
+
+=== securityBotAlarm === mml one interruptible
+; Author: undisbeliever
+
+@1 square gain I20
+
+A @1 v6 MP200,9 o4a%144
+
+
+=== robotDefeated === mml one interruptible
+; Author: undisbeliever
+
+@1 SuperMiniGlitchNoise adsr 12 2 2 20
+
+A @1 ~20,1 v12 o3c%15 v8 o4c%20 v4 o1c%20
+
+=== enterWater === mml
+; Author: undisbeliever
+
+; ::TODO recreate::
+
+@1 noise adsr 12 2 3 15
+
+A @1 v6 o6b%8 v8 {o3a f}%12 v4 {o2f c}%12
+
+=== leaveWater === mml
+; Author: undisbeliever
+
+@1 noise adsr 12 2 3 15
+
+A @1 v6 o5c%12 v4 {o4c f}%8 v2 {o4f a}%8
+
+=== playerJump === mml uninterruptible
+; Author: undisbeliever
+
+@1 square adsr 14 5 6 20
+
+A @1 v5 o5 {ce}%16
+
+=== playerMelee === mml
+; Author: undisbeliever
+
+@1 sine adsr 8 4 5 6
+
+A @1 v10 o4 {f > c}%10 & {< c}%20
+
+=== playerShoot === mml
+; Author: undisbeliever
+
+@1 Pulse32WCF adsr 13 4 2 24
+
+A @1 v7 {o5e o4c}%15
+
+=== playerSwim === mml
+; Author: undisbeliever
+
+@1 sine adsr 13 5 6 10
+
+A @1 v5 o5 {cf}%24
+
+=== unnamedScienceNoise === mml
+; Author: undisbeliever
+
+@1 Pulse16W7F adsr 8 4 1 25
+
+A @1 v8 ~255,1 o5c%30

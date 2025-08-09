@@ -139,6 +139,13 @@ function HurtboxCollision {
         lda.w   #State.DEFEATED
         sta.b   EntityStruct.state
 
+        sep     #$20
+    a8()
+        QueueSoundEffect(robotDefeated)
+
+        rep     #$30
+    a16()
+
         ldy.w   #{GetAnimationId(defeated_left)}
         jmp     SetAnimation_FacingAndGravity_Y
 

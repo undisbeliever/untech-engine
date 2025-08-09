@@ -37,6 +37,10 @@ constant LADDER_Y_MOMENTUM = 0x0120
 constant SWIMMING_YPOS_BEFORE_OUT_OF_WATER = 10
 
 
+// Number of frames before a enterWater/leaveWater sfx can be played
+constant WATER_SFX_FRAMES = 7
+
+
 
 // ::TODO adjust::
 constant ENEMY_SHIELD_IFRAMES = 10
@@ -142,6 +146,19 @@ namespace EntityStruct {
         // (byte)
         field(iFrames, 1)
 
+
+        // Enter/Leave water sound effect countdown.
+        //  * If zero a enter/leave water SFX can play
+        //  * Right shifted every frame
+        //
+        // Minimises water sfx spam.
+        //
+        // Prevents water sfx from playing when after the room loads
+        // (player is initialised before water level is set)
+        //
+        // (byte)
+        field(waterSfxShiftCountdown, 1)
+
         // Decrementing counter until knockback ends
         field(knockbackCountdown, 1)
 
@@ -179,6 +196,11 @@ code()
 function Init {
     assert(State.NORMAL == 0)
     stz.b   EntityStruct.state
+
+    // Prevent water SFX from playing after entering a room
+    assert(EntityStruct.waterSfxShiftCountdown + 1 == EntityStruct.knockbackCountdown)
+    lda.w   #1 << WATER_SFX_FRAMES
+    sta.b   EntityStruct.waterSfxShiftCountdown
 
     jmp     _SetNormalOrUnderwaterState
 }
@@ -235,6 +257,9 @@ a8()
         lda.w   playerHealth
         sec
         sbc.l   Project.EntityRomStructs.BaseEnemy.attack,x
+        bpl     +
+            lda.b   #0
+        +
         sta.w   playerHealth
 
         // Clear high byte
@@ -250,8 +275,15 @@ a8()
         // Change the player to the hurt palette
         SetPalette(1)
 
+        lda.w   Healthbar.playerHealth
+        cmp.b   #3
+        lda.b   #SFX.playerHurt
+        bcs     +
+            lda.b   #SFX.playerHurtLowHealth
+        +
+        QueueSoundEffect_A()
+
         // ::TODO particle::
-        // ::TODO play sound::
 Return:
     rep     #$30
 a16()
@@ -288,6 +320,12 @@ function __EnemyShieldCollision_a8__returnsA16 {
     HorizontalShield:
         // Y = enemy address
 
+        lda.b   EntityStruct.state
+        cmp.b   #State.KNOCKBACK
+        beq     +
+            QueueSoundEffect(playerShieldBounce)
+        +
+
         ldx.w   #State.KNOCKBACK
         stx.b   EntityStruct.state
 
@@ -323,9 +361,8 @@ function __EnemyShieldCollision_a8__returnsA16 {
         lda.w   #ENEMY_SHIELD_KNOCKBACK_YM
         sta.b   EntityStruct.yMomentum.px - 1
 
-
         // ::TODO particle::
-        // ::TODO play sound::
+
         rts
 }
 
@@ -430,6 +467,8 @@ code()
 function Process {
     sep     #$20
 a8()
+    lsr.b   EntityStruct.waterSfxShiftCountdown
+
     lda.b   EntityStruct.iFrames
     beq     +
         dec
@@ -541,6 +580,8 @@ a8()
         beq     NoJump
             // Can jump and jump recently pressed
             stz.w   InputBuffer.jump
+
+            QueueSoundEffect(playerJump)
 
             jsr     SetJumpYVelocity__a8i16
     NoJump:
@@ -800,6 +841,8 @@ a8()
                 lda.b   #SWIM_COOLDOWN_FRAMES
                 sta.b   EntityStruct.swimCooldown
 
+                QueueSoundEffect(playerSwim)
+
                 jsr     SetJumpYVelocity__a8i16
     EndJumpTest:
 
@@ -843,6 +886,8 @@ a8()
                 lda.b   #PROJECTILE_COOLDOWN_FRAMES
                 sta.b   EntityStruct.projectileCooldown
 
+                QueueSoundEffect(playerShoot)
+
                 rep     #$30
             a16()
                 SpawnManualPlayerProjectiles()
@@ -855,12 +900,24 @@ i16()
 
     lda.b   EntityStruct.yPos.px
     cmp.w   Project.GameState.Words.waterPosition
-    bcc     +
-        // ::TODO splash sound::
+    bcc     AboveWater
+        sep     #$20
+    a8()
+        lda.b   EntityStruct.waterSfxShiftCountdown
+        bne     +
+            lda.b   #1 << WATER_SFX_FRAMES
+            sta.b   EntityStruct.waterSfxShiftCountdown
+
+            QueueSoundEffect(enterWater)
+        +
+
         // ::TODO spawn splash particle::
 
+        rep     #$30
+    a16()
+
         jmp     _SetUnderwaterState
-    +
+    AboveWater:
 
     jmp     _SetAnimation
 }
@@ -874,6 +931,8 @@ i16()
 code()
 function __SetMeleeAttackState_A8 {
     stz.w   InputBuffer.attack
+
+    QueueSoundEffect(playerMelee)
 
     lda.b   #State.MELEE_ATTACK
     sta.b   EntityStruct.state
@@ -980,7 +1039,18 @@ i16()
         // Jump out of the water
         asl.b   EntityStruct.yMomentum.px - 1
 
-        // ::TODO splash sound::
+        sep     #$20
+    a8()
+        lda.b   EntityStruct.waterSfxShiftCountdown
+        bne     +
+            lda.b   #1 << WATER_SFX_FRAMES
+            sta.b   EntityStruct.waterSfxShiftCountdown
+
+            QueueSoundEffect(leaveWater)
+        +
+
+        rep     #$30
+    a16()
         // ::TODO splash particle::
 
         jmp     _SetNormalState
@@ -998,6 +1068,8 @@ i16()
 code()
 function __SetUnderwaterAttackState_A8 {
     stz.w   InputBuffer.attack
+
+    QueueSoundEffect(playerMelee)
 
     lda.b   #State.UNDERWATER_ATTACK
     sta.b   EntityStruct.state
@@ -1182,6 +1254,8 @@ EndIf:
         ldx.w   #MovementTableIndex.PlayerWalk
         jsr     SetJumpYVelocity__a8i16
 
+        QueueSoundEffect(playerJump)
+
         rep     #$30
     a16()
     i16()
@@ -1252,6 +1326,7 @@ i8()
     lsr
     lsr
     ora.w   _tmp
+
 
     rep     #$30
 a16()

@@ -152,6 +152,8 @@ macro Process() {
             bcc     Decrement
                 // Health increased
 
+                Entities.QueueSoundEffect(playerHeal)
+
                 ldx.w   Healthbar.uiHealth
                 inc.w   Healthbar.uiHealth
 

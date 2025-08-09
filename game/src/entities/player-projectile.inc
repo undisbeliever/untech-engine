@@ -125,7 +125,14 @@ a16()
 i16()
 code()
 function HitboxCollision {
-    // ::TODO process shield::
+    bcc     NoShield
+        sep     #$20
+    a8()
+        QueueSoundEffect(projectileShieldBounce)
+        rep     #$30
+    a16()
+
+    NoShield:
     jmp     SetState__Pop
 }
 
@@ -176,6 +183,11 @@ function Process__Move {
     lda.b   EntityStruct.movementState
     bit.w   #Entity.MovementState.X_COLLISION_FLAG | Entity.MovementState.STANDING_FLAG
     beq     +
+        sep     #$20
+    a8()
+        QueueSoundEffect(projectileWallCollision)
+        rep     #$30
+    a16()
         jsr     SetState__Pop
     +
 
