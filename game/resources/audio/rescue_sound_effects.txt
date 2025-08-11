@@ -1,3 +1,8 @@
+; Author: undisbeliever
+
+@1 sawtooth adsr 14 2 3 25
+
+!playerHurt @1 V200 V~50,1 {o2e o1c}%30
 === Click === mml
 ; Author: KungFuFurby
 
@@ -38,7 +43,7 @@ A @Pulse32W7F V6 o4f%4&>c%4&>f%4&>c%4
 @1 sawtooth adsr 14 2 3 25
 @2 square gain F127
 
-A @1 V200 V~50,1 {o2e o1c}%30
+A !playerHurt
 
 A @2 V90 o5 [ g%12 w%6 ]3
 
@@ -47,7 +52,7 @@ A @2 V90 o5 [ g%12 w%6 ]3
 
 @1 sawtooth adsr 14 2 3 25
 
-A @1 V200 V~50,1 {o2e o1c}%30
+A !playerHurt
 
 === playerHeal === mml one uninterruptible
 ; Author: undisbeliever
