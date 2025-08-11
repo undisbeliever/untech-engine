@@ -635,6 +635,10 @@
     {
       "name": "VictoryTheme",
       "source": "Music/VictoryTheme.mml"
+    },
+    {
+      "name": "EndingTheme",
+      "source": "Music/EndingTheme.mml"
     }
   ]
 }

@@ -1,0 +1,77 @@
+;Ending Theme for undisbeliever's Space Station Game for SNESDev Compo 2025
+;By KungFuFurby
+;Made for undisbeliever's Terrific Audio Driver v0.1.1
+
+#Title Ending Theme
+#Game SNESDev 2025 Space Station Game
+#Author KungFuFurby
+#Composer KungFuFurby
+#Copyright 2025 undisbeliever
+#Date 2025
+#License Intended for exclusive use for this game.
+
+;Echo Parameters
+#EchoLength 192
+#EchoFeedback 96
+#EchoInvert right
+#EchoVolume 36
+#FirFilter 64 32 16 8 4 2 1 0
+
+;Instrument Definitions
+@Saw16 Saw16 adsr 15 7 7 27
+@SineWave8A15_7_7_16 SineWave8 adsr 15 7 7 16
+@SineWave8A15_7_7_22 SineWave8 adsr 15 7 7 22
+@Pulse32W7F Pulse32W7F adsr 9 7 7 0
+@Pulse32W3F Pulse32W3F adsr 9 7 7 0
+@_808SD _808SD
+@Bass Bass
+
+#Timer 160
+#ZenLen 192
+
+A @Saw16 V32
+A E1 p~16,12 L
+!ARiff1 l32 o2a+<a+>>f<f>a+<a+>f<f
+A [!ARiff1 ]14
+A [l32 o2a<a>>f<f>a<a>f<f]2
+A [!ARiff1 ]6
+A [l32 o3c<c>f<f>>c<<c>f<f]2
+
+B @_808SD V64 L
+B o5c16c8c32c32c16c8.
+
+C @Bass V64 L
+!CRiff1 Q4o0a+8f8
+C [!CRiff1 ]14
+C [Q4o0a8f8]2
+C [!CRiff1 ]6
+C [Q4o1c8<f8]2
+
+D V0 L @SineWave8A15_7_7_16 [
+!DRiff1 r8 o7c+8<g+8
+D !DRiff1 o7c+8
+D !DRiff1 o6c+8 ]2[ A15,7,7,16
+D [!DRiff1 o7c+8]3
+D A15,7,7,13 o7d+4 o6g+4]2
+
+E V8 PM1 E1 L @SineWave8A15_7_7_22 A15,7,7,22 _-1 [
+!ERiff1 _-1 r8 px-16 o6a+8 px0 o6f8 px+16
+E !ERiff1 o6a+8
+E !ERiff1 o5a+8 ]2 [A15,7,7,22
+E [!ERiff1 o6a+8]3
+E px-16 A15,7,7,19 o7c4 px+16 o6f4 ]2
+
+F l1 r^ L
+F @Pulse32W7F V12
+!FRiff1 [
+!FRiff1 o5f4.d24<a+24>f24
+!FRiff1 o5d+4.<a+24g24>d+24
+!FRiff1 o5d4.: o4a+24f24>d24
+!FRiff1 o5c4<f4]2 o5d+24f24a+24
+!FRiff1 o6c4f4
+!FRiff1 o5a+2& GD2 r1.
+F !FRiff1
+
+G l1 r^^48 ~6,3 L
+G @Pulse32W3F V4
+G !FRiff1
