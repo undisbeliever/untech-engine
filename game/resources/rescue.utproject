@@ -12,6 +12,8 @@
     <tile-function-table name="PlayerScriptTrigger" tint="4a4aff"/>
     <tile-function-table name="PlayerActivateScriptTrigger" tint="4a4aff"/>
     <tile-function-table name="Ladder" tint="ffc800"/>
+    <tile-function-table name="CrumblingTiles_A" tint="00ff00"/>
+    <tile-function-table name="CrumblingTiles_A_PlayerOnly" tint="ff5900"/>
   </interactive-tiles>
   <entity-rom-data>
     <listid name="particles"/>
@@ -91,8 +93,10 @@
   <frameset src="metasprites/security-bot.utsi" type="spriteimporter"/>
   <frameset src="metasprites/jumping-bug.utsi" type="spriteimporter"/>
   <palette name="blocky" image="palettes/blocky.png" rows-per-frame="8" animation-delay="35"/>
-  <background-image name="water" bit-depth="4" image="bg-images/water.png" palette="blocky" first-palette="7" npalettes="1" default-order="0"/>
+  <palette name="station" image="palettes/station.png" rows-per-frame="8" animation-delay="255"/>
+  <background-image name="water" bit-depth="4" image="bg-images/water.png" palette="station" first-palette="7" npalettes="1" default-order="0"/>
   <metatile-tileset src="metatiles/blocky.utmt"/>
+  <metatile-tileset src="metatiles/station.utmt"/>
   <room-file src="rooms/_scratchpad.utroom"/>
   <room-file src="rooms/second-room.utroom"/>
   <scene-setting name="BasicRoom" bg-mode="1bg3" layer0-type="mt-tileset" layer1-type="" layer2-type="text" layer3-type=""/>

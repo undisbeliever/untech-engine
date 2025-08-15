@@ -1,0 +1,262 @@
+<?xml version="1.0" encoding="UTF_8"?>
+<!DOCTYPE untech>
+<metatile-tileset name="station">
+  <crumbling-tile chain="a" first-tile="136" first-delay="300" second-tile="0" second-delay="900" third-tile="137"/>
+  <crumbling-tile chain="b" first-tile="152" first-delay="300" second-tile="0" second-delay="900" third-tile="153"/>
+  <tile t="1" ft="PlayerScriptTrigger"/>
+  <tile t="2" collision="solid"/>
+  <tile t="3" collision="solid" ft="PlayerScriptTrigger"/>
+  <tile t="4" collision="es" ft="PlayerScriptTrigger"/>
+  <tile t="5" collision="es" ft="PlayerActivateScriptTrigger"/>
+  <tile t="6" collision="solid"/>
+  <tile t="10" collision="solid"/>
+  <tile t="11" collision="solid"/>
+  <tile t="12" collision="solid"/>
+  <tile t="13" collision="solid"/>
+  <tile t="15" ft="Ladder"/>
+  <tile t="17" collision="solid"/>
+  <tile t="22" collision="solid"/>
+  <tile t="24" collision="solid"/>
+  <tile t="25" collision="es"/>
+  <tile t="26" collision="es" ft="PlayerScriptTrigger"/>
+  <tile t="27" collision="es" ft="PlayerActivateScriptTrigger"/>
+  <tile t="28" collision="solid"/>
+  <tile t="29" collision="solid"/>
+  <tile t="31" ft="Ladder"/>
+  <tile t="34" collision="drs"/>
+  <tile t="35" collision="es"/>
+  <tile t="36" collision="es"/>
+  <tile t="37" collision="dls"/>
+  <tile t="40" collision="es"/>
+  <tile t="41" collision="es"/>
+  <tile t="42" collision="es"/>
+  <tile t="43" collision="solid"/>
+  <tile t="44" collision="solid"/>
+  <tile t="45" collision="es"/>
+  <tile t="46" ft="PlayerScriptTrigger"/>
+  <tile t="47" collision="up" ft="Ladder"/>
+  <tile t="49" collision="drs"/>
+  <tile t="50" collision="es"/>
+  <tile t="51" collision="drs"/>
+  <tile t="52" collision="dls"/>
+  <tile t="53" collision="es"/>
+  <tile t="54" collision="dls"/>
+  <tile t="56" collision="urs"/>
+  <tile t="57" collision="uls"/>
+  <tile t="58" collision="urss"/>
+  <tile t="59" collision="urts"/>
+  <tile t="60" collision="ults"/>
+  <tile t="61" collision="ulss"/>
+  <tile t="63" collision="dp" ft="Ladder"/>
+  <tile t="64" collision="drs"/>
+  <tile t="65" collision="es"/>
+  <tile t="66" collision="es"/>
+  <tile t="67" collision="es"/>
+  <tile t="68" collision="es"/>
+  <tile t="69" collision="es"/>
+  <tile t="71" collision="dls"/>
+  <tile t="72" collision="ulss"/>
+  <tile t="73" collision="urss"/>
+  <tile t="74" collision="es"/>
+  <tile t="75" collision="solid"/>
+  <tile t="76" collision="es"/>
+  <tile t="79" ft="Ladder"/>
+  <tile t="80" collision="drss"/>
+  <tile t="81" collision="drts"/>
+  <tile t="82" collision="dlts"/>
+  <tile t="83" collision="dlss"/>
+  <tile t="90" collision="urs"/>
+  <tile t="91" collision="es"/>
+  <tile t="92" collision="uls"/>
+  <tile t="95" ft="Ladder"/>
+  <tile t="96" collision="es"/>
+  <tile t="97" collision="es"/>
+  <tile t="98" collision="es"/>
+  <tile t="99" collision="es"/>
+  <tile t="100" collision="solid"/>
+  <tile t="101" collision="es"/>
+  <tile t="102" collision="es"/>
+  <tile t="103" collision="solid"/>
+  <tile t="104" collision="solid"/>
+  <tile t="105" collision="solid"/>
+  <tile t="106" collision="solid"/>
+  <tile t="107" collision="solid"/>
+  <tile t="108" collision="solid"/>
+  <tile t="109" collision="solid"/>
+  <tile t="110" collision="solid"/>
+  <tile t="111" ft="Ladder"/>
+  <tile t="112" collision="drss"/>
+  <tile t="113" collision="drts"/>
+  <tile t="114" collision="dlts"/>
+  <tile t="115" collision="dlss"/>
+  <tile t="116" collision="drs"/>
+  <tile t="117" collision="dls"/>
+  <tile t="118" collision="solid"/>
+  <tile t="119" collision="solid"/>
+  <tile t="120" collision="es"/>
+  <tile t="121" collision="solid"/>
+  <tile t="122" collision="solid"/>
+  <tile t="123" collision="solid"/>
+  <tile t="124" collision="solid"/>
+  <tile t="125" collision="solid"/>
+  <tile t="126" collision="solid"/>
+  <tile t="127" ft="Ladder"/>
+  <tile t="128" collision="solid"/>
+  <tile t="129" collision="up"/>
+  <tile t="130" collision="up"/>
+  <tile t="131" collision="up"/>
+  <tile t="132" collision="up"/>
+  <tile t="133" collision="up"/>
+  <tile t="134" collision="up"/>
+  <tile t="135" collision="es" ft="CrumblingTiles_A"/>
+  <tile t="136" collision="es"/>
+  <tile t="137" collision="es"/>
+  <tile t="138" collision="solid"/>
+  <tile t="139" collision="solid"/>
+  <tile t="140" collision="solid"/>
+  <tile t="141" collision="solid"/>
+  <tile t="142" collision="solid"/>
+  <tile t="144" collision="solid"/>
+  <tile t="145" collision="dp"/>
+  <tile t="146" collision="dp"/>
+  <tile t="147" collision="dp"/>
+  <tile t="151" collision="es" ft="CrumblingTiles_A_PlayerOnly"/>
+  <tile t="152" collision="es"/>
+  <tile t="153" collision="es"/>
+  <tile t="154" collision="solid"/>
+  <tile t="155" collision="solid"/>
+  <tile t="156" collision="solid"/>
+  <tile t="157" collision="solid"/>
+  <tile t="158" collision="solid"/>
+  <tile t="159" collision="solid"/>
+  <tile t="160" collision="solid"/>
+  <tile t="164" collision="dp"/>
+  <tile t="165" collision="dp"/>
+  <tile t="166" collision="dp"/>
+  <tile t="167" collision="up"/>
+  <tile t="168" collision="up"/>
+  <tile t="169" collision="up"/>
+  <tile t="170" collision="solid"/>
+  <tile t="171" collision="solid"/>
+  <tile t="172" collision="solid"/>
+  <tile t="173" collision="solid"/>
+  <tile t="174" collision="solid"/>
+  <tile t="175" collision="solid"/>
+  <tile t="176" collision="solid"/>
+  <tile t="184" collision="dp"/>
+  <tile t="185" collision="dp"/>
+  <tile t="186" collision="solid"/>
+  <tile t="187" collision="solid"/>
+  <tile t="188" collision="solid"/>
+  <tile t="189" collision="urs"/>
+  <tile t="190" collision="es"/>
+  <tile t="191" collision="uls"/>
+  <tile t="216" collision="up"/>
+  <tile t="217" collision="up"/>
+  <tile t="231" collision="up"/>
+  <tile t="239" collision="solid"/>
+  <tile t="240" collision="up"/>
+  <tile t="241" collision="up"/>
+  <tile t="242" collision="up"/>
+  <tile t="243" collision="up"/>
+  <tile t="244" collision="up"/>
+  <tile t="245" collision="up"/>
+  <tile t="246" collision="up"/>
+  <tile t="255" collision="solid"/>
+  <tile-priorities>
+    AAAAAAAAAADzzwAA888AAP8/AAD/PwAAL9gAAA/wAAAOQAAAD8AAAAAAAAAAAAAA
+    AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+    AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=
+  </tile-priorities>
+  <animation-frames palette="station" bit-depth="4" animation-delay="30">
+    <frame image="station-frame-0.png"/>
+  </animation-frames>
+  <scratchpad width="64" height="64">
+    AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+    AAAAAAAAAAAAAAAAAAAAAAAAAAAAEhMAFBUAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+    AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAISIjJCQlJgAAAAAA
+    AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+    AAAAITEyAQEBNTYmAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+    AAAAAAAAAAAAAAAAAAAAAAAAITEyAQEBAQE1NiYAAAAAAAAAAAAAAAAAAAAAAAAA
+    AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAISIyAQEBAQEBATUlJgAA
+    AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+    MDFBAQEBAQEBAQEBNTY3AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+    AAAAAAAAAAAAAAAAAAAAAAJBAQEBAQEBAQEBAQE1AgIAAAAAAAAAAAAAAAAAAAAA
+    AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+    AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+    AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+    AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAEhcQEBAgFQAAAAAAAAAAAAAAAAAAAAAA
+    AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAISIjAgICJCUm
+    AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+    AAAAAAAAITEyAQEBAQE1NiYAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+    AAAAAAAAAAAAAAAAAAAAAAAAAAAAITEyAQEBAQEBATU2JgAAAAAAAAAAAAAAAAAA
+    AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAISIyAQEBAQEBAQEB
+    NSUmAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+    ABQQFzFBAQEBAQEBAQEBAQE1NiAQEwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+    AAAAAAAAAAAAAAAAAAAAAAICAgJBAQEBAQEBAQEBAQEBATUCAgICAAAAAAAAAAAA
+    AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+    AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+    AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+    AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAMyQkJCQkNAAAAAAAAAAAAAAAAAAAAAAA
+    AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAM0MBAQEBAUQ0
+    AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+    AAAAAAAAM0MBAQEBAQEBRDQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+    AAAAAAAAAAAAAAAAAAAAAAAAAAAAM0MBAQEBAQEBAQFENAAAAAAAAAAAAAAAAAAA
+    AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAM0MBAQEBAQEBAQEB
+    AUQ0AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+    AAAAM0MBAQEBAQEBAQEBAQEBRDQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+    AAAAAAAAAAAAAAAAAAAAAAICAkMBAQEBAQEBAQEBAQEBAQFEAgICAAAAAAAAAAAA
+    AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+    AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+    AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+    AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAFBRJFJTAAAAAAAAAAAAAAAAAAAAAAAA
+    AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAUFFgAQEBY1JT
+    AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+    AAAAAABQUWABAQEBAQEBY1JTAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+    AAAAAAAAAAAAAAAAAAAAAAAAAFBRYAEBAQEBAQEBAQEBY1JTAAAAAAAAAAAAAAAA
+    AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACAgJgAQEBAQEBAQEBAQEB
+    AQEBYwICAgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+    AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+    AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+    AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAMzQAAAAAAAAAAAAA
+    AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+    AAAAM0NENAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+    AAAAAAAAAAAAAAAAAAAAAAAAM0MBAUQ0AAAAADM0AAAAUFMAAAAAAAAAAAAAAAAA
+    AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACAkMBAQEBRAICAgJDRAIC
+    AmBjAgICAgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+    AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+    AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+    AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABQUSRSUwAA
+    AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+    AAAAAAAAAAAzYQEBAWI0AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+    AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAzQwEBAQEBRDQAAAAAAAAAAAAAAAAAAAAA
+    AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAzQwEBAQEBAQFE
+    NAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+    AAAAAFBRQgEBAQEBAQEBAUVSUwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+    AAAAAAAAAAAAAAAAAAAAAAAAUFFgAQEBAQEBAQEBAQEBAWNSUwAAAAAAAAAAAAAA
+    AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACAmABAQEBAQEBAQEBAQEB
+    AQEBAWICAgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+    AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+    AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+    AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABQUQBSUwAA
+    AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+    AAAAAAAAAAAzYQEAAWI0AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+    AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAQwEBAAEBRAAAAAAAAAAAAAAAAAAAAAAA
+    AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAzAAEBAQABAQEA
+    NAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+    AAAAAFBRQgABAQEAAQEBAERSAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+    AAAAAAAAAAAAAAAAAAAAAABQUQBgAQEAAQEBAAEBAQABAQBSUwAAAAAAAAAAAAAA
+    AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACYAEAAQEBAAEBAQABAQEA
+    AQEAAWICAgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+    AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+    AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+    AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+    AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+    AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+    AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+    AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+    AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+    AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+    AAAAAAAAAAAAAAAAAAAAAA==
+  </scratchpad>
+</metatile-tileset>
