@@ -91,7 +91,9 @@ constant SaveRam_gamestate2 = SaveRam_gamestate1 + GameStateData.size
 constant SaveRamBank = SaveRam >> 16
 
 
-// Save GameState data to Save-RAM
+// Save GameState data to Save-RAM.
+// CAUTION: Must invoke `ConfirmSaveStateValid()` after the room is loaded.
+//
 // REQUIRES: 16 bit A, 16 bit Index, DB = 0x7e
 macro SaveGameState() {
     assert16a()
@@ -114,8 +116,28 @@ macro SaveGameState() {
     lda.w   #GameStateData.size - 1
     mvn     DebugSave.SaveRamBank=(GameStateData >> 16)
 
+    // Temporally invalidate save-RAM to break a BSOD reset loop
+    // if loading a room causes a BRK BSOD.
+    //
+    // The gamestate is saved _before_ the room is loaded to ensure
+    // a reset would result in an identical playing state
+    // (as scripts/entities can modify the state on room load).
+    inc.w   DebugSave.SaveRam_gamestate2
+
     plb
 // DB = 0x7e
+}
+
+
+// REQUIRES: 16 bit A, 16 bit Index, DB = 0x7e
+macro ConfirmGameStateValid() {
+    assert16a()
+    assert16i()
+
+    // Undo the `SaveRam_gamestate2` modification
+    // to mark the save-RAM as valid.
+    lda.l   DebugSave.SaveRam_gamestate1
+    sta.l   DebugSave.SaveRam_gamestate2
 }
 
 
