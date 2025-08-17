@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF_8"?>
+<!DOCTYPE untech>
+<room name="playtest_1_entrance" scene="station">
+  <map width="48" height="14">
+    AgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIC
+    Ah0YGBgYGBgYGBgYGBgYGBgYGBgYGBgYGBgYGBgYGBgYGBgYGBgYGBgYGBgYHAIC
+    AgwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACwIC
+    AgwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACwIC
+    AgwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACwIC
+    AgwAAAAAAAAAAAAAAAAAAAAAAACoqQAAAAAAAACoqQAAAAAAAAAAAAAAAAAACwIC
+    AgwAAAAAAAAAAAAAAAAAAAAAAAC4uQAAAAAAAAC4uQAAAAAAAAAAAAAAAAAACwIC
+    AgwAAAAAAAAAAAAAAAAAAAAAAKipqKmoqQAAAACoqaeoqQAAAACoqQAAAAAAKxgY
+    AgwAAAAAAAAAAAAAAAAAqKmoqbi5uLm4uQAAAAC4uae4uQAAp6e4uaipAAAAAC5L
+    AgwAAAAAAAAAAAAAAACnuLm4uaeoqaipqKkAAACoqaipqKmoqaeoqbi5AAAAAC5L
+    AgwAAAAAAAAAAKenp6enp6enp6e4ubi5uLkAAAC4ubi5uLm4uae4uaenpwAAAC5L
+    Ag0DAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMD
+    AgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIC
+    AgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIC
+  </map>
+  <entrance name="start" x="56" y="162" orientation="down-right"/>
+  <entity-group name="init">
+    <entity entity="cleaning_bot_slow" x="281" y="120" parameter="0"/>
+  </entity-group>
+  <script name="Startup">
+    <statement opcode="Spawn_Entity_Group" arg1="init"/>
+  </script>
+  <script name="right_door">
+    <statement opcode="Load_Room" arg1="playtest_1_entrance" arg2="start"/>
+  </script>
+  <script-trigger script="right_door" x="46" y="8" width="1" height="3"/>
+</room>

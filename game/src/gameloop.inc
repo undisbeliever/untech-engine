@@ -74,6 +74,10 @@ a16()
     Healthbar.Init()
 
 
+    if {defined DEBUG_BUILD} {
+        DebugSave.ConfirmGameStateValid()
+    }
+
     stz.w   inidispBuffer
 
     Loop:

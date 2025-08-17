@@ -3,7 +3,7 @@
 <project>
   <memory-map mode="lorom" first-bank="83" n-banks="5"/>
   <room-settings room-data-size="16384"/>
-  <game-state starting-room="second_room" starting-entrance="lower" starting-player="player">
+  <game-state starting-room="playtest_1_entrance" starting-entrance="start" starting-player="player">
     <word index="0" name="playerHealth" value="6"/>
     <word index="1" name="waterPosition" value="0"/>
   </game-state>
@@ -98,9 +98,11 @@
   <metatile-tileset src="metatiles/blocky.utmt"/>
   <metatile-tileset src="metatiles/station.utmt"/>
   <room-file src="rooms/_scratchpad.utroom"/>
-  <room-file src="rooms/second-room.utroom"/>
+  <room-file src="rooms/playtest-1-entrance.utroom"/>
   <scene-setting name="BasicRoom" bg-mode="1bg3" layer0-type="mt-tileset" layer1-type="" layer2-type="text" layer3-type=""/>
   <scene-setting name="WaterRoom" bg-mode="1bg3" layer0-type="bg-image" layer1-type="mt-tileset" layer2-type="text" layer3-type=""/>
   <scene name="blocky" settings="BasicRoom" palette="blocky" layer0="blocky"/>
   <scene name="water" settings="WaterRoom" palette="blocky" layer0="water" layer1="blocky"/>
+  <scene name="station" settings="BasicRoom" palette="station" layer0="station"/>
+  <scene name="station_water" settings="WaterRoom" palette="station" layer0="water" layer1="station"/>
 </project>

@@ -43,16 +43,4 @@
   <script name="Startup">
     <statement opcode="Spawn_Entity_Group" arg1="spawn"/>
   </script>
-  <script name="UpperDoor">
-    <statement opcode="Load_Room" arg1="second_room" arg2="upper"/>
-  </script>
-  <script name="LowerDoor">
-    <statement opcode="Load_Room" arg1="second_room" arg2="lower"/>
-  </script>
-  <script name="Door">
-    <statement opcode="Load_Room" arg1="second_room" arg2="door"/>
-  </script>
-  <script-trigger script="UpperDoor" x="30" y="3" width="1" height="3"/>
-  <script-trigger script="LowerDoor" x="30" y="10" width="1" height="3"/>
-  <script-trigger script="Door" x="23" y="31" width="1" height="1"/>
 </room>
