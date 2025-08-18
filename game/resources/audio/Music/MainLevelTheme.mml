@@ -15,17 +15,22 @@
 @SuperMiniGlitchNoise SuperMiniGlitchNoise adsr 15 3 0 28
 @Triangle16 Triangle16 adsr 11 2 3 14
 @Saw16 Saw16 adsr 5 7 7 0
+@Saw16_DBH3_2_A15_7_7_27 Saw16_DBH3_2 adsr 15 7 7 27
+@Saw16_DBH3_2_A12_7_7_27 Saw16_DBH3_2 adsr 12 7 7 27
+@SineWave8_DBH2_4 SineWave8_DBH2_4
 
 #Timer 160
 #ZenLen 96
 
-A @Bass V64 L
-!ARiff1 Q4 [o0f8>f8]3
-A [
-A Q4 !ARiff1 Q8 o0b8>c16r16 :
-A Q4 !ARiff1 Q8 o1f8<f16>c16
-A ]2
-A Q4 !ARiff1 o1f8<f8
+!ARiff1a Q4 [o0f8>f8]3
+!ARiff1 [
+!ARiff1 Q4 !ARiff1a Q8 o0b8>c16r16 :
+!ARiff1 Q4 !ARiff1a Q8 o1f8<f16>c16
+!ARiff1 ]2
+!ARiff1 Q4 !ARiff1a o1f8<f8
+A @Bass V64 L [!ARiff1 ]7
+A [[Q4o0f4.f4.:r4]2 Q8d+4]12
+A [!ARiff1 ]4
 
 B V16 L
 B @SuperMiniGlitchNoise o7b8 A15,7,7,28 o7b16b16
@@ -44,7 +49,23 @@ C o3f8d+8d8c8<a+8a8>c8 [
 C o2a+8>c8<a+8a8g8f8 : o2g8a8
 C o2a+8>c8d8d+8f8d+8d8c8 ]2
 C o2d+8f8[g8f8]2d+8d8c8<a+8
-C l1 o1f^^^
+C l1 o1f^^^^^^^
+!CRiff2a o3f4.f2^8f4.f4.
+!CRiff2 !CRiff2a o3d+4
+C @Saw16 A11,2,3,14 V28
+C q254,l4,D9 [
+C !CRiff2
+C o3d4.d2^8d4.d4.d+4
+C !CRiff2
+C o3f4.g2^8g+4.g4.f8d+8 ]3
+C [
+C !CRiff2
+C !CRiff2a o3f4
+C ]2
+C [
+C Vs-8,192 !CRiff2
+C Vs-8,192 !CRiff2a o3f4
+C ]2 q0
 
 D L
 D l1 r^^^
@@ -60,16 +81,61 @@ D o3d8c8<a+8a8g8f8g8 [
 D o2g8a8g8f8d+8d8 : o2d8f8
 D o2g8a8a+8>[c8]3<a+8a8 ]2
 D o2c8d8[d+8d8]2c8<a+8a8g8
-D l1 o1c^^^
+D l1 o1c^^^^^^^
+!DRiff2 o3c4.c2^8c4.c4.c4
+D @Saw16 A11,2,3,14 V28 px0 [
+D q254,l4,D9
+D [!DRiff2 ]3
+D o3c4.d2^8d+4.d4.c8c8 ]3
+D [!DRiff2 ]4
+D [Vs-8,192 !DRiff2 ]4 q0
 
 E L
 E l1 r^^^^^^^^^^^
-!ERiff1 @Saw16 V8
+!ERiff1 @Saw16 V8 px0
 !ERiff1 o6c1<a+1a1g1f1d+1d1c1
-!ERiff1 o4f1^1& GDT2 r1^1
-E !ERiff1
+!ERiff1 o4f1^1& GDT2 r1^1^1^1^1^2...
+E !ERiff1 r16
+!ERiff2a o2a+4.a+2^8a+4.a+4.a+4
+!ERiff2 @Saw16 A11,2,3,14 V28 px+16
+!ERiff2 q254,l4,D9 
+!ERiff2 !ERiff2a
+!ERiff2 o2a4.a2^8a4.a4.a+4
+!ERiff2 !ERiff2a
+!ERiff2 o2a+4.>c2^8c4.c4.<a+8a+8 q0
+E !ERiff2
+E @SineWave8_DBH2_4 V40 px0
+E r4 o1a+4>c4>c4<f4.c4.<a+4
+E o2c2<f2a2>c2
+E r4 o1a+4>c4>c4f4d+4d4c4
+E o2a+4.>c4.d4d+4.d4.c8<a+8
+E q254,l1,D6
+E o3c1^1 o2f1^1
+E o2c1^1 o1f1^1 q0
+E @Saw16 A11,2,3,14 V28 px+16
+E q254,l4,D9 
+E [!ERiff2a ]4
+E [Vs-8,192 !ERiff2a ]4 q0
 
-F r16 L
-F l1 r^^^^^^^^^^^
+F L
+F l1 r^^^^^^^^^^^^16
 F ~16,2
-F !ERiff1
+F !ERiff1 ~0
+!FRiff1a l16 o3fc<a+>a+>fc<a+>c
+!FRiff1 [
+!FRiff1 [!FRiff1a ]4
+!FRiff1 [l16 o3fc<a>a>fc<a>c]4
+!FRiff1 [!FRiff1a ]8 ]3
+!FRiff1 [!FRiff1a ]16
+F @Saw16_DBH3_2_A15_7_7_27 px0 p~16,48 V28 !FRiff1
+F [V-2 !FRiff1a ]16
+
+G L
+G l1 r^^^^^^^^^^^^^^^^^^^^^^^^^^^^16.
+G @Saw16_DBH3_2_A12_7_7_27 px0 V12 !FRiff1
+G [V-2 !FRiff1a !FRiff1a ]7 r2..^32
+
+H L
+H l1 r^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+H !ERiff2 !ERiff2
+H l1 r^^^^^^^^^^^^^^^

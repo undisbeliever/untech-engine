@@ -156,6 +156,19 @@
       "comment": null
     },
     {
+      "name": "SineWave8_DBH2_4",
+      "source": "samples/KungFuFurby/SineWave8.wav",
+      "freq": 1000.0,
+      "loop": "dupe_block_hack_filter_2",
+      "loop_setting": 4,
+      "evaluator": "default",
+      "ignore_gaussian_overflow": false,
+      "first_octave": 0,
+      "last_octave": 7,
+      "envelope": "gain F127",
+      "comment": null
+    },
+    {
       "name": "HardwareOverflowGlitch",
       "source": "samples/KungFuFurby/HardwareOverflowGlitch.brr",
       "freq": 1000.0,
