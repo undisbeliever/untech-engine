@@ -26,7 +26,7 @@ namespace Entities {
 namespace Players {
 
 // 8:8 fixed point
-constant MIN_RUN_MOMENTUM = 0x0280
+constant MIN_RUN_MOMENTUM = 0x0181
 
 // 8:8 fixed point
 constant LADDER_X_MOMENTUM = 0x0120
