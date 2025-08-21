@@ -57,7 +57,7 @@
       </entry>
       <entry name="avoid_ledges" function-table="WalkAvoidLedges" listid="enemies" frameset="cleaning_bot" frame="left" palette="2">
         <entry-field for="attack" value="1"/>
-        <entry-field for="knockback" value="0"/>
+        <entry-field for="knockback" value="1"/>
         <entry-field for="speed" value="0x012000"/>
         <entry-field for="underwaterSpeed" value="0x004444"/>
       </entry>
