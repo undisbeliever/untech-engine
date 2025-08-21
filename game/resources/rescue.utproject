@@ -42,7 +42,7 @@
     <function-table name="Player" type="player" export-order="player" parameter-type="unused"/>
     <function-table name="WalkAndTurn" type="entity" struct="WalkAndTurn" export-order="walk_and_turn" parameter-type="unsigned" comment="0=left, 1=right, 2=up-left, 3=up-right"/>
     <function-table name="WalkAvoidLedges" type="entity" struct="WalkAndTurn" export-order="walk_and_turn" parameter-type="unsigned" comment="0=left, 1=right, 2=up-left, 3=up-right"/>
-    <function-table name="PlayerProjectile" type="projectile" export-order="projectile" parameter-type="unused"/>
+    <function-table name="PlayerProjectile" type="projectile" export-order="player_projectile" parameter-type="unused"/>
     <function-table name="SecurityBot" type="entity" struct="BaseEnemy" export-order="security_bot" parameter-type="unsigned" comment="0=normal-gravity, 1=up-gravity"/>
     <function-table name="JumpTowardsPlayer" type="entity" struct="JumpTowardsPlayer" export-order="jump_towards_player" parameter-type="unsigned" comment="0=normal-gravity, 1=up-gravity"/>
     <function-table name="MoveLeftRight" type="entity" struct="MoveLeftRight" export-order="move_left_right" parameter-type="unsigned" comment="distance before turning"/>
@@ -97,7 +97,7 @@
   <action-point-function name="EnemyProjectile"/>
   <exportorder src="ms-export-order/player.utfseo"/>
   <exportorder src="ms-export-order/walk-and-turn.utfseo"/>
-  <exportorder src="ms-export-order/projectile.utfseo"/>
+  <exportorder src="ms-export-order/player-projectile.utfseo"/>
   <exportorder src="ms-export-order/security-bot.utfseo"/>
   <exportorder src="ms-export-order/jump-towards-player.utfseo"/>
   <exportorder src="ms-export-order/move-left-right.utfseo"/>

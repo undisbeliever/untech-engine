@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF_8"?>
 <!DOCTYPE untech>
-<spriteimporter id="player_projectile" tilesettype="ONE_TILE_FIXED" exportorder="projectile" image="player-projectile.png">
+<spriteimporter id="player_projectile" tilesettype="ONE_TILE_FIXED" exportorder="player_projectile" image="player-projectile.png">
   <grid width="16" height="16" xoffset="0" yoffset="0" xpadding="0" ypadding="0" xorigin="8" yorigin="8"/>
   <palette position="TOP_LEFT" npalettes="1" colorsize="1"/>
   <frame id="frame1" order="2">

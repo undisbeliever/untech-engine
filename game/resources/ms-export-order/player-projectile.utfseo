@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF_8"?>
 <!DOCTYPE untech>
-<fsexportorder name="projectile">
+<fsexportorder name="player_projectile">
   <animation id="move_left">
     <alt name="move_right" hflip="true"/>
   </animation>
