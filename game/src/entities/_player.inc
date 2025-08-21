@@ -41,11 +41,8 @@ constant SWIMMING_YPOS_BEFORE_OUT_OF_WATER = 10
 constant WATER_SFX_FRAMES = 7
 
 
-
-// ::TODO adjust::
+// Frames
 constant ENEMY_SHIELD_IFRAMES = 15
-
-// ::TODO adjust::
 constant ENEMY_SHIELD_KNOCKBACK_TIME = 3
 
 // 8:8 fixed point
@@ -53,8 +50,8 @@ constant ENEMY_SHIELD_KNOCKBACK_XM = 0x0120
 constant ENEMY_SHIELD_KNOCKBACK_YM = 0x0120
 
 
-// ::TODO adjust::
-constant HURT_IFRAMES = 40
+// Frames
+constant HURT_IFRAMES = 90
 
 
 // ::TODO adjust::
