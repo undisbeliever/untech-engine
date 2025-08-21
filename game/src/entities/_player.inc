@@ -43,10 +43,10 @@ constant WATER_SFX_FRAMES = 7
 
 
 // ::TODO adjust::
-constant ENEMY_SHIELD_IFRAMES = 10
+constant ENEMY_SHIELD_IFRAMES = 15
 
 // ::TODO adjust::
-constant ENEMY_SHIELD_KNOCKBACK_TIME = 10
+constant ENEMY_SHIELD_KNOCKBACK_TIME = 3
 
 // 8:8 fixed point
 constant ENEMY_SHIELD_KNOCKBACK_XM = 0x0120
@@ -331,6 +331,10 @@ function __EnemyShieldCollision_a8__returnsA16 {
 
         lda.b   #ENEMY_SHIELD_KNOCKBACK_TIME
         sta.b   EntityStruct.knockbackCountdown
+
+        assert(COYOTE_TIME_FRAMES < 9)
+        lda.b   #1 << (COYOTE_TIME_FRAMES - 1)
+        sta.b   EntityStruct.coyoteJumpBuffer
 
         // Clearing NO_GRAVITY_FLAG to ensure player falls off a ladder
         lda.b   EntityStruct.movementState
