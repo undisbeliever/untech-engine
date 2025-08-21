@@ -64,6 +64,12 @@
     <entity entity="avoid_ledges" x="531" y="136" parameter="1"/>
     <entity entity="jumping_bug" x="900" y="182" parameter="0"/>
     <entity entity="avoid_ledges" x="934" y="133" parameter="0"/>
+    <entity entity="fish_right" x="144" y="385" parameter="64"/>
+    <entity entity="fish_right" x="464" y="464" parameter="96"/>
+    <entity entity="fish_left" x="816" y="424" parameter="96"/>
+    <entity entity="fish_left" x="1136" y="368" parameter="64"/>
+    <entity entity="fish_right" x="573" y="317" parameter="100"/>
+    <entity entity="fish_left" x="457" y="249" parameter="100"/>
   </entity-group>
   <script name="Startup">
     <statement opcode="Spawn_Entity_Group" arg1="init"/>

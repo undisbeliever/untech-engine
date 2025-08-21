@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF_8"?>
+<!DOCTYPE untech>
+<spriteimporter id="fish_left_right" tilesettype="ONE_ROW_FIXED" exportorder="move_left_right" image="fish.png">
+  <grid width="32" height="32" xoffset="0" yoffset="0" xpadding="0" ypadding="0" xorigin="16" yorigin="16"/>
+  <palette position="TOP_LEFT" npalettes="1" colorsize="1"/>
+  <frame id="left" order="2">
+    <gridlocation x="1" y="0"/>
+    <tilehitbox x="6" y="11" width="20" height="10"/>
+    <hitbox x="8" y="11" width="19" height="10"/>
+    <hurtbox x="7" y="12" width="19" height="8"/>
+    <object size="large" x="0" y="8"/>
+    <object size="large" x="16" y="8"/>
+  </frame>
+  <frame id="right_1" order="2">
+    <gridlocation x="2" y="0"/>
+    <tilehitbox x="6" y="11" width="20" height="10"/>
+    <hitbox x="8" y="11" width="19" height="10"/>
+    <hurtbox x="7" y="12" width="19" height="8"/>
+    <object size="large" x="0" y="8"/>
+    <object size="large" x="16" y="8"/>
+  </frame>
+  <frame id="right_2" order="2">
+    <gridlocation x="3" y="0"/>
+    <tilehitbox x="6" y="11" width="20" height="10"/>
+    <hitbox x="8" y="11" width="18" height="10"/>
+    <hurtbox x="7" y="12" width="19" height="8"/>
+    <object size="large" x="0" y="8"/>
+    <object size="large" x="16" y="8"/>
+  </frame>
+  <frame id="turn_1" order="2">
+    <gridlocation x="4" y="0"/>
+    <tilehitbox x="6" y="11" width="20" height="10"/>
+    <hitbox x="9" y="11" width="16" height="10"/>
+    <hurtbox x="7" y="12" width="19" height="8"/>
+    <object size="large" x="8" y="8"/>
+  </frame>
+  <frame id="turn_2" order="2">
+    <gridlocation x="5" y="0"/>
+    <tilehitbox x="6" y="11" width="20" height="10"/>
+    <hitbox x="10" y="11" width="12" height="10"/>
+    <hurtbox x="7" y="12" width="19" height="8"/>
+    <object size="large" x="8" y="8"/>
+  </frame>
+  <animation id="right" durationformat="DISTANCE_HORIZONTAL">
+    <aframe frame="right_1" duration="255"/>
+    <aframe frame="right_2" duration="255"/>
+  </animation>
+  <animation id="turn_right" durationformat="TIME" next="right">
+    <aframe frame="turn_1" hflip="true" duration="10"/>
+    <aframe frame="turn_2" hflip="true" duration="10"/>
+    <aframe frame="turn_1" duration="6"/>
+  </animation>
+</spriteimporter>

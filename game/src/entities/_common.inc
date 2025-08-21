@@ -24,6 +24,23 @@
 
 namespace Entities {
 
+// REQUIRES: 16 bit A, 16 bit Index, DB = 0x7e
+// INPUT: DP = entity
+// INPUT: Y = animation id
+a16()
+i16()
+code()
+function SetAnimation_Facing_Y {
+    assert(Entity.MovementState.FACING_RIGHT_FLAG == 1)
+
+    lda.b   BaseEntity.movementState
+    lsr
+    bcc     +
+        iny
+    +
+    jmp     MetaSprite.Animation.SetAnimationId_Y
+}
+
 
 // REQUIRES: 16 bit A, 16 bit Index, DB = 0x7e
 // INPUT: DP = entity

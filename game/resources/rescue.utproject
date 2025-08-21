@@ -35,12 +35,17 @@
       <struct-field name="swimYMomentum" type="uint24"/>
       <struct-field name="swimDelay" type="uint8"/>
     </struct>
+    <struct name="MoveLeftRight" parent="BaseEnemy">
+      <struct-field name="initDirection" type="uint8" default="0" comment="0 = left, 1 = right"/>
+      <struct-field name="xMomentum" type="uint24"/>
+    </struct>
     <function-table name="Player" type="player" export-order="player" parameter-type="unused"/>
     <function-table name="WalkAndTurn" type="entity" struct="WalkAndTurn" export-order="walk_and_turn" parameter-type="unsigned" comment="0=left, 1=right, 2=up-left, 3=up-right"/>
     <function-table name="WalkAvoidLedges" type="entity" struct="WalkAndTurn" export-order="walk_and_turn" parameter-type="unsigned" comment="0=left, 1=right, 2=up-left, 3=up-right"/>
     <function-table name="PlayerProjectile" type="projectile" export-order="projectile" parameter-type="unused"/>
     <function-table name="SecurityBot" type="entity" struct="BaseEnemy" export-order="security_bot" parameter-type="unsigned" comment="0=normal-gravity, 1=up-gravity"/>
     <function-table name="JumpTowardsPlayer" type="entity" struct="JumpTowardsPlayer" export-order="jump_towards_player" parameter-type="unsigned" comment="0=normal-gravity, 1=up-gravity"/>
+    <function-table name="MoveLeftRight" type="entity" struct="MoveLeftRight" export-order="move_left_right" parameter-type="unsigned" comment="distance before turning"/>
     <entities>
       <entry name="cleaning_bot_slow" function-table="WalkAndTurn" listid="enemies" frameset="cleaning_bot" frame="left" palette="0">
         <entry-field for="knockback" value="1"/>
@@ -68,6 +73,18 @@
         <entry-field for="swimXMomentum" value="0x012000"/>
         <entry-field for="swimYMomentum" value="0x00dddd"/>
       </entry>
+      <entry name="fish_left" function-table="MoveLeftRight" listid="enemies" frameset="fish_left_right" frame="left" palette="0">
+        <entry-field for="initDirection" value="0"/>
+        <entry-field for="knockback" value="1"/>
+        <entry-field for="shieldDirection" value="0"/>
+        <entry-field for="xMomentum" value="0x010000"/>
+      </entry>
+      <entry name="fish_right" function-table="MoveLeftRight" listid="enemies" frameset="fish_left_right" frame="right_1" palette="0">
+        <entry-field for="initDirection" value="1"/>
+        <entry-field for="knockback" value="1"/>
+        <entry-field for="shieldDirection" value="0"/>
+        <entry-field for="xMomentum" value="0x010000"/>
+      </entry>
     </entities>
     <projectiles>
       <entry name="PlayerProjectile" function-table="PlayerProjectile" listid="playerProjectiles" frameset="player_projectile" frame="frame1" palette="0"/>
@@ -83,11 +100,13 @@
   <exportorder src="ms-export-order/projectile.utfseo"/>
   <exportorder src="ms-export-order/security-bot.utfseo"/>
   <exportorder src="ms-export-order/jump-towards-player.utfseo"/>
+  <exportorder src="ms-export-order/move-left-right.utfseo"/>
   <frameset src="metasprites/player.utsi" type="spriteimporter"/>
   <frameset src="metasprites/cleaning-bot.utsi" type="spriteimporter"/>
   <frameset src="metasprites/player-projectile.utsi" type="spriteimporter"/>
   <frameset src="metasprites/security-bot.utsi" type="spriteimporter"/>
   <frameset src="metasprites/jumping-bug.utsi" type="spriteimporter"/>
+  <frameset src="metasprites/fish-left-right.utsi" type="spriteimporter"/>
   <palette name="blocky" image="palettes/blocky.png" rows-per-frame="8" animation-delay="35"/>
   <palette name="station" image="palettes/station.png" rows-per-frame="8" animation-delay="255"/>
   <background-image name="water" bit-depth="4" image="bg-images/water.png" palette="station" first-palette="7" npalettes="1" default-order="0"/>
