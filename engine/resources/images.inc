@@ -37,7 +37,7 @@ namespace Resources {
 // REQUIRES: 16 bit A, 16 bit Index, DB = 0x7e, DP = 0
 // MODIFIES: decompressionBuffer
 //
-// INPUT: A = background Image ID
+// INPUT: A = background Image ID (high byte ignored)
 //        Y = bgIndex for the background to load
 a16()
 i16()
@@ -53,6 +53,7 @@ assertZeroPage(_ptr)
 assert(Format.BackgroundImageHeader.size == 1)
 
     // Get data address
+    and.w   #0xff
     cmp.w   #BackgroundImageList.count
     bcc     +
         break(INVALID_IMAGE_ID)
