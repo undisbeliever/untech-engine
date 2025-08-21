@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF_8"?>
+<!DOCTYPE untech>
+<spriteimporter id="tall_jumper" tilesettype="ONE_ROW_FIXED" exportorder="jump_towards_player" image="tall-jumper.png">
+  <grid width="32" height="32" xoffset="0" yoffset="0" xpadding="0" ypadding="0" xorigin="16" yorigin="16"/>
+  <palette position="TOP_LEFT" npalettes="1" colorsize="1"/>
+  <frame id="land_left" order="2">
+    <gridlocation x="1" y="0"/>
+    <tilehitbox x="8" y="11" width="16" height="10"/>
+    <hitbox x="9" y="11" width="14" height="10"/>
+    <hurtbox x="8" y="11" width="16" height="10"/>
+    <object size="large" x="0" y="8"/>
+    <object size="large" x="16" y="8"/>
+  </frame>
+  <frame id="rise_left" order="2">
+    <gridlocation x="2" y="0"/>
+    <tilehitbox x="8" y="11" width="16" height="10"/>
+    <hitbox x="9" y="12" width="14" height="8"/>
+    <hurtbox x="8" y="11" width="16" height="10"/>
+    <object size="large" x="0" y="8"/>
+    <object size="large" x="16" y="8"/>
+  </frame>
+  <frame id="fall_left" order="2">
+    <gridlocation x="3" y="0"/>
+    <tilehitbox x="8" y="11" width="16" height="10"/>
+    <hitbox x="9" y="12" width="14" height="8"/>
+    <hurtbox x="8" y="11" width="16" height="10"/>
+    <object size="large" x="0" y="8"/>
+    <object size="large" x="16" y="8"/>
+  </frame>
+  <frame id="defeated_left" order="2">
+    <gridlocation x="4" y="0"/>
+    <tilehitbox x="8" y="11" width="16" height="10"/>
+    <object size="large" x="8" y="8"/>
+  </frame>
+  <animation id="rise_left" durationformat="FRAME" oneshot="true">
+    <aframe frame="rise_left" duration="1"/>
+  </animation>
+  <animation id="fall_left" durationformat="FRAME" oneshot="true">
+    <aframe frame="fall_left" duration="1"/>
+  </animation>
+  <animation id="land_left" durationformat="TIME" oneshot="true">
+    <aframe frame="land_left" duration="36"/>
+  </animation>
+  <animation id="defeated_left" durationformat="TIME" oneshot="true">
+    <aframe frame="defeated_left" duration="120"/>
+  </animation>
+</spriteimporter>
