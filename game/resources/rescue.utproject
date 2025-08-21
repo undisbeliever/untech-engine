@@ -99,6 +99,10 @@
   <metatile-tileset src="metatiles/station.utmt"/>
   <room-file src="rooms/_scratchpad.utroom"/>
   <room-file src="rooms/playtest-1-entrance.utroom"/>
+  <room-file src="rooms/playtest-2-stairway.utroom"/>
+  <room-file src="rooms/playtest-3-water-test.utroom"/>
+  <room-file src="rooms/playtest-4-tower.utroom"/>
+  <room-file src="rooms/playtest-5-end.utroom"/>
   <scene-setting name="BasicRoom" bg-mode="1bg3" layer0-type="mt-tileset" layer1-type="" layer2-type="text" layer3-type=""/>
   <scene-setting name="WaterRoom" bg-mode="1bg3" layer0-type="bg-image" layer1-type="mt-tileset" layer2-type="text" layer3-type=""/>
   <scene name="blocky" settings="BasicRoom" palette="blocky" layer0="blocky"/>

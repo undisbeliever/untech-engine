@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF_8"?>
+<!DOCTYPE untech>
+<room name="playtest_5_end" scene="station">
+  <map width="16" height="14">
+    AgICAgICAgICAgICAgICAgIdGBgYGBgYGBgYGBgYHAICDAAAAAAAAAAAAAAAAAsC
+    AgxLS0sASwAASwBLSwALAgIMSwAAAEtLAEsASwBLCwICDEtLSwBLS0tLAEsASwsC
+    AgxLAAAASwBLSwBLAEsLAgIMS0tLAEsAAEsAS0sACwICDAAAAAAAAAAAAAAAAAsC
+    AgwAAD4AAAAAAAAAAAALAgIMAAA+AAAAAAAAAAAACwICDQMDBQMDAwMDAwMDAwoC
+    AgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgI=
+  </map>
+  <entrance name="door" x="80" y="162" orientation="down-right"/>
+  <script name="Startup"/>
+  <script name="door">
+    <statement opcode="Load_Room" arg1="playtest_4_tower" arg2="top"/>
+  </script>
+  <script-trigger script="door" x="4" y="11" width="1" height="1"/>
+</room>
