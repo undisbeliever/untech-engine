@@ -32,6 +32,7 @@
     <struct name="JumpTowardsPlayer" parent="BaseEnemy">
       <struct-field name="airXMomentum" type="uint24"/>
       <struct-field name="airYMomentum" type="uint24"/>
+      <struct-field name="swimXMomentum" type="uint24"/>
       <struct-field name="swimYMomentum" type="uint24"/>
       <struct-field name="swimDelay" type="uint8"/>
     </struct>
@@ -70,6 +71,7 @@
         <entry-field for="attack" value="2"/>
         <entry-field for="knockback" value="1"/>
         <entry-field for="swimDelay" value="45"/>
+        <entry-field for="swimXMomentum" value="0x012000"/>
         <entry-field for="swimYMomentum" value="0x00dddd"/>
       </entry>
     </entities>

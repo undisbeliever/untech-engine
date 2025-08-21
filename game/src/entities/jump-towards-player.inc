@@ -204,15 +204,7 @@ a8()
     lda.b   #State.RISE
     sta.b   EntityStruct.state
 
-
-    lda.b   EntityStruct.movementState
-    and.b   #~(Entity.MovementState.FACING_RIGHT_FLAG | Entity.MovementState.MOVING_RIGHT_FLAG | Entity.MovementState.STANDING_FLAG | Entity.MovementState.MOVING_DOWN_FLAG | Entity.MovementState.NO_GRAVITY_FLAG)
-
-    ldx.b   EntityStruct.xPos.px
-    cpx.w   Entity.Player.xPos.px
-    bcs     +
-        ora.b   #Entity.MovementState.FACING_RIGHT_FLAG | Entity.MovementState.MOVING_RIGHT_FLAG
-    +
+    jsr     __FacePlayerAndClearMovingDown_a8
     bit.b   #Entity.MovementState.UP_GRAVITY_FLAG
     beq     +
         ora.b   #Entity.MovementState.MOVING_DOWN_FLAG
@@ -239,6 +231,28 @@ a16()
     ldy.w   #{GetAnimationId(rise_left)}
     jmp     SetAnimation_FacingAndGravity_Y
 }
+
+
+
+// REQUIRES: 8 bit A, 16 bit Index, DB = 0x7e
+// INPUT: DP = entity
+// OUT: A = new entity movementState
+a8()
+i16()
+code()
+function __FacePlayerAndClearMovingDown_a8 {
+    lda.b   EntityStruct.movementState
+    and.b   #~(Entity.MovementState.FACING_RIGHT_FLAG | Entity.MovementState.MOVING_RIGHT_FLAG | Entity.MovementState.STANDING_FLAG | Entity.MovementState.MOVING_DOWN_FLAG | Entity.MovementState.NO_GRAVITY_FLAG)
+
+    ldx.b   EntityStruct.xPos.px
+    cpx.w   Entity.Player.xPos.px
+    bcs     +
+        ora.b   #Entity.MovementState.FACING_RIGHT_FLAG | Entity.MovementState.MOVING_RIGHT_FLAG
+    +
+
+    rts
+}
+
 
 
 // REQUIRES: 16 bit A, 16 bit Index, DB = 0x7e
@@ -322,16 +336,22 @@ function Process__Underwater {
         and.w   #0xff
         sta.b   EntityStruct.swimCountdown
 
+        lda.l   {RomStruct}.swimXMomentum,x
+        sta.b   EntityStruct.xMomentum.sx
+
         lda.l   {RomStruct}.swimYMomentum,x
         sta.b   EntityStruct.yMomentum.sx
 
         sep     #$20
     a8()
+        lda.l   {RomStruct}.swimXMomentum + 2,x
+        sta.b   EntityStruct.xMomentum.px
+
         lda.l   {RomStruct}.swimYMomentum + 2,x
         sta.b   EntityStruct.yMomentum.sx + 2
 
-        lda.b   #Entity.MovementState.MOVING_DOWN_FLAG | Entity.MovementState.STANDING_FLAG
-        trb.b   EntityStruct.movementState
+        jsr     __FacePlayerAndClearMovingDown_a8
+        sta.b   EntityStruct.movementState
 
         rep     #$30
     a16()
