@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF_8"?>
 <!DOCTYPE untech>
 <metatile-tileset name="station">
-  <crumbling-tile chain="a" first-tile="136" first-delay="300" second-tile="0" second-delay="900" third-tile="137"/>
-  <crumbling-tile chain="b" first-tile="152" first-delay="300" second-tile="0" second-delay="900" third-tile="153"/>
+  <crumbling-tile chain="a" first-tile="136" first-delay="50" second-tile="0" second-delay="900" third-tile="137"/>
+  <crumbling-tile chain="b" first-tile="152" first-delay="50" second-tile="0" second-delay="600" third-tile="153"/>
   <tile t="1" ft="PlayerScriptTrigger"/>
   <tile t="2" collision="solid"/>
   <tile t="3" collision="solid"/>
@@ -108,9 +108,9 @@
   <tile t="132" collision="up"/>
   <tile t="133" collision="up"/>
   <tile t="134" collision="up"/>
-  <tile t="135" collision="es" ft="CrumblingTiles_A"/>
+  <tile t="135" collision="es" ft="CrumblingTiles_A_PlayerOnly"/>
   <tile t="136" collision="es"/>
-  <tile t="137" collision="es"/>
+  <tile t="137" collision="es" ft="CrumblingTiles_A_PlayerOnly"/>
   <tile t="138" collision="solid"/>
   <tile t="139" collision="solid"/>
   <tile t="140" collision="solid"/>
@@ -122,7 +122,7 @@
   <tile t="147" collision="dp"/>
   <tile t="151" collision="es" ft="CrumblingTiles_A_PlayerOnly"/>
   <tile t="152" collision="es"/>
-  <tile t="153" collision="es"/>
+  <tile t="153" collision="es" ft="CrumblingTiles_A_PlayerOnly"/>
   <tile t="154" collision="solid"/>
   <tile t="155" collision="solid"/>
   <tile t="156" collision="solid"/>
