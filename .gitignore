@@ -2,9 +2,9 @@
 *.swp
 *~
 
-/game/bin/
-/game/gen/
-/unit_tests/bin/
-/unit_tests/gen/
+/game/bin
+/game/gen
+/unit_tests/bin
+/unit_tests/gen
 
 
