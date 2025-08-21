@@ -9,6 +9,9 @@
   <tile t="4" collision="es" ft="PlayerScriptTrigger"/>
   <tile t="5" collision="es" ft="PlayerActivateScriptTrigger"/>
   <tile t="6" collision="solid"/>
+  <tile t="7" collision="solid"/>
+  <tile t="8" collision="solid"/>
+  <tile t="9" collision="solid"/>
   <tile t="10" collision="solid"/>
   <tile t="11" collision="solid"/>
   <tile t="12" collision="solid"/>
@@ -55,8 +58,8 @@
   <tile t="68" collision="es"/>
   <tile t="69" collision="es"/>
   <tile t="71" collision="dls"/>
-  <tile t="72" collision="ulss"/>
-  <tile t="73" collision="urss"/>
+  <tile t="72" collision="ults"/>
+  <tile t="73" collision="urts"/>
   <tile t="74" collision="es"/>
   <tile t="75" collision="solid"/>
   <tile t="76" collision="es"/>
