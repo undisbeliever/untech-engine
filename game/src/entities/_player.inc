@@ -248,12 +248,10 @@ a8()
         lda.b   #HURT_IFRAMES
         sta.b   EntityStruct.iFrames
 
-        // Enemy hurts the player
-        ldx.w   BaseEntity.romPtr,y
-
+        // All enemies do 2 damage to the player
         lda.w   playerHealth
-        sec
-        sbc.l   Project.EntityRomStructs.BaseEnemy.attack,x
+        dec
+        dec
         bpl     +
             lda.b   #0
         +
@@ -263,6 +261,7 @@ a8()
         lda.b   #0
         xba
 
+        ldx.w   BaseEntity.romPtr,y
         lda.l   Project.EntityRomStructs.BaseEnemy.knockback,x
         asl
         and.b   #_KnockbackFunctionTable.MASK
