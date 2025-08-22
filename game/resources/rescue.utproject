@@ -42,6 +42,9 @@
       <struct-field name="initDirection" type="uint8" default="0" comment="0 = left, 1 = right"/>
       <struct-field name="xMomentum" type="uint24"/>
     </struct>
+    <struct name="LeftRightProjectile" parent="BaseEnemy">
+      <struct-field name="xMomentum" type="uint24"/>
+    </struct>
     <function-table name="Player" type="player" export-order="player" parameter-type="unused"/>
     <function-table name="WalkAndTurn" type="entity" struct="WalkAndTurn" export-order="walk_and_turn" parameter-type="unsigned" comment="0=left, 1=right, 2=up-left, 3=up-right"/>
     <function-table name="WalkAvoidLedges" type="entity" struct="WalkAndTurn" export-order="walk_and_turn" parameter-type="unsigned" comment="0=left, 1=right, 2=up-left, 3=up-right"/>
@@ -50,6 +53,7 @@
     <function-table name="JumpTowardsPlayer" type="entity" struct="JumpTowardsPlayer" export-order="jump_towards_player" parameter-type="unsigned" comment="0=normal-gravity, 1=up-gravity"/>
     <function-table name="JumpAroundSpawn" type="entity" struct="JumpAroundSpawn" export-order="jump_towards_player" parameter-type="unsigned" comment="0=normal-gravity, 1=up-gravity"/>
     <function-table name="MoveLeftRight" type="entity" struct="MoveLeftRight" export-order="move_left_right" parameter-type="unsigned" comment="distance before turning"/>
+    <function-table name="LeftRightProjectile" type="projectile" struct="LeftRightProjectile" export-order="left_right_projectile" parameter-type="unused"/>
     <entities>
       <entry name="cleaning_bot_slow" function-table="WalkAndTurn" listid="enemies" frameset="cleaning_bot" frame="left" palette="0">
         <entry-field for="knockback" value="1"/>
@@ -99,9 +103,32 @@
         <entry-field for="shieldDirection" value="0"/>
         <entry-field for="xMomentum" value="0x010000"/>
       </entry>
+      <entry name="jump_and_shoot_low" function-table="JumpTowardsPlayer" projectileid="LeftRightBullet" listid="enemies" frameset="jump_and_shoot" frame="land" palette="0">
+        <entry-field for="airXMomentum" value="0"/>
+        <entry-field for="airYMomentum" value="0x020000"/>
+        <entry-field for="knockback" value="1"/>
+        <entry-field for="shieldDirection" value="0"/>
+        <entry-field for="swimDelay" value="20"/>
+        <entry-field for="swimXMomentum" value="0"/>
+        <entry-field for="swimYMomentum" value="0x00c000"/>
+      </entry>
+      <entry name="jump_and_shoot_high" function-table="JumpTowardsPlayer" projectileid="LeftRightBullet" listid="enemies" frameset="jump_and_shoot" frame="land" palette="0">
+        <entry-field for="airXMomentum" value="0"/>
+        <entry-field for="airYMomentum" value="0x042000"/>
+        <entry-field for="knockback" value="1"/>
+        <entry-field for="shieldDirection" value="0"/>
+        <entry-field for="swimDelay" value="20"/>
+        <entry-field for="swimXMomentum" value="0"/>
+        <entry-field for="swimYMomentum" value="0x00c000"/>
+      </entry>
     </entities>
     <projectiles>
       <entry name="PlayerProjectile" function-table="PlayerProjectile" listid="playerProjectiles" frameset="player_projectile" frame="frame1" palette="0"/>
+      <entry name="LeftRightBullet" function-table="LeftRightProjectile" listid="enemyProjectiles" frameset="enemy_projectile_bullet" frame="frame" palette="0">
+        <entry-field for="knockback" value="1"/>
+        <entry-field for="shieldDirection" value="0"/>
+        <entry-field for="xMomentum" value="0x040000"/>
+      </entry>
     </projectiles>
     <players>
       <entry name="player" function-table="Player" projectileid="PlayerProjectile" frameset="player" frame="standing_right" palette="0"/>
@@ -115,6 +142,7 @@
   <exportorder src="ms-export-order/security-bot.utfseo"/>
   <exportorder src="ms-export-order/jump-towards-player.utfseo"/>
   <exportorder src="ms-export-order/move-left-right.utfseo"/>
+  <exportorder src="ms-export-order/left-right-projectile.utfseo"/>
   <frameset src="metasprites/player.utsi" type="spriteimporter"/>
   <frameset src="metasprites/cleaning-bot.utsi" type="spriteimporter"/>
   <frameset src="metasprites/player-projectile.utsi" type="spriteimporter"/>
@@ -122,6 +150,8 @@
   <frameset src="metasprites/jumping-bug.utsi" type="spriteimporter"/>
   <frameset src="metasprites/fish-left-right.utsi" type="spriteimporter"/>
   <frameset src="metasprites/tall-jumper.utsi" type="spriteimporter"/>
+  <frameset src="metasprites/projectile-bullet.utsi" type="spriteimporter"/>
+  <frameset src="metasprites/jump-and-shoot.utsi" type="spriteimporter"/>
   <palette name="blocky" image="palettes/blocky.png" rows-per-frame="8" animation-delay="35"/>
   <palette name="station" image="palettes/station.png" rows-per-frame="8" animation-delay="255"/>
   <background-image name="water" bit-depth="4" image="bg-images/water.png" palette="station" first-palette="7" npalettes="1" default-order="0"/>

@@ -147,3 +147,10 @@ A @1 v5 o5 {cf}%24
 @1 Pulse16W7F adsr 8 4 1 25
 
 A @1 v8 ~255,1 o5c%30
+
+=== enemyShootProjectile === mml
+; Author: undisbeliever
+
+@1 Pulse32WEF adsr 13 2 6 0
+
+A @1 v5 {o4e o2c}%15

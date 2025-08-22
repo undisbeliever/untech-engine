@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF_8"?>
+<!DOCTYPE untech>
+<spriteimporter id="jump_and_shoot" tilesettype="ONE_ROW_FIXED" exportorder="jump_towards_player" image="jump-and-shoot.png">
+  <grid width="32" height="32" xoffset="0" yoffset="0" xpadding="0" ypadding="0" xorigin="16" yorigin="16"/>
+  <palette position="TOP_LEFT" npalettes="1" colorsize="1"/>
+  <frame id="land" order="2">
+    <gridlocation x="1" y="0"/>
+    <tilehitbox x="9" y="9" width="14" height="14"/>
+    <hitbox x="10" y="10" width="12" height="12"/>
+    <hurtbox x="9" y="9" width="14" height="14"/>
+    <object size="large" x="8" y="8"/>
+  </frame>
+  <frame id="rise" order="2">
+    <gridlocation x="2" y="0"/>
+    <tilehitbox x="9" y="9" width="14" height="14"/>
+    <hitbox x="10" y="10" width="12" height="12"/>
+    <hurtbox x="9" y="9" width="14" height="14"/>
+    <object size="large" x="8" y="8"/>
+  </frame>
+  <frame id="fall" order="2">
+    <gridlocation x="3" y="0"/>
+    <tilehitbox x="9" y="9" width="14" height="14"/>
+    <hitbox x="10" y="10" width="12" height="12"/>
+    <hurtbox x="9" y="9" width="14" height="14"/>
+    <object size="large" x="8" y="8"/>
+    <actionpoint type="EnemyProjectile" x="9" y="15"/>
+  </frame>
+  <frame id="defeated" order="2">
+    <gridlocation x="4" y="0"/>
+    <tilehitbox x="9" y="9" width="14" height="14"/>
+    <object size="large" x="8" y="8"/>
+  </frame>
+  <animation id="rise_left" durationformat="FRAME" oneshot="true">
+    <aframe frame="rise" duration="0"/>
+  </animation>
+  <animation id="fall_left" durationformat="FRAME" oneshot="true">
+    <aframe frame="fall" duration="0"/>
+  </animation>
+  <animation id="land_left" durationformat="TIME" oneshot="true">
+    <aframe frame="land" duration="50"/>
+  </animation>
+  <animation id="defeated_left" durationformat="TIME" oneshot="true">
+    <aframe frame="defeated" duration="75"/>
+  </animation>
+</spriteimporter>

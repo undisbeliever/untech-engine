@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF_8"?>
+<!DOCTYPE untech>
+<fsexportorder name="left_right_projectile">
+  <animation id="left">
+    <alt name="right" hflip="true"/>
+  </animation>
+  <animation id="right">
+    <alt name="right" hflip="true"/>
+  </animation>
+  <animation id="collision_left">
+    <alt name="collision_right" hflip="true"/>
+  </animation>
+  <animation id="collision_right">
+    <alt name="collision_right" hflip="true"/>
+  </animation>
+</fsexportorder>

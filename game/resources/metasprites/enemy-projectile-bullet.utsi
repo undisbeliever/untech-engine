@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF_8"?>
+<!DOCTYPE untech>
+<spriteimporter id="enemy_projectile" tilesettype="ONE_ROW" exportorder="projectile" image="enemy-projectile.png">
+  <grid width="16" height="16" xoffset="0" yoffset="0" xpadding="0" ypadding="0" xorigin="8" yorigin="8"/>
+  <palette position="TOP_LEFT" npalettes="1" colorsize="1"/>
+  <frame id="frame" order="2">
+    <gridlocation x="1" y="0"/>
+    <tilehitbox x="6" y="6" width="4" height="4"/>
+    <hitbox x="6" y="6" width="4" height="4"/>
+    <object size="small" x="4" y="4"/>
+  </frame>
+</spriteimporter>

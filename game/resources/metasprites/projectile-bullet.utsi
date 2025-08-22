@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF_8"?>
+<!DOCTYPE untech>
+<spriteimporter id="enemy_projectile_bullet" tilesettype="ONE_TILE_FIXED" exportorder="left_right_projectile" image="enemy-projectile-bullet.png">
+  <grid width="16" height="16" xoffset="0" yoffset="0" xpadding="0" ypadding="0" xorigin="8" yorigin="8"/>
+  <palette position="TOP_LEFT" npalettes="1" colorsize="1"/>
+  <frame id="frame" order="2">
+    <gridlocation x="1" y="0"/>
+    <tilehitbox x="6" y="6" width="4" height="4"/>
+    <hitbox x="5" y="5" width="6" height="6"/>
+    <object size="small" x="4" y="4"/>
+  </frame>
+  <frame id="collision" order="2">
+    <gridlocation x="2" y="0"/>
+    <object size="small" x="4" y="4"/>
+  </frame>
+  <animation id="left" durationformat="FRAME" oneshot="true">
+    <aframe frame="frame" duration="0"/>
+  </animation>
+  <animation id="right" durationformat="FRAME" oneshot="true">
+    <aframe frame="frame" duration="0"/>
+  </animation>
+  <animation id="collision_left" durationformat="TIME" oneshot="true">
+    <aframe frame="collision" duration="15"/>
+  </animation>
+  <animation id="collision_right" durationformat="TIME" oneshot="true">
+    <aframe frame="collision" duration="15"/>
+  </animation>
+</spriteimporter>
