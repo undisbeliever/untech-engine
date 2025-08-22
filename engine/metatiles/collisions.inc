@@ -328,7 +328,6 @@ i16()
     // Calculate tile index for the top of the tile hitbox (if any)
 
     ldx.b   BaseEntity.MetaSprite.collisionBoxes
-    // collisionBoxes is never null
     lda.l   MetaSprite.Format.CollisionBoxes.TileHitbox.yOffset,x
     sta.w   _yOffsetHeightPair
     bmi     NoHitbox

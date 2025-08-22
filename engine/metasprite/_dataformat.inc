@@ -29,7 +29,7 @@
 
 
 // Data format may be subject to changes
-if MetaSprite.Data.METASPRITE_FORMAT_VERSION != 41 {
+if MetaSprite.Data.METASPRITE_FORMAT_VERSION != 42 {
     error "Invalid UnTech MetaSprite Format"
 }
 
@@ -258,6 +258,11 @@ namespace Format {
     //
     // NOTE: All MetaSprite frames contain a `CollisionBoxes` data structure.
     //       Thus this struct IS NOT accessed with a `index+1` index.
+    //
+    // NOTE: The first `CollisionBoxes` instance in `Data.CollisionBoxData`
+    //       MUST not have any collision boxes.
+    //       (`BaseEntity.MetaSprite.collisionBoxes` is 0 on spawn and may
+    //       not set until AFTER animations have been processed)
     //
     namespace CollisionBoxes {
         struct(Data.CollisionBoxData)

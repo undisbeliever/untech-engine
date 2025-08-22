@@ -58,7 +58,6 @@ namespace MetaSprite {
 
         // CollisionBoxes index for the current frame.
         // This value MUST be set whenever `currentFrame` is changed.
-        // MUST NOT BE NULL
         // (word index into MetaSprite.Format.CollisionBoxes)
         field(MetaSprite.collisionBoxes, 2)
 
