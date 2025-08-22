@@ -91,7 +91,8 @@ a16()
     assert(State.FALL == 0)
     stz.b   EntityStruct.state
 
-    ldy.w   #{GetAnimationId(fall_left)}
+    // Cannot use fall animation - the jump and shoot enemy that spawns a projectile when falling
+    ldy.w   #{GetAnimationId(land_left)}
     jmp     SetAnimation_FacingAndGravity_Y
 }
 
