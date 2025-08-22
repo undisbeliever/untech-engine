@@ -121,6 +121,12 @@
         <entry-field for="swimXMomentum" value="0"/>
         <entry-field for="swimYMomentum" value="0x00c000"/>
       </entry>
+      <entry name="walking_tank" function-table="WalkAvoidLedges" projectileid="SlowLeftRightBullet" listid="enemies" frameset="walking_tank" frame="walk_left_1" palette="0">
+        <entry-field for="knockback" value="1"/>
+        <entry-field for="shieldDirection" value="0"/>
+        <entry-field for="speed" value="0x005000"/>
+        <entry-field for="underwaterSpeed" value="0x004000"/>
+      </entry>
     </entities>
     <projectiles>
       <entry name="PlayerProjectile" function-table="PlayerProjectile" listid="playerProjectiles" frameset="player_projectile" frame="frame1" palette="0"/>
@@ -128,6 +134,11 @@
         <entry-field for="knockback" value="1"/>
         <entry-field for="shieldDirection" value="0"/>
         <entry-field for="xMomentum" value="0x040000"/>
+      </entry>
+      <entry name="SlowLeftRightBullet" function-table="LeftRightProjectile" listid="enemyProjectiles" frameset="enemy_projectile_bullet" frame="frame" palette="0">
+        <entry-field for="knockback" value="1"/>
+        <entry-field for="shieldDirection" value="0"/>
+        <entry-field for="xMomentum" value="0x020000"/>
       </entry>
     </projectiles>
     <players>
@@ -152,6 +163,7 @@
   <frameset src="metasprites/tall-jumper.utsi" type="spriteimporter"/>
   <frameset src="metasprites/projectile-bullet.utsi" type="spriteimporter"/>
   <frameset src="metasprites/jump-and-shoot.utsi" type="spriteimporter"/>
+  <frameset src="metasprites/walking-tank.utsi" type="spriteimporter"/>
   <palette name="blocky" image="palettes/blocky.png" rows-per-frame="8" animation-delay="35"/>
   <palette name="station" image="palettes/station.png" rows-per-frame="8" animation-delay="255"/>
   <background-image name="water" bit-depth="4" image="bg-images/water.png" palette="station" first-palette="7" npalettes="1" default-order="0"/>
