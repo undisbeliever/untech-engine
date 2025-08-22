@@ -24,7 +24,7 @@
       <struct-field name="knockback" type="uint8"/>
       <struct-field name="shieldDirection" type="uint8" comment="0 = horizontal, non-zero = vertical"/>
     </struct>
-    <struct name="WalkAndTurn" parent="BaseEnemy">
+    <struct name="BaseWalkEnemy" parent="BaseEnemy">
       <struct-field name="speed" type="uint24"/>
       <struct-field name="underwaterSpeed" type="uint24"/>
     </struct>
@@ -46,8 +46,8 @@
       <struct-field name="xMomentum" type="uint24"/>
     </struct>
     <function-table name="Player" type="player" export-order="player" parameter-type="unused"/>
-    <function-table name="WalkAndTurn" type="entity" struct="WalkAndTurn" export-order="walk_and_turn" parameter-type="unsigned" comment="0=left, 1=right, 2=up-left, 3=up-right"/>
-    <function-table name="WalkAvoidLedges" type="entity" struct="WalkAndTurn" export-order="walk_and_turn" parameter-type="unsigned" comment="0=left, 1=right, 2=up-left, 3=up-right"/>
+    <function-table name="WalkAndTurn" type="entity" struct="BaseWalkEnemy" export-order="walk_and_turn" parameter-type="unsigned" comment="0=left, 1=right, 2=up-left, 3=up-right"/>
+    <function-table name="WalkAvoidLedges" type="entity" struct="BaseWalkEnemy" export-order="walk_and_turn" parameter-type="unsigned" comment="0=left, 1=right, 2=up-left, 3=up-right"/>
     <function-table name="PlayerProjectile" type="projectile" export-order="player_projectile" parameter-type="unused"/>
     <function-table name="SecurityBot" type="entity" struct="BaseEnemy" export-order="security_bot" parameter-type="unsigned" comment="0=normal-gravity, 1=up-gravity"/>
     <function-table name="JumpTowardsPlayer" type="entity" struct="JumpTowardsPlayer" export-order="jump_towards_player" parameter-type="unsigned" comment="0=normal-gravity, 1=up-gravity"/>
