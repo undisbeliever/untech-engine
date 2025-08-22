@@ -10,9 +10,9 @@
     AgwAAAAAAAAAAAAAAAAAAAAAAACoqQAAAAAAAACoqQAAAAAAAAAAAAAAAAAACwIC
     AgwAAAAAAAAAAAAAAAAAAAAAAAC4uQAAAAAAAAC4uQAAAAAAAAAAAAAAAAAACwIC
     AgwAAAAAAAAAAAAAAAAAAAAAAKipqKmoqQAAAACoqaeoqQAAAACoqQAAAAAAKxgY
-    AgwAAAAAAAAAAAAAAAAAAACoqbi5uLm4uQAAAAC4uae4uQAAp6e4uaipAAAAAC5L
-    AgwAAAAAAAAAAAAAAAAAAAC4uaeoqaipqKkAAACoqaipqKmoqaeoqbi5AAAAAC5L
-    AgwAAAAAAKenp6enp6enp6enp6e4ubi5uLkAAAC4ubi5uLm4uae4uaenpwAAAC5L
+    AgwAAAAAAAAAAAAAAAAAqKmoqbi5uLm4uQAAAAC4uae4uQAAp6e4uaipAAAAAC5L
+    AgwAAAAAAAAAAAAAAACnuLm4uaeoqaipqKkAAACoqaipqKmoqaeoqbi5AAAAAC5L
+    AgwAAAAAAAAAAKenp6enp6enp6e4ubi5uLkAAAC4ubi5uLm4uae4uaenpwAAAC5L
     Ag0DAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMD
     AgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIC
     AgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIC
@@ -20,8 +20,7 @@
   <entrance name="start" x="56" y="162" orientation="down-right"/>
   <entrance name="right_door" x="728" y="162" orientation="down-left"/>
   <entity-group name="init">
-    <entity entity="walking_tank" x="211" y="151" parameter="0"/>
-    <entity entity="walking_tank" x="243" y="150" parameter="1"/>
+    <entity entity="cleaning_bot_slow" x="281" y="120" parameter="0"/>
   </entity-group>
   <script name="Startup">
     <statement opcode="Spawn_Entity_Group" arg1="init"/>
