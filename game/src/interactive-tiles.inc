@@ -66,8 +66,8 @@ constant EntityAirCollision = NullFunction
 constant PlayerLeftRightCollision = NullFunction
 
 
-constant PlayerOriginCollision = Entities.Players.Player.SetLadderStateIfUpDownPressed
-constant PlayerAirCollision = Entities.Players.Player.SetLadderStateIfUpDownPressed
+constant PlayerOriginCollision = Entities.Players.Player.PlayerLadderTileCollision
+constant PlayerAirCollision = Entities.Players.Player.PlayerLadderTileCollision
 
 }
 

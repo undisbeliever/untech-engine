@@ -177,7 +177,8 @@ namespace EntityStruct {
         field(swimCooldown, 1)
 
 
-        // The X-position of the ladder the player is on
+        // The X-position of the ladder the player is on.
+        // Also used to determine if the player is on a ladder.
         // (word)
         field(ladderXpos, 2)
     endstruct()
@@ -193,6 +194,8 @@ code()
 function Init {
     assert(State.NORMAL == 0)
     stz.b   EntityStruct.state
+
+    stz.b   EntityStruct.ladderXpos
 
     // Prevent water SFX from playing after entering a room
     assert(EntityStruct.waterSfxShiftCountdown + 1 == EntityStruct.knockbackCountdown)
@@ -1100,6 +1103,29 @@ function Process__UnderwaterAttack {
 }
 
 
+// REQUIRES: 16 bit A, 16 bit Index, DB = 0x7e
+// INPUT: dp = entity
+a16()
+i16()
+code()
+function Process__Knockback {
+    sep     #$20
+a8()
+    dec.b   EntityStruct.knockbackCountdown
+
+    rep     #$30
+a16()
+
+    bpl     +
+        jmp     _SetNormalOrUnderwaterState
+    +
+
+    MovePlayerWithTileCollisionsAndInteractiveTiles()
+
+    rts
+}
+
+
 // Called by interactive tile
 //
 // REQUIRES: 16 bit A, 16 bit Index, DB = 0x7e
@@ -1107,10 +1133,10 @@ function Process__UnderwaterAttack {
 a16()
 i16()
 code()
-function SetLadderStateIfUpDownPressed {
+function PlayerLadderTileCollision {
     lda.w   Controller.Joy1.pressed
     bit.w   #JOY.up | JOY.down
-    beq     Return
+    beq     EndIf
         lda.w   MetaTiles.map.data,y
         and.w   #0xff
         tax
@@ -1131,38 +1157,11 @@ function SetLadderStateIfUpDownPressed {
         ldx.w   #State.LADDER
         stx.b   EntityStruct.state
 
-        rep     #$30
-    a16()
-        lda.b   EntityStruct.xPos.px
-        and.w   #0xfff0
-        ora.w   #8
-        sta.b   EntityStruct.ladderXpos
-
-Return:
-    rep     #$30
-a16()
-    rts
-}
-
-
-// REQUIRES: 16 bit A, 16 bit Index, DB = 0x7e
-// INPUT: dp = entity
-a16()
-i16()
-code()
-function Process__Knockback {
-    sep     #$20
-a8()
-    dec.b   EntityStruct.knockbackCountdown
-
-    rep     #$30
-a16()
-
-    bpl     +
-        jmp     _SetNormalOrUnderwaterState
-    +
-
-    MovePlayerWithTileCollisionsAndInteractiveTiles()
+EndIf:
+    lda.b   EntityStruct.xPos.px
+    and.w   #0xfff0
+    ora.w   #8
+    sta.b   EntityStruct.ladderXpos
 
     rts
 }
@@ -1266,28 +1265,15 @@ EndIf:
     rep     #$30
 a16()
 i16()
+    stz.b   EntityStruct.ladderXpos
+
     MovePlayerWithTileCollisionsAndInteractiveTiles()
 
-    // Test if still on the ladder
-    lda.b   BaseEntity.yPos.px
-    and.w   MetaTiles.map.yPositionMask
-    assert(MetaTiles.METATILE_SIZE_PX == 1 << 4)
-    lsr
-    lsr
-    lsr
-    lsr
-    ora.w   MetaTiles.MoveEntityAndProcessTileCollisions__far._tileIndexTmp
-    tax
-    // X = map index at the tile
-    lda.w   MetaTiles.map.data,x
-    sep     #$30
+    sep     #$20
 a8()
-i8()
-    tax
-    lda.w   MetaTiles.Tileset.interactiveTilesMap,x
-    and.b   #MetaTiles.Tileset.interactiveTilesMap.MASK
-    cmp.b   #InteractiveTiles.LADDER_INTERACTIVE_TILES_INDEX
-    beq     +
+
+    ldx.b   EntityStruct.ladderXpos
+    bne     OnLadder
         // Not on a ladder
 
         // Enable gravity
@@ -1298,7 +1284,6 @@ i8()
         lda.b   #1 << (LADDER_COYOTE_TIME_FRAMES - 1)
         sta.b   EntityStruct.coyoteJumpBuffer
 
-        // Not on a ladder
         stz.b   EntityStruct.yMomentum.px
 
         rep     #$30
@@ -1307,7 +1292,7 @@ i8()
         stz.b   EntityStruct.yMomentum.sx
 
         jmp     _SetNormalOrUnderwaterState
-    +
+    OnLadder:
 
 
     // Use player y-position to determine metasprite frame
