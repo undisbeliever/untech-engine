@@ -75,6 +75,10 @@ constant COYOTE_TIME_FRAMES = 8
 // ::TODO adjust::
 constant LADDER_COYOTE_TIME_FRAMES = 5
 
+
+constant LADDER_COOLDOWN_FRAMES = 5
+
+
 // Number of frames between B swim up/down actions
 // ::TODO adjust::
 constant SWIM_COOLDOWN_FRAMES = 20
@@ -181,6 +185,13 @@ namespace EntityStruct {
         // Also used to determine if the player is on a ladder.
         // (word)
         field(ladderXpos, 2)
+
+        // Right-shift cooldown frame counter to prevent player from
+        // instantly re-grabbing a ladder after jumping off it when
+        // up/down is held.
+        //
+        // (word)
+        field(ladderCooldown, 2)
     endstruct()
 }
 
@@ -196,6 +207,7 @@ function Init {
     stz.b   EntityStruct.state
 
     stz.b   EntityStruct.ladderXpos
+    stz.b   EntityStruct.ladderCooldown
 
     // Prevent water SFX from playing after entering a room
     assert(EntityStruct.waterSfxShiftCountdown + 1 == EntityStruct.knockbackCountdown)
@@ -483,6 +495,8 @@ a8()
 
     rep     #$30
 a16()
+
+    lsr.b   EntityStruct.ladderCooldown
 
     ldx.b   EntityStruct.state
     jsr     (ProcessFunctionTable,x)
@@ -1134,25 +1148,42 @@ a16()
 i16()
 code()
 function PlayerLadderTileCollision {
-    lda.w   Controller.Joy1.pressed
+    lda.w   Controller.Joy1.current
+
+    ldx.b   EntityStruct.ladderCooldown
+    beq     +
+        // Renew the ladder cooldown to prevent a frame alternating
+        // grab-release loop when holding up/down and left/right.
+        ldx.w   #1 << LADDER_COOLDOWN_FRAMES
+        stx.b   EntityStruct.ladderCooldown
+
+        // Allow the player to regrab onto the ladder after reaching the top
+        // or jumping up the ladder.
+        lda.w   Controller.Joy1.pressed
+    +
+
     bit.w   #JOY.up | JOY.down
     beq     EndIf
-        lda.w   MetaTiles.map.data,y
-        and.w   #0xff
-        tax
-        lda.w   MetaTiles.Tileset.collisionMap,x
-        and.w   #0xff
-        cmp.w   #MetaTiles.TileCollisionType.UP_PLATFORM
-        bne     +
-            // Move the player down 1 unit so it is below an up-platform tile
-            inc.b   EntityStruct.yPos.px
-            bra     ++
-        +
-        cmp.w   #MetaTiles.TileCollisionType.DOWN_PLATFORM
-        bne     +
-            // Move the player down 1 unit so it is below an up-platform tile
-            inc.b   EntityStruct.yPos.px
-        +
+        lda.b   EntityStruct.movementState
+        bit.w   #Entity.MovementState.STANDING_FLAG
+        beq     NotStanding
+            lda.w   MetaTiles.map.data,y
+            and.w   #0xff
+            tax
+            lda.w   MetaTiles.Tileset.collisionMap,x
+            and.w   #0xff
+            cmp.w   #MetaTiles.TileCollisionType.UP_PLATFORM
+            bne     +
+                // Move the player down 1 unit so it is below an up-platform tile
+                inc.b   EntityStruct.yPos.px
+                bra     ++
+            +
+            cmp.w   #MetaTiles.TileCollisionType.DOWN_PLATFORM
+            bne     +
+                // Move the player down 1 unit so it is below an up-platform tile
+                inc.b   EntityStruct.yPos.px
+            +
+        NotStanding:
 
         ldx.w   #State.LADDER
         stx.b   EntityStruct.state
@@ -1258,6 +1289,10 @@ EndIf:
         rep     #$30
     a16()
     i16()
+        assert(LADDER_COYOTE_TIME_FRAMES < 15)
+        lda.w   #1 << LADDER_COOLDOWN_FRAMES
+        sta.b   EntityStruct.ladderCooldown
+
         jmp     _SetNormalOrUnderwaterState
     NoJump:
 
@@ -1290,6 +1325,10 @@ a8()
     a16()
     i16()
         stz.b   EntityStruct.yMomentum.sx
+
+        assert(LADDER_COYOTE_TIME_FRAMES < 15)
+        lda.w   #1 << LADDER_COOLDOWN_FRAMES
+        sta.b   EntityStruct.ladderCooldown
 
         jmp     _SetNormalOrUnderwaterState
     OnLadder:
