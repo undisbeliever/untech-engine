@@ -16,7 +16,7 @@ TABLE_DIRS     := tables
 UNTECH_DIR     := ..
 
 GEN_DIR        := gen
-RESOURCES      := gen/font-fixed.1bpp
+RESOURCES      := gen/font-fixed.2bpp
 
 
 RESOURCES      += gen/movement-table.inc
@@ -49,8 +49,8 @@ gen/movement-table.inc: resources/movement-table.csv tools/gen-movement-table.py
 	python3 -bb tools/gen-movement-table.py -o "$@" resources/movement-table.csv
 
 
-gen/font-fixed.1bpp: resources/text/font-fixed.png
-	$(untech-png2tileset) -b 1 -o '$@' '$<'
+gen/font-fixed.2bpp: resources/text/font-fixed.png
+	$(untech-png2tileset) -b 2 -o '$@' '$<'
 
 
 

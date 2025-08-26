@@ -57,8 +57,8 @@ include "../resources/text/text.inc"
 namespace Text {
     namespace Font {
 rodata()
-        insert FixedTiles, "../gen/font-fixed.1bpp"
-        constant FixedTiles.bitDepth = 1
+        insert FixedTiles, "../gen/font-fixed.2bpp"
+        constant FixedTiles.bitDepth = 2
     }
 }
 

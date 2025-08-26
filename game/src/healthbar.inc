@@ -30,12 +30,13 @@ constant MAX_HEALTH = 6
 constant SHIELD_X = 1
 constant SHIELD_Y = 1
 
-// ::TODO draw shield tiles::
-constant SHIELD_TILE = 0x48
-constant NO_SHIELD_TILE = 0x4b
+constant SHIELD_TILE = Text.Font.SHIELD_1
+constant NO_SHIELD_TILE = Text.Font.NO_SHIELD_1
 
 constant playerHealth = Project.GameState.Words.playerHealth
+
 constant shieldBuffer = Text.buffer + (Text.Console.MARGIN_TOP + Healthbar.SHIELD_Y) * Text.Console.BUFFER_WIDTH + Text.Console.MARGIN_LEFT + Healthbar.SHIELD_X
+
 
 
 // Health visible in the UI
@@ -58,9 +59,27 @@ macro Init() {
     assert16a()
     assert16i()
 
-    Text.Console.SetCursor(Healthbar.SHIELD_X, Healthbar.SHIELD_Y - 1)
-    Text.Console.PrintConstString("SHIELD")
+    jsr     Text.Console.ClearBuffer
 
+
+    sep     #$30
+a8()
+i8()
+    constant _SX = Healthbar.SHIELD_X + (Healthbar.MAX_HEALTH - Text.Font.SHIELD_LABEL_LEN) / 2
+    constant _SY = Healthbar.SHIELD_Y - 1
+    constant _shieldLabel = Text.buffer + (Text.Console.MARGIN_TOP + _SY) * Text.Console.BUFFER_WIDTH + Text.Console.MARGIN_LEFT + _SX
+
+    lda.b   #Text.Font.SHIELD_LABEL + Text.Font.SHIELD_LABEL_LEN - 1
+    ldx.b   #Text.Font.SHIELD_LABEL_LEN - 1
+    -
+        sta.w   _shieldLabel,x
+        dec
+        dex
+        bpl     -
+
+    rep     #$30
+a16()
+i16()
     jsr     Healthbar.RedrawHealthBar
 }
 
@@ -84,28 +103,30 @@ i8()
     sta.w   playerHealth
     sta.w   uiHealth
 
-    tay
-    tax
 
     // Draw shield tiles
-    beq     +
-        lda.b   #SHIELD_TILE
-        -
-            dex
-            sta.w   shieldBuffer,x
-            bne     -
-    +
+    // Not fast, but it doesn't need to be
+    assert(MAX_HEALTH % 2 == 0)
+    lda.b   #NO_SHIELD_TILE
+    ldx.b   #MAX_HEALTH - 1
+    -
+        cpx.w   playerHealth
+        bcs     +
+            lda.b   #SHIELD_TILE
+        +
+        inc
+        sta.w   shieldBuffer,x
+        dec
+        dex
 
-    // Draw empty shield tiles
-    cpy.b   #MAX_HEALTH
-    bcs     +
-        lda.b   #NO_SHIELD_TILE
-        -
-            sta.w   shieldBuffer,y
-            iny
-            cpy.b   #MAX_HEALTH
-            bcc     -
-    +
+        cpx.w   playerHealth
+        bcs     +
+            lda.b   #SHIELD_TILE
+        +
+        sta.w   shieldBuffer,x
+
+        dex
+        bpl     -
 
 
     stz.w   vblank_healthTile
@@ -157,7 +178,7 @@ macro Process() {
                 ldx.w   Healthbar.uiHealth
                 inc.w   Healthbar.uiHealth
 
-                lda.b   #Healthbar.SHIELD_TILE
+                ldy.b   #Healthbar.SHIELD_TILE
                 bra     EndIf
 
             Decrement:
@@ -166,9 +187,16 @@ macro Process() {
                 dex
                 stx.w   Healthbar.uiHealth
 
-                lda.b   #Healthbar.NO_SHIELD_TILE
+                ldy.b   #Healthbar.NO_SHIELD_TILE
             EndIf:
 
+            txa
+            lsr
+            bcc     +
+                iny
+            +
+
+            tya
             sta.w   Healthbar.shieldBuffer,x
             sta.w   Healthbar.vblank_healthTile
 
