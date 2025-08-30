@@ -3,119 +3,133 @@
 <spriteimporter id="walking_tank" tilesettype="TWO_ROWS_FIXED" exportorder="walk_and_turn" image="walking-tank.png">
   <grid width="32" height="32" xoffset="0" yoffset="0" xpadding="0" ypadding="0" xorigin="16" yorigin="16"/>
   <palette position="TOP_LEFT" npalettes="1" colorsize="1"/>
-  <frame id="walk_left_1" order="2">
+  <frame id="walk_right_1" order="2">
     <gridlocation x="1" y="0"/>
     <tilehitbox x="5" y="7" width="22" height="18"/>
-    <shield x="6" y="7" width="7" height="18"/>
-    <hitbox x="7" y="8" width="19" height="16"/>
-    <hurtbox x="14" y="7" width="13" height="18"/>
-    <object size="large" x="4" y="3"/>
+    <shield x="18" y="6" width="8" height="19"/>
+    <hitbox x="6" y="8" width="19" height="16"/>
+    <hurtbox x="5" y="7" width="13" height="18"/>
+    <object size="small" x="4" y="3"/>
+    <object size="small" x="12" y="3"/>
     <object size="small" x="20" y="3"/>
+    <object size="large" x="4" y="11"/>
     <object size="small" x="20" y="11"/>
-    <object size="small" x="4" y="19"/>
     <object size="small" x="20" y="19"/>
-    <object size="small" x="12" y="19"/>
   </frame>
-  <frame id="walk_left_2" order="2">
+  <frame id="walk_right_2" order="2">
     <gridlocation x="2" y="0"/>
     <tilehitbox x="5" y="7" width="22" height="18"/>
-    <shield x="6" y="7" width="7" height="18"/>
-    <hitbox x="7" y="8" width="19" height="16"/>
-    <hurtbox x="14" y="7" width="13" height="18"/>
-    <object size="large" x="4" y="3"/>
+    <shield x="18" y="6" width="8" height="19"/>
+    <hitbox x="6" y="8" width="19" height="16"/>
+    <hurtbox x="5" y="7" width="13" height="18"/>
+    <object size="small" x="4" y="3"/>
+    <object size="small" x="12" y="3"/>
     <object size="small" x="20" y="3"/>
+    <object size="large" x="4" y="11"/>
     <object size="small" x="20" y="11"/>
-    <object size="small" x="4" y="19"/>
     <object size="small" x="20" y="19"/>
-    <object size="small" x="12" y="19"/>
   </frame>
-  <frame id="walk_left_3" order="2">
+  <frame id="walk_right_2b" order="2">
     <gridlocation x="3" y="0"/>
     <tilehitbox x="5" y="7" width="22" height="18"/>
-    <shield x="6" y="7" width="7" height="18"/>
-    <hitbox x="7" y="8" width="19" height="16"/>
-    <hurtbox x="14" y="7" width="13" height="18"/>
-    <object size="large" x="4" y="3"/>
+    <shield x="18" y="6" width="8" height="19"/>
+    <hitbox x="6" y="8" width="19" height="16"/>
+    <hurtbox x="5" y="7" width="13" height="18"/>
+    <object size="small" x="4" y="3"/>
+    <object size="small" x="12" y="3"/>
     <object size="small" x="20" y="3"/>
+    <object size="large" x="4" y="11"/>
     <object size="small" x="20" y="11"/>
-    <object size="small" x="4" y="19"/>
     <object size="small" x="20" y="19"/>
-    <object size="small" x="12" y="19"/>
+    <actionpoint type="EnemyProjectile" x="26" y="14"/>
   </frame>
-  <frame id="attack_left_a" order="2">
+  <frame id="walk_right_3" order="3">
     <gridlocation x="4" y="0"/>
     <tilehitbox x="5" y="7" width="22" height="18"/>
-    <shield x="6" y="7" width="7" height="18"/>
-    <hitbox x="7" y="8" width="19" height="16"/>
-    <hurtbox x="14" y="7" width="13" height="18"/>
-    <object size="large" x="4" y="3"/>
+    <shield x="18" y="6" width="8" height="19"/>
+    <hitbox x="6" y="8" width="19" height="16"/>
+    <hurtbox x="5" y="7" width="13" height="18"/>
+    <object size="small" x="4" y="3"/>
+    <object size="small" x="12" y="3"/>
     <object size="small" x="20" y="3"/>
+    <object size="large" x="4" y="11"/>
     <object size="small" x="20" y="11"/>
-    <object size="small" x="4" y="19"/>
     <object size="small" x="20" y="19"/>
-    <object size="small" x="12" y="19"/>
   </frame>
-  <frame id="attack_left_b" order="2">
+  <frame id="walk_right_4" order="3">
     <gridlocation x="5" y="0"/>
     <tilehitbox x="5" y="7" width="22" height="18"/>
-    <shield x="6" y="7" width="7" height="18"/>
-    <hitbox x="7" y="8" width="19" height="16"/>
-    <hurtbox x="14" y="7" width="13" height="18"/>
-    <object size="large" x="4" y="3"/>
+    <shield x="18" y="6" width="8" height="19"/>
+    <hitbox x="6" y="8" width="19" height="16"/>
+    <hurtbox x="5" y="7" width="13" height="18"/>
+    <object size="small" x="4" y="3"/>
+    <object size="small" x="12" y="3"/>
     <object size="small" x="20" y="3"/>
+    <object size="large" x="4" y="11"/>
     <object size="small" x="20" y="11"/>
-    <object size="small" x="4" y="19"/>
     <object size="small" x="20" y="19"/>
-    <object size="small" x="12" y="19"/>
-    <actionpoint type="EnemyProjectile" x="3" y="14"/>
   </frame>
-  <frame id="turn_left_1" order="2">
+  <frame id="walk_right_4b" order="3">
     <gridlocation x="0" y="1"/>
     <tilehitbox x="5" y="7" width="22" height="18"/>
-    <shield x="9" y="7" width="7" height="18"/>
-    <hitbox x="10" y="8" width="12" height="16"/>
-    <hurtbox x="17" y="7" width="6" height="18"/>
-    <object size="large" x="8" y="6"/>
-    <object size="small" x="16" y="22"/>
-    <object size="small" x="8" y="22"/>
+    <shield x="18" y="6" width="8" height="19"/>
+    <hitbox x="6" y="8" width="19" height="16"/>
+    <hurtbox x="5" y="7" width="13" height="18"/>
+    <object size="small" x="4" y="3"/>
+    <object size="small" x="12" y="3"/>
+    <object size="small" x="20" y="3"/>
+    <object size="large" x="4" y="11"/>
+    <object size="small" x="20" y="11"/>
+    <object size="small" x="20" y="19"/>
+    <actionpoint type="EnemyProjectile" x="26" y="14"/>
   </frame>
-  <frame id="turn_left_2" order="2">
+  <frame id="turn_left_1" order="3">
     <gridlocation x="1" y="1"/>
-    <tilehitbox x="4" y="7" width="22" height="18"/>
-    <shield x="11" y="7" width="10" height="17"/>
-    <hitbox x="11" y="8" width="10" height="16"/>
-    <object size="large" x="8" y="6"/>
-    <object size="small" x="16" y="22"/>
-    <object size="small" x="8" y="22"/>
+    <tilehitbox x="5" y="7" width="22" height="18"/>
+    <shield x="16" y="6" width="8" height="19"/>
+    <hitbox x="8" y="8" width="15" height="16"/>
+    <hurtbox x="8" y="7" width="12" height="18"/>
+    <object size="small" x="7" y="3"/>
+    <object size="large" x="7" y="11"/>
+    <object size="small" x="15" y="3"/>
+    <object size="small" x="23" y="3"/>
+    <object size="small" x="23" y="11"/>
+    <object size="small" x="23" y="19"/>
   </frame>
-  <frame id="defeated_left" order="2">
+  <frame id="turn_left_2" order="3">
     <gridlocation x="2" y="1"/>
     <tilehitbox x="5" y="7" width="22" height="18"/>
-    <object size="large" x="4" y="3"/>
-    <object size="small" x="20" y="3"/>
-    <object size="small" x="20" y="11"/>
-    <object size="small" x="4" y="19"/>
-    <object size="small" x="20" y="19"/>
-    <object size="small" x="12" y="19"/>
+    <shield x="10" y="5" width="12" height="19"/>
+    <hitbox x="9" y="8" width="14" height="16"/>
+    <object size="small" x="8" y="3"/>
+    <object size="large" x="7" y="11"/>
+    <object size="small" x="16" y="3"/>
+    <object size="small" x="23" y="11"/>
   </frame>
-  <animation id="walk_left" durationformat="DISTANCE_HORIZONTAL">
-    <aframe frame="walk_left_1" duration="128"/>
-    <aframe frame="attack_left_a" duration="128"/>
-    <aframe frame="attack_left_b" duration="128"/>
-    <aframe frame="walk_left_2" duration="192"/>
-    <aframe frame="walk_left_2" duration="192"/>
-    <aframe frame="walk_left_1" duration="128"/>
-    <aframe frame="attack_left_a" duration="128"/>
-    <aframe frame="attack_left_b" duration="128"/>
-    <aframe frame="walk_left_3" duration="192"/>
-    <aframe frame="walk_left_3" duration="192"/>
+  <frame id="defeated_right" order="2">
+    <gridlocation x="3" y="1"/>
+    <tilehitbox x="5" y="7" width="22" height="18"/>
+    <object size="small" x="4" y="3"/>
+    <object size="small" x="12" y="3"/>
+    <object size="small" x="20" y="3"/>
+    <object size="large" x="4" y="11"/>
+    <object size="small" x="20" y="11"/>
+    <object size="small" x="20" y="19"/>
+  </frame>
+  <animation id="walk_right" durationformat="DISTANCE_HORIZONTAL">
+    <aframe frame="walk_right_1" duration="192"/>
+    <aframe frame="walk_right_2" duration="96"/>
+    <aframe frame="walk_right_2b" duration="96"/>
+    <aframe frame="walk_right_3" duration="192"/>
+    <aframe frame="walk_right_4" duration="96"/>
+    <aframe frame="walk_right_4b" duration="96"/>
   </animation>
   <animation id="turn_left" durationformat="TIME" oneshot="true">
-    <aframe frame="turn_left_1" hflip="true" duration="25"/>
-    <aframe frame="turn_left_2" duration="25"/>
-    <aframe frame="turn_left_1" duration="25"/>
+    <aframe frame="turn_left_1" duration="15"/>
+    <aframe frame="turn_left_2" duration="20"/>
+    <aframe frame="turn_left_1" hflip="true" duration="15"/>
   </animation>
-  <animation id="defeated_left" durationformat="TIME" oneshot="true">
-    <aframe frame="defeated_left" duration="25"/>
+  <animation id="defeated_right" durationformat="TIME" oneshot="true">
+    <aframe frame="defeated_right" duration="25"/>
   </animation>
 </spriteimporter>

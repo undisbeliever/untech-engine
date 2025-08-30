@@ -70,8 +70,9 @@
         <entry-field for="speed" value="0x012000"/>
         <entry-field for="underwaterSpeed" value="0x004444"/>
       </entry>
-      <entry name="secutity_bot" function-table="SecurityBot" listid="enemies" frameset="security_bot" frame="frame" palette="0">
+      <entry name="secutity_bot" function-table="SecurityBot" listid="enemies" frameset="security_bot" frame="frame1" palette="0">
         <entry-field for="knockback" value="1"/>
+        <entry-field for="shieldDirection" value="0"/>
       </entry>
       <entry name="jumping_bug" function-table="JumpTowardsPlayer" listid="enemies" frameset="jumping_bug" frame="fall_left" palette="0">
         <entry-field for="airXMomentum" value="0x015000"/>
@@ -81,7 +82,7 @@
         <entry-field for="swimXMomentum" value="0x012000"/>
         <entry-field for="swimYMomentum" value="0x00dddd"/>
       </entry>
-      <entry name="tall_jumper" function-table="JumpAroundSpawn" listid="enemies" frameset="tall_jumper" frame="rise_left" palette="0">
+      <entry name="tall_jumper" function-table="JumpAroundSpawn" listid="enemies" frameset="tall_jumper" frame="land_left_1" palette="0">
         <entry-field for="airXMomentum" value="0x005000"/>
         <entry-field for="airYMomentum" value="0x04cccc"/>
         <entry-field for="distanceFromSpawn" value="30"/>
@@ -103,7 +104,7 @@
         <entry-field for="shieldDirection" value="0"/>
         <entry-field for="xMomentum" value="0x010000"/>
       </entry>
-      <entry name="jump_and_shoot_low" function-table="JumpTowardsPlayer" projectileid="LeftRightBullet" listid="enemies" frameset="jump_and_shoot" frame="land" palette="0">
+      <entry name="jump_and_shoot_low" function-table="JumpTowardsPlayer" projectileid="LeftRightBullet" listid="enemies" frameset="jump_and_shoot" frame="land_1" palette="0">
         <entry-field for="airXMomentum" value="0"/>
         <entry-field for="airYMomentum" value="0x020000"/>
         <entry-field for="knockback" value="1"/>
@@ -112,7 +113,7 @@
         <entry-field for="swimXMomentum" value="0"/>
         <entry-field for="swimYMomentum" value="0x00c000"/>
       </entry>
-      <entry name="jump_and_shoot_high" function-table="JumpTowardsPlayer" projectileid="LeftRightBullet" listid="enemies" frameset="jump_and_shoot" frame="land" palette="0">
+      <entry name="jump_and_shoot_high" function-table="JumpTowardsPlayer" projectileid="LeftRightBullet" listid="enemies" frameset="jump_and_shoot" frame="land_2" palette="0">
         <entry-field for="airXMomentum" value="0"/>
         <entry-field for="airYMomentum" value="0x042000"/>
         <entry-field for="knockback" value="1"/>
@@ -121,10 +122,10 @@
         <entry-field for="swimXMomentum" value="0"/>
         <entry-field for="swimYMomentum" value="0x00c000"/>
       </entry>
-      <entry name="walking_tank" function-table="WalkAvoidLedges" projectileid="SlowLeftRightBullet" listid="enemies" frameset="walking_tank" frame="walk_left_1" palette="0">
+      <entry name="walking_tank" function-table="WalkAvoidLedges" projectileid="SlowLeftRightBullet" listid="enemies" frameset="walking_tank" frame="walk_right_1" palette="0">
         <entry-field for="knockback" value="1"/>
         <entry-field for="shieldDirection" value="0"/>
-        <entry-field for="speed" value="0x005000"/>
+        <entry-field for="speed" value="0x003000"/>
         <entry-field for="underwaterSpeed" value="0x004000"/>
       </entry>
     </entities>

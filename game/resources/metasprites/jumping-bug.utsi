@@ -3,35 +3,47 @@
 <spriteimporter id="jumping_bug" tilesettype="ONE_ROW_FIXED" exportorder="jump_towards_player" image="jumping-bug.png">
   <grid width="32" height="32" xoffset="0" yoffset="0" xpadding="0" ypadding="0" xorigin="16" yorigin="16"/>
   <palette position="TOP_LEFT" npalettes="1" colorsize="1"/>
-  <frame id="landed_left" order="2">
+  <frame id="landed_left_1" order="2">
     <gridlocation x="1" y="0"/>
     <tilehitbox x="6" y="12" width="20" height="8"/>
     <hitbox x="7" y="12" width="18" height="8"/>
     <hurtbox x="6" y="11" width="20" height="10"/>
-    <object size="large" x="0" y="8"/>
-    <object size="large" x="16" y="8"/>
+    <object size="large" x="4" y="8"/>
+    <object size="small" x="20" y="8"/>
+    <object size="small" x="20" y="16"/>
+  </frame>
+  <frame id="landed_left_2" order="2">
+    <gridlocation x="2" y="0"/>
+    <tilehitbox x="6" y="12" width="20" height="8"/>
+    <hitbox x="7" y="12" width="18" height="8"/>
+    <hurtbox x="6" y="11" width="20" height="10"/>
+    <object size="large" x="4" y="8"/>
+    <object size="small" x="20" y="8"/>
+    <object size="small" x="20" y="16"/>
   </frame>
   <frame id="rise_left" order="2">
-    <gridlocation x="2" y="0"/>
-    <tilehitbox x="6" y="12" width="19" height="8"/>
-    <hitbox x="7" y="12" width="17" height="7"/>
-    <hurtbox x="6" y="11" width="19" height="9"/>
-    <object size="large" x="0" y="8"/>
-    <object size="large" x="16" y="8"/>
+    <gridlocation x="3" y="0"/>
+    <tilehitbox x="6" y="12" width="20" height="8"/>
+    <hitbox x="7" y="12" width="18" height="8"/>
+    <hurtbox x="6" y="12" width="20" height="9"/>
+    <object size="large" x="4" y="8"/>
+    <object size="small" x="20" y="12"/>
+    <object size="small" x="20" y="20"/>
   </frame>
   <frame id="fall_left" order="2">
-    <gridlocation x="3" y="0"/>
-    <tilehitbox x="6" y="12" width="19" height="8"/>
-    <hitbox x="7" y="13" width="17" height="7"/>
-    <hurtbox x="6" y="12" width="19" height="9"/>
-    <object size="large" x="0" y="8"/>
-    <object size="large" x="16" y="8"/>
+    <gridlocation x="4" y="0"/>
+    <tilehitbox x="6" y="12" width="20" height="8"/>
+    <hitbox x="7" y="12" width="18" height="8"/>
+    <hurtbox x="6" y="12" width="20" height="9"/>
+    <object size="large" x="4" y="8"/>
+    <object size="small" x="20" y="8"/>
+    <object size="small" x="20" y="16"/>
   </frame>
   <frame id="defeated_left" order="2">
-    <gridlocation x="4" y="0"/>
+    <gridlocation x="5" y="0"/>
     <tilehitbox x="7" y="12" width="17" height="8"/>
-    <object size="large" x="0" y="8"/>
-    <object size="large" x="16" y="8"/>
+    <object size="large" x="4" y="9"/>
+    <object size="small" x="20" y="13"/>
   </frame>
   <animation id="rise_left" durationformat="FRAME">
     <aframe frame="rise_left" duration="255"/>
@@ -40,7 +52,8 @@
     <aframe frame="fall_left" duration="255"/>
   </animation>
   <animation id="land_left" durationformat="TIME" oneshot="true">
-    <aframe frame="landed_left" duration="30"/>
+    <aframe frame="landed_left_1" duration="10"/>
+    <aframe frame="landed_left_2" duration="25"/>
   </animation>
   <animation id="defeated_left" durationformat="TIME">
     <aframe frame="defeated_left" duration="75"/>

@@ -3,32 +3,39 @@
 <spriteimporter id="jump_and_shoot" tilesettype="ONE_ROW_FIXED" exportorder="jump_towards_player" image="jump-and-shoot.png">
   <grid width="32" height="32" xoffset="0" yoffset="0" xpadding="0" ypadding="0" xorigin="16" yorigin="16"/>
   <palette position="TOP_LEFT" npalettes="1" colorsize="1"/>
-  <frame id="land" order="2">
-    <gridlocation x="1" y="0"/>
-    <tilehitbox x="9" y="9" width="14" height="14"/>
-    <hitbox x="10" y="10" width="12" height="12"/>
-    <hurtbox x="9" y="9" width="14" height="14"/>
-    <object size="large" x="8" y="8"/>
-  </frame>
   <frame id="rise" order="2">
-    <gridlocation x="2" y="0"/>
-    <tilehitbox x="9" y="9" width="14" height="14"/>
+    <gridlocation x="1" y="0"/>
+    <tilehitbox x="9" y="10" width="14" height="12"/>
     <hitbox x="10" y="10" width="12" height="12"/>
-    <hurtbox x="9" y="9" width="14" height="14"/>
-    <object size="large" x="8" y="8"/>
+    <hurtbox x="10" y="9" width="13" height="10"/>
+    <object size="large" x="8" y="9"/>
   </frame>
   <frame id="fall" order="2">
-    <gridlocation x="3" y="0"/>
-    <tilehitbox x="9" y="9" width="14" height="14"/>
+    <gridlocation x="2" y="0"/>
+    <tilehitbox x="9" y="10" width="14" height="12"/>
     <hitbox x="10" y="10" width="12" height="12"/>
-    <hurtbox x="9" y="9" width="14" height="14"/>
-    <object size="large" x="8" y="8"/>
+    <hurtbox x="10" y="9" width="13" height="10"/>
+    <object size="large" x="8" y="9"/>
     <actionpoint type="EnemyProjectile" x="9" y="15"/>
   </frame>
-  <frame id="defeated" order="2">
+  <frame id="land_1" order="2">
+    <gridlocation x="3" y="0"/>
+    <tilehitbox x="9" y="10" width="14" height="12"/>
+    <hitbox x="10" y="10" width="12" height="12"/>
+    <hurtbox x="10" y="9" width="13" height="10"/>
+    <object size="large" x="8" y="9"/>
+  </frame>
+  <frame id="land_2" order="2">
     <gridlocation x="4" y="0"/>
-    <tilehitbox x="9" y="9" width="14" height="14"/>
-    <object size="large" x="8" y="8"/>
+    <tilehitbox x="9" y="10" width="14" height="12"/>
+    <hitbox x="10" y="12" width="12" height="10"/>
+    <hurtbox x="10" y="11" width="13" height="12"/>
+    <object size="large" x="8" y="9"/>
+  </frame>
+  <frame id="defeated" order="2">
+    <gridlocation x="5" y="0"/>
+    <tilehitbox x="9" y="10" width="14" height="12"/>
+    <object size="large" x="8" y="9"/>
   </frame>
   <animation id="rise_left" durationformat="FRAME" oneshot="true">
     <aframe frame="rise" duration="0"/>
@@ -37,7 +44,8 @@
     <aframe frame="fall" duration="0"/>
   </animation>
   <animation id="land_left" durationformat="TIME" oneshot="true">
-    <aframe frame="land" duration="50"/>
+    <aframe frame="land_1" duration="30"/>
+    <aframe frame="land_2" duration="20"/>
   </animation>
   <animation id="defeated_left" durationformat="TIME" oneshot="true">
     <aframe frame="defeated" duration="75"/>

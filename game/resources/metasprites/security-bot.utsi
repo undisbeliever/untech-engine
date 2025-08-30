@@ -3,28 +3,39 @@
 <spriteimporter id="security_bot" tilesettype="ONE_ROW_FIXED" exportorder="security_bot" image="security-bot.png">
   <grid width="32" height="64" xoffset="0" yoffset="0" xpadding="0" ypadding="0" xorigin="16" yorigin="37"/>
   <palette position="TOP_LEFT" npalettes="1" colorsize="1"/>
-  <frame id="frame" order="2">
+  <frame id="frame1" order="2">
     <gridlocation x="1" y="0"/>
     <tilehitbox x="11" y="18" width="10" height="38"/>
-    <shield x="8" y="19" width="6" height="34"/>
-    <hitbox x="12" y="17" width="8" height="35"/>
+    <shield x="8" y="18" width="6" height="35"/>
+    <hitbox x="12" y="19" width="8" height="33"/>
+    <hurtbox x="17" y="19" width="4" height="35"/>
+    <object size="large" x="8" y="25"/>
+    <object size="large" x="8" y="41"/>
+    <object size="large" x="8" y="9"/>
+  </frame>
+  <frame id="frame2" order="2">
+    <gridlocation x="2" y="0"/>
+    <tilehitbox x="11" y="18" width="10" height="38"/>
+    <shield x="8" y="18" width="6" height="35"/>
+    <hitbox x="12" y="19" width="8" height="33"/>
     <hurtbox x="17" y="19" width="4" height="35"/>
     <object size="large" x="8" y="25"/>
     <object size="large" x="8" y="41"/>
     <object size="large" x="8" y="9"/>
   </frame>
   <frame id="defeated" order="2">
-    <gridlocation x="2" y="0"/>
+    <gridlocation x="3" y="0"/>
     <tilehitbox x="11" y="18" width="10" height="38"/>
     <object size="large" x="8" y="25"/>
     <object size="large" x="8" y="41"/>
     <object size="large" x="8" y="9"/>
   </frame>
-  <animation id="move_left" durationformat="FRAME">
-    <aframe frame="frame" duration="255"/>
+  <animation id="move_left" durationformat="TIME">
+    <aframe frame="frame1" duration="15"/>
+    <aframe frame="frame2" duration="15"/>
   </animation>
   <animation id="turn_left" durationformat="FRAME" next="move_left">
-    <aframe frame="frame" duration="4"/>
+    <aframe frame="frame1" duration="4"/>
   </animation>
   <animation id="defeated_left" durationformat="FRAME">
     <aframe frame="defeated" duration="255"/>
