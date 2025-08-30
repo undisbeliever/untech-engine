@@ -328,9 +328,6 @@ code()
 function Process__Underwater {
     dec.b   EntityStruct.swimCountdown
     bpl     EndIf
-        ldy.w   #{GetAnimationId(rise_left)}
-        jsr     SetAnimation_FacingAndGravity_Y
-
         ldx.b   EntityStruct.romPtr
 
         lda.l   {RomStruct}.swimDelay,x
@@ -351,12 +348,17 @@ function Process__Underwater {
         lda.l   {RomStruct}.swimYMomentum + 2,x
         sta.b   EntityStruct.yMomentum.sx + 2
 
+
         jsr     __FacePlayerAndClearMovingDown_a8
         sta.b   EntityStruct.movementState
 
         rep     #$30
     a16()
+
+        ldy.w   #{GetAnimationId(rise_left)}
+        jsr     SetAnimation_FacingAndGravity_Y
     EndIf:
+
 
     BranchIfUnderWater_Y(Underwater)
         sep     #$20

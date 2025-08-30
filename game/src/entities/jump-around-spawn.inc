@@ -403,9 +403,6 @@ code()
 function Process__Underwater {
     dec.b   EntityStruct.swimCountdown
     bpl     EndIf
-        ldy.w   #{GetAnimationId(rise_left)}
-        jsr     SetAnimation_FacingAndGravity_Y
-
         ldx.b   EntityStruct.romPtr
 
         lda.l   {RomStruct}.swimDelay,x
@@ -431,6 +428,9 @@ function Process__Underwater {
 
         rep     #$30
     a16()
+
+        ldy.w   #{GetAnimationId(rise_left)}
+        jsr     SetAnimation_FacingAndGravity_Y
     EndIf:
 
     BranchIfUnderWater_Y(Underwater)
