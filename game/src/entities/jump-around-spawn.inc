@@ -445,8 +445,28 @@ function Process__Underwater {
     i16()
 
         jsr     _Jump
-    Underwater:
+        bra     EndUnderwaterTest
 
+    Underwater:
+        // Test if the enemy is falling
+        sep     #$20
+    a8()
+        assert(Entity.MovementState.MOVING_DOWN_FLAG == Entity.MovementState.UP_GRAVITY_FLAG << 1)
+        lda.b   EntityStruct.movementState
+        asl
+        eor.b   EntityStruct.movementState
+        and.b   #Entity.MovementState.MOVING_DOWN_FLAG
+        beq     +
+            rep     #$30
+        a16()
+            ldy.w   #{GetAnimationId(fall_left)}
+            jsr     SetAnimation_FacingAndGravity_Y
+        +
+    au()
+        rep     #$30
+    a16()
+
+EndUnderwaterTest:
     MoveEntityAndProcessTileCollisions()
 
     jmp     Entity.DeactivateIfOutsideOrDrawAndGotoNextEntity

@@ -182,23 +182,51 @@ a16()
 i16()
 code()
 function Process__Landed {
+    sep     #$20
+a8()
     // Animation id is 0xff if animation ended
-    lda.b   EntityStruct.MetaSprite.Animation.id - 1
-    cmp.w   #0xff00
-    bcc     +
-        jsr     _Jump
+    lda.b   EntityStruct.MetaSprite.Animation.id
+    inc
+    bne     +
+        jsr     __Jump__au__returnsA16
+    a16()
+        jmp     __UnderwaterTestAndGotoNextEntity
     +
+
+a8()
+    // Change direction if required, restarting the land animation
+    lda.b   EntityStruct.movementState
+    and.b   #~(Entity.MovementState.FACING_RIGHT_FLAG | Entity.MovementState.MOVING_RIGHT_FLAG)
+
+    ldx.b   EntityStruct.xPos.px
+    cpx.w   Entity.Player.xPos.px
+    bcs     +
+        ora.b   #Entity.MovementState.FACING_RIGHT_FLAG | Entity.MovementState.MOVING_RIGHT_FLAG
+    +
+    cmp.b   EntityStruct.movementState
+    beq     +
+        sta.b   EntityStruct.movementState
+
+        rep     #$30
+    a16()
+        ldy.w   #{GetAnimationId(land_left)}
+        jsr     SetAnimation_FacingAndGravity_Y
+    +
+
+    rep     #$30
+a16()
 
     jmp     __UnderwaterTestAndGotoNextEntity
 }
 
 
-// REQUIRES: 16 bit A, 16 bit Index, DB = 0x7e
+// REQUIRES: 16 bit Index, DB = 0x7e
+// RETURNS: 16 bit A
 // INPUT: DP = entity
-a16()
+au()
 i16()
 code()
-function _Jump {
+function __Jump__au__returnsA16 {
     sep     #$20
 a8()
 
@@ -367,13 +395,30 @@ function Process__Underwater {
         assert(Gravity.NORMAL == 0)
         stz.b   EntityStruct.gravity
 
+        jsr     __Jump__au__returnsA16
+    a16()
+        bra     EndUnderwaterTest
+
+    Underwater:
+        // Test if the enemy is falling
+        sep     #$20
+    a8()
+        assert(Entity.MovementState.MOVING_DOWN_FLAG == Entity.MovementState.UP_GRAVITY_FLAG << 1)
+        lda.b   EntityStruct.movementState
+        asl
+        eor.b   EntityStruct.movementState
+        and.b   #Entity.MovementState.MOVING_DOWN_FLAG
+        beq     +
+            rep     #$30
+        a16()
+            ldy.w   #{GetAnimationId(fall_left)}
+            jsr     SetAnimation_FacingAndGravity_Y
+        +
+    au()
         rep     #$30
     a16()
-    i16()
 
-        jsr     _Jump
-    Underwater:
-
+EndUnderwaterTest:
     MoveEntityAndProcessTileCollisions()
 
     jmp     Entity.DeactivateIfOutsideOrDrawAndGotoNextEntity
