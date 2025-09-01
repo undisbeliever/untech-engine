@@ -130,4 +130,16 @@
   <animation id="melee_right_up">
     <alt name="melee_right" vflip="true"/>
   </animation>
+  <animation id="shoot_left">
+    <alt name="shoot_right" hflip="true"/>
+  </animation>
+  <animation id="shoot_right">
+    <alt name="shoot_left" hflip="true"/>
+  </animation>
+  <animation id="shoot_left_up">
+    <alt name="shoot_right" hflip="true" vflip="true"/>
+  </animation>
+  <animation id="shoot_right_up">
+    <alt name="shoot_right" vflip="true"/>
+  </animation>
 </fsexportorder>

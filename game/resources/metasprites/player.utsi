@@ -9,7 +9,6 @@
     <hurtbox x="10" y="12" width="12" height="25"/>
     <object size="large" x="8" y="8"/>
     <object size="large" x="8" y="24"/>
-    <actionpoint type="ManualPlayerProjectile" x="22" y="24"/>
   </frame>
   <frame id="melee_right_1" order="2">
     <gridlocation x="2" y="0"/>
@@ -54,7 +53,6 @@
     <object size="large" x="8" y="8"/>
     <object size="large" x="8" y="24"/>
     <object size="small" x="24" y="32"/>
-    <actionpoint type="ManualPlayerProjectile" x="22" y="24"/>
   </frame>
   <frame id="walking_right_2" order="2">
     <gridlocation x="1" y="1"/>
@@ -62,7 +60,6 @@
     <hurtbox x="10" y="12" width="12" height="25"/>
     <object size="large" x="8" y="8"/>
     <object size="large" x="8" y="24"/>
-    <actionpoint type="ManualPlayerProjectile" x="22" y="24"/>
   </frame>
   <frame id="walking_right_3" order="2">
     <gridlocation x="2" y="1"/>
@@ -70,7 +67,6 @@
     <hurtbox x="10" y="12" width="12" height="25"/>
     <object size="large" x="8" y="8"/>
     <object size="large" x="8" y="24"/>
-    <actionpoint type="ManualPlayerProjectile" x="22" y="24"/>
   </frame>
   <frame id="running_right_1" order="2">
     <gridlocation x="3" y="1"/>
@@ -79,7 +75,6 @@
     <object size="large" x="9" y="8"/>
     <object size="large" x="8" y="24"/>
     <object size="small" x="24" y="31"/>
-    <actionpoint type="ManualPlayerProjectile" x="22" y="24"/>
   </frame>
   <frame id="running_right_2" order="2">
     <gridlocation x="4" y="1"/>
@@ -87,7 +82,6 @@
     <hurtbox x="10" y="12" width="12" height="25"/>
     <object size="large" x="8" y="8"/>
     <object size="large" x="8" y="24"/>
-    <actionpoint type="ManualPlayerProjectile" x="22" y="24"/>
   </frame>
   <frame id="running_right_3" order="2">
     <gridlocation x="5" y="1"/>
@@ -96,7 +90,6 @@
     <object size="large" x="9" y="8"/>
     <object size="large" x="8" y="24"/>
     <object size="small" x="24" y="32"/>
-    <actionpoint type="ManualPlayerProjectile" x="22" y="24"/>
   </frame>
   <frame id="sliding_left" order="2">
     <gridlocation x="0" y="2"/>
@@ -104,7 +97,6 @@
     <hurtbox x="10" y="12" width="12" height="25"/>
     <object size="large" x="8" y="8"/>
     <object size="large" x="8" y="24"/>
-    <actionpoint type="ManualPlayerProjectile" x="22" y="24"/>
   </frame>
   <frame id="breaking_right" order="2">
     <gridlocation x="1" y="2"/>
@@ -112,7 +104,6 @@
     <hurtbox x="10" y="12" width="12" height="25"/>
     <object size="large" x="8" y="8"/>
     <object size="large" x="8" y="24"/>
-    <actionpoint type="ManualPlayerProjectile" x="22" y="24"/>
   </frame>
   <frame id="rising_right" order="2">
     <gridlocation x="2" y="2"/>
@@ -121,7 +112,6 @@
     <object size="large" x="10" y="8"/>
     <object size="large" x="8" y="24"/>
     <object size="small" x="2" y="16"/>
-    <actionpoint type="ManualPlayerProjectile" x="22" y="24"/>
   </frame>
   <frame id="falling_right" order="2">
     <gridlocation x="3" y="2"/>
@@ -130,7 +120,6 @@
     <object size="large" x="8" y="8"/>
     <object size="large" x="8" y="24"/>
     <object size="small" x="0" y="18"/>
-    <actionpoint type="ManualPlayerProjectile" x="22" y="24"/>
   </frame>
   <frame id="underwater_right" order="2">
     <gridlocation x="4" y="2"/>
@@ -163,6 +152,14 @@
     <object size="large" x="8" y="8"/>
     <object size="large" x="7" y="24"/>
     <object size="small" x="23" y="21"/>
+  </frame>
+  <frame id="shoot_right" order="2">
+    <gridlocation x="2" y="3"/>
+    <tilehitbox x="10" y="14" width="12" height="24"/>
+    <hurtbox x="10" y="12" width="12" height="25"/>
+    <object size="large" x="8" y="8"/>
+    <object size="large" x="8" y="24"/>
+    <actionpoint type="PlayerProjectile" x="24" y="24"/>
   </frame>
   <animation id="standing_right" durationformat="FRAME" oneshot="true">
     <aframe frame="standing_right" duration="0"/>
@@ -204,5 +201,8 @@
     <aframe frame="melee_right_2" duration="8"/>
     <aframe frame="melee_right_3" duration="8"/>
     <aframe frame="melee_right_4" duration="8"/>
+  </animation>
+  <animation id="shoot_right" durationformat="TIME" oneshot="true">
+    <aframe frame="shoot_right" duration="15"/>
   </animation>
 </spriteimporter>

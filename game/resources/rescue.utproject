@@ -146,7 +146,7 @@
       <entry name="player" function-table="Player" projectileid="PlayerProjectile" frameset="player" frame="standing_right" palette="0"/>
     </players>
   </entity-rom-data>
-  <action-point-function name="ManualPlayerProjectile" manually-invoked="true"/>
+  <action-point-function name="PlayerProjectile"/>
   <action-point-function name="EnemyProjectile"/>
   <exportorder src="ms-export-order/player.utfseo"/>
   <exportorder src="ms-export-order/walk-and-turn.utfseo"/>

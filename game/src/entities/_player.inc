@@ -96,7 +96,7 @@ namespace Player {
 namespace State {
     createEnum(0, 2)
         enum(NORMAL)
-        enum(MELEE_ATTACK)
+        enum(ATTACK)
         enum(UNDERWATER)
         enum(UNDERWATER_ATTACK)
         enum(KNOCKBACK)
@@ -109,7 +109,7 @@ i16()
 code()
 ProcessFunctionTable:
     dw  Process__Normal
-    dw  Process__MeleeAttack
+    dw  Process__Attack
     dw  Process__Underwater
     dw  Process__UnderwaterAttack
     dw  Process__Knockback
@@ -897,17 +897,7 @@ a8()
         beq     +
             lda.w   nPlayerProjectiles
             cmp.b   #MAX_PROJECTILES
-            bcs     +
-                stz.w   InputBuffer.projectile
-
-                lda.b   #PROJECTILE_COOLDOWN_FRAMES
-                sta.b   EntityStruct.projectileCooldown
-
-                QueueSoundEffect(playerShoot)
-
-                rep     #$30
-            a16()
-                SpawnManualPlayerProjectiles()
+            bcc     __SetProjectileAttackState_A8
     +
 au()
     rep     #$30
@@ -946,12 +936,36 @@ i16()
 a8()
 i16()
 code()
+function __SetProjectileAttackState_A8 {
+    stz.w   InputBuffer.projectile
+
+    lda.b   #PROJECTILE_COOLDOWN_FRAMES
+    sta.b   EntityStruct.projectileCooldown
+
+    QueueSoundEffect(playerShoot)
+
+    lda.b   #State.ATTACK
+    sta.b   EntityStruct.state
+
+    lda.b   EntityStruct.movementState
+    and.b   #3
+    ora.b   #{GetAnimationId(shoot_left)}
+    jmp     MetaSprite.Animation.SetAnimationId
+}
+
+
+// REQUIRES: 8 bit A, 16 bit Index, DB = 0x7e
+// RETURNS: 16 bit A
+// INPUT: dp = entity
+a8()
+i16()
+code()
 function __SetMeleeAttackState_A8 {
     stz.w   InputBuffer.attack
 
     QueueSoundEffect(playerMelee)
 
-    lda.b   #State.MELEE_ATTACK
+    lda.b   #State.ATTACK
     sta.b   EntityStruct.state
 
     lda.b   EntityStruct.movementState
@@ -966,7 +980,7 @@ function __SetMeleeAttackState_A8 {
 a16()
 i16()
 code()
-function Process__MeleeAttack {
+function Process__Attack {
     jsr     _Movement
 
     // Switch to normal state when attack animation is over
