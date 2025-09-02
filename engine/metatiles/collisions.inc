@@ -73,6 +73,8 @@ allocateTmpWord(_yDelta)
 allocateTmpWord(_bottomOffset)
 allocateTmpWord(_edgeOnPlatform)
 
+allocateTmpWord(_tmpYoffset)
+
 constant _TileCollisionType_FIRST_UP_SLOPE   = TileCollisionType.UP_RIGHT_SLOPE
 constant _TileCollisionType_LAST_UP_SLOPE    = TileCollisionType.UP_LEFT_SHORT_SLOPE
 constant _TileCollisionType_FIRST_DOWN_SLOPE = TileCollisionType.DOWN_RIGHT_SLOPE
@@ -1743,12 +1745,14 @@ MovingUp:
         // BaseEntity.yPos.px = ((_top & 0xfff0) | BottomHeightTable[x])
         //                       - _yPosHeightPair.yOffset - METATILE_SIZE_PX + 1
 
-        // sign extend _yOffset to 16 bits
-        lda.b   #0xff
-        sta.w   _yOffsetHeightPair + 1
-
         rep     #$31
     a16()
+        // sign extend _yOffset to 16 bits
+        // Must not use carry
+        lda.w   _yOffsetHeightPair
+        ora.w   #0xff00
+        sta.w   _tmpYoffset
+
         lda.w   _top
         and.w   #0xfff0
 
@@ -1761,7 +1765,7 @@ MovingUp:
         // carry clear
         sbc.w   #METATILE_SIZE_PX - 1 - 1 // -1 for carry and -1 to place entity below solid tiles
         sec
-        sbc.w   _yOffsetHeightPair
+        sbc.w   _tmpYoffset
         sta.b   BaseEntity.yPos.px
         stz.b   BaseEntity.yPos.sx
 
@@ -1877,16 +1881,18 @@ MovingUp_Standing:
         //
         // BaseEntity.yPos.px = (_top & 0xfff0) - _yPosHeightPair.yOffset + 1
 
-        // sign extend _yOffset to 16 bits
-        lda.b   #0xff
-        sta.w   _yOffsetHeightPair + 1
-
         rep     #$30
     a16()
+        // sign extend _yOffset to 16 bits
+        lda.w   _yOffsetHeightPair
+        ora.w   #0xff00
+        sta.w   _tmpYoffset
+
+
         lda.w   _top
         and.w   #0xfff0
         sec
-        sbc.w   _yOffsetHeightPair
+        sbc.w   _tmpYoffset
         sta.b   BaseEntity.yPos.px
         stz.b   BaseEntity.yPos.sx
 
