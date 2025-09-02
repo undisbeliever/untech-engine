@@ -62,9 +62,12 @@ function Process__WalkLeft {
     assert(Entity.MovementState.X_COLLISION_FLAG == 0x80)
     bit.b   EntityStruct.movementState - 1
     bpl     +
-    _Ledge:
         jsr     XCollision
+        bra     End
     +
+
+    ldy.w   #{GetAnimationId(walk_left)}
+    jsr     SetAnimation_FacingAndGravity_Y
 
 End:
     jmp     Entity.DeactivateIfOutsideOrDrawAndGotoNextEntity
@@ -87,7 +90,11 @@ function Process__WalkRight {
     bit.b   EntityStruct.movementState - 1
     bpl     +
         jsr     XCollision
+        bra     End
     +
+
+    ldy.w   #{GetAnimationId(walk_left)}
+    jsr     SetAnimation_FacingAndGravity_Y
 
 End:
     jmp     Entity.DeactivateIfOutsideOrDrawAndGotoNextEntity

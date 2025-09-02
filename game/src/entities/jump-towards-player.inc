@@ -341,7 +341,7 @@ au()
     rep     #$30
 a16()
 
-    MoveEntityAndProcessTileCollisions()
+    MoveEntityWithTileCollisionsAndInteractiveTiles()
 
     jmp     Entity.DeactivateIfOutsideOrDrawAndGotoNextEntity
 }
@@ -419,7 +419,7 @@ function Process__Underwater {
     a16()
 
 EndUnderwaterTest:
-    MoveEntityAndProcessTileCollisions()
+    MoveEntityWithTileCollisionsAndInteractiveTiles()
 
     jmp     Entity.DeactivateIfOutsideOrDrawAndGotoNextEntity
 }
@@ -482,7 +482,7 @@ function Process__Defeated {
         stz.b   EntityStruct.xMomentum.sx + 1
     +
 
-    MoveEntityAndProcessTileCollisions()
+    MoveEntityWithTileCollisionsAndInteractiveTiles()
 
     jmp     Entity.DeactivateIfOutsideOrDrawAndGotoNextEntity
 }

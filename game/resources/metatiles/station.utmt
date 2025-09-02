@@ -63,6 +63,7 @@
   <tile t="74" collision="es"/>
   <tile t="75" collision="solid"/>
   <tile t="76" collision="es"/>
+  <tile t="78" ft="UpGravity"/>
   <tile t="79" ft="Ladder"/>
   <tile t="80" collision="drss"/>
   <tile t="81" collision="drts"/>
@@ -71,6 +72,7 @@
   <tile t="90" collision="urs"/>
   <tile t="91" collision="es"/>
   <tile t="92" collision="uls"/>
+  <tile t="94" ft="DownGravity"/>
   <tile t="95" ft="Ladder"/>
   <tile t="96" collision="es"/>
   <tile t="97" collision="es"/>
@@ -173,6 +175,11 @@
   </tile-priorities>
   <animation-frames palette="station" bit-depth="4" animation-delay="30">
     <frame image="station-frame-0.png"/>
+    <frame image="station-frame-1.png"/>
+    <frame image="station-frame-2.png"/>
+    <frame image="station-frame-3.png"/>
+    <frame image="station-frame-4.png"/>
+    <frame image="station-frame-5.png"/>
   </animation-frames>
   <scratchpad width="64" height="64">
     AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA

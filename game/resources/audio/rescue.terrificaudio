@@ -623,10 +623,14 @@
     "enemyShootProjectile",
     "enterWater",
     "leaveWater",
+    "playerUpGravity",
+    "playerDownGravity",
     "playerJump",
     "playerMelee",
     "playerShoot",
-    "playerSwim"
+    "playerSwim",
+    "enemyUpGravity",
+    "enemyDownGravity"
   ],
   "low_priority_sound_effects": [
     "projectileShieldBounce",

@@ -187,7 +187,7 @@ a16()
     ldy.w   #{GetAnimationId(move_left)}
     jsr     SetAnimation_FacingAndGravity_Y
 
-    MoveEntityAndProcessTileCollisions()
+    MoveEntityWithTileCollisionsAndInteractiveTiles()
 
     jmp     Entity.DeactivateIfOutsideOrDrawAndGotoNextEntity
 }
@@ -200,7 +200,7 @@ a16()
 i16()
 code()
 function Process__Left {
-    MoveEntityAndProcessTileCollisions()
+    MoveEntityWithTileCollisionsAndInteractiveTiles()
 
     sep     #$20
 a8()
@@ -263,7 +263,7 @@ a16()
 i16()
 code()
 function Process__Right {
-    MoveEntityAndProcessTileCollisions()
+    MoveEntityWithTileCollisionsAndInteractiveTiles()
 
     sep     #$20
 a8()
@@ -336,7 +336,7 @@ function Process__Underwater {
     ldx.w   #MovementTableIndex.SecurityBot
     jsr     DecelerateXmomentum
 
-    MoveEntityAndProcessTileCollisions()
+    MoveEntityWithTileCollisionsAndInteractiveTiles()
 
 
     BranchIfUnderWater_Y(EndIf)
@@ -416,7 +416,7 @@ function Process__Defeated {
         stz.b   EntityStruct.xMomentum.sx + 1
     +
 
-    MoveEntityAndProcessTileCollisions()
+    MoveEntityWithTileCollisionsAndInteractiveTiles()
 
     jmp     Entity.DeactivateIfOutsideOrDrawAndGotoNextEntity
 }

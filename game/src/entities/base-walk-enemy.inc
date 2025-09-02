@@ -340,8 +340,11 @@ a16()
 i16()
 code()
 function Process__FallAndTurn {
-    MoveEntityAndProcessTileCollisions()
-    bcc     +
+    MoveEntityWithTileCollisionsAndInteractiveTiles()
+
+    lda.b   EntityStruct.movementState
+    bit.w   #Entity.MovementState.STANDING_FLAG
+    beq     +
         jsr     SetState__Turn
     +
     jmp     Entity.DeactivateIfOutsideOrDrawAndGotoNextEntity
@@ -390,7 +393,7 @@ function Process__Turn {
             jsr     SetState_WalkRight
     EndIf:
 
-    MoveEntityAndProcessTileCollisions()
+    MoveEntityWithTileCollisionsAndInteractiveTiles()
 
     jmp     Entity.DeactivateIfOutsideOrDrawAndGotoNextEntity
 }
@@ -410,7 +413,7 @@ function Process__Defeated {
         stz.b   EntityStruct.xMomentum.sx + 1
     +
 
-    MoveEntityAndProcessTileCollisions()
+    MoveEntityWithTileCollisionsAndInteractiveTiles()
 
     jmp     Entity.DeactivateIfOutsideOrDrawAndGotoNextEntity
 }

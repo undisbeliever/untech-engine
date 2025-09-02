@@ -71,4 +71,135 @@ constant PlayerAirCollision = Entities.Players.Player.PlayerLadderTileCollision
 
 }
 
+namespace UpGravity {
+
+constant EntityCollision = NullFunction
+constant PlayerLeftRightCollision = NullFunction
+constant PlayerOriginCollision = NullFunction
+
+
+// Called when a tile-interacting player hovers over the tile.
+//
+// REQUIRES: 16 bit A, 16 bit Index, DB = 0x7e
+// INPUT: dp = entity
+// INPUT: Y = map data index
+a16()
+i16()
+code()
+function PlayerAirCollision {
+    sep     #$20
+a8()
+    lda.b   BaseEntity.movementState
+    bit.b   #Entity.MovementState.UP_GRAVITY_FLAG
+    bne     +
+        and.b   #~Entity.MovementState.STANDING_FLAG
+        ora.b   #Entity.MovementState.UP_GRAVITY_FLAG
+        sta.b   BaseEntity.movementState
+
+        lda.b   #SFX.playerUpGravity
+        jsr     Audio.QueueSoundEffect__DpUnknown
+    +
+
+    rep     #$30
+a16()
+
+    rts
+}
+
+
+// Called when a tile-interacting entity hovers over the tile.
+//
+// REQUIRES: 16 bit A, 16 bit Index, DB = 0x7e
+// INPUT: dp = entity
+// INPUT: Y = map data index
+a16()
+i16()
+code()
+function EntityAirCollision {
+    sep     #$20
+a8()
+    lda.b   BaseEntity.movementState
+    bit.b   #Entity.MovementState.UP_GRAVITY_FLAG
+    bne     +
+        and.b   #~Entity.MovementState.STANDING_FLAG
+        ora.b   #Entity.MovementState.UP_GRAVITY_FLAG
+        sta.b   BaseEntity.movementState
+
+        lda.b   #SFX.enemyUpGravity
+        jsr     Audio.QueueSoundEffect__DpUnknown
+    +
+
+    rep     #$30
+a16()
+
+    rts
+}
+
+}
+
+
+namespace DownGravity {
+
+constant EntityCollision = NullFunction
+constant PlayerLeftRightCollision = NullFunction
+constant PlayerOriginCollision = NullFunction
+
+
+// Called when a tile-interacting player hovers over the tile.
+//
+// REQUIRES: 16 bit A, 16 bit Index, DB = 0x7e
+// INPUT: dp = entity
+// INPUT: Y = map data index
+a16()
+i16()
+code()
+function PlayerAirCollision {
+    sep     #$20
+a8()
+    lda.b   BaseEntity.movementState
+    bit.b   #Entity.MovementState.UP_GRAVITY_FLAG
+    beq     +
+        and.b   #~(Entity.MovementState.UP_GRAVITY_FLAG | Entity.MovementState.STANDING_FLAG)
+        sta.b   BaseEntity.movementState
+
+        lda.b   #SFX.playerDownGravity
+        jsr     Audio.QueueSoundEffect__DpUnknown
+    +
+
+    rep     #$30
+a16()
+
+    rts
+}
+
+
+// Called when a tile-interacting entity hovers over the tile.
+//
+// REQUIRES: 16 bit A, 16 bit Index, DB = 0x7e
+// INPUT: dp = entity
+// INPUT: Y = map data index
+a16()
+i16()
+code()
+function EntityAirCollision {
+    sep     #$20
+a8()
+    lda.b   BaseEntity.movementState
+    bit.b   #Entity.MovementState.UP_GRAVITY_FLAG
+    beq     +
+        and.b   #~(Entity.MovementState.UP_GRAVITY_FLAG | Entity.MovementState.STANDING_FLAG)
+        sta.b   BaseEntity.movementState
+
+        lda.b   #SFX.enemyDownGravity
+        jsr     Audio.QueueSoundEffect__DpUnknown
+    +
+
+    rep     #$30
+a16()
+
+    rts
+}
+
+}
+
 }

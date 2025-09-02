@@ -183,7 +183,7 @@ a16()
 i16()
 code()
 function Process__Left {
-    MoveEntityAndProcessTileCollisions()
+    MoveEntityWithTileCollisionsAndInteractiveTiles()
 
     lda.b   EntityStruct.movementState
     bit.w   #Entity.MovementState.X_COLLISION_FLAG | Entity.MovementState.STANDING_FLAG
@@ -212,7 +212,7 @@ a16()
 i16()
 code()
 function Process__Right {
-    MoveEntityAndProcessTileCollisions()
+    MoveEntityWithTileCollisionsAndInteractiveTiles()
 
     lda.b   EntityStruct.movementState
     bit.w   #Entity.MovementState.X_COLLISION_FLAG | Entity.MovementState.STANDING_FLAG

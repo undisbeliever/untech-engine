@@ -154,3 +154,32 @@ A @1 v8 ~255,1 o5c%30
 @1 Pulse32WEF adsr 13 2 6 0
 
 A @1 v5 {o4e o2c}%15
+
+=== playerUpGravity === mml uninterruptible
+; Author: undisbeliever
+
+@1 Pulse32WFF adsr 12 5 4 12
+
+A @1 v4 v~3,1 {o4e o5e}%40
+
+
+=== playerDownGravity === mml uninterruptible
+; Author: undisbeliever
+
+@1 Pulse32W1F adsr 12 5 5 12
+
+A @1 v5 v~4,1 {o4g o2c}%40
+
+=== enemyUpGravity === mml uninterruptible
+; Author: undisbeliever
+
+@1 sawtooth adsr 12 5 4 12
+
+A @1 v4 v~3,1 {o4e o5c}%25
+
+=== enemyDownGravity === mml uninterruptible
+; Author: undisbeliever
+
+@1 sawtooth adsr 12 5 5 12
+
+A @1 v4 v~3,1 {o4g o2c}%25
