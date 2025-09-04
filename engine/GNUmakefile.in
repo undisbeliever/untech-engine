@@ -23,7 +23,7 @@ RESOURCES      += $(PROJECT_BIN) $(PROJECT_INC) $(AUDIO_FILES)
 ifeq ($(strip $(TAD_PROJECT)),)
   $(error "TAD_PROJECT not defined")
 endif
-AUDIO_FILES := $(call rwildcard_all $(dir $(TAD_PROJECT))) $(TAD_PROJECT)
+AUDIO_SOURCES := $(call rwildcard_all $(dir $(TAD_PROJECT))) $(TAD_PROJECT)
 
 
 # If VANILLA_BASS is not 'n' then the Makefile will use vanilla bass instead of bass-untech
@@ -142,11 +142,10 @@ $(PROJECT_BIN) $(PROJECT_INC): project-data
 .INTERMEDIATE: audio-data
 audio-data: $(GEN_DIR)/audio-data.bin $(GEN_DIR)/audio-data.inc
 
-$(GEN_DIR)/audio-data.bin $(GEN_DIR)/audio-data.ca65: $(TAD_PROJECT)
+$(GEN_DIR)/audio-data.bin $(GEN_DIR)/audio-data.ca65: $(TAD_PROJECT) $(AUDIO_SOURCES)
   ifeq ($(MEMORY_MAP), hirom)
 	$(tad-compiler) ca65-export --output-asm '$(GEN_DIR)/audio-data.ca65' --output-bin '$(GEN_DIR)/audio-data.bin' --segment 'TadData0' --hirom '$(TAD_PROJECT)'
   else ifeq ($(MEMORY_MAP), lorom)
-$(GEN_DIR)/audio-data.bin $(GEN_DIR)/audio-data.ca65: $(TAD_PROJECT)
 	$(tad-compiler) ca65-export --output-asm '$(GEN_DIR)/audio-data.ca65' --output-bin '$(GEN_DIR)/audio-data.bin' --segment 'TadData0' --lorom '$(TAD_PROJECT)'
   else
     $(error "Unknown memory map, please set MEMORY_MAP to 'hirom' or 'lorom'")
