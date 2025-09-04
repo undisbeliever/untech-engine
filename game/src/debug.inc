@@ -39,6 +39,44 @@ macro ProcessDebugCommands() {
         inc.w   Project.GameState.Words.playerHealth
     +
 
+
+    lda.w   Controller.Joy2.pressed + 1
+    bit.b   #JOYH.up | JOYH.down | JOYH.left | JOYH.right
+    beq     NotDpad
+        ldx.w   GameState.roomId
+
+        bit.b   #JOYH.left
+        beq     NotLeft
+            txy
+            beq     EndDirectionIf
+                dex
+            bra     EndDirectionIf
+        NotLeft:
+
+        bit.b   #JOYH.right
+        beq     NotRight
+            inx
+            cpx.b   #Room.RoomList.count
+            bcc     +
+                dex
+            +
+            bra     EndDirectionIf
+        NotRight:
+
+        bit.b   #JOYH.up
+        beq     NotUp
+            ldx.b   #Project.RoomList._scratchpad
+        NotUp:
+
+    EndDirectionIf:
+        stx.w   GameState.roomId
+
+        stz.w   GameState.entranceId
+
+        jmp     RoomChangeRequested
+    NotDpad:
+
+
     lda.w   Controller.Joy2.pressed
     bit.b   #JOYL.x
     beq     +
