@@ -29,6 +29,19 @@ namespace Font {
     constant SHIELD_2 = 0x4d
     constant NO_SHIELD_1 = 0x4e
     constant NO_SHIELD_2 = 0xef
+
+
+
+constant _BSOD_BG_COLOR = 13 << Palette.blue.shift
+constant _BSOD_TEXT_COLOR = 0x7fff
+
+BsodPalette:
+    dw  _BSOD_BG_COLOR
+    dw  _BSOD_BG_COLOR
+    dw  _BSOD_TEXT_COLOR
+    dw  _BSOD_BG_COLOR
+    constant BsodPalette.size = pc() - BsodPalette
+
 }
 }
 

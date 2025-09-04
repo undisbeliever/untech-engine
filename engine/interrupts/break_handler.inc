@@ -47,9 +47,6 @@ function BreakHandler {
 
 namespace BreakBSOD {
 
-constant BSOD_BG_COLOR = 13 << Palette.blue.shift
-constant BSOD_TEXT_COLOR = 0x7fff
-
 constant VRAM_CONSOLE_TILES_WADDR = 0x0000
 constant VRAM_CONSOLE_MAP_WADDR   = 0x1000
 
@@ -79,17 +76,15 @@ macro Init() {
 
     stz.b   CGADD
 
-    lda.b   #BSOD_BG_COLOR & 0xff
-    sta.b   CGDATA
-
-    lda.b   #BSOD_BG_COLOR >> 8
-    sta.b   CGDATA
-
-    lda.b   #BSOD_TEXT_COLOR & 0xff
-    sta.b   CGDATA
-
-    lda.b   #BSOD_TEXT_COLOR >> 8
-    sta.b   CGDATA
+    assert(Text.Font.BsodPalette.size > 2)
+    assert(Text.Font.BsodPalette.size <= 8)
+    ldx.w   #0
+    -
+        lda.l   Text.Font.BsodPalette,x
+        sta.b   CGDATA
+        inx
+        cpx.w   #Text.Font.BsodPalette.size
+        bcc     -
 
 
     // Load Font

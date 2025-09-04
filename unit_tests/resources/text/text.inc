@@ -19,6 +19,16 @@ namespace Font {
     constant MINUS = 0x4b
 
     constant NEW_LINE = 0xff
+
+
+
+constant _BSOD_BG_COLOR = 13 << Palette.blue.shift
+constant _BSOD_TEXT_COLOR = 0x7fff
+
+BsodPalette:
+    dw  _BSOD_BG_COLOR
+    dw  _BSOD_TEXT_COLOR
+    constant BsodPalette.size = pc() - BsodPalette
 }
 }
 
