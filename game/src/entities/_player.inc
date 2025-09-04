@@ -1194,8 +1194,8 @@ function PlayerLadderTileCollision {
             +
             cmp.w   #MetaTiles.TileCollisionType.DOWN_PLATFORM
             bne     +
-                // Move the player down 1 unit so it is below an up-platform tile
-                inc.b   EntityStruct.yPos.px
+                // Move the player up 1 unit so it is above a down-platform tile
+                dec.b   EntityStruct.yPos.px
             +
         NotStanding:
 
