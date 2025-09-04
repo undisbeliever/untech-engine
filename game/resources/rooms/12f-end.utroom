@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF_8"?>
+<!DOCTYPE untech>
+<room name="a2f_end" scene="station">
+  <map width="32" height="14">
+    AgICAgICAgICAgICAgICAgICAgICAq2urq6vAgICAgICHRgYGBgYGBgYGBgYGBgY
+    GBgYGBgYra6urq8YGBgYGAIMAAAAAAAAAAAAAAAAAAAAAAAAgAC9vr6+vwAAAABL
+    AgwAAAAAAAAAAAAAAAAAAAAAAACAAABeXl4AAAAAAEsCDAAAAAAAAAAAAAAAAAAA
+    AAAAAIAAAF5eXgAAAAAASwIMAAAAAAAAAAAAAAAAAAAAAAAAgAAAAAAAAAAAAABL
+    AgwAAAAAAAAAAAAAAAAAAAAAAACAAAAAAAAAAAAAAEsCDAAAAAAAAAAAAADl5QAA
+    AAAAAIAAAAAAAAAAAAAASwIM2NnY2QDY2djZAOXlAAAAAAAAgAAAAAAAAAAAAABL
+    Agzo6ejpPujp6OkA5eUAAOTkAAGAAABOTk4AAAAAAEsCDPj5+Pk++Pn4+QAAAADw
+    8fX2AYAAAE5OTgAAAAAASwINAwMDAwUDAwMDAwMDAwMDAwMDAwMDmpucAwMDAwMD
+    AgICAgICAgICAgICAgICAgICAgICAgKqq6wCAgICAgICAgICAgICAgICAgICAgIC
+    AgICAgICAqqrrAICAgICAg==
+  </map>
+  <entrance name="door" x="112" y="162" orientation="down-right"/>
+  <entity-group name="init">
+    <entity entity="jump_and_shoot_low" x="386" y="168" parameter="0"/>
+  </entity-group>
+  <script name="Startup">
+    <statement opcode="Spawn_Entity_Group" arg1="init"/>
+  </script>
+  <script name="door">
+    <statement opcode="Load_Room" arg1="a2e_up_gravity_room" arg2="right_door"/>
+  </script>
+  <script name="rescued"/>
+  <script-trigger script="door" x="6" y="11" width="1" height="1"/>
+  <script-trigger script="rescued" x="19" y="9" width="1" height="3"/>
+</room>

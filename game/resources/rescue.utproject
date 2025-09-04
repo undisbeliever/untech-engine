@@ -64,7 +64,7 @@
       </entry>
       <entry name="cleaning_bot_fast" function-table="WalkAndTurn" listid="enemies" frameset="cleaning_bot" frame="left" palette="1">
         <entry-field for="knockback" value="1"/>
-        <entry-field for="speed" value="0x028000"/>
+        <entry-field for="speed" value="0x020000"/>
         <entry-field for="underwaterSpeed" value="0x007000"/>
       </entry>
       <entry name="avoid_ledges" function-table="WalkAvoidLedges" listid="enemies" frameset="cleaning_bot" frame="left" palette="2">
@@ -178,6 +178,12 @@
   <room-file src="rooms/playtest-3-water-test.utroom"/>
   <room-file src="rooms/playtest-4-tower.utroom"/>
   <room-file src="rooms/playtest-5-end.utroom"/>
+  <room-file src="rooms/12a-start.utroom"/>
+  <room-file src="rooms/12b-boxes-on-ceiling.utroom"/>
+  <room-file src="rooms/12c-down-gravity.utroom"/>
+  <room-file src="rooms/12d-up-down-gravity.utroom"/>
+  <room-file src="rooms/12e-up-gravity.utroom"/>
+  <room-file src="rooms/12f-end.utroom"/>
   <scene-setting name="BasicRoom" bg-mode="1bg3" layer0-type="mt-tileset" layer1-type="" layer2-type="text" layer3-type=""/>
   <scene-setting name="WaterRoom" bg-mode="1bg3" layer0-type="bg-image" layer1-type="mt-tileset" layer2-type="text" layer3-type=""/>
   <scene name="blocky" settings="BasicRoom" palette="blocky" layer0="blocky"/>

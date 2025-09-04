@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF_8"?>
+<!DOCTYPE untech>
+<room name="a2a_start" scene="station">
+  <map width="64" height="14">
+    AgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIC
+    AgICAgICAgICAgICAgICAgICHRgYGBgYGBgYGBgYGBgYGBgYGBgYGBgYGBgYGBgY
+    GBgYGBgYGBgYGBgYGBgYGBgYGBgYGBgYGBgYGBgcAgICAgwAAAAAAAAAAAAAAAAA
+    AAAAAJAAAAAAAAAAAAAAAAAAAACQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACwIC
+    AgIMAAAAAAAAAAAAAAAAAAAAAACgAAAAAAAAAAAAAAAAAAAAoAAAAAAAAAAAAAAA
+    AAAAAAAAAAAAAAAAAAsCAgICDAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+    AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAALAgICAgwAAAAAAAAAAAAAAAAA
+    AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACwIC
+    AgIMAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+    AAAAAAAAAAAAAAAAAAsCAhgYLAAAAAAAAAAAAAAAAAAAAAAAsAAAAAAAAAAAAAAA
+    AAAAALAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAArGBhLLgAAAAAAAAAAAAAAAAAA
+    AAAAAJAAAAAAAAAAAAAAAAAAAACQAOXl5QAAAAAAAAAAAAAAAAAAAAAAAAAAAC5L
+    Sy4AAADn5wAAAOIAAAAA5OOwAACA39/P38/fmpuc39/Pz9/fkAAAAAAAAAAA4+Th
+    AAAAAKipqKkAAAAAAAAuS0suAAAA9/cA8PHyAAAA8/T19rAAgO/v7+/v76qrrO/v
+    7+/v74AAAAAAsLAAAPP08fIAAAC4ubi5AAAAAAAALksDAwMDAwMDAwMDAwMDAwMD
+    AwMDAxb///////+qq6z///////8RAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMD
+    AgICAgICAgICAgICAgICAgICAgIM/v7+/v7+qqus/v7+/v7+CwICAgICAgICAgIC
+    AgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICArq7vAIC
+    AgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgI=
+  </map>
+  <entrance name="left_door" x="40" y="162" orientation="down-right"/>
+  <entrance name="right_door" x="984" y="162" orientation="down-left"/>
+  <entity-group name="init">
+    <entity entity="cleaning_bot_slow" x="948" y="37" parameter="2"/>
+    <entity entity="tall_jumper" x="536" y="152" parameter="0"/>
+    <entity entity="tall_jumper" x="424" y="153" parameter="0"/>
+    <entity entity="tall_jumper" x="473" y="138" parameter="0"/>
+    <entity entity="tall_jumper" x="536" y="152" parameter="0"/>
+    <entity entity="tall_jumper" x="920" y="171" parameter="0"/>
+  </entity-group>
+  <script name="Startup">
+    <statement opcode="Spawn_Entity_Group" arg1="init"/>
+  </script>
+  <script name="right_door">
+    <statement opcode="Load_Room" arg1="a2b_boxes_on_ceiling" arg2="left_door"/>
+  </script>
+  <script-trigger script="right_door" x="62" y="8" width="1" height="3"/>
+</room>
