@@ -31,7 +31,7 @@ constant _shipVOffset = Scenes.TitleScreen.shipVOffset
 constant SHIP_TARGET_H_OFFSET = -64
 constant SHIP_START_H_OFFSET = SHIP_TARGET_H_OFFSET - 64
 
-constant SHIP_V_OFFSET = -112
+constant SHIP_V_OFFSET = -106
 
 constant ANIMATION_INTERVAL = 10
 
