@@ -36,6 +36,14 @@ macro ResetLevelNumber() {
 
 
 // DB = 0x7e
+macro NextLevel() {
+    assert8a()
+    inc.w   LevelNameScreen.levelNumber
+    stz.w   LevelNameScreen.restartLevelOnZero
+}
+
+
+// DB = 0x7e
 macro RestartLevel() {
     assert8a()
     stz.w   LevelNameScreen.restartLevelOnZero

@@ -41,6 +41,12 @@ macro ProcessDebugCommands() {
 
 
     lda.w   Controller.Joy2.pressed + 1
+    bit.b   #JOYH.select
+    beq     +
+        LevelNameScreen.NextLevel()
+        lda.b   #Mode.LEVEL_NAME
+        sta.w   currentMode
+    +
     bit.b   #JOYH.up | JOYH.down | JOYH.left | JOYH.right
     beq     NotDpad
         ldx.w   GameState.roomId
