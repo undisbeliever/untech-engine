@@ -43,6 +43,11 @@ i16()
 // DB = 0x7e
 code()
 function Run {
+    // Reset player health
+    lda.w   #Healthbar.MAX_HEALTH
+    sta.w   Project.GameState.Words.playerHealth
+
+
     sep     #$20
 a8()
     lda.b   #Song.BLANK

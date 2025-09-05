@@ -109,7 +109,14 @@ a16()
         if {defined DEBUG_BUILD} {
             ProcessDebugCommands()
         }
-    iu()
+
+        rep     #$10
+    i16()
+        lda.w   Healthbar.uiHealth
+        bne     +
+            Entities.Players.Defeated.SwitchToDefeatedPlayer()
+        +
+
         rep     #$30
     a16()
     i16()

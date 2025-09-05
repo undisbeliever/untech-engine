@@ -72,6 +72,8 @@ if {defined DEBUG_BUILD} {
 }
 
 
+include "entities/_player-defeated.inc"
+
 include "input.inc"
 include "healthbar.inc"
 include "bytecodes.inc"
