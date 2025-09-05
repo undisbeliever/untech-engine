@@ -87,6 +87,8 @@ function Process {
     // Switch to level name screen after a delay
     dec.w   frameCountdown
     bpl     +
+        // ::TODO save and reload gamestate::
+
         lda.w   #Mode.LEVEL_NAME
         sta.w   currentMode
     +

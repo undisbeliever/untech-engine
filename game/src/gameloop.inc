@@ -95,6 +95,12 @@ a16()
         sep     #$30
     a8()
     i8()
+        lda.w   Controller.Joy1.pressed + 1
+        bit.b   #JOYH.start
+        beq     +
+            jsr     _PauseGameLoop
+        +
+
         InputBuffer.Process()
         Healthbar.Process()
 
@@ -162,5 +168,51 @@ a16()
         jsl     WaitFrame__far
 
         jmp     Loop
+}
+
+
+
+
+a8()
+i8()
+// DB = 0x7e
+code()
+function _PauseGameLoop {
+constant _counter = zpTmp0
+
+    lda.b   #8
+    sta.w   inidispBuffer
+
+    // Wait a bit before allowing the player to unpause
+    sta.b   _counter
+    -
+        jsl     WaitFrame__far
+        dec.b   _counter
+        bne     -
+
+
+    Loop:
+        jsl     WaitFrame__far
+
+        lda.w   Controller.Joy1.pressed + 1
+        bit.b   #JOYH.select
+        beq     +
+            // Restart room
+            // ::TODO save and reload gamestate::
+            lda.b   #Mode.LEVEL_NAME
+            sta.w   currentMode
+
+            rts
+        +
+
+        lda.w   Controller.Joy1.pressed + 1
+        bit.b   #JOYH.start
+        beq     Loop
+
+    lda.b   #15
+    sta.w   inidispBuffer
+
+    rts
+
 }
 

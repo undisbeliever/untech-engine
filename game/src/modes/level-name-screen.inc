@@ -26,14 +26,19 @@ allocate(levelNumber, wram7e, 1)
 allocate(restartLevelOnZero, wram7e, 1)
 
 
-a16()
-i16()
 // DB = 0x7e
 macro ResetLevelNumber() {
     assert16a()
 
     assert(LevelNameScreen.restartLevelOnZero == LevelNameScreen.levelNumber + 1)
     stz.w   LevelNameScreen.levelNumber
+}
+
+
+// DB = 0x7e
+macro RestartLevel() {
+    assert8a()
+    stz.w   LevelNameScreen.restartLevelOnZero
 }
 
 
@@ -101,7 +106,7 @@ a8()
 
 
     lda.w   restartLevelOnZero
-    beq     +
+    bne     +
         inc.w   restartLevelOnZero
 
         lda.l   LevelNameData & 0xff0000,x

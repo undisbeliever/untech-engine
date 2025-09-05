@@ -74,16 +74,15 @@ if {defined DEBUG_BUILD} {
 
 include "entities/_player-defeated.inc"
 
+include "modes/level-name-screen.inc"
+include "modes/title-screen.inc"
+
 include "input.inc"
 include "healthbar.inc"
 include "bytecodes.inc"
 include "misc.inc"
 include "modes.inc"
 include "gameloop.inc"
-
-include "modes/level-name-screen.inc"
-include "modes/title-screen.inc"
-
 
 include "entities/_common.inc"
 include "entities/_movement.inc"
