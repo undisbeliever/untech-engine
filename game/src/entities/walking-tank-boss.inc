@@ -187,6 +187,22 @@ a16()
 i16()
 code()
 function Process__AttackScientists {
+    // Wait for animation to complete before switching to the next state
+    // to prevent boss from attacking player immediately
+    lda.b   EntityStruct.MetaSprite.Animation.id - 1
+    cmp.w   #0xff00
+    bcc     +
+        lda.w   Entity.Player.yPos.px
+        sec
+        sbc.b   EntityStruct.yPos.px
+        bcc     +
+            jsr     SetState__AttackingPlayer
+
+            // Attack once before charging
+            stz.b   EntityStruct.attacksRemaining
+
+            bra     End
+    +
 
     dec.b   EntityStruct.countdown
     bpl     +
@@ -200,17 +216,7 @@ function Process__AttackScientists {
     MoveEntityAndProcessTileCollisions()
 
 
-    lda.w   Entity.Player.yPos.px
-    sec
-    sbc.b   EntityStruct.yPos.px
-    bcc     +
-        jsr     SetState__AttackingPlayer
-
-        stz.b   EntityStruct.attacksRemaining
-    +
-
-
-
+End:
     jmp     Entity.DrawAndGotoNextEntity
 }
 
