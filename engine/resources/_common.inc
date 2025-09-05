@@ -319,7 +319,7 @@ a16()
 i16()
 code()
 function DecompressData_FromPtr {
-    lda.w   #decompressionBuffer - decompressionBuffer.size
+    lda.w   #decompressionBuffer + decompressionBuffer.size
     sec
     sbc.w   decompressionBufferPos
     bcc     DecompressionBufferFull
