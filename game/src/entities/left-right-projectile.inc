@@ -183,7 +183,6 @@ function Process__Move {
     MoveEntityAndProcessTileCollisions()
 
     lda.b   EntityStruct.movementState
-    wdm #1
     bit.w   #Entity.MovementState.X_COLLISION_FLAG | Entity.MovementState.STANDING_FLAG
     beq     +
         sep     #$20
@@ -205,11 +204,18 @@ a16()
 i16()
 code()
 function SetState__Collision {
+    // This check ensures the projectile will despawn if the pop animation has a hitbox.
+    lda.b   EntityStruct.state
+    bne     Return
+
     lda.w   #State.COLLISION
     sta.b   EntityStruct.state
 
     ldy.w   #{GetAnimationId(collision_left)}
     jmp     SetAnimation_Facing_Y
+
+Return:
+    rts
 }
 
 
