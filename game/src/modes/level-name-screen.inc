@@ -81,7 +81,7 @@ a16()
     sep     #$20
 a8()
 
-    Text.Console.SetCursor(0, 2)
+    Text.Console.SetCursor(2, 3)
 
 
     // Clear Ah
@@ -126,7 +126,7 @@ a8()
     lda.b   #LevelNameData >> 16
     jsr     Text.Console.PrintString
 
-    // ::TODO use code for level number::
+    // ::TODO Draw level number::
 
 
     jsr     FadeIn
@@ -150,8 +150,9 @@ a16()
 // Format: string name, room index
 rodata()
 LevelNameData:
-    db  Project.RoomList.playtest_1_entrance, "1-1\nIntro", 0
-    db  Project.RoomList.a2a_start, "1-2\nGravity Labs", 0
+    // ::TODO fix margin on second line (add custom margins/active-section in console)::
+    db  Project.RoomList.playtest_1_entrance, "Newbie's First\n  Solo Rescue", 0
+    db  Project.RoomList.a2a_start, "Gravity Labs", 0
     db  0
 
 constant N_LEVELS = 2
