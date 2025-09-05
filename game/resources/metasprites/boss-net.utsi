@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF_8"?>
+<!DOCTYPE untech>
+<spriteimporter id="boss_net" tilesettype="ONE_ROW" exportorder="boss_net" image="boss-net.png">
+  <grid width="80" height="64" xoffset="0" yoffset="0" xpadding="0" ypadding="0" xorigin="40" yorigin="8"/>
+  <frame id="small" order="2">
+    <gridlocation x="0" y="0"/>
+    <object size="small" x="32" y="1"/>
+    <object size="small" x="40" y="1"/>
+  </frame>
+  <frame id="unfold_1" order="2">
+    <gridlocation x="1" y="0"/>
+    <object size="large" x="24" y="0"/>
+    <object size="large" x="40" y="0"/>
+  </frame>
+  <frame id="unfold_2" order="2">
+    <gridlocation x="2" y="0"/>
+    <object size="large" x="24" y="0"/>
+    <object size="large" x="40" y="0"/>
+    <object size="large" x="20" y="9"/>
+    <object size="large" x="44" y="9"/>
+    <object size="small" x="36" y="16"/>
+  </frame>
+  <frame id="unfold_3" order="2">
+    <gridlocation x="3" y="0"/>
+    <object size="large" x="24" y="0"/>
+    <object size="large" x="40" y="0"/>
+    <object size="large" x="8" y="0"/>
+    <object size="large" x="56" y="0"/>
+    <object size="large" x="24" y="16"/>
+    <object size="large" x="40" y="16"/>
+    <object size="large" x="8" y="16"/>
+    <object size="large" x="56" y="16"/>
+    <object size="large" x="0" y="32"/>
+    <object size="large" x="16" y="32"/>
+    <object size="large" x="32" y="32"/>
+    <object size="large" x="48" y="32"/>
+    <object size="large" x="64" y="32"/>
+  </frame>
+  <animation id="unfold" durationformat="TIME" oneshot="true">
+    <aframe frame="small" duration="5"/>
+    <aframe frame="unfold_1" duration="5"/>
+    <aframe frame="unfold_2" duration="5"/>
+    <aframe frame="unfold_3" duration="5"/>
+  </animation>
+</spriteimporter>

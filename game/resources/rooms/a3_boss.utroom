@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF_8"?>
+<!DOCTYPE untech>
+<room name="a3_boss" scene="station">
+  <map width="16" height="14">
+    Sy4AAAAAAAAAAAAAAAALAksuAAAAAAAAAAAAAAAACwJLLgAAAAAAAAAAAAAAAAsC
+    AwMICAkAAAAAAABpZWULAgIMAAAAAAAAAAAAAAAACwICDAAAAAAAAAAAAAAAAAsC
+    AgwAAAAAAAAAAAAAAAALAgIMAAAAAAAAAAAAAAAACwICDAAAAAAAAAAAAAAAAAsC
+    AgwAAAAAAAAAAAAAAAALAgIMAAAAAAAAAAAAAAAACwICDQMDAwMDAwMDAwMDAwoC
+    AgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgI=
+  </map>
+  <entrance name="strat" x="40" y="34" orientation="down-right"/>
+  <entity-group name="initial">
+    <entity entity="walking_tank_boss" x="57" y="155" parameter=""/>
+  </entity-group>
+  <script name="Startup">
+    <statement opcode="Spawn_Entity_Group" arg1="initial"/>
+  </script>
+</room>

@@ -30,6 +30,7 @@ namespace Gravity {
         enum(PLAYER_HOLDING_JUMP)
         enum(SWIMMING_PLAYER)
         enum(SWIMMING_PLAYER_HOLDING_JUMP)
+        enum(BOSS_NET)
     endEnum()
 }
 
@@ -40,6 +41,8 @@ namespace GravityTable {
     constant _PLAYER_SWIM_GRAVITY = 2000
     constant _ENEMY_WATER_GRAVITY = 1500
 
+    constant _BOSS_NET = 1000
+
 // 0.16 fixed point px/frame/frame
 Acceleration:
     // ::TODO tweak::
@@ -49,6 +52,7 @@ Acceleration:
     dw  _PLAYER_GRAVITY / 2         // player holding jump
     dw  _PLAYER_SWIM_GRAVITY        // swimming player
     dw  _PLAYER_SWIM_GRAVITY / 2    // swimming player holding jump
+    dw  _BOSS_NET                   // boss net
 
 
 // Maximum Y momentum
@@ -56,6 +60,7 @@ constant _MAX_ENEMY_YM         = 0x0800
 constant _MAX_ENEMY_WATER_YM   = 0x0160
 constant _MAX_PLAYER_YM        = 0x0600
 constant _MAX_PLAYER_WATER_YM  = 0x0180
+constant _MAX_BOSS_NET_YM      = 0x0220
 
 // 8.8 fixed point px/frame
 MaxMomentum:
@@ -66,6 +71,7 @@ MaxMomentum:
     dw  _MAX_PLAYER_YM          // player holding jump
     dw  _MAX_PLAYER_WATER_YM    // swimming player
     dw  _MAX_PLAYER_WATER_YM    // swimming player holding jump
+    dw  _MAX_BOSS_NET_YM        // boss net
 
 assert(pc() - MaxMomentum == MaxMomentum - Acceleration)
 }
@@ -73,6 +79,22 @@ assert(pc() - MaxMomentum == MaxMomentum - Acceleration)
 
 
 namespace Entities {
+
+
+// REQUIRES: 16 bit A, 16 bit Index, DB = 0x7e
+// INPUT: dp = entity, X = movement table index
+// KEEP: X/Y
+a16()
+i16()
+code()
+function AccelerateInFacingDirection {
+    assert(Entity.MovementState.FACING_RIGHT_FLAG == 1)
+    lda.b   BaseEntity.movementState
+    lsr
+    bcc     AccelerateLeft
+    jmp     AccelerateRight
+}
+
 
 
 

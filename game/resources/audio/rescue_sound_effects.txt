@@ -183,3 +183,29 @@ A @1 v4 v~3,1 {o4e o5c}%25
 @1 sawtooth adsr 12 5 5 12
 
 A @1 v4 v~3,1 {o4g o2c}%25
+
+=== bossHitsWall === mml one interruptible
+; Author: undisbeliever
+
+@1 Pulse32WBF gain F127
+@2 SuperMiniGlitchNoise2 gain F127
+
+A @1 V255 ~50,1 o1 c%10 & o2 a%5 & o1 c%10
+
+A @2
+A V180 o0 c%2
+A [ w%10 V-50 V~45,1 o2 g%4]4
+
+=== bossHurt === mml one uninterruptible
+; Author: undisbeliever
+
+@1 ElectricBass adsr 14 2 5 10
+
+A @1 V255 {o2e o1e}%30,%6 & {o0c}%10,,10 &
+
+=== throwNet === mml both uninterruptible
+; Author: undisbeliever
+
+@1 square gain F127
+
+A @1 v5 vs-5,256 {o5e o4c}%250

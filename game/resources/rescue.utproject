@@ -47,6 +47,10 @@
     <struct name="LeftRightProjectile" parent="BaseEnemy">
       <struct-field name="xMomentum" type="uint24"/>
     </struct>
+    <struct name="DiagonalProjectile" parent="BaseEnemy">
+      <struct-field name="xMomentum" type="uint24"/>
+      <struct-field name="yMomentum" type="uint24"/>
+    </struct>
     <function-table name="Player" type="player" export-order="player" parameter-type="unused"/>
     <function-table name="WalkAndTurn" type="entity" struct="BaseWalkEnemy" export-order="walk_and_turn" parameter-type="unsigned" comment="0=left, 1=right, 2=up-left, 3=up-right"/>
     <function-table name="WalkAvoidLedges" type="entity" struct="BaseWalkEnemy" export-order="walk_and_turn" parameter-type="unsigned" comment="0=left, 1=right, 2=up-left, 3=up-right"/>
@@ -56,6 +60,9 @@
     <function-table name="JumpAroundSpawn" type="entity" struct="JumpAroundSpawn" export-order="jump_towards_player" parameter-type="unsigned" comment="0=normal-gravity, 1=up-gravity"/>
     <function-table name="MoveLeftRight" type="entity" struct="MoveLeftRight" export-order="move_left_right" parameter-type="unsigned" comment="distance before turning"/>
     <function-table name="LeftRightProjectile" type="projectile" struct="LeftRightProjectile" export-order="left_right_projectile" parameter-type="unused"/>
+    <function-table name="UpDiagonalProjectile" type="projectile" struct="DiagonalProjectile" export-order="left_right_projectile" parameter-type="unused"/>
+    <function-table name="WalkingTankBoss" type="entity" struct="BaseEnemy" export-order="walking_tank_boss" parameter-type="unused"/>
+    <function-table name="BossNet" type="entity" export-order="boss_net" parameter-type="unsigned"/>
     <entities>
       <entry name="cleaning_bot_slow" function-table="WalkAndTurn" listid="enemies" frameset="cleaning_bot" frame="left" palette="0">
         <entry-field for="knockback" value="1"/>
@@ -130,6 +137,13 @@
         <entry-field for="speed" value="0x003000"/>
         <entry-field for="underwaterSpeed" value="0x004000"/>
       </entry>
+      <entry name="walking_tank_boss" function-table="WalkingTankBoss" projectileid="UpDiagonalFireball" listid="enemies" frameset="walking_tank_boss" frame="walk_right_1" palette="0">
+        <entry-field for="knockback" value="1"/>
+        <entry-field for="shieldDirection" value="0"/>
+        <entry-field for="speed" value="0x033000"/>
+        <entry-field for="underwaterSpeed" value="0x004000"/>
+      </entry>
+      <entry name="boss_net" function-table="BossNet" listid="particles" frameset="boss_net" frame="small" palette="0"/>
     </entities>
     <projectiles>
       <entry name="PlayerProjectile" function-table="PlayerProjectile" listid="playerProjectiles" frameset="player_projectile" frame="frame1" palette="0"/>
@@ -142,6 +156,17 @@
         <entry-field for="knockback" value="1"/>
         <entry-field for="shieldDirection" value="0"/>
         <entry-field for="xMomentum" value="0x020000"/>
+      </entry>
+      <entry name="LargeFireball" function-table="LeftRightProjectile" listid="enemyProjectiles" frameset="large_fireball" frame="right_1" palette="0">
+        <entry-field for="knockback" value="1"/>
+        <entry-field for="shieldDirection" value="0"/>
+        <entry-field for="xMomentum" value="0x020000"/>
+      </entry>
+      <entry name="UpDiagonalFireball" function-table="UpDiagonalProjectile" listid="enemyProjectiles" frameset="large_diagonal_fireball" frame="right_1" palette="0">
+        <entry-field for="knockback" value="1"/>
+        <entry-field for="shieldDirection" value="0"/>
+        <entry-field for="xMomentum" value="0x020000"/>
+        <entry-field for="yMomentum" value="0x020000"/>
       </entry>
     </projectiles>
     <players>
@@ -157,6 +182,8 @@
   <exportorder src="ms-export-order/jump-towards-player.utfseo"/>
   <exportorder src="ms-export-order/move-left-right.utfseo"/>
   <exportorder src="ms-export-order/left-right-projectile.utfseo"/>
+  <exportorder src="ms-export-order/walking-tank-boss.utfseo"/>
+  <exportorder src="ms-export-order/boss-net.utfseo"/>
   <frameset src="metasprites/player.utsi" type="spriteimporter"/>
   <frameset src="metasprites/cleaning-bot.utsi" type="spriteimporter"/>
   <frameset src="metasprites/player-projectile.utsi" type="spriteimporter"/>
@@ -167,6 +194,10 @@
   <frameset src="metasprites/projectile-bullet.utsi" type="spriteimporter"/>
   <frameset src="metasprites/jump-and-shoot.utsi" type="spriteimporter"/>
   <frameset src="metasprites/walking-tank.utsi" type="spriteimporter"/>
+  <frameset src="metasprites/walking-tank-boss.utsi" type="spriteimporter"/>
+  <frameset src="metasprites/large-fireball.utsi" type="spriteimporter"/>
+  <frameset src="metasprites/large-diagonal-fireball.utsi" type="spriteimporter"/>
+  <frameset src="metasprites/boss-net.utsi" type="spriteimporter"/>
   <palette name="blocky" image="palettes/blocky.png" rows-per-frame="8" animation-delay="35"/>
   <palette name="station" image="palettes/station.png" rows-per-frame="8" animation-delay="255"/>
   <background-image name="water" bit-depth="4" image="bg-images/water.png" palette="station" first-palette="7" npalettes="1" default-order="0"/>
@@ -184,6 +215,7 @@
   <room-file src="rooms/12d-up-down-gravity.utroom"/>
   <room-file src="rooms/12e-up-gravity.utroom"/>
   <room-file src="rooms/12f-end.utroom"/>
+  <room-file src="rooms/a3_boss.utroom"/>
   <scene-setting name="BasicRoom" bg-mode="1bg3" layer0-type="mt-tileset" layer1-type="" layer2-type="text" layer3-type=""/>
   <scene-setting name="WaterRoom" bg-mode="1bg3" layer0-type="bg-image" layer1-type="mt-tileset" layer2-type="text" layer3-type=""/>
   <scene name="blocky" settings="BasicRoom" palette="blocky" layer0="blocky"/>

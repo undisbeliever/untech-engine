@@ -614,6 +614,8 @@
   "high_priority_sound_effects": [
     "playerHurtLowHealth",
     "playerHurt",
+    "bossHitsWall",
+    "throwNet",
     "playerHeal",
     "playerShieldBounce"
   ],
@@ -621,6 +623,7 @@
     "securityBotAlarm",
     "robotDefeated",
     "enemyShootProjectile",
+    "bossHurt",
     "enterWater",
     "leaveWater",
     "playerUpGravity",

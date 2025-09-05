@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF_8"?>
+<!DOCTYPE untech>
+<fsexportorder name="walking_tank_boss">
+  <animation id="charge_left">
+    <alt name="charge_right" hflip="true"/>
+  </animation>
+  <animation id="charge_right">
+    <alt name="charge_left" hflip="true"/>
+  </animation>
+  <animation id="attack_left">
+    <alt name="attack_right" hflip="true"/>
+  </animation>
+  <animation id="attack_right">
+    <alt name="attack_left" hflip="true"/>
+  </animation>
+  <animation id="wall_collision_left">
+    <alt name="wall_collision_right" hflip="true"/>
+  </animation>
+  <animation id="wall_collision_right">
+    <alt name="wall_collision_left" hflip="true"/>
+  </animation>
+  <animation id="turn_left">
+    <alt name="turn_right" hflip="true"/>
+  </animation>
+  <animation id="turn_right">
+    <alt name="turn_left" hflip="true"/>
+  </animation>
+  <animation id="hurt_left">
+    <alt name="hurt_right" hflip="true"/>
+  </animation>
+  <animation id="hurt_right">
+    <alt name="hurt_left" hflip="true"/>
+  </animation>
+</fsexportorder>

@@ -83,6 +83,7 @@ include "entities/_movement.inc"
 include "entities/_player.inc"
 include "entities/base-walk-enemy.inc"
 include "entities/left-right-projectile.inc"
+include "entities/up-diagonal-projectile.inc"
 include "entities/player-projectile.inc"
 include "entities/jump-around-spawn.inc"
 include "entities/jump-towards-player.inc"
@@ -90,6 +91,9 @@ include "entities/move-left-right.inc"
 include "entities/security-bot.inc"
 include "entities/walk-and-turn.inc"
 include "entities/walk-avoid-ledges.inc"
+
+include "entities/walking-tank-boss.inc"
+include "entities/boss-net.inc"
 
 include "interactive-tiles.inc"
 

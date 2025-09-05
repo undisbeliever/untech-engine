@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF_8"?>
+<!DOCTYPE untech>
+<spriteimporter id="large_fireball" tilesettype="TWO_TILES_FIXED" exportorder="left_right_projectile" image="large-fireball.png">
+  <grid width="16" height="16" xoffset="0" yoffset="0" xpadding="0" ypadding="0" xorigin="8" yorigin="8"/>
+  <palette position="TOP_LEFT" npalettes="1" colorsize="1"/>
+  <frame id="right_1" order="2">
+    <gridlocation x="1" y="0"/>
+    <tilehitbox x="2" y="1" width="12" height="14"/>
+    <hitbox x="3" y="1" width="11" height="14"/>
+    <object size="large" x="0" y="0"/>
+  </frame>
+  <frame id="right_2" order="2">
+    <gridlocation x="2" y="0"/>
+    <tilehitbox x="2" y="1" width="12" height="14"/>
+    <hitbox x="3" y="1" width="11" height="14"/>
+    <object size="large" x="0" y="0"/>
+  </frame>
+  <animation id="right" durationformat="TIME">
+    <aframe frame="right_1" duration="7"/>
+    <aframe frame="right_2" duration="7"/>
+  </animation>
+  <animation id="collision_right" durationformat="TIME" oneshot="true">
+    <aframe frame="right_1" duration="3"/>
+  </animation>
+</spriteimporter>

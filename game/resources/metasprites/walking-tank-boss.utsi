@@ -1,0 +1,250 @@
+<?xml version="1.0" encoding="UTF_8"?>
+<!DOCTYPE untech>
+<spriteimporter id="walking_tank_boss" tilesettype="TWO_ROWS" exportorder="walking_tank_boss" image="walking-tank-boss.png">
+  <grid width="64" height="64" xoffset="0" yoffset="0" xpadding="0" ypadding="0" xorigin="32" yorigin="32"/>
+  <palette position="TOP_LEFT" npalettes="1" colorsize="1"/>
+  <frame id="walk_right_1" order="2">
+    <gridlocation x="1" y="0"/>
+    <tilehitbox x="11" y="13" width="42" height="38"/>
+    <hitbox x="11" y="14" width="43" height="29"/>
+    <hurtbox x="11" y="14" width="41" height="29"/>
+    <object size="large" x="10" y="7"/>
+    <object size="large" x="26" y="7"/>
+    <object size="large" x="42" y="7"/>
+    <object size="large" x="10" y="23"/>
+    <object size="large" x="26" y="23"/>
+    <object size="large" x="42" y="23"/>
+    <object size="large" x="10" y="39"/>
+    <object size="large" x="26" y="39"/>
+    <object size="large" x="42" y="39"/>
+  </frame>
+  <frame id="walk_right_2" order="2">
+    <gridlocation x="2" y="0"/>
+    <tilehitbox x="11" y="13" width="42" height="38"/>
+    <hitbox x="11" y="14" width="43" height="29"/>
+    <hurtbox x="11" y="14" width="41" height="29"/>
+    <object size="large" x="10" y="7"/>
+    <object size="large" x="26" y="7"/>
+    <object size="large" x="42" y="7"/>
+    <object size="large" x="10" y="23"/>
+    <object size="large" x="26" y="23"/>
+    <object size="large" x="42" y="23"/>
+    <object size="large" x="10" y="39"/>
+    <object size="large" x="26" y="39"/>
+    <object size="large" x="42" y="39"/>
+  </frame>
+  <frame id="walk_right_3" order="2">
+    <gridlocation x="3" y="0"/>
+    <tilehitbox x="11" y="13" width="42" height="38"/>
+    <hitbox x="11" y="14" width="43" height="29"/>
+    <hurtbox x="11" y="14" width="41" height="29"/>
+    <object size="large" x="10" y="7"/>
+    <object size="large" x="26" y="7"/>
+    <object size="large" x="42" y="7"/>
+    <object size="large" x="10" y="23"/>
+    <object size="large" x="26" y="23"/>
+    <object size="large" x="42" y="23"/>
+    <object size="large" x="10" y="39"/>
+    <object size="large" x="26" y="39"/>
+    <object size="large" x="42" y="39"/>
+  </frame>
+  <frame id="walk_right_4" order="2">
+    <gridlocation x="4" y="0"/>
+    <tilehitbox x="11" y="13" width="42" height="38"/>
+    <hitbox x="11" y="14" width="43" height="29"/>
+    <hurtbox x="11" y="14" width="41" height="29"/>
+    <object size="large" x="10" y="7"/>
+    <object size="large" x="26" y="7"/>
+    <object size="large" x="42" y="7"/>
+    <object size="large" x="10" y="23"/>
+    <object size="large" x="26" y="23"/>
+    <object size="large" x="42" y="23"/>
+    <object size="large" x="10" y="39"/>
+    <object size="large" x="26" y="39"/>
+    <object size="large" x="42" y="39"/>
+  </frame>
+  <frame id="attack_right_1" order="2">
+    <gridlocation x="5" y="0"/>
+    <tilehitbox x="11" y="13" width="42" height="38"/>
+    <hitbox x="11" y="14" width="43" height="29"/>
+    <hurtbox x="11" y="14" width="41" height="29"/>
+    <object size="large" x="10" y="7"/>
+    <object size="large" x="26" y="7"/>
+    <object size="large" x="42" y="7"/>
+    <object size="large" x="10" y="23"/>
+    <object size="large" x="26" y="23"/>
+    <object size="large" x="42" y="23"/>
+    <object size="large" x="10" y="39"/>
+    <object size="large" x="26" y="39"/>
+    <object size="large" x="42" y="39"/>
+  </frame>
+  <frame id="attack_right_2" order="2">
+    <gridlocation x="0" y="1"/>
+    <tilehitbox x="11" y="13" width="42" height="38"/>
+    <hitbox x="11" y="14" width="43" height="29"/>
+    <hurtbox x="11" y="14" width="41" height="29"/>
+    <object size="large" x="10" y="7"/>
+    <object size="large" x="26" y="7"/>
+    <object size="large" x="42" y="7"/>
+    <object size="large" x="10" y="23"/>
+    <object size="large" x="26" y="23"/>
+    <object size="large" x="42" y="23"/>
+    <object size="large" x="10" y="39"/>
+    <object size="large" x="26" y="39"/>
+    <object size="large" x="42" y="39"/>
+  </frame>
+  <frame id="attack_right_3" order="2">
+    <gridlocation x="1" y="1"/>
+    <tilehitbox x="11" y="13" width="42" height="38"/>
+    <hitbox x="11" y="14" width="43" height="29"/>
+    <hurtbox x="11" y="14" width="41" height="29"/>
+    <object size="large" x="10" y="7"/>
+    <object size="large" x="26" y="7"/>
+    <object size="large" x="42" y="7"/>
+    <object size="large" x="10" y="23"/>
+    <object size="large" x="26" y="23"/>
+    <object size="large" x="42" y="23"/>
+    <object size="large" x="10" y="39"/>
+    <object size="large" x="26" y="39"/>
+    <object size="large" x="42" y="39"/>
+  </frame>
+  <frame id="attack_right_4" order="2">
+    <gridlocation x="2" y="1"/>
+    <tilehitbox x="11" y="13" width="42" height="38"/>
+    <hitbox x="11" y="14" width="43" height="29"/>
+    <hurtbox x="11" y="14" width="41" height="29"/>
+    <object size="large" x="10" y="7"/>
+    <object size="large" x="26" y="7"/>
+    <object size="large" x="42" y="7"/>
+    <object size="large" x="10" y="23"/>
+    <object size="large" x="26" y="23"/>
+    <object size="large" x="42" y="23"/>
+    <object size="large" x="10" y="39"/>
+    <object size="large" x="26" y="39"/>
+    <object size="large" x="42" y="39"/>
+    <actionpoint type="EnemyProjectile" x="55" y="28"/>
+  </frame>
+  <frame id="wall_collision_1" order="2">
+    <gridlocation x="3" y="1"/>
+    <tilehitbox x="11" y="13" width="42" height="38"/>
+    <hitbox x="11" y="14" width="43" height="29"/>
+    <hurtbox x="11" y="14" width="41" height="29"/>
+    <object size="small" x="44" y="0"/>
+    <object size="small" x="33" y="0"/>
+    <object size="large" x="10" y="7"/>
+    <object size="large" x="26" y="7"/>
+    <object size="large" x="42" y="7"/>
+    <object size="large" x="10" y="23"/>
+    <object size="large" x="26" y="23"/>
+    <object size="large" x="42" y="23"/>
+    <object size="large" x="10" y="39"/>
+    <object size="large" x="26" y="39"/>
+    <object size="large" x="42" y="39"/>
+  </frame>
+  <frame id="wall_collision_2" order="2">
+    <gridlocation x="4" y="1"/>
+    <tilehitbox x="11" y="13" width="42" height="38"/>
+    <hitbox x="11" y="14" width="43" height="29"/>
+    <hurtbox x="11" y="14" width="41" height="29"/>
+    <object size="small" x="39" y="0"/>
+    <object size="large" x="10" y="7"/>
+    <object size="large" x="26" y="7"/>
+    <object size="large" x="42" y="7"/>
+    <object size="large" x="10" y="23"/>
+    <object size="large" x="26" y="23"/>
+    <object size="large" x="42" y="23"/>
+    <object size="large" x="10" y="39"/>
+    <object size="large" x="26" y="39"/>
+    <object size="large" x="42" y="39"/>
+  </frame>
+  <frame id="wall_collision_3" order="2">
+    <gridlocation x="5" y="1"/>
+    <tilehitbox x="11" y="13" width="42" height="38"/>
+    <hitbox x="11" y="14" width="43" height="29"/>
+    <hurtbox x="11" y="14" width="41" height="29"/>
+    <object size="small" x="41" y="0"/>
+    <object size="large" x="10" y="7"/>
+    <object size="large" x="26" y="7"/>
+    <object size="large" x="42" y="7"/>
+    <object size="large" x="10" y="23"/>
+    <object size="large" x="26" y="23"/>
+    <object size="large" x="42" y="23"/>
+    <object size="large" x="10" y="39"/>
+    <object size="large" x="26" y="39"/>
+    <object size="large" x="42" y="39"/>
+  </frame>
+  <frame id="turn_left_1" order="2">
+    <gridlocation x="0" y="2"/>
+    <tilehitbox x="11" y="13" width="42" height="38"/>
+    <hitbox x="11" y="14" width="43" height="29"/>
+    <hurtbox x="11" y="14" width="41" height="29"/>
+    <object size="large" x="10" y="7"/>
+    <object size="large" x="26" y="7"/>
+    <object size="large" x="42" y="7"/>
+    <object size="large" x="10" y="23"/>
+    <object size="large" x="26" y="23"/>
+    <object size="large" x="42" y="23"/>
+    <object size="large" x="10" y="39"/>
+    <object size="large" x="26" y="39"/>
+    <object size="large" x="42" y="39"/>
+  </frame>
+  <frame id="turn_left_2" order="2">
+    <gridlocation x="1" y="2"/>
+    <tilehitbox x="11" y="13" width="42" height="38"/>
+    <hitbox x="11" y="14" width="43" height="29"/>
+    <hurtbox x="11" y="14" width="41" height="29"/>
+    <object size="large" x="16" y="5"/>
+    <object size="large" x="32" y="5"/>
+    <object size="large" x="12" y="21"/>
+    <object size="large" x="36" y="21"/>
+    <object size="large" x="16" y="37"/>
+    <object size="large" x="32" y="37"/>
+    <object size="small" x="28" y="21"/>
+    <object size="small" x="28" y="29"/>
+  </frame>
+  <frame id="hurt_right" order="2">
+    <gridlocation x="2" y="2"/>
+    <tilehitbox x="11" y="13" width="42" height="38"/>
+    <hitbox x="11" y="14" width="43" height="29"/>
+    <hurtbox x="11" y="14" width="41" height="29"/>
+    <object size="large" x="11" y="4"/>
+    <object size="large" x="27" y="4"/>
+    <object size="large" x="43" y="4"/>
+    <object size="large" x="11" y="20"/>
+    <object size="large" x="27" y="20"/>
+    <object size="large" x="43" y="20"/>
+    <object size="large" x="11" y="36"/>
+    <object size="large" x="27" y="36"/>
+    <object size="large" x="43" y="36"/>
+  </frame>
+  <animation id="charge_right" durationformat="DISTANCE_HORIZONTAL">
+    <aframe frame="walk_right_1" duration="224"/>
+    <aframe frame="walk_right_1" duration="224"/>
+    <aframe frame="walk_right_2" duration="224"/>
+    <aframe frame="walk_right_2" duration="224"/>
+    <aframe frame="walk_right_3" duration="224"/>
+    <aframe frame="walk_right_3" duration="224"/>
+    <aframe frame="walk_right_4" duration="224"/>
+    <aframe frame="walk_right_4" duration="224"/>
+  </animation>
+  <animation id="attack_right" durationformat="TIME" oneshot="true">
+    <aframe frame="attack_right_1" duration="10"/>
+    <aframe frame="attack_right_2" duration="10"/>
+    <aframe frame="attack_right_3" duration="10"/>
+    <aframe frame="attack_right_4" duration="20"/>
+    <aframe frame="attack_right_2" duration="10"/>
+  </animation>
+  <animation id="wall_collision_right" durationformat="TIME">
+    <aframe frame="wall_collision_1" duration="5"/>
+    <aframe frame="wall_collision_2" duration="5"/>
+    <aframe frame="wall_collision_3" duration="5"/>
+  </animation>
+  <animation id="turn_left" durationformat="TIME" oneshot="true">
+    <aframe frame="turn_left_1" duration="15"/>
+    <aframe frame="turn_left_2" duration="20"/>
+    <aframe frame="turn_left_1" hflip="true" duration="15"/>
+  </animation>
+  <animation id="hurt_right" durationformat="TIME" oneshot="true">
+    <aframe frame="hurt_right" duration="75"/>
+  </animation>
+</spriteimporter>
