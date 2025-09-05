@@ -6,7 +6,7 @@
   <frame id="walk_right_1" order="2">
     <gridlocation x="1" y="0"/>
     <tilehitbox x="11" y="13" width="42" height="38"/>
-    <hitbox x="11" y="14" width="43" height="29"/>
+    <hitbox x="12" y="14" width="42" height="29"/>
     <hurtbox x="11" y="14" width="41" height="29"/>
     <object size="large" x="10" y="7"/>
     <object size="large" x="26" y="7"/>
@@ -21,7 +21,7 @@
   <frame id="walk_right_2" order="2">
     <gridlocation x="2" y="0"/>
     <tilehitbox x="11" y="13" width="42" height="38"/>
-    <hitbox x="11" y="14" width="43" height="29"/>
+    <hitbox x="12" y="14" width="42" height="29"/>
     <hurtbox x="11" y="14" width="41" height="29"/>
     <object size="large" x="10" y="7"/>
     <object size="large" x="26" y="7"/>
@@ -36,7 +36,7 @@
   <frame id="walk_right_3" order="2">
     <gridlocation x="3" y="0"/>
     <tilehitbox x="11" y="13" width="42" height="38"/>
-    <hitbox x="11" y="14" width="43" height="29"/>
+    <hitbox x="12" y="14" width="42" height="29"/>
     <hurtbox x="11" y="14" width="41" height="29"/>
     <object size="large" x="10" y="7"/>
     <object size="large" x="26" y="7"/>
@@ -51,7 +51,7 @@
   <frame id="walk_right_4" order="2">
     <gridlocation x="4" y="0"/>
     <tilehitbox x="11" y="13" width="42" height="38"/>
-    <hitbox x="11" y="14" width="43" height="29"/>
+    <hitbox x="12" y="14" width="42" height="29"/>
     <hurtbox x="11" y="14" width="41" height="29"/>
     <object size="large" x="10" y="7"/>
     <object size="large" x="26" y="7"/>
@@ -66,7 +66,7 @@
   <frame id="attack_right_1" order="2">
     <gridlocation x="5" y="0"/>
     <tilehitbox x="11" y="13" width="42" height="38"/>
-    <hitbox x="11" y="14" width="43" height="29"/>
+    <hitbox x="12" y="14" width="42" height="29"/>
     <hurtbox x="11" y="14" width="41" height="29"/>
     <object size="large" x="10" y="7"/>
     <object size="large" x="26" y="7"/>
@@ -81,7 +81,7 @@
   <frame id="attack_right_2" order="2">
     <gridlocation x="0" y="1"/>
     <tilehitbox x="11" y="13" width="42" height="38"/>
-    <hitbox x="11" y="14" width="43" height="29"/>
+    <hitbox x="12" y="14" width="42" height="29"/>
     <hurtbox x="11" y="14" width="41" height="29"/>
     <object size="large" x="10" y="7"/>
     <object size="large" x="26" y="7"/>
@@ -96,7 +96,7 @@
   <frame id="attack_right_3" order="2">
     <gridlocation x="1" y="1"/>
     <tilehitbox x="11" y="13" width="42" height="38"/>
-    <hitbox x="11" y="14" width="43" height="29"/>
+    <hitbox x="12" y="14" width="42" height="29"/>
     <hurtbox x="11" y="14" width="41" height="29"/>
     <object size="large" x="10" y="7"/>
     <object size="large" x="26" y="7"/>
@@ -111,7 +111,7 @@
   <frame id="attack_right_4" order="2">
     <gridlocation x="2" y="1"/>
     <tilehitbox x="11" y="13" width="42" height="38"/>
-    <hitbox x="11" y="14" width="43" height="29"/>
+    <hitbox x="12" y="14" width="42" height="29"/>
     <hurtbox x="11" y="14" width="41" height="29"/>
     <object size="large" x="10" y="7"/>
     <object size="large" x="26" y="7"/>
@@ -127,8 +127,8 @@
   <frame id="wall_collision_1" order="2">
     <gridlocation x="3" y="1"/>
     <tilehitbox x="11" y="13" width="42" height="38"/>
-    <hitbox x="11" y="14" width="43" height="29"/>
-    <hurtbox x="11" y="14" width="41" height="29"/>
+    <hitbox x="14" y="14" width="33" height="29"/>
+    <hurtbox x="13" y="14" width="37" height="29"/>
     <object size="small" x="44" y="0"/>
     <object size="small" x="33" y="0"/>
     <object size="large" x="10" y="7"/>
@@ -144,8 +144,8 @@
   <frame id="wall_collision_2" order="2">
     <gridlocation x="4" y="1"/>
     <tilehitbox x="11" y="13" width="42" height="38"/>
-    <hitbox x="11" y="14" width="43" height="29"/>
-    <hurtbox x="11" y="14" width="41" height="29"/>
+    <hitbox x="14" y="14" width="33" height="29"/>
+    <hurtbox x="13" y="14" width="37" height="29"/>
     <object size="small" x="39" y="0"/>
     <object size="large" x="10" y="7"/>
     <object size="large" x="26" y="7"/>
@@ -160,8 +160,8 @@
   <frame id="wall_collision_3" order="2">
     <gridlocation x="5" y="1"/>
     <tilehitbox x="11" y="13" width="42" height="38"/>
-    <hitbox x="11" y="14" width="43" height="29"/>
-    <hurtbox x="11" y="14" width="41" height="29"/>
+    <hitbox x="14" y="14" width="33" height="29"/>
+    <hurtbox x="13" y="14" width="37" height="29"/>
     <object size="small" x="41" y="0"/>
     <object size="large" x="10" y="7"/>
     <object size="large" x="26" y="7"/>
@@ -176,8 +176,8 @@
   <frame id="turn_left_1" order="2">
     <gridlocation x="0" y="2"/>
     <tilehitbox x="11" y="13" width="42" height="38"/>
-    <hitbox x="11" y="14" width="43" height="29"/>
-    <hurtbox x="11" y="14" width="41" height="29"/>
+    <hitbox x="17" y="14" width="33" height="29"/>
+    <hurtbox x="17" y="13" width="33" height="30"/>
     <object size="large" x="10" y="7"/>
     <object size="large" x="26" y="7"/>
     <object size="large" x="42" y="7"/>
@@ -191,8 +191,8 @@
   <frame id="turn_left_2" order="2">
     <gridlocation x="1" y="2"/>
     <tilehitbox x="11" y="13" width="42" height="38"/>
-    <hitbox x="11" y="14" width="43" height="29"/>
-    <hurtbox x="11" y="14" width="41" height="29"/>
+    <hitbox x="16" y="14" width="32" height="29"/>
+    <hurtbox x="16" y="17" width="32" height="26"/>
     <object size="large" x="16" y="5"/>
     <object size="large" x="32" y="5"/>
     <object size="large" x="12" y="21"/>
@@ -205,8 +205,7 @@
   <frame id="hurt_right" order="2">
     <gridlocation x="2" y="2"/>
     <tilehitbox x="11" y="13" width="42" height="38"/>
-    <hitbox x="11" y="14" width="43" height="29"/>
-    <hurtbox x="11" y="14" width="41" height="29"/>
+    <hitbox x="13" y="14" width="41" height="29"/>
     <object size="large" x="11" y="4"/>
     <object size="large" x="27" y="4"/>
     <object size="large" x="43" y="4"/>
