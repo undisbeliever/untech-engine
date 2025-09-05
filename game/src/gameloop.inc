@@ -81,6 +81,12 @@ a16()
     stz.w   inidispBuffer
 
     Loop:
+        assert(Mode.GAME == 0)
+        lda.w   currentMode
+        beq     +
+            jmp     SwitchMode
+        +
+
         assert(Room.roomChangeRequested.LOAD_NEW_ROOM_FLAG == 0x80)
         bit.w   Room.roomChangeRequested - 1
         bmi     RoomChangeRequested

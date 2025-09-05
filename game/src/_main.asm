@@ -74,9 +74,13 @@ if {defined DEBUG_BUILD} {
 
 include "input.inc"
 include "healthbar.inc"
-include "gameloop.inc"
 include "bytecodes.inc"
 include "misc.inc"
+include "modes.inc"
+include "gameloop.inc"
+
+include "modes/title-screen.inc"
+
 
 include "entities/_common.inc"
 include "entities/_movement.inc"
@@ -97,6 +101,7 @@ include "entities/boss-net.inc"
 
 include "interactive-tiles.inc"
 
+include "scenes/title-screen.inc"
 include "scenes/basic-room.inc"
 include "scenes/water-room.inc"
 
@@ -118,10 +123,9 @@ a8()
     rep     #$30
 a16()
 i16()
-    jsr     GameState.LoadInitialGameState
 
 
-    // ::TODO show a screen when loading audio::
+    // ::SHOULDDO show a screen when loading audio::
     sep     #$20
 a8()
     jsl     Audio.Init__far
@@ -133,15 +137,17 @@ a16()
     if {defined DEBUG_BUILD} {
         DebugSave.LoadGameStateOrBranchIfNoSave(NoSave)
             // Game successfully loaded from Save-RAM
-            // ::TODO switch to GameLoop when loaded::
+
+            // Skip title screen and jump straight to game loop
+            lda.w   #Mode.GAME
+            jmp     SwitchMode
         NoSave:
     }
 
-    // ::TODO start and options screens::
+    wdm #1
 
-
-    // Load first room and run the Game Loop
-    jmp     GameLoop
+    lda.w   #Mode.TITLE_SCREEN
+    jmp     SwitchMode
 }
 
 

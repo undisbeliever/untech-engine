@@ -200,7 +200,11 @@
   <frameset src="metasprites/boss-net.utsi" type="spriteimporter"/>
   <palette name="blocky" image="palettes/blocky.png" rows-per-frame="8" animation-delay="35"/>
   <palette name="station" image="palettes/station.png" rows-per-frame="8" animation-delay="255"/>
+  <palette name="title_screen" image="palettes/title-screen.png" rows-per-frame="4" skip-first="true" animation-delay="50"/>
   <background-image name="water" bit-depth="4" image="bg-images/water.png" palette="station" first-palette="7" npalettes="1" default-order="0"/>
+  <background-image name="title_stars" bit-depth="2" image="bg-images/title-stars.png" palette="title_screen" first-palette="0" npalettes="4" default-order="0"/>
+  <background-image name="title_ship" bit-depth="4" image="bg-images/title-ship.png" palette="title_screen" first-palette="0" npalettes="4" default-order="0"/>
+  <background-image name="title_text" bit-depth="4" image="bg-images/title-text.png" palette="title_screen" first-palette="0" npalettes="4" default-order="0"/>
   <metatile-tileset src="metatiles/blocky.utmt"/>
   <metatile-tileset src="metatiles/station.utmt"/>
   <room-file src="rooms/_scratchpad.utroom"/>
@@ -216,8 +220,10 @@
   <room-file src="rooms/12e-up-gravity.utroom"/>
   <room-file src="rooms/12f-end.utroom"/>
   <room-file src="rooms/a3_boss.utroom"/>
+  <scene-setting name="TitleScreen" bg-mode="1" layer0-type="bg-image" layer1-type="bg-image" layer2-type="bg-image" layer3-type=""/>
   <scene-setting name="BasicRoom" bg-mode="1bg3" layer0-type="mt-tileset" layer1-type="" layer2-type="text" layer3-type=""/>
   <scene-setting name="WaterRoom" bg-mode="1bg3" layer0-type="bg-image" layer1-type="mt-tileset" layer2-type="text" layer3-type=""/>
+  <scene name="title_screen" settings="TitleScreen" palette="title_screen" layer0="title_text" layer1="title_ship" layer2="title_stars"/>
   <scene name="blocky" settings="BasicRoom" palette="blocky" layer0="blocky"/>
   <scene name="water" settings="WaterRoom" palette="blocky" layer0="water" layer1="blocky"/>
   <scene name="station" settings="BasicRoom" palette="station" layer0="station"/>

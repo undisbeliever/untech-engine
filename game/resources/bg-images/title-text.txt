@@ -1,0 +1,11 @@
+Created in Aseprite
+
+Title:
+    Font: DejaVuSans Bold, size 36
+    Manually adjusted
+    Shadow done with outline tool
+
+Copyright:
+    Font: DejaVuSans, size 11
+    Manually adjusted
+

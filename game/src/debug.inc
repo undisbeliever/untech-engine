@@ -92,12 +92,8 @@ macro ProcessDebugCommands() {
     and.b   #JOYL.l | JOYL.r
     cmp.b   #JOYL.l | JOYL.r
     bne     +
-        // ::TODO switch to start screen::
-        rep     #$30
-    a16()
-    i16()
-        jsr     GameState.LoadInitialGameState
-        jmp     RoomChangeRequested
+        lda.b   #Mode.TITLE_SCREEN
+        sta.w   currentMode
     +
 }
 

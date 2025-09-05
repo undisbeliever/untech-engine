@@ -21,25 +21,54 @@
 //
 //    3. This notice may not be removed or altered from any source distribution.
 
-
-// See `Modes` enum
-allocate(currentMode, wram7e, 2)
-
-
-// Number of active player projectiles
-allocate(nPlayerProjectiles, wram7e, 2)
+namespace Scenes {
+namespace TitleScreen {
 
 
+constant shipHOffset   = sceneVar1
+constant shipVOffset   = sceneVar2
 
-namespace InputBuffer {
 
-    // Input buffer variables.
-    //  * Right shifted every gameloop frame
-    //  * Set to `1 << N` if the button is pressed
-    // (byte)
-    allocate(attack, zeropage, 1)
-    allocate(projectile, zeropage, 1)
-    allocate(jump, zeropage, 1)
 
+a16()
+i8()
+// DB = 0x7e
+// DP = 0x2100
+code()
+function SetupPpu_dp2100 {
+    rts
+}
+
+
+a16()
+i8()
+// DB = 0x7e
+code()
+function Process {
+    rts
+}
+
+
+a16()
+i8()
+// DB = 0x80
+// DP = $2100
+farCode()
+function VBlank_dp2100 {
+    ldy.w   shipHOffset
+    sty.b   BG2HOFS
+    ldy.w   shipHOffset + 1
+    sty.b   BG2HOFS
+
+    ldy.w   shipVOffset
+    sty.b   BG2VOFS
+    ldy.w   shipVOffset + 1
+    sty.b   BG2VOFS
+
+    rts
+}
+
+
+}
 }
 

@@ -23,6 +23,35 @@
 
 
 
+// Fades in the screen over 15 frames
+//
+// REQUIRES: 16 bit A, 16 bit Index, DP = 0, DB = 0x7e
+au()
+iu()
+code()
+function FadeIn {
+    sep     #$20
+a8()
+    Loop:
+        lda.w   inidispBuffer
+        bpl     +
+            lda.b   #-1
+        +
+        inc
+        cmp.b   #INIDISP.brightness.mask + 1
+        bcs     Break
+        sta.w   inidispBuffer
+
+        jsl     WaitFrame__far
+        bra     Loop
+    Break:
+
+    rep     #$30
+a16()
+    rts
+}
+
+
 // Fades out the screen over 16 frames
 //
 // REQUIRES: 16 bit A, 16 bit Index, DP = 0, DB = 0x7e

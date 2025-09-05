@@ -22,24 +22,58 @@
 //    3. This notice may not be removed or altered from any source distribution.
 
 
-// See `Modes` enum
-allocate(currentMode, wram7e, 2)
-
-
-// Number of active player projectiles
-allocate(nPlayerProjectiles, wram7e, 2)
-
-
-
-namespace InputBuffer {
-
-    // Input buffer variables.
-    //  * Right shifted every gameloop frame
-    //  * Set to `1 << N` if the button is pressed
-    // (byte)
-    allocate(attack, zeropage, 1)
-    allocate(projectile, zeropage, 1)
-    allocate(jump, zeropage, 1)
-
+namespace Mode {
+    createEnum(0, 2)
+        enum(GAME)
+        enum(TITLE_SCREEN)
+    endEnum()
 }
+
+constant N_MODES = Mode.__ENUM__.count
+
+code()
+ModeFunctionTable:
+    dw  GameLoop
+    dw  TitleScreen.Run
+assert(pc() - ModeFunctionTable == N_MODES * 2)
+
+
+
+// CAUTION: Changes Stack Pointer
+// IN: A = new mode
+au()
+iu()
+// DB unknown
+code()
+function SwitchMode {
+    // 16 bit A, 16 bit I, decimal mode disabled
+    rep #$38
+a16()
+i16()
+    // Reset stack
+    ldx.w   #STACK_BOTTOM
+    txs
+
+    // Reset DB (without setting A)
+    pea     0x7e7e
+    plb
+    plb
+
+    // Reset direct page (without changing A)
+    pea     0
+    tcd
+
+    // A = new mode
+    and.w   #0xfe
+    cmp.w   #N_MODES * 2
+    bcc     +
+        lda.w   #Mode.TITLE_SCREEN
+    +
+    sta.w   currentMode
+    tax
+    jsr     (ModeFunctionTable,x)
+
+    bra     SwitchMode
+}
+
 
