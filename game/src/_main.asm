@@ -79,6 +79,7 @@ include "misc.inc"
 include "modes.inc"
 include "gameloop.inc"
 
+include "modes/level-name-screen.inc"
 include "modes/title-screen.inc"
 
 
@@ -102,6 +103,7 @@ include "entities/boss-net.inc"
 include "interactive-tiles.inc"
 
 include "scenes/title-screen.inc"
+include "scenes/text.inc"
 include "scenes/basic-room.inc"
 include "scenes/water-room.inc"
 

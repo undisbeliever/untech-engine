@@ -135,6 +135,9 @@ macro SaveGameState() {
 
     phb
 
+    lda.w   LevelNameScreen.levelNumber
+    sta.w   Project.GameState.Words.levelNumber
+
     ldy.w   #DebugSave.SaveRam
 
     ldx.w   #DebugSave.SNES_HEADER
@@ -207,6 +210,10 @@ macro LoadGameStateOrBranchIfNoSave(NoSaveLabel) {
     ldy.w   #GameStateData
     lda.w   #GameStateData.size - 1
     mvn     0x7e=DebugSave.SaveRamBank
+
+
+    lda.w   Project.GameState.Words.levelNumber
+    sta.w   LevelNameScreen.levelNumber
 }
 
 }

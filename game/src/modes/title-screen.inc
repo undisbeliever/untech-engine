@@ -46,6 +46,8 @@ constant _frame = zpTmp1
 
     jsr     GameState.LoadInitialGameState
 
+    LevelNameScreen.ResetLevelNumber()
+
 
     jsr     FadeOut
 
@@ -154,7 +156,7 @@ a16()
     bit.w   #JOY.start
     beq     +
         // Safe - SwitchMode will reset the stack pointer
-        lda.w   #Mode.GAME
+        lda.w   #Mode.LEVEL_NAME
         jmp     SwitchMode
     +
 
