@@ -45,9 +45,8 @@ code()
 function Run {
     sep     #$20
 a8()
-
-    lda.b   #Audio.TadCommand.PAUSE
-    jsr     Audio.QueueCommandOverride
+    lda.b   #Song.BLANK
+    jsr     Audio.LoadSong
 
 
     jsr     FadeOut
