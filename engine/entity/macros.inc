@@ -507,7 +507,7 @@ inline GetEntityWithIdOrBranchIfEmpty_A8X(label) {
 macro QueueAudioCommand_BranchOk(name, label) {
     assert8a()
 
-    lda.b   #TadCommand.{name}
+    lda.b   #Audio.TadCommand.{name}
     jsr     Audio.QueueCommand
     bcs     {label}
 }
@@ -516,7 +516,7 @@ macro QueueAudioCommand_BranchOk(name, label) {
 macro QueueAudioCommand_X_BranchOk(name, label) {
     assert8a()
 
-    lda.b   #TadCommand.{name}
+    lda.b   #Audio.TadCommand.{name}
     jsr     Audio.QueueCommand
     bcs     {label}
 }
@@ -525,7 +525,7 @@ macro QueueAudioCommand_X_BranchOk(name, label) {
 macro QueueAudioCommand_XY_BranchOk(name, label) {
     assert8a()
 
-    lda.b   #TadCommand.{name}
+    lda.b   #Audio.TadCommand.{name}
     jsr     Audio.QueueCommand
     bcs     {label}
 }
@@ -535,7 +535,7 @@ macro QueueAudioCommand_XY_BranchOk(name, label) {
 macro QueueAudioCommand_BranchErr(name, label) {
     assert8a()
 
-    lda.b   #TadCommand.{name}
+    lda.b   #Audio.TadCommand.{name}
     jsr     Audio.QueueCommand
     bcc     {label}
 }
@@ -544,7 +544,7 @@ macro QueueAudioCommand_BranchErr(name, label) {
 macro QueueAudioCommand_X_BranchErr(name, label) {
     assert8a()
 
-    lda.b   #TadCommand.{name}
+    lda.b   #Audio.TadCommand.{name}
     jsr     Audio.QueueCommand
     bcc     {label}
 }
@@ -553,7 +553,7 @@ macro QueueAudioCommand_X_BranchErr(name, label) {
 macro QueueAudioCommand_XY_BranchErr(name, label) {
     assert8a()
 
-    lda.b   #TadCommand.{name}
+    lda.b   #Audio.TadCommand.{name}
     jsr     Audio.QueueCommand
     bcc     {label}
 }
@@ -564,7 +564,7 @@ macro QueueAudioCommand_XY_BranchErr(name, label) {
 macro QueueAudioCommandOverride(name) {
     assert8a()
 
-    lda.b   #TadCommandOverride.{name}
+    lda.b   #Audio.TadCommand.{name}
     jsr     Audio.QueueCommandOverride
 }
 
@@ -572,7 +572,7 @@ macro QueueAudioCommandOverride(name) {
 macro QueueAudioCommandOverride_X(name) {
     assert8a()
 
-    lda.b   #TadCommandOverride.{name}
+    lda.b   #Audio.TadCommand.{name}
     jsr     Audio.QueueCommandOverride
 }
 
@@ -580,7 +580,7 @@ macro QueueAudioCommandOverride_X(name) {
 macro QueueAudioCommandOverride_XY(name) {
     assert8a()
 
-    lda.b   #TadCommandOverride.{name}
+    lda.b   #Audio.TadCommand.{name}
     jsr     Audio.QueueCommandOverride
 }
 
