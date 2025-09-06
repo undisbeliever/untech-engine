@@ -63,7 +63,7 @@ i16()
 
     // Reset direct page (without changing A)
     pea     0
-    tcd
+    pld
 
     // A = new mode
     and.w   #0xfe
