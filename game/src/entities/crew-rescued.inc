@@ -32,7 +32,7 @@ constant SPRITE_YPOS = 80 - INT_MS8_OFFSET
 constant FRAME_0_DISPLAY_COUNTDOWN = 0
 constant FRAME_1_DISPLAY_COUNTDOWN = 45
 
-constant FRAMES_UNTIL_NEXT_LEVEL = 200
+constant FRAMES_UNTIL_NEXT_LEVEL = 5 * 60
 
 
 buildFunctionTable(BaseEntityFunctionTable, CrewRescued)
