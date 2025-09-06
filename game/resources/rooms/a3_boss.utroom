@@ -8,7 +8,7 @@
     AgwAAAAAAAAAAAAAAAALAgIMAAAAAAAAAAAAAAAACwICDQMDAwMDAwMDAwMDAwoC
     AgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgI=
   </map>
-  <entrance name="strat" x="40" y="34" orientation="down-right"/>
+  <entrance name="strat" x="40" y="36" orientation="down-right"/>
   <entity-group name="initial">
     <entity entity="walking_tank_boss" x="57" y="155" parameter=""/>
     <entity entity="scientist" x="213" y="36" parameter="4"/>

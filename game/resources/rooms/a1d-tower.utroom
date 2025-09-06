@@ -52,8 +52,8 @@
     Sy4AAAAAALi5AAAApKWlpaWlpaWlpgsCAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwoC
     AgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIC
   </map>
-  <entrance name="bottom" x="40" y="1506" orientation="down-right"/>
-  <entrance name="top" x="144" y="114" orientation="down-right"/>
+  <entrance name="bottom" x="40" y="1508" orientation="down-right"/>
+  <entrance name="top" x="144" y="116" orientation="down-right"/>
   <entity-group name="init">
     <entity entity="avoid_ledges" x="209" y="837" parameter="0"/>
     <entity entity="jumping_bug" x="231" y="121" parameter="0"/>

@@ -51,7 +51,7 @@
     e2wCAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIC
     AgICAgICAgICAgICAgICAgICAgICAgJ6e3tsAgICAgICAgICAgICAgICAgICAgIC
   </map>
-  <entrance name="left_door" x="40" y="450" orientation="down-right"/>
+  <entrance name="left_door" x="40" y="452" orientation="down-right"/>
   <entrance name="top_door" x="80" y="116" orientation="down-right"/>
   <entity-group name="init">
     <entity entity="avoid_ledges" x="186" y="266" parameter="0"/>

@@ -8,7 +8,7 @@
     AgwAAD4AAAABAAAAAAALAgIMAAA+AAAAAQAAAAAACwICDQMDBQMDAwMDAwMDAwoC
     AgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgI=
   </map>
-  <entrance name="door" x="80" y="162" orientation="down-right"/>
+  <entrance name="door" x="80" y="164" orientation="down-right"/>
   <entity-group name="init">
     <entity entity="scientist" x="192" y="164" parameter="0"/>
     <entity entity="scientist" x="202" y="164" parameter="0"/>

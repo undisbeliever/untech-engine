@@ -22,8 +22,8 @@
     AgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICArq7vAIC
     AgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgI=
   </map>
-  <entrance name="left_door" x="40" y="162" orientation="down-right"/>
-  <entrance name="right_door" x="984" y="162" orientation="down-left"/>
+  <entrance name="left_door" x="40" y="164" orientation="down-right"/>
+  <entrance name="right_door" x="984" y="164" orientation="down-left"/>
   <entity-group name="init">
     <entity entity="cleaning_bot_slow" x="948" y="37" parameter="2"/>
     <entity entity="tall_jumper" x="536" y="152" parameter="0"/>

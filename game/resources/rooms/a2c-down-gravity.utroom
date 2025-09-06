@@ -31,8 +31,8 @@
     AgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAnp7e3t8AgICAgICAgICAgIC
     AgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIC
   </map>
-  <entrance name="left_door" x="40" y="162" orientation="down-right"/>
-  <entrance name="right_door" x="1496" y="162" orientation="down-left"/>
+  <entrance name="left_door" x="40" y="164" orientation="down-right"/>
+  <entrance name="right_door" x="1496" y="164" orientation="down-left"/>
   <entity-group name="init">
     <entity entity="cleaning_bot_slow" x="64" y="37" parameter="3"/>
     <entity entity="cleaning_bot_slow" x="128" y="37" parameter="3"/>
