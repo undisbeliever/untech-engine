@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF_8"?>
 <!DOCTYPE untech>
-<room name="playtest_1_entrance" scene="station">
+<room name="a1a_entrance" scene="station">
   <map width="48" height="14">
     AgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIC
     Ah0YGBgYGBgYGBgYGBgYGBgYGBgYGBgYGBgYGBgYGBgYGBgYGBgYGBgYGBgYHAIC
@@ -26,7 +26,7 @@
     <statement opcode="Spawn_Entity_Group" arg1="init"/>
   </script>
   <script name="right_door">
-    <statement opcode="Load_Room" arg1="playtest_2_stairway" arg2="left_door"/>
+    <statement opcode="Load_Room" arg1="a1b_stairway" arg2="left_door"/>
   </script>
   <script-trigger script="right_door" x="46" y="8" width="1" height="3"/>
 </room>

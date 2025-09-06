@@ -3,7 +3,7 @@
 <project>
   <memory-map mode="lorom" first-bank="83" n-banks="5"/>
   <room-settings room-data-size="16384"/>
-  <game-state starting-room="playtest_1_entrance" starting-entrance="start" starting-player="player">
+  <game-state starting-room="_scratchpad" starting-entrance="start" starting-player="player">
     <word index="0" name="levelNumber" value="0"/>
     <word index="1" name="playerHealth" value="6"/>
     <word index="2" name="waterPosition" value="0"/>
@@ -222,11 +222,11 @@
   <metatile-tileset src="metatiles/blocky.utmt"/>
   <metatile-tileset src="metatiles/station.utmt"/>
   <room-file src="rooms/_scratchpad.utroom"/>
-  <room-file src="rooms/playtest-1-entrance.utroom"/>
-  <room-file src="rooms/playtest-2-stairway.utroom"/>
-  <room-file src="rooms/playtest-3-water-test.utroom"/>
-  <room-file src="rooms/playtest-4-tower.utroom"/>
-  <room-file src="rooms/playtest-5-end.utroom"/>
+  <room-file src="rooms/a1a-entrance.utroom"/>
+  <room-file src="rooms/a1b-stairway.utroom"/>
+  <room-file src="rooms/a1c-water-test.utroom"/>
+  <room-file src="rooms/a1d-tower.utroom"/>
+  <room-file src="rooms/a1e-end.utroom"/>
   <room-file src="rooms/a2a-start.utroom"/>
   <room-file src="rooms/a2b-boxes-on-ceiling.utroom"/>
   <room-file src="rooms/a2c-down-gravity.utroom"/>

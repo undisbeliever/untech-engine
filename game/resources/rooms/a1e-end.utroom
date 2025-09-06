@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF_8"?>
 <!DOCTYPE untech>
-<room name="playtest_5_end" scene="station">
+<room name="a1e_end" scene="station">
   <map width="16" height="14">
     AgICAgICAgICAgICAgICAgIdGBgYGBgYGBgYGBgYHAICDAAAAAAAAAAAAAAAAAsC
     AgwAAAAAAAAAAAAAAAALAgIMAAAAAAAAAAAAAAAACwICDAAAAAAAAAAAAAAAAAsC
@@ -19,7 +19,7 @@
     <statement opcode="Spawn_Entity_Group" arg1="init"/>
   </script>
   <script name="door">
-    <statement opcode="Load_Room" arg1="playtest_4_tower" arg2="top"/>
+    <statement opcode="Load_Room" arg1="a1d_tower" arg2="top"/>
   </script>
   <script name="level_complete">
     <statement opcode="Crew_Rescued"/>

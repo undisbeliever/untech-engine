@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF_8"?>
 <!DOCTYPE untech>
-<room name="playtest_3_water_test" scene="station_water">
+<room name="a1c_water_test" scene="station_water">
   <map width="80" height="32">
     AgICAgICAgICAgICAgICAgICAgICAgJ6e3wCAgICAgICAgICAgICAgICAgICAgIC
     AgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAh0YGBgYGBgYGBgYGBgY
@@ -76,10 +76,10 @@
     <statement opcode="Set_Word" arg1="waterPosition" arg2="0x10DC"/>
   </script>
   <script name="left_door">
-    <statement opcode="Load_Room" arg1="playtest_2_stairway" arg2="bottom_door"/>
+    <statement opcode="Load_Room" arg1="a1b_stairway" arg2="bottom_door"/>
   </script>
   <script name="right_door">
-    <statement opcode="Load_Room" arg1="playtest_4_tower" arg2="bottom"/>
+    <statement opcode="Load_Room" arg1="a1d_tower" arg2="bottom"/>
   </script>
   <script-trigger script="left_door" x="1" y="9" width="1" height="3"/>
   <script-trigger script="right_door" x="78" y="9" width="1" height="3"/>
