@@ -52,7 +52,7 @@
     AgICAgICAgICAgICAgICAgICAgICAgJ6e3tsAgICAgICAgICAgICAgICAgICAgIC
   </map>
   <entrance name="left_door" x="40" y="450" orientation="down-right"/>
-  <entrance name="right_door" x="112" y="114" orientation="down-left"/>
+  <entrance name="top_door" x="80" y="116" orientation="down-right"/>
   <entity-group name="init">
     <entity entity="avoid_ledges" x="186" y="266" parameter="0"/>
     <entity entity="avoid_ledges" x="164" y="266" parameter="1"/>
@@ -70,9 +70,9 @@
   <script name="left_door">
     <statement opcode="Load_Room" arg1="a2d_up_down_gravity" arg2="right_door"/>
   </script>
-  <script name="right_door">
+  <script name="top_door">
     <statement opcode="Load_Room" arg1="a2f_end" arg2="door"/>
   </script>
   <script-trigger script="left_door" x="1" y="26" width="1" height="3"/>
-  <script-trigger script="right_door" x="4" y="8" width="1" height="1"/>
+  <script-trigger script="top_door" x="4" y="8" width="1" height="1"/>
 </room>
