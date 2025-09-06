@@ -25,7 +25,7 @@
 define MEMORY_MAP = LOROM
 define ROM_SIZE = 2
 define REGION = US // NTSC
-define ROM_NAME = "RESCUE"
+define ROM_NAME = "SPACE RESCUE SQUAD"
 define VERSION = 0
 
 if {defined RELEASE_BUILD} {
