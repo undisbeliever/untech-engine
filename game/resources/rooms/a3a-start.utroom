@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF_8"?>
+<!DOCTYPE untech>
+<room name="a3a_start" scene="station">
+  <map width="52" height="14">
+    AgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIC
+    AgICAgIdGBgYGBgYGBgYGBgYGBgYGBgYGBgYGBgYGBgYGBgYGBgYGBgYGBgYGBgY
+    GBgYGBgcAgICDAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAqKkAAAAAAAAA
+    AAAAAAAAAAAACwICAgwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAALi5AAAA
+    AAAAAAAAAAAAAAAAAAsCAgIMAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAKip
+    qKkAAAAAAAAAAAAAAAAAAAALAgICDAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+    AAC4ubi5AAAAAACoqaipAAAAAAAACwICAgwAAAAAhIWFhYWFhYWFhgAAAAAAhIWF
+    hYWFhYWFhYWFhYYAAAAAuLm4uQCnAAAAAAsCAgIMAAAAAJSVlZWVlZWVlZYAqKkA
+    AJSVlZWVlZWVlZWVlZWWAAAAqKmoqaippwAAAAArGBgCDAAAAACUlZWVlZWVlZWW
+    ALi5AACUlZWVlZWVlZWVlZWVlgAAALi5uLm4uaenAAAAAC5LAgwAAAAAlJWVlZWV
+    lZWVlqipqKkAlJWVlZWVlZWVlZWVlZYAqKmoqaipqKmoqQAAAAAuSwIMAAAAAKSl
+    paWlpaWlpaa4ubi5AKSlpaWlpaWlpaWlpaWmALi5uLm4ubi5uLkAAAAALksCDQMD
+    AwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMD
+    AgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIC
+    AgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIC
+    AgICAgICAgI=
+  </map>
+  <entrance name="start" x="64" y="164" orientation="down-right"/>
+  <entrance name="right_door" x="792" y="164" orientation="down-left"/>
+  <entity-group name="init">
+    <entity entity="avoid_ledges" x="392" y="90" parameter="0"/>
+    <entity entity="jumping_bug" x="470" y="170" parameter="0"/>
+  </entity-group>
+  <script name="Startup">
+    <statement opcode="Spawn_Entity_Group" arg1="init"/>
+  </script>
+  <script name="right_door">
+    <statement opcode="Load_Room" arg1="a3b_sloped_room" arg2="left_door"/>
+  </script>
+  <script-trigger script="right_door" x="50" y="8" width="1" height="3"/>
+</room>

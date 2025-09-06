@@ -157,8 +157,9 @@ LevelNameData:
     // ::TODO fix margin on second line (add custom margins/active-section in console)::
     db  Project.RoomList.a1a_entrance, "Newbie's First\n  Solo Rescue", 0
     db  Project.RoomList.a2a_start, "Gravity Labs", 0
+    db  Project.RoomList.a3a_start, "The animal enclosures", 0
     db  0
 
-constant N_LEVELS = 2
+constant N_LEVELS = 3
 }
 

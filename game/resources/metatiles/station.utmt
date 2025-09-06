@@ -135,6 +135,7 @@
   <tile t="158" collision="solid"/>
   <tile t="159" collision="solid"/>
   <tile t="160" collision="solid"/>
+  <tile t="161" collision="solid"/>
   <tile t="164" collision="dp"/>
   <tile t="165" collision="dp"/>
   <tile t="166" collision="dp"/>
@@ -148,6 +149,7 @@
   <tile t="174" collision="solid"/>
   <tile t="175" collision="solid"/>
   <tile t="176" collision="solid"/>
+  <tile t="177" collision="solid"/>
   <tile t="184" collision="solid"/>
   <tile t="185" collision="solid"/>
   <tile t="186" collision="solid"/>

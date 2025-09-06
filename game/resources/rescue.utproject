@@ -119,7 +119,7 @@
         <entry-field for="shieldDirection" value="0"/>
         <entry-field for="xMomentum" value="0x010000"/>
       </entry>
-      <entry name="jump_and_shoot_low" function-table="JumpTowardsPlayer" projectileid="LeftRightBullet" listid="enemies" frameset="jump_and_shoot" frame="land_1" palette="0">
+      <entry name="jump_and_shoot_low" function-table="JumpTowardsPlayer" projectileid="LeftRightBullet" listid="enemies" frameset="jump_and_shoot" frame="land_2" palette="0">
         <entry-field for="airXMomentum" value="0"/>
         <entry-field for="airYMomentum" value="0x020000"/>
         <entry-field for="knockback" value="1"/>
@@ -128,7 +128,7 @@
         <entry-field for="swimXMomentum" value="0"/>
         <entry-field for="swimYMomentum" value="0x00c000"/>
       </entry>
-      <entry name="jump_and_shoot_high" function-table="JumpTowardsPlayer" projectileid="LeftRightBullet" listid="enemies" frameset="jump_and_shoot" frame="land_2" palette="0">
+      <entry name="jump_and_shoot_high" function-table="JumpTowardsPlayer" projectileid="LeftRightBullet" listid="enemies" frameset="jump_and_shoot" frame="rise" palette="0">
         <entry-field for="airXMomentum" value="0"/>
         <entry-field for="airYMomentum" value="0x042000"/>
         <entry-field for="knockback" value="1"/>
@@ -140,8 +140,8 @@
       <entry name="walking_tank" function-table="WalkAvoidLedges" projectileid="SmallFireball" listid="enemies" frameset="walking_tank" frame="walk_right_1" palette="0">
         <entry-field for="knockback" value="1"/>
         <entry-field for="shieldDirection" value="0"/>
-        <entry-field for="speed" value="0x003000"/>
-        <entry-field for="underwaterSpeed" value="0x004000"/>
+        <entry-field for="speed" value="0x002d00"/>
+        <entry-field for="underwaterSpeed" value="0x002000"/>
       </entry>
       <entry name="walking_tank_boss" function-table="WalkingTankBoss" projectileid="UpDiagonalFireball" listid="enemies" frameset="walking_tank_boss" frame="walk_right_1" palette="0">
         <entry-field for="knockback" value="1"/>
@@ -239,6 +239,9 @@
   <room-file src="rooms/a2d-up-down-gravity.utroom"/>
   <room-file src="rooms/a2e-up-gravity.utroom"/>
   <room-file src="rooms/a2f-end.utroom"/>
+  <room-file src="rooms/a3a-start.utroom"/>
+  <room-file src="rooms/a3b-sloped-room.utroom"/>
+  <room-file src="rooms/a3c-the-enclosure.utroom"/>
   <room-file src="rooms/a3_boss.utroom"/>
   <scene-setting name="TitleScreen" bg-mode="1" layer0-type="bg-image" layer1-type="bg-image" layer2-type="bg-image" layer3-type=""/>
   <scene-setting name="Credits" bg-mode="0" layer0-type="bg-image" layer1-type="" layer2-type="" layer3-type=""/>
