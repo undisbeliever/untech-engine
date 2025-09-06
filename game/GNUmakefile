@@ -1,5 +1,5 @@
 
-BINARY         := bin/rescue.sfc
+BINARY         := bin/space-rescue-squad.sfc
 DEBUG_BINARY   := bin/rescue-debug.sfc
 
 BASS_FLAGS     := -d RELEASE_BUILD
