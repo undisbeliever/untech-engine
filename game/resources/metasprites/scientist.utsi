@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF_8"?>
+<!DOCTYPE untech>
+<spriteimporter id="scientist" tilesettype="ONE_ROW_FIXED" exportorder="scientist" image="scientist.png">
+  <grid width="32" height="48" xoffset="0" yoffset="0" xpadding="0" ypadding="0" xorigin="16" yorigin="27"/>
+  <palette position="TOP_LEFT" npalettes="1" colorsize="1"/>
+  <frame id="stand_left" order="2">
+    <gridlocation x="1" y="0"/>
+    <tilehitbox x="12" y="15" width="8" height="24"/>
+    <object size="large" x="8" y="10"/>
+    <object size="large" x="8" y="26"/>
+  </frame>
+  <frame id="falling_left" order="2">
+    <gridlocation x="2" y="0"/>
+    <tilehitbox x="12" y="15" width="8" height="24"/>
+    <object size="large" x="7" y="10"/>
+    <object size="large" x="8" y="26"/>
+  </frame>
+  <frame id="crouched_left" order="2">
+    <gridlocation x="3" y="0"/>
+    <tilehitbox x="12" y="15" width="8" height="24"/>
+    <object size="small" x="12" y="18"/>
+    <object size="large" x="8" y="26"/>
+  </frame>
+  <animation id="stand_left" durationformat="FRAME">
+    <aframe frame="stand_left" duration="255"/>
+  </animation>
+  <animation id="falling_left" durationformat="FRAME">
+    <aframe frame="falling_left" duration="255"/>
+  </animation>
+  <animation id="crouching_left" durationformat="FRAME">
+    <aframe frame="crouched_left" duration="255"/>
+  </animation>
+</spriteimporter>

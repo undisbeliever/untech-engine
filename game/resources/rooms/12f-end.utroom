@@ -15,7 +15,8 @@
   </map>
   <entrance name="door" x="112" y="162" orientation="down-right"/>
   <entity-group name="init">
-    <entity entity="jump_and_shoot_low" x="386" y="168" parameter="0"/>
+    <entity entity="scientist" x="383" y="144" parameter="0"/>
+    <entity entity="scientist" x="405" y="142" parameter="0"/>
   </entity-group>
   <script name="Startup">
     <statement opcode="Spawn_Entity_Group" arg1="init"/>

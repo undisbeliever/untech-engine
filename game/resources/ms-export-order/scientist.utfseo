@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF_8"?>
+<!DOCTYPE untech>
+<fsexportorder name="scientist">
+  <animation id="stand_left">
+    <alt name="stand_right" hflip="true"/>
+  </animation>
+  <animation id="stand_right">
+    <alt name="stand_left" hflip="true"/>
+  </animation>
+  <animation id="stand_left_up">
+    <alt name="stand_left" vflip="true"/>
+    <alt name="stand_right" hflip="true" vflip="true"/>
+  </animation>
+  <animation id="stand_right_up">
+    <alt name="stand_left" hflip="true" vflip="true"/>
+    <alt name="stand_right" hflip="true"/>
+  </animation>
+  <animation id="falling_left">
+    <alt name="falling_right" hflip="true"/>
+  </animation>
+  <animation id="falling_right">
+    <alt name="falling_left" hflip="true"/>
+  </animation>
+  <animation id="falling_left_up">
+    <alt name="falling_left" vflip="true"/>
+    <alt name="falling_right" hflip="true" vflip="true"/>
+  </animation>
+  <animation id="falling_right_up">
+    <alt name="falling_left" hflip="true" vflip="true"/>
+    <alt name="falling_right" hflip="true"/>
+  </animation>
+  <animation id="crouching_left">
+    <alt name="crouching_right" hflip="true"/>
+  </animation>
+  <animation id="crouching_right">
+    <alt name="crouching_left" hflip="true"/>
+  </animation>
+  <animation id="crouching_left_up">
+    <alt name="crouching_left" vflip="true"/>
+    <alt name="crouching_right" hflip="true" vflip="true"/>
+  </animation>
+  <animation id="crouching_right_up">
+    <alt name="crouching_left" hflip="true" vflip="true"/>
+    <alt name="crouching_right" hflip="true"/>
+  </animation>
+</fsexportorder>

@@ -96,6 +96,7 @@ include "entities/jump-around-spawn.inc"
 include "entities/jump-towards-player.inc"
 include "entities/move-left-right.inc"
 include "entities/security-bot.inc"
+include "entities/scientist.inc"
 include "entities/walk-and-turn.inc"
 include "entities/walk-avoid-ledges.inc"
 
@@ -148,8 +149,6 @@ a16()
             jmp     SwitchMode
         NoSave:
     }
-
-    wdm #1
 
     lda.w   #Mode.TITLE_SCREEN
     jmp     SwitchMode

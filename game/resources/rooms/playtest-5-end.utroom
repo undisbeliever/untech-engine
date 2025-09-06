@@ -3,15 +3,25 @@
 <room name="playtest_5_end" scene="station">
   <map width="16" height="14">
     AgICAgICAgICAgICAgICAgIdGBgYGBgYGBgYGBgYHAICDAAAAAAAAAAAAAAAAAsC
-    AgxLS0sASwAASwBLSwALAgIMSwAAAEtLAEsASwBLCwICDEtLSwBLS0tLAEsASwsC
-    AgxLAAAASwBLSwBLAEsLAgIMS0tLAEsAAEsAS0sACwICDAAAAAAAAAAAAAAAAAsC
-    AgwAAD4AAAAAAAAAAAALAgIMAAA+AAAAAAAAAAAACwICDQMDBQMDAwMDAwMDAwoC
+    AgwAAAAAAAAAAAAAAAALAgIMAAAAAAAAAAAAAAAACwICDAAAAAAAAAAAAAAAAAsC
+    AgwAAAAAAAAAAAAAAAALAgIMAAAAAAAAAQAAAAAACwICDAAAAAAAAAEAAAAAAAsC
+    AgwAAD4AAAABAAAAAAALAgIMAAA+AAAAAQAAAAAACwICDQMDBQMDAwMDAwMDAwoC
     AgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgI=
   </map>
   <entrance name="door" x="80" y="162" orientation="down-right"/>
-  <script name="Startup"/>
+  <entity-group name="init">
+    <entity entity="scientist" x="192" y="164" parameter="0"/>
+    <entity entity="scientist" x="202" y="164" parameter="0"/>
+    <entity entity="scientist" x="180" y="164" parameter="0"/>
+    <entity entity="scientist" x="168" y="164" parameter="0"/>
+  </entity-group>
+  <script name="Startup">
+    <statement opcode="Spawn_Entity_Group" arg1="init"/>
+  </script>
   <script name="door">
     <statement opcode="Load_Room" arg1="playtest_4_tower" arg2="top"/>
   </script>
+  <script name="level_complete"/>
   <script-trigger script="door" x="4" y="11" width="1" height="1"/>
+  <script-trigger script="level_complete" x="8" y="7" width="1" height="4" once="true"/>
 </room>

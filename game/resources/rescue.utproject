@@ -64,6 +64,7 @@
     <function-table name="UpDiagonalProjectile" type="projectile" struct="DiagonalProjectile" export-order="left_right_projectile" parameter-type="unused"/>
     <function-table name="WalkingTankBoss" type="entity" struct="BaseEnemy" export-order="walking_tank_boss" parameter-type="unused"/>
     <function-table name="BossNet" type="entity" export-order="boss_net" parameter-type="unsigned"/>
+    <function-table name="Scientist" type="entity" export-order="scientist" parameter-type="unsigned"/>
     <entities>
       <entry name="cleaning_bot_slow" function-table="WalkAndTurn" listid="enemies" frameset="cleaning_bot" frame="left" palette="0">
         <entry-field for="knockback" value="1"/>
@@ -145,6 +146,7 @@
         <entry-field for="underwaterSpeed" value="0x004000"/>
       </entry>
       <entry name="boss_net" function-table="BossNet" listid="particles" frameset="boss_net" frame="small" palette="0"/>
+      <entry name="scientist" function-table="Scientist" listid="particles" frameset="scientist" frame="stand_left" palette="0"/>
     </entities>
     <projectiles>
       <entry name="PlayerProjectile" function-table="PlayerProjectile" listid="playerProjectiles" frameset="player_projectile" frame="frame1" palette="0"/>
@@ -185,6 +187,7 @@
   <exportorder src="ms-export-order/left-right-projectile.utfseo"/>
   <exportorder src="ms-export-order/walking-tank-boss.utfseo"/>
   <exportorder src="ms-export-order/boss-net.utfseo"/>
+  <exportorder src="ms-export-order/scientist.utfseo"/>
   <frameset src="metasprites/player.utsi" type="spriteimporter"/>
   <frameset src="metasprites/cleaning-bot.utsi" type="spriteimporter"/>
   <frameset src="metasprites/player-projectile.utsi" type="spriteimporter"/>
@@ -199,6 +202,7 @@
   <frameset src="metasprites/large-fireball.utsi" type="spriteimporter"/>
   <frameset src="metasprites/large-diagonal-fireball.utsi" type="spriteimporter"/>
   <frameset src="metasprites/boss-net.utsi" type="spriteimporter"/>
+  <frameset src="metasprites/scientist.utsi" type="spriteimporter"/>
   <palette name="blocky" image="palettes/blocky.png" rows-per-frame="8" animation-delay="35"/>
   <palette name="station" image="palettes/station.png" rows-per-frame="8" animation-delay="255"/>
   <palette name="title_screen" image="palettes/title-screen.png" rows-per-frame="4" skip-first="true" animation-delay="50"/>
