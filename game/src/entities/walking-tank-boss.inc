@@ -542,7 +542,7 @@ function SetState__Defeated {
     ldy.b   EntityStruct.instanceId
     SpawnEntity(boss_net)
 
-    ldy.w   #{GetAnimationId(wall_collision_left)}
+    ldy.w   #{GetAnimationId(defeated_left)}
     jmp     SetAnimation_Facing_Y
 }
 
