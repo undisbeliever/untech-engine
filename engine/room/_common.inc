@@ -162,6 +162,8 @@ i16()
     // ::TODO define multiple cameras and select active camera::
     jsr     Camera.CenterOnPlayer
 
+    jsr     Entity._UpdateActiveWindows
+
 
     Scripting._ProcessRoomStartupScript()
 
