@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF_8"?>
+<!DOCTYPE untech>
+<spriteimporter id="crew_rescued" tilesettype="TWO_ROWS" exportorder="crew_rescued" image="crew-rescued.png">
+  <grid width="142" height="66" xoffset="0" yoffset="0" xpadding="0" ypadding="0" xorigin="71" yorigin="33"/>
+  <frame id="crew" order="2">
+    <gridlocation x="0" y="0"/>
+    <object size="large" x="32" y="8"/>
+    <object size="large" x="48" y="8"/>
+    <object size="large" x="64" y="8"/>
+    <object size="large" x="80" y="8"/>
+    <object size="large" x="96" y="8"/>
+    <object size="small" x="32" y="24"/>
+    <object size="small" x="40" y="24"/>
+    <object size="small" x="48" y="24"/>
+    <object size="small" x="56" y="24"/>
+    <object size="small" x="64" y="24"/>
+    <object size="small" x="72" y="24"/>
+    <object size="small" x="80" y="24"/>
+    <object size="small" x="88" y="24"/>
+    <object size="small" x="96" y="24"/>
+    <object size="small" x="104" y="24"/>
+    <object size="small" x="24" y="11"/>
+    <object size="small" x="24" y="19"/>
+  </frame>
+  <frame id="rescued" order="2">
+    <gridlocation x="0" y="0"/>
+    <object size="large" x="9" y="34"/>
+    <object size="large" x="25" y="34"/>
+    <object size="large" x="41" y="34"/>
+    <object size="large" x="57" y="34"/>
+    <object size="large" x="73" y="34"/>
+    <object size="small" x="9" y="50"/>
+    <object size="small" x="17" y="50"/>
+    <object size="small" x="25" y="50"/>
+    <object size="small" x="33" y="50"/>
+    <object size="small" x="41" y="50"/>
+    <object size="small" x="49" y="50"/>
+    <object size="small" x="57" y="50"/>
+    <object size="small" x="65" y="50"/>
+    <object size="small" x="73" y="50"/>
+    <object size="small" x="81" y="50"/>
+    <object size="large" x="89" y="34"/>
+    <object size="large" x="105" y="34"/>
+    <object size="large" x="121" y="34"/>
+    <object size="small" x="89" y="50"/>
+    <object size="small" x="97" y="50"/>
+    <object size="small" x="105" y="50"/>
+    <object size="small" x="113" y="50"/>
+    <object size="small" x="121" y="50"/>
+    <object size="small" x="129" y="50"/>
+  </frame>
+</spriteimporter>

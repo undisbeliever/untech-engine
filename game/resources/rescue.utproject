@@ -8,7 +8,10 @@
     <word index="1" name="playerHealth" value="6"/>
     <word index="2" name="waterPosition" value="0"/>
   </game-state>
-  <bytecode/>
+  <bytecode>
+    <instruction name="Crew_Rescued"/>
+    <instruction name="Clear_Map_Horizontal" arg1="immediate-u16" arg2="immediate-u16" yields="true"/>
+  </bytecode>
   <interactive-tiles>
     <tile-function-table name="PlayerScriptTrigger" tint="4a4aff"/>
     <tile-function-table name="PlayerActivateScriptTrigger" tint="4a4aff"/>
@@ -65,6 +68,7 @@
     <function-table name="WalkingTankBoss" type="entity" struct="BaseEnemy" export-order="walking_tank_boss" parameter-type="unused"/>
     <function-table name="BossNet" type="entity" export-order="boss_net" parameter-type="unsigned"/>
     <function-table name="Scientist" type="entity" export-order="scientist" parameter-type="unsigned"/>
+    <function-table name="CrewRescued" type="entity" export-order="crew_rescued" parameter-type="unsigned" comment="0 = top, 1=bottom"/>
     <entities>
       <entry name="cleaning_bot_slow" function-table="WalkAndTurn" listid="enemies" frameset="cleaning_bot" frame="left" palette="0">
         <entry-field for="knockback" value="1"/>
@@ -147,6 +151,7 @@
       </entry>
       <entry name="boss_net" function-table="BossNet" listid="particles" frameset="boss_net" frame="small" palette="0"/>
       <entry name="scientist" function-table="Scientist" listid="particles" frameset="scientist" frame="stand_left" palette="0"/>
+      <entry name="crew_rescued" function-table="CrewRescued" listid="particles" frameset="crew_rescued" frame="crew" palette="0"/>
     </entities>
     <projectiles>
       <entry name="PlayerProjectile" function-table="PlayerProjectile" listid="playerProjectiles" frameset="player_projectile" frame="frame1" palette="0"/>
@@ -188,6 +193,7 @@
   <exportorder src="ms-export-order/walking-tank-boss.utfseo"/>
   <exportorder src="ms-export-order/boss-net.utfseo"/>
   <exportorder src="ms-export-order/scientist.utfseo"/>
+  <exportorder src="ms-export-order/crew-rescued.utfseo"/>
   <frameset src="metasprites/player.utsi" type="spriteimporter"/>
   <frameset src="metasprites/cleaning-bot.utsi" type="spriteimporter"/>
   <frameset src="metasprites/player-projectile.utsi" type="spriteimporter"/>
@@ -203,6 +209,7 @@
   <frameset src="metasprites/large-diagonal-fireball.utsi" type="spriteimporter"/>
   <frameset src="metasprites/boss-net.utsi" type="spriteimporter"/>
   <frameset src="metasprites/scientist.utsi" type="spriteimporter"/>
+  <frameset src="metasprites/crew-rescued.utsi" type="spriteimporter"/>
   <palette name="blocky" image="palettes/blocky.png" rows-per-frame="8" animation-delay="35"/>
   <palette name="station" image="palettes/station.png" rows-per-frame="8" animation-delay="255"/>
   <palette name="title_screen" image="palettes/title-screen.png" rows-per-frame="4" skip-first="true" animation-delay="50"/>

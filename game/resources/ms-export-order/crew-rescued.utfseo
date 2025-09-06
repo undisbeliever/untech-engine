@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF_8"?>
+<!DOCTYPE untech>
+<fsexportorder name="crew_rescued">
+  <frame id="crew"/>
+  <frame id="rescued"/>
+</fsexportorder>

@@ -1,0 +1,5 @@
+ * Font: DejaVu Sans Condensed size 28 bold
+ * Manually adjusted
+ * 4 direction outside outline
+ * bottom-right outside outline
+

@@ -51,9 +51,11 @@ a8()
     lda.b   #Song.MainLevelTheme
     jsr     Audio.LoadSongIfChanged
 
+
+    stz.b   crewRescuedFlag
+
     rep     #$20
 a16()
-
 
     stz.w   nPlayerProjectiles
 

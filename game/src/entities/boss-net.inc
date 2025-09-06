@@ -120,7 +120,8 @@ function Process {
                 rep     #$30
             a16()
 
-                // ::TODO Spawn CREW RESCUED sprite::
+                ldy.w   #0
+                SpawnEntity(crew_rescued)
 
                 bra     End
         +

@@ -7,9 +7,9 @@
     AgwAAAAAAAAAAAAAAAAAAAAAAACAAABeXl4AAAAAAEsCDAAAAAAAAAAAAAAAAAAA
     AAAAAIAAAF5eXgAAAAAASwIMAAAAAAAAAAAAAAAAAAAAAAAAgAAAAAAAAAAAAABL
     AgwAAAAAAAAAAAAAAAAAAAAAAACAAAAAAAAAAAAAAEsCDAAAAAAAAAAAAADl5QAA
-    AAAAAIAAAAAAAAAAAAAASwIM2NnY2QDY2djZAOXlAAAAAAAAgAAAAAAAAAAAAABL
+    AAAAAYAAAAAAAAAAAAAASwIM2NnY2QDY2djZAOXlAAAAAAABgAAAAAAAAAAAAABL
     Agzo6ejpPujp6OkA5eUAAOTkAAGAAABOTk4AAAAAAEsCDPj5+Pk++Pn4+QAAAADw
-    8fX2AYAAAE5OTgAAAAAASwINAwMDAwUDAwMDAwMDAwMDAwMDAwMDmpucAwMDAwMD
+    8fX2AYAAAE5OTgAAAAAASwINAwMDAwUDAwMDAwMDAwMDAwMEAwMDmpucAwMDAwMD
     AgICAgICAgICAgICAgICAgICAgICAgKqq6wCAgICAgICAgICAgICAgICAgICAgIC
     AgICAgICAqqrrAICAgICAg==
   </map>
@@ -24,7 +24,11 @@
   <script name="door">
     <statement opcode="Load_Room" arg1="a2e_up_gravity_room" arg2="right_door"/>
   </script>
-  <script name="rescued"/>
+  <script name="rescued">
+    <statement opcode="Clear_Map_Horizontal" arg1="0x5c9" arg2="3"/>
+    <statement opcode="Clear_Map_Horizontal" arg1="0x5ca" arg2="3"/>
+    <statement opcode="Crew_Rescued"/>
+  </script>
   <script-trigger script="door" x="6" y="11" width="1" height="1"/>
-  <script-trigger script="rescued" x="19" y="9" width="1" height="3"/>
+  <script-trigger script="rescued" x="19" y="7" width="1" height="5" once="true"/>
 </room>

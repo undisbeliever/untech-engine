@@ -30,6 +30,10 @@ allocate(currentMode, wram7e, 2)
 allocate(nPlayerProjectiles, wram7e, 2)
 
 
+// If non-zero, the crew has been rescued
+allocate(crewRescuedFlag, wram7e, 1)
+
+
 
 namespace InputBuffer {
 

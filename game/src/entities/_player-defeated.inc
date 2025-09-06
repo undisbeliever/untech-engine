@@ -27,10 +27,17 @@ namespace Players {
 
 namespace Defeated {
 
-allocate(frameCountdown, wram7e, 2)
-
 
 constant FRAMES_BEFORE_LEVEL_SCREEN = 120
+
+
+namespace EntityStruct {
+    childstruct(BaseEntity)
+        field(frameCountdown, 2)
+
+        field(gotoNextLevel, 1)
+    endstruct()
+}
 
 
 buildFunctionTable(BasePlayerFunctionTable, Defeated)
@@ -53,11 +60,32 @@ inline SwitchToDefeatedPlayer() {
     beq     EndIf{#}
         stx.w   Entity.playerEntity + BaseEntity.functionTable
 
+        stz.w   Entity.playerEntity + Entities.Players.Defeated.EntityStruct.gotoNextLevel
+
         ldx.w   #Entities.Players.Defeated.FRAMES_BEFORE_LEVEL_SCREEN - 1
-        stx.w   Entities.Players.Defeated.frameCountdown
+        stx.w   Entity.playerEntity + Entities.Players.Defeated.EntityStruct.frameCountdown
 
         // ::TODO switch to defeated song::
     EndIf{#}:
+}
+
+
+
+// REQUIRES: 16 bit A, 16 bit Index, DB = 0x7e
+//
+// DP unknown
+inline SwitchToVictoriousPlayer() {
+    assert8a()
+    assert16i()
+
+    ldx.w   #Entities.Players.Defeated.FunctionTable
+    stx.w   Entity.playerEntity + BaseEntity.functionTable
+
+    lda.b   #1
+    sta.w   Entity.playerEntity + Entities.Players.Defeated.EntityStruct.gotoNextLevel
+
+    ldx.w   #Entities.CrewRescued.FRAMES_UNTIL_NEXT_LEVEL - 1
+    stx.w   Entity.playerEntity + Entities.Players.Defeated.EntityStruct.frameCountdown
 }
 
 
@@ -85,14 +113,23 @@ i16()
 code()
 function Process {
     // Switch to level name screen after a delay
-    dec.w   frameCountdown
-    bpl     +
-        // ::TODO save and reload gamestate::
+    dec.b   EntityStruct.frameCountdown
+    bpl     NoTransition
+        sep     #$20
+    a8()
+        lda.b   EntityStruct.gotoNextLevel
+        beq     +
+            LevelNameScreen.NextLevel()
+        +
 
-        lda.w   #Mode.LEVEL_NAME
+        // ::TODO save and reload gamestate if gotoNextLevel is 0)::
+
+        lda.b   #Mode.LEVEL_NAME
         sta.w   currentMode
-    +
 
+        rep     #$30
+    a16()
+NoTransition:
 
     ldx.w   #MovementTableIndex.PlayerWalk
     jsr     DecelerateXmomentum

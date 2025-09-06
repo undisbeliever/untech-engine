@@ -21,7 +21,9 @@
   <script name="door">
     <statement opcode="Load_Room" arg1="playtest_4_tower" arg2="top"/>
   </script>
-  <script name="level_complete"/>
+  <script name="level_complete">
+    <statement opcode="Crew_Rescued"/>
+  </script>
   <script-trigger script="door" x="4" y="11" width="1" height="1"/>
   <script-trigger script="level_complete" x="8" y="7" width="1" height="4" once="true"/>
 </room>

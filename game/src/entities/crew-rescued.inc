@@ -23,29 +23,26 @@
 
 
 namespace Entities {
-namespace Scientist {
+namespace CrewRescued {
 
 
-namespace State {
-    createEnum(0, 2)
-        enum(NORMAL)
-        enum(CROUCHED)
-    endEnum()
-}
+constant SPRITE_XPOS = 128 - INT_MS8_OFFSET
+constant SPRITE_YPOS = 80 - INT_MS8_OFFSET
 
-ProcessFunctionTable:
-    dw  Process__Normal
-    dw  Process__Crouched
+constant FRAME_0_DISPLAY_COUNTDOWN = 0
+constant FRAME_1_DISPLAY_COUNTDOWN = 45
+
+constant FRAMES_UNTIL_NEXT_LEVEL = 200
 
 
-buildFunctionTable(BaseEntityFunctionTable, Scientist)
+buildFunctionTable(BaseEntityFunctionTable, CrewRescued)
 
 
 namespace EntityStruct {
     childstruct(BaseEntity)
-        field(state, 2)
+        field(frame, 2)
 
-        field(tmp, 2)
+        field(displayCountdown, 2)
     endstruct()
 }
 
@@ -53,46 +50,54 @@ namespace EntityStruct {
 
 // REQUIRES: 16 bit A, 16 bit Index, DB = 0x7e
 // INPUT: DP = entity
-//         A = facing direction
+//         A = top/bottom half
 // OUTPUT: C set = always activate entity
 a16()
 i16()
 code()
 function Init {
+    and.w   #1
+    sta.b   EntityStruct.frame
+    SetFrame_A()
+
     sep     #$20
 a8()
+    lda.b   #1
+    sta.w   crewRescuedFlag
 
-    // A.bit0 = left/right flag
-    // A.bit1 = down/up gravity
-    // A.bit2 = crouching
-    sta.b   EntityStruct.tmp
+    ldx.w   #FRAME_1_DISPLAY_COUNTDOWN
 
-    lsr.b   EntityStruct.tmp
-    bcc     +
-        lda.b   #Entity.MovementState.MOVING_DOWN_FLAG | Entity.MovementState.FACING_RIGHT_FLAG
-        tsb.b   EntityStruct.movementState
+    lda.b   EntityStruct.frame
+    bne     +
+        Entities.Players.Defeated.SwitchToVictoriousPlayer()
+
+        lda.b   #Song.VictoryTheme
+        jsr     Audio.LoadSong
+
+        rep     #$30
+    a16()
+
+        lda.w   #Project.EntityIds.crew_rescued
+        ldy.w   #1
+        jsr     Entity.Spawn
+
+        ldx.w   #FRAME_0_DISPLAY_COUNTDOWN
     +
 
-    lsr.b   EntityStruct.tmp
-    bcc     +
-        lda.b   #Entity.MovementState.UP_GRAVITY_FLAG
-        tsb.b   EntityStruct.movementState
-    +
-
-
-    ldx.w   #State.NORMAL
-    ldy.w   #{GetAnimationId(stand_left)}
-    lsr.b   EntityStruct.tmp
-    bcc     +
-        ldx.w   #State.CROUCHED
-        ldy.w   #{GetAnimationId(crouching_left)}
-    +
-
-    stx.b   EntityStruct.state
+au()
+    stx.b   EntityStruct.displayCountdown
 
     rep     #$30
 a16()
-    jmp     SetAnimation_FacingAndGravity_Y
+
+    ldx.w   #SPRITE_XPOS
+    stx.b   EntityStruct.xPos.px
+
+    ldx.w   #SPRITE_YPOS
+    stx.b   EntityStruct.yPos.px
+
+    sec
+    rts
 }
 
 
@@ -158,52 +163,19 @@ a16()
 i16()
 code()
 function Process {
-    ldx.b   EntityStruct.state
-    jsr     (ProcessFunctionTable,x)
+    dec.b   EntityStruct.displayCountdown
+    bpl     +
+        lda.b   EntityStruct.xPos.px
+        sta.w   MetaSprite.Render.xPos
 
-    jmp     Entity.DeactivateIfOutsideOrDrawAndGotoNextEntity
-}
+        lda.b   EntityStruct.yPos.px
+        sta.w   MetaSprite.Render.yPos
 
-
-// REQUIRES: 16 bit A, 16 bit Index, DB = 0x7e
-// INPUT: DP = entity
-a16()
-i16()
-code()
-function Process__Normal {
-    MoveEntityWithTileCollisionsAndInteractiveTiles()
-
-    ldy.w   #{GetAnimationId(stand_left)}
-    bra     _SetAnimation
-}
-
-
-// REQUIRES: 16 bit A, 16 bit Index, DB = 0x7e
-// INPUT: DP = entity
-a16()
-i16()
-code()
-function Process__Crouched {
-    MoveEntityAndProcessTileCollisions()
-
-    ldy.w   #{GetAnimationId(crouching_left)}
-    bra     _SetAnimation
-}
-
-
-// REQUIRES: 16 bit A, 16 bit Index, DB = 0x7e
-// INPUT: DP = entity
-// INPUT: Y = normal animation
-a16()
-i16()
-code()
-function _SetAnimation {
-    lda.b   EntityStruct.movementState
-    bit.w   #Entity.MovementState.STANDING_FLAG
-    bne     +
-        ldy.w   #{GetAnimationId(falling_left)}
+        ldx.b   EntityStruct.MetaSprite.currentFrame
+        jsr     MetaSprite.Render.RenderEntityFrameAndPos
     +
-    jmp     SetAnimation_FacingAndGravity_Y
+
+    jmp     Entity.GotoNextEntity
 }
 
 }

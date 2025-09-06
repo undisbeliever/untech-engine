@@ -72,9 +72,9 @@ if {defined DEBUG_BUILD} {
 }
 
 
+include "modes/level-name-screen.inc"
 include "entities/_player-defeated.inc"
 
-include "modes/level-name-screen.inc"
 include "modes/title-screen.inc"
 include "modes/credits.inc"
 
@@ -89,6 +89,7 @@ include "entities/_common.inc"
 include "entities/_movement.inc"
 include "entities/_player.inc"
 include "entities/base-walk-enemy.inc"
+include "entities/crew-rescued.inc"
 include "entities/left-right-projectile.inc"
 include "entities/up-diagonal-projectile.inc"
 include "entities/player-projectile.inc"

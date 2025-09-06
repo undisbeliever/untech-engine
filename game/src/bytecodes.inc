@@ -26,6 +26,80 @@ namespace Bytecode {
 
 CreateBgTasksFunctionTables()
 
+
+
+// ::TODO change to tile index::
+// ::TODO change to u8 second argument::
+constant Clear_Map_Horizontal___ImmU16_ImmU16 = YieldInstruction__4ByteArg
+
+// REQUIRES: 8 bit A, 16 bit Index, DB = 0x7e, DP = 0
+//
+// INPUT: Y - currentScriptIndex
+// RETURN: Jump to `ResumeInstruction_Sleep_Y` or `ResumeInstruction_GotoNextOpcode_Y`
+a8()
+i16()
+code()
+function Clear_Map_Horizontal___ImmU16_ImmU16___Resume {
+
+    rep     #$30
+a16()
+    lda.w   scripts.resumeArg1,y
+    tax
+
+    clc
+    adc.w   MetaTiles.map.bytesPerColumn
+    cmp.w   MetaTiles.map.dataSize
+    bcs     Done
+    sta.w   scripts.resumeArg1,y
+
+    txy
+    lda.w   #0
+    jsr     MetaTiles.SetMapCell
+
+
+    ldy.w   currentScriptIndex
+
+    lda.w   scripts.resumeArg2,y
+    dec
+    sta.w   scripts.resumeArg2,y
+    beq     Done
+    bmi     Done
+
+    jmp     ResumeInstruction_Sleep_Y
+
+
+Done:
+    sep     #$20
+a8()
+    jmp     ResumeInstruction_GotoNextOpcode_Y
+
+}
+
+
+// INPUT: Y - program counter
+// OUTPUT: programCounter - program counter after arguments
+// RETURN: Jump to GotoNextOpcode_LoadPC
+a8()
+i16()
+code()
+function Crew_Rescued {
+    sty.b   programCounter
+
+    lda.b   crewRescuedFlag
+    bne     EndIf
+        php
+
+        rep     #$30
+    a16()
+        lda.w   #Project.EntityIds.crew_rescued
+        ldy.w   #0
+        jsr     Entity.Spawn
+
+        plp
+EndIf:
+    jmp     GotoNextOpcode_LoadPC
+}
+
 }
 }
 
