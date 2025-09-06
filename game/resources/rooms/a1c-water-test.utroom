@@ -60,7 +60,7 @@
   <entrance name="left_door" x="40" y="178" orientation="down-right"/>
   <entrance name="right_door" x="1240" y="178" orientation="down-right"/>
   <entity-group name="init">
-    <entity entity="cleaning_bot_slow" x="182" y="132" parameter="1"/>
+    <entity entity="cleaning_bot_slow" x="182" y="138" parameter="1"/>
     <entity entity="avoid_ledges" x="531" y="136" parameter="1"/>
     <entity entity="jumping_bug" x="900" y="182" parameter="0"/>
     <entity entity="avoid_ledges" x="934" y="133" parameter="0"/>
