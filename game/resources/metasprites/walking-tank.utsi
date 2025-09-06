@@ -106,7 +106,7 @@
     <object size="small" x="16" y="3"/>
     <object size="small" x="23" y="11"/>
   </frame>
-  <frame id="defeated_right" order="2">
+  <frame id="defeated_right_1" order="2">
     <gridlocation x="3" y="1"/>
     <tilehitbox x="5" y="7" width="22" height="18"/>
     <object size="small" x="4" y="3"/>
@@ -115,6 +115,18 @@
     <object size="large" x="4" y="11"/>
     <object size="small" x="20" y="11"/>
     <object size="small" x="20" y="19"/>
+    <object size="small" x="24" y="0"/>
+  </frame>
+  <frame id="defeated_right_2" order="2">
+    <gridlocation x="4" y="1"/>
+    <tilehitbox x="5" y="7" width="22" height="18"/>
+    <object size="small" x="4" y="3"/>
+    <object size="small" x="12" y="3"/>
+    <object size="small" x="20" y="3"/>
+    <object size="large" x="4" y="11"/>
+    <object size="small" x="20" y="11"/>
+    <object size="small" x="20" y="19"/>
+    <object size="small" x="23" y="1"/>
   </frame>
   <animation id="walk_right" durationformat="DISTANCE_HORIZONTAL">
     <aframe frame="walk_right_1" duration="192"/>
@@ -129,7 +141,8 @@
     <aframe frame="turn_left_2" duration="20"/>
     <aframe frame="turn_left_1" hflip="true" duration="15"/>
   </animation>
-  <animation id="defeated_right" durationformat="TIME" oneshot="true">
-    <aframe frame="defeated_right" duration="25"/>
+  <animation id="defeated_right" durationformat="TIME">
+    <aframe frame="defeated_right_1" duration="25"/>
+    <aframe frame="defeated_right_2" duration="25"/>
   </animation>
 </spriteimporter>
