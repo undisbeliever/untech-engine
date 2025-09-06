@@ -286,7 +286,8 @@ i8()
     AssertForceBlank()
 
     // Disable HDMA (prevents a crash on model 1 consoles)
-    stz.w   HDMAEN
+    ldx.b   #0
+    stx.w   HDMAEN
 
     ldx.b   #MDMAEN.dma0
     stx.w   MDMAEN
