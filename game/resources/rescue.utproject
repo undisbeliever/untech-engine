@@ -137,7 +137,7 @@
         <entry-field for="swimXMomentum" value="0"/>
         <entry-field for="swimYMomentum" value="0x00c000"/>
       </entry>
-      <entry name="walking_tank" function-table="WalkAvoidLedges" projectileid="SlowLeftRightBullet" listid="enemies" frameset="walking_tank" frame="walk_right_1" palette="0">
+      <entry name="walking_tank" function-table="WalkAvoidLedges" projectileid="SmallFireball" listid="enemies" frameset="walking_tank" frame="walk_right_1" palette="0">
         <entry-field for="knockback" value="1"/>
         <entry-field for="shieldDirection" value="0"/>
         <entry-field for="speed" value="0x003000"/>
@@ -176,6 +176,11 @@
         <entry-field for="xMomentum" value="0x020000"/>
         <entry-field for="yMomentum" value="0x020000"/>
       </entry>
+      <entry name="SmallFireball" function-table="LeftRightProjectile" listid="enemyProjectiles" frameset="small_fireball" frame="frame1" palette="0">
+        <entry-field for="knockback" value="1"/>
+        <entry-field for="shieldDirection" value="0"/>
+        <entry-field for="xMomentum" value="0x028000"/>
+      </entry>
     </projectiles>
     <players>
       <entry name="player" function-table="Player" projectileid="PlayerProjectile" frameset="player" frame="standing_right" palette="0"/>
@@ -210,6 +215,7 @@
   <frameset src="metasprites/boss-net.utsi" type="spriteimporter"/>
   <frameset src="metasprites/scientist.utsi" type="spriteimporter"/>
   <frameset src="metasprites/crew-rescued.utsi" type="spriteimporter"/>
+  <frameset src="metasprites/small-fireball.utsi" type="spriteimporter"/>
   <palette name="blocky" image="palettes/blocky.png" rows-per-frame="8" animation-delay="35"/>
   <palette name="station" image="palettes/station.png" rows-per-frame="8" animation-delay="255"/>
   <palette name="title_screen" image="palettes/title-screen.png" rows-per-frame="4" skip-first="true" animation-delay="50"/>
