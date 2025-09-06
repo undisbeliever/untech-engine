@@ -21,63 +21,38 @@
 //
 //    3. This notice may not be removed or altered from any source distribution.
 
+namespace Scenes {
+namespace Credits {
 
-namespace Mode {
-    createEnum(0, 2)
-        enum(GAME)
-        enum(TITLE_SCREEN)
-        enum(LEVEL_NAME)
-        enum(CREDITS)
-    endEnum()
-}
-
-constant N_MODES = Mode.__ENUM__.count
-
-code()
-ModeFunctionTable:
-    dw  GameLoop
-    dw  TitleScreen.Run
-    dw  LevelNameScreen.Run
-    dw  CreditsScreen.Run
-assert(pc() - ModeFunctionTable == N_MODES * 2)
-
-
-
-// CAUTION: Changes Stack Pointer
-// IN: A = new mode
-au()
-iu()
-// DB unknown
-code()
-function SwitchMode {
-    // 16 bit A, 16 bit I, decimal mode disabled
-    rep #$38
 a16()
-i16()
-    // Reset stack
-    ldx.w   #STACK_BOTTOM
-    txs
-
-    // Reset DB (without setting A)
-    pea     0x7e7e
-    plb
-    plb
-
-    // Reset direct page (without changing A)
-    pea     0
-    pld
-
-    // A = new mode
-    and.w   #0xfe
-    cmp.w   #N_MODES * 2
-    bcc     +
-        lda.w   #Mode.TITLE_SCREEN
-    +
-    sta.w   currentMode
-    tax
-    jsr     (ModeFunctionTable,x)
-
-    bra     SwitchMode
+i8()
+// DB = 0x7e
+// DP = 0x2100
+code()
+function SetupPpu_dp2100 {
+    rts
 }
 
+
+a16()
+i8()
+// DB = 0x7e
+code()
+function Process {
+    rts
+}
+
+
+a16()
+i8()
+// DB = 0x80
+// DP = $2100
+farCode()
+function VBlank_dp2100 {
+    rts
+}
+
+
+}
+}
 

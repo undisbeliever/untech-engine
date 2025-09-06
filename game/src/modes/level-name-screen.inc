@@ -63,6 +63,16 @@ function Run {
 
     sep     #$20
 a8()
+
+    // Switch to credits when the last level is completed
+    lda.w   levelNumber
+    cmp.b   #N_LEVELS
+    bcc     +
+        lda.b   #Mode.CREDITS
+        rts
+    +
+
+
     lda.b   #Song.BLANK
     jsr     Audio.LoadSong
 
@@ -87,16 +97,10 @@ a8()
     // Clear Ah
     tdc
 
-    lda.w   levelNumber
-    cmp.b   #N_LEVELS
-    bcc     +
-        lda.b   #0
-        stz.w   levelNumber
-    +
-
     ldx.w   #LevelNameData
 
-    cmp.b   #0
+    // levelNumber is < N_LEVELS
+    lda.w   levelNumber
     beq     Found
         tay
 

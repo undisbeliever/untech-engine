@@ -76,6 +76,7 @@ include "entities/_player-defeated.inc"
 
 include "modes/level-name-screen.inc"
 include "modes/title-screen.inc"
+include "modes/credits.inc"
 
 include "input.inc"
 include "healthbar.inc"
@@ -105,6 +106,7 @@ include "interactive-tiles.inc"
 
 include "scenes/title-screen.inc"
 include "scenes/text.inc"
+include "scenes/credits.inc"
 include "scenes/basic-room.inc"
 include "scenes/water-room.inc"
 

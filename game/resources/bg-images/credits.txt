@@ -1,0 +1,8 @@
+
+Text is initially placed with GIMP
+ * DejaVu Serif Condensed
+ * Size 11 with an Adjust letter spacing of 0.5
+ * Size 13 with an Adjust letter spacing of 1.0
+
+Manually adjusted text in Aseprite
+
