@@ -197,17 +197,6 @@ constant _counter = zpTmp0
         jsl     WaitFrame__far
 
         lda.w   Controller.Joy1.pressed + 1
-        bit.b   #JOYH.select
-        beq     +
-            // Restart room
-            // ::TODO save and reload gamestate::
-            lda.b   #Mode.LEVEL_NAME
-            sta.w   currentMode
-
-            rts
-        +
-
-        lda.w   Controller.Joy1.pressed + 1
         bit.b   #JOYH.start
         beq     Loop
 

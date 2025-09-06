@@ -17,8 +17,7 @@ Controls
  * **A** melee attack
  * **X** shoot
  * **Up** enter doors
- * **Select** pause
- * **Select**, then **Select** - restart room
+ * **Start** pause
 
 
 License
